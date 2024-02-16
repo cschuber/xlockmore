@@ -22,8 +22,10 @@ static const char sccsid[] = "@(#)option.c	4.00 97/01/01 xlockmore";
  * 3: add a string ( char * ) after *inval=NULL,*geo=NULL
  * 4: add a callback like f_username with your new string
  * 5: copy and paste after
-   geometry=XtVaCreateManagedWidget("geometry",xmPushButtonGadgetClass,options,NULL);
-   XtAddCallback(geometry,XmNactivateCallback,f_geometry,NULL);
+   geometry = XtVaCreateManagedWidget("geometry",
+		xmPushButtonGadgetClass,options, NULL);
+   XtAddCallback(geometry,
+		XmNactivateCallback, f_geometry, NULL);
  *    change geometry by your name of widget, and f_geometry by the name
  *    of your new callback
  * 6: go to the church , call god for a miracle :)
@@ -51,14 +53,35 @@ static const char sccsid[] = "@(#)option.c	4.00 97/01/01 xlockmore";
 #include <Xm/ToggleBG.h>
 #elif defined(HAVE_XAW3D)
 #include <X11/StringDefs.h>
+#include <X11/Intrinsic.h>
 #include <X11/Xaw3d/Form.h>
+#include <X11/Xaw3d/Box.h>
+#include <X11/Xaw3d/SimpleMenu.h>
+#include <X11/Xaw3d/MenuButton.h>
+#include <X11/Xaw3d/SmeBSB.h>
+#include <X11/Xaw3d/Command.h>
 #define HAVE_ATHENA 1
 #elif defined(HAVE_ATHENA)
 #include <X11/StringDefs.h>
+#include <X11/Intrinsic.h>
 #include <X11/Xaw/Form.h>
+#include <X11/Xaw/Box.h>
+#include <X11/Xaw/SimpleMenu.h>
+#include <X11/Xaw/MenuButton.h>
+#include <X11/Xaw/SmeBSB.h>
+#include <X11/Xaw/Command.h>
 #endif
 
 #include "option.h"
+#ifdef HAVE_ATHENA
+#define check_width 16
+#define check_height 16
+static unsigned char check_bits[] = {
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0x00, 0x38, 0x00, 0x1e, 0x08, 0x0f,
+  0x8c, 0x07, 0xde, 0x03, 0xfe, 0x03, 0xfc, 0x01, 0xf8, 0x00, 0xf0, 0x00,
+  0x70, 0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00};
+int toggleState[numToggleNames];
+#endif
 
 /*#define OPTIONS 8*/
 /*#define REGULAR_OPTIONS (OPTIONS-2)*/
@@ -71,15 +94,13 @@ static const char sccsid[] = "@(#)option.c	4.00 97/01/01 xlockmore";
  * it associates the message , the command and the user data
  * this structure is describe in option.h
  ****************************************/
-OptionStruct Opt[]={
-      {(char *)"Enter the user name.",(char *)"username",NULL},
-      {(char *)"Enter the password message.",(char *)"password",NULL},
-      {(char *)"Enter the info message.",(char *)"info",NULL},
-      {(char *)"Enter the valid message.",(char *)"validate",NULL},
-      {(char *)"Enter the invalid message.",(char *)"invalid",NULL},
-      {(char *)"Enter the geometry mxn.",(char *)"geometry",NULL}
+
+static char *fileTypes[] =
+{
+	(char *) "Exit"
 };
 
+#define numFileTypes (sizeof(fileType) / sizeof(fileType[0]))
 
 static char *prognames[NBPROGNAME] =
 {
@@ -88,49 +109,21 @@ static char *prognames[NBPROGNAME] =
 	(char *) "echo hello world"
 };
 
-char *toggleNames[TOGGLES] =
-{
-        (char *) "allowaccess",
-        (char *) "allowroot",
-        (char *) "debug",
-        (char *) "echokeys",
-        (char *) "echokeys",
-        (char *) "enablesaver",
-        (char *) "fullrandom",
-        (char *) "grabmouse",
-        (char *) "grabmouse",
-        (char *) "grabserver",
-        (char *) "install",
-        (char *) "mousemotion",
-        (char *) "nolock",
-        (char *) "remote",
-        (char *) "sound",
-        (char *) "timeelapsed",
-        (char *) "trackmouse",
-        (char *) "use3d",
-        (char *) "usefirst",
-        (char *) "usefirst",
-        (char *) "verbose",
-        (char *) "wireframe",
-	(char *) "mono"
-
-};
-
-Widget      menuOption;
-static Widget Options[OPTIONS];
+Widget menuOption;
+Widget toggles[numToggleNames];
+static Widget options[numOptions];
 
 /* extern variables */
-extern int getNumberofElementofOpt(void);
-#ifdef HAVE_MOTIF
 extern Widget topLevel;
+#ifdef HAVE_MOTIF
 extern void setupOption(Widget menuBar);
-void exitcallback(Widget w, XtPointer client_data, XtPointer call_data);
+void exitCallback(Widget w, XtPointer client_data, XtPointer call_data);
+
 
 
 /* Widget */
 static Widget PromptDialog, FontSelectionDialog, ProgramSelectionDialog;
 
-Widget toggles[TOGGLES];
 
 
 /* string temp */
@@ -140,8 +133,8 @@ static char **whichone;
 static void
 managePrompt(char *s)
 {
-	int         ac;
-	Arg         args[3];
+	int ac;
+	Arg args[3];
 	XmString    label_str1, label_str2;
 
 	ac = 0;
@@ -167,10 +160,10 @@ managePrompt(char *s)
 
 /* CallBack */
 static void
-f_option(Widget w, XtPointer client_data, XtPointer call_data)
+optionListener(Widget w, XtPointer client_data, XtPointer call_data)
 {
-			whichone = &Opt[(long) client_data].userdata;
-			managePrompt(Opt[(long) client_data].description);
+	whichone = &Opt[(long) client_data].userdata;
+	managePrompt(Opt[(long) client_data].description);
 }
 
 #if 0
@@ -211,10 +204,10 @@ f_fontdia(Widget w, XtPointer client_data, XtPointer call_data)
  * Callback for the program dialog
 ******************************/
 static void f_programdia(Widget w, XtPointer client_data, XtPointer call_data) {
-			/*whichone = &c_Options[REGULAR_OPTIONS + 1];*/
+	/*whichone = &c_Options[REGULAR_OPTIONS + 1];*/
 /* PURIFY 4.0.1 on Solaris 2 reports a 71 byte memory leak on the next line. */
-			XtManageChild(ProgramSelectionDialog);
-	}
+	XtManageChild(ProgramSelectionDialog);
+}
 #endif
 
 static void
@@ -238,41 +231,61 @@ f_Dialog(Widget w, XtPointer client_data, XtPointer call_data)
 	*whichone = quoted_text;
 }
 
+#elif defined(HAVE_ATHENA)
+static Pixmap checkPixmap = None;
+void toggleCallback(Widget w, XtPointer client_data, XtPointer call_data)
+{
+	long position = (long) client_data;
+
+	toggleState[position] = (toggleState[position] != 0) ? 0: 1;
+	XtVaSetValues(toggles[position],
+		XtNrightBitmap, (toggleState[position]) ? checkPixmap : None,
+		NULL);
+}
+#endif
+
 /* Setup Widget */
 void
 setupOption(Widget menuBar)
 {
-	Arg         args[15];
 	int         i, ac = 0;
-	XmString    label_str;
-	Widget      listtmp, pulldownmenu,exitwidget;
+	Widget      listtmp, pulldownMenu, exitWidget;
 	XtPointer   iptr = 0;
+#ifdef HAVE_MOTIF
+	Arg         args[15];
+	XmString    label_str;
 
 /**
  ** Popup Menu File
  **/
-	pulldownmenu = XmCreatePulldownMenu(menuBar, (char *) "PopupFile",
+	pulldownMenu = XmCreatePulldownMenu(menuBar, (char *) "PopupFile",
 		(Arg *) NULL, 0);
 	label_str = XmStringCreateSimple((char *) "File");
-	XtVaCreateManagedWidget("File", xmCascadeButtonWidgetClass, menuBar,
-		XmNlabelString, label_str, XmNsubMenuId, pulldownmenu, NULL);
+	XtVaCreateManagedWidget("File",
+		xmCascadeButtonWidgetClass, menuBar,
+		XmNlabelString, label_str,
+		XmNsubMenuId, pulldownMenu, NULL);
 	XmStringFree(label_str);
-	exitwidget = XtVaCreateManagedWidget("Exit", xmPushButtonGadgetClass,
-		pulldownmenu, NULL);
-	XtAddCallback(exitwidget, XmNactivateCallback, exitcallback,NULL);
+	exitWidget = XtVaCreateManagedWidget("Exit",
+		xmPushButtonGadgetClass, pulldownMenu, NULL);
+	XtAddCallback(exitWidget,
+		XmNactivateCallback, exitCallback, NULL);
 
-	pulldownmenu = XmCreatePulldownMenu(menuBar, (char *) "PopupOptions",
+	pulldownMenu = XmCreatePulldownMenu(menuBar, (char *) "PopupOptions",
 		(Arg *) NULL, 0);
 	label_str = XmStringCreateSimple((char *) "Options");
-	XtVaCreateManagedWidget("Options", xmCascadeButtonWidgetClass, menuBar,
-		XmNlabelString, label_str, XmNsubMenuId, pulldownmenu, NULL);
+	XtVaCreateManagedWidget("Options",
+		xmCascadeButtonWidgetClass, menuBar,
+		XmNlabelString, label_str,
+		XmNsubMenuId, pulldownMenu, NULL);
 	XmStringFree(label_str);
 
 	for (i = 0; i < (int) (sizeof(Opt)/sizeof(OptionStruct)); i++) {
-		Options[i] = XtVaCreateManagedWidget(Opt[i].description,
-			/*xmToggleButtonGadgetClass, pulldownmenu, NULL);*/
-			xmPushButtonGadgetClass, pulldownmenu, NULL);
-		XtAddCallback(Options[i], XmNactivateCallback, f_option, iptr++);
+		options[i] = XtVaCreateManagedWidget(Opt[i].description,
+			/*xmToggleButtonGadgetClass, pulldownMenu, NULL);*/
+			xmPushButtonGadgetClass, pulldownMenu, NULL);
+		XtAddCallback(options[i],
+			XmNactivateCallback, optionListener, iptr++);
 	}
 /* PURIFY 4.0.1 on Solaris 2 reports a 12 byte memory leak on the next line. */
 	PromptDialog = XmCreatePromptDialog(topLevel, (char *) "PromptDialog",
@@ -299,23 +312,65 @@ setupOption(Widget menuBar)
 /**
  ** Make the menu with all options boolean
 ***/
-	pulldownmenu = XmCreatePulldownMenu(menuBar, (char *) "PopupSwitches",
+	pulldownMenu = XmCreatePulldownMenu(menuBar, (char *) "PopupSwitches",
 		(Arg *) NULL, 0);
 	label_str = XmStringCreateSimple((char *) "Switches");
-	XtVaCreateManagedWidget("Switches", xmCascadeButtonWidgetClass, menuBar,
-		XmNlabelString, label_str, XmNsubMenuId, pulldownmenu, NULL);
+	XtVaCreateManagedWidget("Switches",
+		xmCascadeButtonWidgetClass, menuBar,
+		XmNlabelString, label_str,
+		XmNsubMenuId, pulldownMenu, NULL);
 	XmStringFree(label_str);
 
-        for (i = 0; i < TOGGLES; i++) {
+	for (i = 0; i < numToggleNames; i++) {
 		toggles[i] = XtVaCreateManagedWidget(toggleNames[i],
-			xmToggleButtonGadgetClass, pulldownmenu, NULL);
+			xmToggleButtonGadgetClass, pulldownMenu, NULL);
 	}
+#elif defined(HAVE_ATHENA)
+	Widget w, fileMenu, fileLabel, switchesMenu, switchesLabel;
+	Display *dpy = XtDisplay(topLevel);
+
+	if (checkPixmap == None) {
+		checkPixmap = XCreateBitmapFromData(dpy,
+			RootWindow(dpy, DefaultScreen(dpy)),
+			(char *)check_bits, check_width, check_height);
+	}
+	fileLabel = XtVaCreateManagedWidget("File",
+		menuButtonWidgetClass, menuBar,
+		XtNborderWidth, 0,
+		/*XtNwidth, 202,*/
+		NULL);
+	fileMenu = XtVaCreatePopupShell("menu",
+		simpleMenuWidgetClass, fileLabel, NULL);
+	for (i = 0; i < 1; i++) {
+		w = XtVaCreateManagedWidget(fileTypes[i],
+			smeBSBObjectClass, fileMenu, NULL);
+		XtAddCallback(w,
+			XtNcallback, (XtCallbackProc) exitCallback,
+			(XtPointer) (size_t) i);
+	}
+	switchesLabel = XtVaCreateManagedWidget("Switches",
+		menuButtonWidgetClass, menuBar,
+		XtNborderWidth, 0,
+		XtNfromHoriz, fileLabel,
+		/*XtNwidth, 202,*/
+		NULL);
+	switchesMenu = XtVaCreatePopupShell("menu",
+		simpleMenuWidgetClass, switchesLabel, NULL);
+	for (i = 0; i < numToggleNames; i++) {
+		toggleState[i] = 0;
+		toggles[i] = XtVaCreateManagedWidget(toggleNames[i],
+			smeBSBObjectClass, switchesMenu, NULL);
+		XtVaSetValues(toggles[i],
+			XtNrightBitmap, (toggleState[i]) ? checkPixmap : None,
+			XtNrightMargin, 24, NULL); /* 16 + 2 * 4 */
+		XtAddCallback(toggles[i],
+			XtNcallback, (XtCallbackProc) toggleCallback,
+			(XtPointer) (size_t) i);
+	}
+	/*createList(menuBar, menu, label, "File", fileTypes, 1, NULL);*/
+	/*XtAddCallback(menu,
+		XtNcallback, exitCallback,
+		(XtPointer) NULL);*/
+	/*createList(menuBar, menu2, label2, "Switches", toggleNames, numToggleNames, menuForm);*/
+#endif
 }
-#endif 
-/*************************
- * this function return the number of
- * element of the array Opt
-**************************/
-int getNumberofElementofOpt(void) {
-	return( sizeof(Opt)/sizeof(OptionStruct));
-	}

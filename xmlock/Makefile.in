@@ -91,8 +91,8 @@ ECHO = echo
 #ECHO = write sys$output
 
 DEFS = @DEFS@ $(DEFINES) -DHAVE_MOTIF
-#DEFS = @DEFS@ $(DEFINES) -DHAVE_ATHENA # change -lXm to -Xaw
-#DEFS = @DEFS@ $(DEFINES) -DHAVE_XAW3D # change -lXm to -Xaw3d
+#DEFS = @DEFS@ $(DEFINES) -DHAVE_ATHENA # change -lXm to -lXaw
+#DEFS = @DEFS@ $(DEFINES) -DHAVE_XAW3D # change -lXm to -lXaw3d
 XMLOCKINC = @XMLOCKINC@ -I.. -I$(top_srcdir)
 CFLAGS = @CFLAGS@
 #CFLAGS = -O

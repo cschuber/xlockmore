@@ -14,6 +14,8 @@ XCOMM Define these now or down further below, see below for explanation.
 XCOMM #define CPPCompiler
 XCOMM #define XpmLibrary
 XCOMM #define XmLibrary
+XCOMM #define XawLibrary
+XCOMM #define Xaw3dLibrary
 XCOMM #define GLLibrary
 XCOMM #define TtfLibrary
 XCOMM #define GlttLibrary
@@ -127,6 +129,28 @@ XCOMM  EDITRESLIB = -lXmu
 #endif
 
 XCOMM   *** END XM CONFIG SECTION ***
+
+XCOMM   *** BEGIN XAW CONFIG SECTION ***
+
+XCOMM Only options.c and xmlock.c uses Athena.
+XCOMM Use as fallback if you have or want Motif.
+XCOMM If you have XAW3D use that instead of Athena.
+XCOMM If your system has libXaw, remove the 'XCOMM  ' from the next line.
+XCOMM  #define XawLibrary
+
+#ifdef XawLibrary
+XMDEF = -DHAVE_ATHENA
+XCOMM  XMDEF = -DHAVE_XAW3D
+
+XMLIB = -lXaw
+XCOMM  XMLIB = -lXaw3d
+
+XCOMM Debugging with editres
+XCOMM  EDITRESDEF = -DUSE_XMU
+XCOMM  EDITRESLIB = -lXmu
+#endif
+
+XCOMM   *** END XAW CONFIG SECTION ***
 
 XCOMM   *** BEGIN MESA AND OPENGL CONFIG SECTION ***
 

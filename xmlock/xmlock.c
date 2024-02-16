@@ -13,7 +13,7 @@ static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
  *
  * Revision History:
  * Jul-22: Awt option added.  Also cleaned up variables so I could read
-     easier.
+ *   easier.
  * Jun-03: Code added from Xlockup by Thad Phetteplace
  *     tdphette AT dexter.glaci.com
  *   Sun -- works (both timeouts seem connected to the same device)
@@ -80,6 +80,7 @@ static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
 #include <Xm/Scale.h>
 #elif defined(HAVE_XAW3D)
 #include <X11/StringDefs.h>
+#include <X11/Intrinsic.h>
 #include <X11/Xaw3d/Form.h>
 #include <X11/Xaw3d/Label.h>
 #include <X11/Xaw3d/Toggle.h>
@@ -93,6 +94,7 @@ static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
 #define HAVE_ATHENA 1
 #elif defined(HAVE_ATHENA)
 #include <X11/StringDefs.h>
+#include <X11/Intrinsic.h>
 #include <X11/Xaw/Form.h>
 #include <X11/Xaw/Label.h>
 #include <X11/Xaw/Toggle.h>
@@ -101,7 +103,7 @@ static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
 #include <X11/Xaw/SimpleMenu.h>
 #include <X11/Xaw/MenuButton.h>
 #include <X11/Xaw/SmeBSB.h>
-#include <X11/Xaw3d/Command.h>
+#include <X11/Xaw/Command.h>
 #include <X11/Xaw/Dialog.h>
 /*#include <X11/Xaw/AsciiText.h>*/
 #endif
@@ -122,7 +124,14 @@ extern pid_t  wait(int *);
 #define SKIPDELAY 60000 /* 1 minute */
 #define MAXMIN 120
 
-/* like an enum */
+static char *labelPushButtons[] =
+{
+	(char *) "Launch",
+	(char *) "In Root",
+	(char *) "In Window",
+};
+#define numButtons (sizeof(labelPushButtons) / sizeof(labelPushButtons[0]))
+
 enum ACTION {
 	LAUNCH=0,
 	ROOT,
@@ -131,10 +140,7 @@ enum ACTION {
 
 /* extern variable */
 extern Widget menuOption;
-extern Widget toggles[TOGGLES];
-extern OptionStruct Opt[];
-
-extern char *toggleNames[];
+extern Widget toggles[];
 
 static pid_t numberProcess = -1;	/* PID of xlock */
 
@@ -142,7 +148,6 @@ static pid_t numberProcess = -1;	/* PID of xlock */
  * To know the number of element
  * in the Opt Array
 **************************/
-extern int getNumberofElementofOpt(void);
 
 /* Widget */
 Widget topLevel;
@@ -150,15 +155,18 @@ static Widget labelXlock;
 static Widget timeoutSlider;
 #ifdef HAVE_ATHENA
 static Widget modeList, modeListLabel;
+static Widget menuBar, exitMenuButton;
+extern int toggleState[];
 #endif
-
 
 static time_t timeNow;
 
 /* If this worked on all systems it would be 30 min or 1800 */
 static long timeout = 0;
 
-static Widget scrolledListModes, pushButtons[PUSHBUTTONS];
+static int mode = 0;
+
+static Widget scrolledListModes, pushButtons[numButtons];
 
  /*Resource string */
 #include "modes.h"
@@ -169,19 +177,10 @@ static XmStringCharSet char_set = (XmStringCharSet) XmSTRING_DEFAULT_CHARSET;
 
 /* some resources of buttons and toggles not really good programming :( */
 
-static char *labelPushButtons[PUSHBUTTONS] =
-{
-	(char *) "Launch",
-	(char *) "In Root",
-	(char *) "In Window",
-};
-
-static int mode = 0;
-
 static void checkTime(void);
 /* CallBack */
 
-void exitcallback(Widget w, XtPointer client_data, XtPointer call_data)
+void exitCallback(Widget w, XtPointer client_data, XtPointer call_data)
 {
 	if (numberProcess != -1) {
 		(void) kill(numberProcess, SIGKILL);
@@ -206,19 +205,14 @@ callLocker(int choice)
 	/* booleans (+/-) options */
 
 #ifdef HAVE_MOTIF
-	for (i = 0; i < TOGGLES; i++) {
+	for (i = 0; i < numToggleNames; i++) {
 		if (XmToggleButtonGetState(toggles[i])) {
 			(void) strcat(command, "-");
 			(void) strcat(command, toggleNames[i]);
 			(void) strcat(command, " ");
 		}
 	}
-	/*
-		sizeof(Opt)/sizeof(OptionStruct) is not good to
-		know the number of element in Opt
-		so I have made a function getNumberofElementofOpt
-	*/
-	for (i = 0; i < getNumberofElementofOpt(); i++)
+	for (i = 0; i < numOptions; i++)
 		if (Opt[i].userdata != NULL) {
 			(void) strcat(command, "-");
 			(void) strcat(command, Opt[i].cmd);
@@ -227,7 +221,13 @@ callLocker(int choice)
 			(void) strcat(command, " ");
 		}
 #elif defined(HAVE_ATHENA)
-	/*TBD*/
+	for (i = 0; i < numToggleNames; i++) {
+		if (toggleState[i]) {
+			(void) strcat(command, "-");
+			(void) strcat(command, toggleNames[i]);
+			(void) strcat(command, " ");
+		}
+	}
 #endif
 
 	switch (choice) {
@@ -261,14 +261,14 @@ callLocker(int choice)
 			SKIPDELAY, (XtTimerCallbackProc) checkTime, topLevel);
 }
 
-/*----------------------------------------------------------*/
-/* Code taken from Xlockup by Thad Phetteplace              */
-/*    tdphette@dexter.glaci.com used by permission          */
-/* CHECKTIME: This routine is called periodically by the    */
-/*    openwin event handler.  It checks the last access     */
-/*    time/date stamp on the mouse and keyboard devices     */
-/*    and compares it to the timeout value.                 */
-/*----------------------------------------------------------*/
+/*--------------------------------------------------------------*/
+/* Code taken from Xlockup by Thad Phetteplace			*/
+/*	tdphette@dexter.glaci.com used by permission		*/
+/* CHECKTIME: This routine is called periodically by the	*/
+/*	openwin event handler.  It checks the last access	*/
+/*	time/date stamp on the mouse and keyboard devices	*/
+/*	and compares it to the timeout value.			*/
+/*--------------------------------------------------------------*/
 
 static void checkTime(void)
 {
@@ -277,12 +277,12 @@ static void checkTime(void)
 	struct stat statkeybd;
 #endif
 
-	(void) time( &timeNow );                  /* get current time */
+	(void) time( &timeNow );		/* get current time */
 	/* next does not work on Cygwin */
-	(void) stat("/dev/mouse", &statmouse );   /* get mouse status */
+	(void) stat("/dev/mouse", &statmouse );	/* get mouse status */
 #if 0
 	/* does not seem to help on Solaris and hinders on Linux */
-	(void) stat("/dev/kbd", &statkeybd );     /* get keyboard status */
+	(void) stat("/dev/kbd", &statkeybd );	/* get keyboard status */
 #endif
 
 	/* check if last access time was larger than timeout */
@@ -292,12 +292,12 @@ static void checkTime(void)
 	}
 #ifdef DEBUG
 	printf("timeout %ld,  timeNow - amouse %ld\n",
-			timeout, timeNow - statmouse.st_atime);
+		timeout, timeNow - statmouse.st_atime);
 	printf("timeout %ld,  timeNow - akeybd %ld\n",
-			timeout, timeNow - statkeybd.st_atime);
+		timeout, timeNow - statkeybd.st_atime);
 #endif
 	(void) XtAppAddTimeOut(XtWidgetToApplicationContext(topLevel),
-			SKIPDELAY, (XtTimerCallbackProc) checkTime, topLevel);
+		SKIPDELAY, (XtTimerCallbackProc) checkTime, topLevel);
 }
 
 static void
@@ -306,14 +306,51 @@ listenerPushButtons(Widget w, XtPointer client_data, XtPointer call_data)
 	callLocker((long) client_data);
 }
 
+static void
+runInLabelWindow(int mode)
+{
+	char numberWidget[50];
+	char str[50];
+	int n;
+
+	(void) sprintf(numberWidget, "%ld", XtWindow(labelXlock));
+	(void) sprintf(str, "%s", LockProcs[mode].cmdline_arg);
+	if (numberProcess != -1) {
+		(void) kill(numberProcess, SIGKILL);
+		(void) wait(&n);
+	}
+#ifdef VMS
+#define FORK vfork
+#else
+#define FORK fork
+#endif
+	if ((numberProcess = FORK()) == -1)
+		(void) fprintf(stderr, "Fork error\n");
+	else if (numberProcess == 0) {
+		(void) execlp(XLOCK, XLOCK, "-parent", numberWidget,
+			"-mode", str, "-geometry", WINDOW_GEOMETRY,
+			"-delay", "100000",
+			"-nolock", "-inwindow", "+install", NULL);
+	}
+}
+
+#ifdef HAVE_MOTIF
+static void
+listenerScrolledListModes(Widget w, XtPointer client_data, XtPointer call_data)
+{
+	mode = ((XmListCallbackStruct *) call_data)->item_position - 1;
+	runInLabelWindow(mode);
+}
+#endif
 
 #ifdef HAVE_ATHENA
 static void
 modeListener(Widget w, XtPointer clientData, XtPointer callData)
 {
-        mode = (size_t) clientData;
-        XtVaSetValues(modeListLabel,
-                XtNlabel, LockProcs[mode].cmdline_arg, NULL);
+	mode = (size_t) clientData;
+	XtVaSetValues(modeListLabel,
+		XtNlabel, LockProcs[mode].cmdline_arg, NULL);
+	runInLabelWindow(mode);
 }
 
 static void
@@ -356,22 +393,28 @@ createList(Widget form, int init)
 	Widget w;
 	int mode, max;
 	char *defaultString;
+	char string[160];
 
 	max = findMaxLength();
 	createBlank(&defaultString, max, LockProcs[init].cmdline_arg, 0);
 	modeListLabel = XtVaCreateManagedWidget(defaultString,
 		menuButtonWidgetClass, form,
+		XtNfromVert, menuBar,
 		/*XtNwidth, 202,*/
 		NULL);
 	free(defaultString);
 	modeList = XtVaCreatePopupShell("menu",
 		simpleMenuWidgetClass, modeListLabel, NULL);
 	for (mode = 0; mode < numprocs; mode++) {
-		w = XtVaCreateManagedWidget(LockProcs[mode].cmdline_arg,
+		(void) sprintf(string, "%-14s%s", LockProcs[mode].cmdline_arg,
+			LockProcs[mode].desc);
+		w = XtVaCreateManagedWidget(string,
 			smeBSBObjectClass, modeList, NULL);
 		XtAddCallback(w, XtNcallback,
 			(XtCallbackProc) modeListener,
 			(XtPointer) (size_t) mode);
+	/*XtAddCallback(scrolledListModes, XtNcallback,
+		listenerScrolledListModes, NULL);*/
 	}
 }
 
@@ -384,40 +427,6 @@ findMode(char * string)
 	return 0;
 }
 #endif
-
-static void
-listenerScrolledListModes(Widget w, XtPointer client_data, XtPointer call_data)
-{
-	char numberWidget[50];
-	char str[50];
-	int n;
-
-#ifdef HAVE_MOTIF
-	mode = ((XmListCallbackStruct *) call_data)->item_position - 1;
-#elif defined(HAVE_ATHENA)
-	mode = ((size_t) call_data);
-	printf("listenerScrolledListModes %d\n", mode);
-#endif
-	(void) sprintf(numberWidget, "%ld", XtWindow(labelXlock));
-	(void) sprintf(str, "%s", LockProcs[mode].cmdline_arg);
-	if (numberProcess != -1) {
-		(void) kill(numberProcess, SIGKILL);
-		(void) wait(&n);
-	}
-#ifdef VMS
-#define FORK vfork
-#else
-#define FORK fork
-#endif
-	if ((numberProcess = FORK()) == -1)
-		(void) fprintf(stderr, "Fork error\n");
-	else if (numberProcess == 0) {
-		(void) execlp(XLOCK, XLOCK, "-parent", numberWidget,
-			"-mode", str, "-geometry", WINDOW_GEOMETRY,
-			"-delay", "100000",
-			"-nolock", "-inwindow", "+install", NULL);
-	}
-}
 
 #ifdef HAVE_MOTIF
 static void
@@ -434,7 +443,7 @@ setupForm(Widget father)
 {
 	Arg args[15];
 	int i, ac;
-	Widget pushButtonRow, exitwidgetB;
+	Widget pushButtonRow, exitButton;
 	char string[160];
 	XtPointer iptr = 0;
 #ifdef HAVE_MOTIF
@@ -489,7 +498,7 @@ setupForm(Widget father)
 	pushButtonRow = XmCreateRowColumn(father,
 		(char *) "pushButtonRow", args, ac);
 
-	for (i = 0; i < PUSHBUTTONS; i++) {
+	for (i = 0; i < numButtons; i++) {
 		ac = 0;
 #ifndef USE_MB
 		labelStr = XmStringCreate(labelPushButtons[i],
@@ -517,14 +526,14 @@ setupForm(Widget father)
 	XtSetArg(args[ac], XmNlabelString, labelStr);
 	ac++;
 #endif
-	exitwidgetB = XmCreatePushButton(pushButtonRow,
+	exitButton = XmCreatePushButton(pushButtonRow,
 			(char *) "Exit", args, ac);
 #ifndef USE_MB
 	XmStringFree(labelStr);
 #endif
-	XtAddCallback(exitwidgetB, XmNactivateCallback, exitcallback,
+	XtAddCallback(exitButton, XmNactivateCallback, exitCallback,
 			(XtPointer) NULL);
-	XtManageChild(exitwidgetB);
+	XtManageChild(exitButton);
 
 	timeoutSlider = XtVaCreateManagedWidget("timeout",
 		xmScaleWidgetClass, pushButtonRow,
@@ -561,19 +570,19 @@ setupForm(Widget father)
 
 	for (i = 0; i < (int) numprocs; i++) {
 		(void) sprintf(string, "%-14s%s", LockProcs[i].cmdline_arg,
-			       LockProcs[i].desc);
+			LockProcs[i].desc);
 		tabXmStr[i] = XmStringCreate(string, XmSTRING_DEFAULT_CHARSET);
 	}
 	scrolledListModes = XmCreateScrolledList(father,
-			(char *) "ScrolledListModes", args, ac);
+		(char *) "ScrolledListModes", args, ac);
 	XtAddCallback(scrolledListModes, XmNbrowseSelectionCallback,
-			listenerScrolledListModes, NULL);
+		listenerScrolledListModes, NULL);
 	XtManageChild(scrolledListModes);
 
 #if 0
 	int togglesRow, row;
 	togglesRow = XmCreateRowColumn(Row, (char *) "TogglesRow", NULL, 0);
-	for (i = 0; i < TOGGLES; i++) {
+	for (i = 0; i < numToggleNames; i++) {
 #ifndef USE_MB
 		ac = 0;
 		labelStr = XmStringCreate(toggleNames[i],
@@ -596,26 +605,34 @@ setupForm(Widget father)
 		XmStringFree(tabXmStr[i]);
 	}
 #elif defined(HAVE_ATHENA)
-	pushButtonRow = XtVaCreateManagedWidget("pushButtonRow",
-		formWidgetClass, father, XtNborderWidth, 0,
+	labelXlock = XtVaCreateManagedWidget("Window",
+		commandWidgetClass, father,
+		XtNwidth, WINDOW_WIDTH,
+		XtNheight, WINDOW_HEIGHT,
 		XtNfromVert, modeListLabel, NULL);
-	for (i = 0; i < PUSHBUTTONS; i++) {
+
+	pushButtonRow = XtVaCreateManagedWidget("pushButtonRow",
+		formWidgetClass, father,
+		XtNborderWidth, 0,
+		XtNfromVert, labelXlock, NULL);
+	for (i = 0; i < numButtons; i++) {
 		pushButtons[i] = XtVaCreateManagedWidget(labelPushButtons[i],
-	       		toggleWidgetClass, pushButtonRow, NULL);
+			commandWidgetClass, pushButtonRow, NULL);
 		if (i > 0)
 			XtVaSetValues(pushButtons[i],
 				XtNfromHoriz, pushButtons[i - 1], NULL);
 		XtAddCallback(pushButtons[i],
 			XtNcallback, listenerPushButtons, iptr++);
 	}
+	exitButton = XtVaCreateManagedWidget("Exit",
+		commandWidgetClass, pushButtonRow,
+		XtNfromHoriz, pushButtons[numButtons - 1], NULL);
+	XtAddCallback(exitButton,
+		XtNcallback, exitCallback, (XtPointer) NULL);
 #endif
 }
 
-#ifdef HAVE_MOTIF
 extern void setupOption(Widget menuBar);
-#elif defined(HAVE_ATHENA)
-	/*TBD*/
-#endif
 
 int
 main(int argc, char **argv)
@@ -645,17 +662,20 @@ main(int argc, char **argv)
 	form = XmCreateForm(topLevel, (char *) "Form", (Arg *) NULL, 0);
 #elif defined(HAVE_ATHENA)
 	form = XtVaCreateManagedWidget("Form",
-			formWidgetClass, topLevel,
-			XtNborderWidth, 0, NULL);
+		formWidgetClass, topLevel,
+		XtNborderWidth, 0, NULL);
+	menuBar = XtVaCreateManagedWidget("MenuBar",
+		formWidgetClass, form,
+		XtNborderWidth, 1, NULL);
+	setupOption(menuBar);
 	createList(form, findMode("random"));
 #endif
 	setupForm(form);
 #ifdef HAVE_MOTIF
-	setupOption(menuOption);
-#elif defined(HAVE_ATHENA)
-	/*TBD*/
-#endif
 	XtManageChild(form);
+	setupOption(menuOption);
+#endif
+	/*XtManageChild(menuBar);*/
 	XtRealizeWidget(topLevel);
 	(void) XtAppAddTimeOut(XtWidgetToApplicationContext(topLevel),
 			SKIPDELAY, (XtTimerCallbackProc) checkTime, topLevel);

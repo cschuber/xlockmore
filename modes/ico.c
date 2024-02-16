@@ -609,6 +609,60 @@ static Polyinfo polygons[] =
 		}
 	},
 
+/* objcubo - structure values for cuboctahedron */
+
+	{
+#ifdef DEFUNCT
+		"cuboctahedron", "cubooctahedron",	/* long and short names */
+		"rhombic dodecahedron",	/* long name of dual */
+#endif
+		12, 24, 14,	/* number of vertices, edges, and faces */
+		{		/* vertices (x,y,z) */
+			/* all points must be within radius 1 of the origin */
+#define T 1.0
+#define H 0.5
+#define A 0.86602540
+#define B 0.81649658
+#define C 0.57735027
+#define D 0.28867513
+			{-H, -A, 0},
+			{-T, 0, 0},
+			{-H, A, 0},
+			{H, A, 0},
+			{T, 0, 0},
+			{H, -A, 0},
+			{-H, -D, -B},
+			{0, C, -B},
+			{H, -D, -B},
+			{0, -C, B},
+			{H, D, B},
+			{-H, D, B},
+#undef T
+#undef H
+#undef A
+#undef B
+#undef C
+#undef D
+		},
+		{	/* faces (numfaces + indexes into vertices) */
+		/* faces must be specified clockwise from the outside */
+			3, 0, 1, 6,
+			4, 0, 6, 8, 5,
+			3, 0, 5, 9,
+			4, 0, 9, 11, 1,
+			4, 1, 2, 7, 6,
+			3, 1, 11, 2,
+			3, 2, 3, 7,
+			4, 2, 11, 10, 3,
+			4, 3, 4, 8, 7,
+			3, 3, 10, 4,
+			3, 4, 5, 8,
+			4, 4, 10, 9, 5,
+			3, 6, 7, 8,
+			3, 9, 10, 11,
+		}
+	},
+
 /* ico does not draw non-convex polyhedra well. */
 /* objstar - structure values for octahedron star (stellated octahedron?) */
 	{
@@ -741,7 +795,7 @@ static Polyinfo polygons[] =
 };
 
 static int  polysize = sizeof (polygons) / sizeof (polygons[0]);
-#define POLYSIZE 8	/* Only the 5 Platonic solids, the 2 edge transitive*/
+#define POLYSIZE 9	/* Only the 5 Platonic solids, the 2 edge transitive*/
 	/* Catalan solids and the space filling Archimedean solid work */
 
 #define POLYBITS(n,w,h)\

@@ -1,9 +1,9 @@
 typedef struct LockStruct_s
 {
-	char *cmdline_arg;          /* mode name */
+	char *cmdline_arg;	/* mode name */
 	/* Maybe other things should be added here from xlock? */
 	/* Should read in XLock as well to set defaults */
-	char *desc;                 /* text description of mode */
+	char *desc;		/* text description of mode */
 } LockStruct;
 
 static LockStruct LockProcs[] =
@@ -201,4 +201,4 @@ static LockStruct LockProcs[] =
 #endif
 };
 
-#define numprocs (sizeof(LockProcs) /sizeof(LockProcs[0]))
+#define numprocs (sizeof(LockProcs) / sizeof(LockProcs[0]))
