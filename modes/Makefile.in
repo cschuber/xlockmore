@@ -1,4 +1,4 @@
-# $Id : Makefile.in 5.24 2007/01/18 $
+ $Id : Makefile.in 5.24 2007/01/18 $
 #
 # xlockmore Makefile.in for autoconf (UNIX/VMS X11 support)
 ############################################################
@@ -110,14 +110,14 @@ wator$(OM)wire$(OM)world$(OM)worm$(OM)xcl$(OM)xjack$(O)
 @GL@ATUNNELSOBJS = $(DOG)tunnel_draw$(O)
 @GL@BUBBLE3DOBJS = $(DOG)b_draw$(OG)b_sphere$(OG)b_lockglue$(O)
 @GL@GLPLANETOBJS = $(DOG)sphere$(O)
-@GL@MAZ3DOBJS = $(DOG)ximage-loader$(O)
-@GL@MOLECULEOBJS = $(DOG)tube$(OG)sphere$(O)
 @GL@JUGGLER3DOBJS = $(DOG)tube$(OG)sphere$(OG)rotator$(O)$(S)\
 @GL@$(DOG)glxfonts$(OG)gltrackball$(OG)trackball$(O)
+@GL@MAZE3DOBJS = $(DOG)ximage-loader$(O)
+@GL@MOLECULEOBJS = $(DOG)tube$(OG)sphere$(O)
 @GL@XLOCKDEPGLOBJS = $(DOG)xpm-ximage$(OG)pipeobjs$(O)$(S)\
 @GL@$(SPROINGIESOBJS)$(S)$(ATLANTISOBJS)$(S)$(ATUNNELSOBJS)$(S)\
-@GL@$(BUBBLE3DOBJS)$(S)$(JUGGLER3DOBJS)$(S)$(MAZE3DOBJS)$(S)\
-@GL@$(XLOCKDEPCPPGLOBJS)
+@GL@$(BUBBLE3DOBJS)$(S)$(JUGGLER3DOBJS)$(S)\
+@GL@$(MAZE3DOBJS)$(S)$(XLOCKDEPCPPGLOBJS)
 @GL@XLOCKNORMGLOBJS = $(DOG)cage$(OG)gears$(O)$(S)\
 @GL@$(DOG)moebius$(OG)morph3d$(OG)noof$(OG)rubik$(O)$(S)\
 @GL@$(DOG)sierpinski3d$(OG)skewb$(OG)stairs$(OG)superquadrics$(O)$(S)\
@@ -126,7 +126,7 @@ wator$(OM)wire$(OM)world$(OM)worm$(OM)xcl$(OM)xjack$(O)
 @GL@XLOCKMULTGLOBJS = $(DOG)fire$(OG)lament$(OG)sballs$(OG)molecule$(O)$(S)\
 @GL@$(DOG)pipes$(OG)sproingies$(OG)atlantis$(OG)atunnels$(OG)boxed$(O)$(S)\
 @GL@$(DOG)bubble3d$(OG)glplanet$(OG)juggler3d$(OG)maze3d$(O)$(S)\
-@GL@$(DOG)ximage-loader$(O)$(S)$(XLOCKMULTCPPGLOBJS)
+@GL@$(XLOCKMULTCPPGLOBJS)
 XLOCKGLOBJS = $(XLOCKNORMGLOBJS)$(S)\
 $(XLOCKDEPGLOBJS)$(S)$(XLOCKMULTGLOBJS)
 @BOMB@XLOCKBOMBOBJS = $(DOM)bomb$(O)
@@ -396,17 +396,17 @@ $(DOG)pipes.xlk : $(DOG)buildlwo.o $(DOG)pipeobjs.o
 @MODULES@@GL@	$(RM) $@
 @MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(DOG)buildlwo.o $(DOG)pipeobjs.o $<
 
-$(DOG)sproingies.xlk : $(SPROINGIESOBJS)
-
-@MODULES@@GL@$(DOG)sproingies.xlk : %.xlk:%.o
-@MODULES@@GL@	$(RM) $@
-@MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(SPROINGIESOBJS) $<
-
 $(DOG)atlantis.xlk : $(ATLANTISOBJS)
 
 @MODULES@@GL@$(DOG)atlantis.xlk : %.xlk:%.o
 @MODULES@@GL@	$(RM) $@
 @MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(ATLANTISOBJS) $<
+
+$(DOG)atunnels.xlk : $(ATUNNELOBJS)
+
+@MODULES@@GL@$(DOG)atunnels.xlk : %.xlk:%.o
+@MODULES@@GL@	$(RM) $@
+@MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(ATUNNELOBJS) $<
 
 $(DOG)boxed.xlk : $(BOXED3DOBJS)
 
@@ -426,17 +426,11 @@ $(DOG)glplanet.xlk : $(GLPLANETOBJS)
 @MODULES@@GL@	$(RM) $@
 @MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(GLPLANETOBJS) $<
 
-$(DOG)molecule.xlk : $(MOLECULEOBJS)
+$(DOG)invert.xlk : $(INVERTOBJS)
 
-@MODULES@@GL@$(DOG)molecule.xlk : %.xlk:%.o
-@MODULES@@GL@	$(RM) $@
-@MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(MOLECULEOBJS) $<
-
-$(DOG)maze3d.xlk : $(MAZE3DOBJS)
-
-@MODULES@@CCC@@GL@$(DOG)maze3d.xlk : %.xlk:%.o
+@MODULES@@CCC@@GL@$(DOG)invert.xlk : %.xlk:%.o
 @MODULES@@CCC@@GL@	$(RM) $@
-@MODULES@@CCC@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(MAZE3DOBJS) $<
+@MODULES@@CCC@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(INVERTOBJS) $<
 
 $(DOG)juggler3d.xlk : $(JUGGLER3DOBJS)
 
@@ -444,11 +438,23 @@ $(DOG)juggler3d.xlk : $(JUGGLER3DOBJS)
 @MODULES@@GL@	$(RM) $@
 @MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(JUGGLER3DOBJS) $<
 
-$(DOG)invert.xlk : $(INVERTOBJS)
+$(DOG)maze3d.xlk : $(MAZE3DOBJS)
 
-@MODULES@@CCC@@GL@$(DOG)invert.xlk : %.xlk:%.o
-@MODULES@@CCC@@GL@	$(RM) $@
-@MODULES@@CCC@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(INVERTOBJS) $<
+@MODULES@@GL@$(DOG)maze3d.xlk : %.xlk:%.o
+@MODULES@@GL@	$(RM) $@
+@MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(MAZE3DOBJS) $<
+
+$(DOG)molecule.xlk : $(MOLECULEOBJS)
+
+@MODULES@@GL@$(DOG)molecule.xlk : %.xlk:%.o
+@MODULES@@GL@	$(RM) $@
+@MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(MOLECULEOBJS) $<
+
+$(DOG)sproingies.xlk : $(SPROINGIESOBJS)
+
+@MODULES@@GL@$(DOG)sproingies.xlk : %.xlk:%.o
+@MODULES@@GL@	$(RM) $@
+@MODULES@@GL@	$(CXX) $(CXXFLAGS) -shared -o $@ $(SPROINGIESOBJS) $<
 
 xlock : $(UTILOBJDIR)xlock
 

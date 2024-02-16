@@ -93,16 +93,14 @@ ping.
 
 #ifdef STANDALONE
 #define MODE_loop
-#define PROGCLASS "loop"
-#define HACK_INIT init_loop
-#define HACK_DRAW draw_loop
-#define loop_opts xlockmore_opts
 #define DEFAULTS "*delay: 100000 \n" \
- "*count: -5 \n" \
- "*cycles: 1600 \n" \
- "*size: -12 \n" \
- "*ncolors: 15 \n" \
- "*neighbors: 0 \n"
+	"*count: -5 \n" \
+	"*cycles: 1600 \n" \
+	"*size: -12 \n" \
+	"*ncolors: 15 \n" \
+
+# define reshape_loop 0
+# define loop_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -189,14 +187,14 @@ static OptionStruct desc[] =
 	{(char *) "-/+vertical", (char *) "change orientation for hexagons"}
 };
 
-ModeSpecOpt loop_opts =
+ENTRYPOINT ModeSpecOpt loop_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 
 #ifdef USE_MODULES
 ModStruct   loop_description =
 {"loop", "init_loop", "draw_loop", "release_loop",
- "refresh_loop", "init_loop", (char *) NULL, &loop_opts,
+ "refresh_loop", "init_loop", "free_loop", &loop_opts,
  100000, 5, 1600, -12, 64, 1.0, "",
  "Shows Langton's self-producing loops", 0, NULL};
 
@@ -205,7 +203,7 @@ ModStruct   loop_description =
 #define LOOPBITS(n,w,h)\
   if ((lp->pixmaps[lp->init_bits]=\
   XCreatePixmapFromBitmapData(display,window,(char *)n,w,h,1,0,1))==None){\
-  free_loop(display,lp); return;} else {lp->init_bits++;}
+  free_loop_screen(display,lp); return;} else {lp->init_bits++;}
 
 static int  local_neighbors = 0;
 
@@ -1306,10 +1304,13 @@ free_cells(loopstruct * lp)
 }
 
 static void
-free_loop(Display *display, loopstruct * lp)
+free_loop_screen(Display *display, loopstruct * lp)
 {
 	int         shade;
 
+	if (lp == NULL) {
+		return;
+	}
 	for (shade = 0; shade < lp->init_bits; shade++)
 		if (lp->pixmaps[shade] != None) {
 			XFreePixmap(display, lp->pixmaps[shade]);
@@ -1321,6 +1322,13 @@ free_loop(Display *display, loopstruct * lp)
 		lp->stippledGC = None;
 	}
 	free_cells(lp);
+	lp = NULL;
+}
+
+ENTRYPOINT void
+free_loop(ModeInfo * mi)
+{
+	free_loop_screen(MI_DISPLAY(mi), &loops[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -1332,7 +1340,7 @@ addtolist(ModeInfo * mi, int col, int row, unsigned char state)
 	if ((lp->cellList[state] = (CellList *) malloc(sizeof (CellList))) ==
 			NULL) {
 		lp->cellList[state] = current;
-		free_loop(MI_DISPLAY(mi), lp);
+		free_loop_screen(MI_DISPLAY(mi), lp);
 		return False;
 	}
 	lp->cellList[state]->pt.x = col;
@@ -1419,7 +1427,7 @@ draw_state(ModeInfo * mi, int state)
 	SHEATHCOUNT(d) + SHEATHCOUNT(e)) >= 2)
 
 static void
-setUndefinedRule()
+setUndefinedRule(void)
 {
 	int a, b, c, d, e;
 
@@ -1522,7 +1530,7 @@ setUndefinedRule()
 }
 
 static void
-setUndefinedEvoRule()
+setUndefinedEvoRule(void)
 {
 	int a, b, c, d, e;
 
@@ -1851,7 +1859,7 @@ init_flaw(ModeInfo * mi)
 }
 
 static int
-sqAdamLoopX()
+sqAdamLoopX(void)
 {
 	if (byl) {
 		return BYL_ADAM_LOOPX;
@@ -1865,7 +1873,7 @@ sqAdamLoopX()
 }
 
 static int
-sqAdamLoopY()
+sqAdamLoopY(void)
 {
 	if (byl) {
 		return BYL_ADAM_LOOPY;
@@ -2196,14 +2204,14 @@ do_gen(loopstruct * lp)
 	}
 }
 
-void
+ENTRYPOINT void
 release_loop(ModeInfo * mi)
 {
 	if (loops != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_loop(MI_DISPLAY(mi), &loops[screen]);
+			free_loop_screen(MI_DISPLAY(mi), &loops[screen]);
 		free(loops);
 		loops = (loopstruct *) NULL;
 	}
@@ -2214,7 +2222,7 @@ release_loop(ModeInfo * mi)
 	local_neighbors = 0;
 }
 
-void
+ENTRYPOINT void
 init_loop(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -2223,11 +2231,7 @@ init_loop(ModeInfo * mi)
 	loopstruct *lp;
 	XGCValues   gcv;
 
-	if (loops == NULL) {
-		if ((loops = (loopstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (loopstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, loops);
 	lp = &loops[MI_SCREEN(mi)];
 
 	lp->redrawing = 0;
@@ -2239,7 +2243,7 @@ init_loop(ModeInfo * mi)
 			gcv.fill_style = FillOpaqueStippled;
 			if ((lp->stippledGC = XCreateGC(display, window,
 				 GCFillStyle, &gcv)) == None) {
-				free_loop(display, lp);
+				free_loop_screen(display, lp);
 				return;
 			}
 		}
@@ -2364,12 +2368,12 @@ init_loop(ModeInfo * mi)
 
 	if ((lp->oldcells = (unsigned char *) calloc(lp->bncols * lp->bnrows,
 			sizeof (unsigned char))) == NULL) {
-		free_loop(display, lp);
+		free_loop_screen(display, lp);
 		return;
 	}
 	if ((lp->newcells = (unsigned char *) calloc(lp->bncols * lp->bnrows,
 			sizeof (unsigned char))) == NULL) {
-		free_loop(display, lp);
+		free_loop_screen(display, lp);
 		return;
 	}
 	if (!init_table(mi)) {
@@ -2395,7 +2399,7 @@ init_loop(ModeInfo * mi)
 	init_adam(mi);
 }
 
-void
+ENTRYPOINT void
 draw_loop(ModeInfo * mi)
 {
 	int         offset, i, j, factor = 1;
@@ -2448,7 +2452,7 @@ draw_loop(ModeInfo * mi)
 	}
 	for (i = 0; i < EXT_STATES; i++)
 		if (!draw_state(mi, i)) {
-			free_loop(MI_DISPLAY(mi), lp);
+			free_loop_screen(MI_DISPLAY(mi), lp);
 			return;
 		}
 	if (byl | chou1 | chou2)
@@ -2474,7 +2478,8 @@ draw_loop(ModeInfo * mi)
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_loop(ModeInfo * mi)
 {
 	loopstruct *lp;
@@ -2487,6 +2492,7 @@ refresh_loop(ModeInfo * mi)
 	lp->redrawing = 1;
 	lp->redrawpos = lp->by * lp->ncols + lp->bx;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Loop", loop)
 

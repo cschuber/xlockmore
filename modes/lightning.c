@@ -30,11 +30,11 @@ static const char sccsid[] = "@(#)lightning.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_lightning
-#define PROGCLASS "Lightning"
-#define HACK_INIT init_lightning
-#define HACK_DRAW draw_lightning
-#define lightning_opts xlockmore_opts
-#define DEFAULTS "*delay: 10000 \n"
+# define DEFAULTS "*delay: 10000 \n"\
+
+# define free_lightning 0
+# define reshape_lightning 0
+# define lightning_handle_event 0
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -43,13 +43,13 @@ static const char sccsid[] = "@(#)lightning.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_lightning
 
-ModeSpecOpt lightning_opts =
+ENTRYPOINT ModeSpecOpt lightning_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   lightning_description =
 {"lightning", "init_lightning", "draw_lightning", "release_lightning",
- "refresh_lightning", "init_lightning", (char *) NULL, &lightning_opts,
+ (char *) NULL, "init_lightning", (char *) NULL, &lightning_opts,
  10000, 1, 1, 1, 64, 0.6, "",
  "Shows Keith's fractal lightning bolts", 0, NULL};
 
@@ -514,16 +514,12 @@ wiggle_line(XPoint * p, int number, int amount)
 
 /*------------------------------------------------------------------------*/
 
-void
+ENTRYPOINT void
 init_lightning(ModeInfo * mi)
 {
 	Storm      *st;
 
-	if (Helga == NULL) {
-		if ((Helga = (Storm *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (Storm))) == NULL)
-			return;
-	}
+	MI_INIT(mi, Helga);
 	st = &Helga[MI_SCREEN(mi)];
 
 	st->scr_width = MI_WIDTH(mi);
@@ -536,7 +532,7 @@ init_lightning(ModeInfo * mi)
 
 /*------------------------------------------------------------------------*/
 
-void
+ENTRYPOINT void
 draw_lightning(ModeInfo * mi)
 {
 	int         i;
@@ -594,7 +590,7 @@ draw_lightning(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_lightning(ModeInfo * mi)
 {
 	if (Helga != NULL) {
@@ -603,11 +599,13 @@ release_lightning(ModeInfo * mi)
 	}
 }
 
-void
+#if 0
+ENTRYPOINT void
 refresh_lightning(ModeInfo * mi)
 {
 	/* Do nothing, it will refresh by itself */
 }
+#endif
 
 XSCREENSAVER_MODULE ("Lightning", lightning)
 

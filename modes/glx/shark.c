@@ -1,8 +1,7 @@
 /* atlantis --- Shows moving 3D sea animals */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)shark.c	5.01 2001/04/17 xlockmore";
-
 #endif
 
 /* Copyright (c) E. Lassauge, 1998. */

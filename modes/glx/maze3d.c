@@ -28,9 +28,9 @@
 
 #ifdef STANDALONE
 #define DEFAULTS	"*delay:			20000   \n"	\
-					"*showFPS:			False	\n" \
+			"*showFPS:			False	\n" \
 
-#define release_maze 0
+#define free_maze3d 0
 # include "xlockmore.h"				/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
 # include "xlock.h"					/* from the xlockmore distribution */
@@ -123,12 +123,13 @@ static argtype vars[] = {
 	{&speed, "speed", "speed", DEF_SPEED, t_Float},
 };
 
-ENTRYPOINT ModeSpecOpt maze3d_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt maze3d_opts =
+{countof(opts), opts, countof(vars), vars, NULL};
 
 
 #ifdef USE_MODULES
 
-ModStruct   boxed_description = {
+ModStruct   maze3d_description = {
      "maze3d", "init_maze3d", "draw_maze3d", "release_maze3d",
      "draw_maze3d", "init_maze3d", (char *) NULL, &maze3d_opts,
      1000, 1, 2, 1, 64, 1.0, "",
@@ -1970,7 +1971,7 @@ release_maze3d (ModeInfo * mi)
     free(maze->gl3dTextPosition);
     free(maze->rats);
 
-    //memset(maze, 0, sizeof(*maze));
+    /*memset(maze, 0, sizeof(*maze));*/
     }
     free(mazes);
     mazes = (maze_configuration *) NULL;
@@ -1978,9 +1979,8 @@ release_maze3d (ModeInfo * mi)
     }
 }
 
-
 #ifdef STANDALONE
 XSCREENSAVER_MODULE_2 ("Maze3D", maze3d, maze)
 #endif
 
-#endif
+#endif /* MODE_maze3d */

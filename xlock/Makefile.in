@@ -112,7 +112,7 @@ ECHO = echo
 #RM_S = set file/remove/nolog
 #ECHO = write sys$output
 
-DEF_MODULEPATH = $(prefix)/lib/xlock_modules
+DEF_MODULEPATH = $(prefix)/lib/X11/xlock/modules
 @MODULES@MODULEDEF = -DDEF_MODULEPATH=\"$(DEF_MODULEPATH)\"
 DEFINES = -DDEF_FILESEARCHPATH=\"$(xapploaddir)/%N%C%S:$(xapploaddir)/%N%S\" $(MODULEDEF) $(CHECKDEF)
 DEFS = @DEFS@ $(DEFINES)

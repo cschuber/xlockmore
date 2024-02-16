@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* pipes --- 3D selfbuiding pipe system */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)pipes.c	5.00 2000/11/01 xlockmore";
-
 #endif
 
 /*-
@@ -34,7 +33,7 @@ static const char sccsid[] = "@(#)pipes.c	5.00 2000/11/01 xlockmore";
  * mistakes.
  *
  * My e-mail addresses is
- * mfvianna@centroin.com.br
+ * mfvianna AT centroin.com.br
  *
  * Marcelo F. Vianna (Apr-09-1997)
  *
@@ -49,23 +48,21 @@ static const char sccsid[] = "@(#)pipes.c	5.00 2000/11/01 xlockmore";
 #endif
 
 #ifdef STANDALONE
-#define MODE_pipes
-#define PROGCLASS "Pipes"
-#define HACK_INIT init_pipes
-#define HACK_DRAW draw_pipes
-#define pipes_opts xlockmore_opts
-#define DEFAULTS "*delay: 1000 \n" \
- "*count: 2 \n" \
- "*cycles: 5 \n" \
- "*size: 500 \n" \
- "*fisheye: True \n" \
- "*tightturns: False \n" \
- "*rotatepipes: True \n" \
- "*noBuffer: True \n"
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+# define MODE_pipes
+# define DEFAULTS	"*delay: 1000 \n" \
+			"*count: 2 \n" \
+			"*cycles: 5 \n" \
+			"*size: 500 \n" \
+			"*showFPS: False \n" \
+			"*fpsSolid: True \n" \
+			"*wireframe: True \n" \
+
+#define reshape_pipes 0
+#define pipes_handle_event 0
+# include "xlockmore.h"		/* from the xscreensaver distribution */
 #else /* !STANDALONE */
-#include "xlock.h"		/* from the xlockmore distribution */
-#include "visgl.h"
+# include "xlock.h"		/* from the xlockmore distribution */
+# include "visgl.h"
 #endif /* !STANDALONE */
 
 #ifdef MODE_pipes
@@ -89,8 +86,8 @@ static XrmOptionDescRec opts[] =
 	{(char *) "+fisheye", (char *) ".pipes.fisheye", XrmoptionNoArg, (caddr_t) "off"},
 	{(char *) "-tightturns", (char *) ".pipes.tightturns", XrmoptionNoArg, (caddr_t) "on"},
 	{(char *) "+tightturns", (char *) ".pipes.tightturns", XrmoptionNoArg, (caddr_t) "off"},
-      {(char *) "-rotatepipes", (char *) ".pipes.rotatepipes", XrmoptionNoArg, (caddr_t) "on"},
-      {(char *) "+rotatepipes", (char *) ".pipes.rotatepipes", XrmoptionNoArg, (caddr_t) "off"}
+	{(char *) "-rotatepipes", (char *) ".pipes.rotatepipes", XrmoptionNoArg, (caddr_t) "on"},
+	{(char *) "+rotatepipes", (char *) ".pipes.rotatepipes", XrmoptionNoArg, (caddr_t) "off"}
 };
 static argtype vars[] =
 {
@@ -107,7 +104,7 @@ static OptionStruct desc[] =
 	{(char *) "-/+rotatepipes", (char *) "turn on/off pipe system rotation per screenful"}
 };
 
-ModeSpecOpt pipes_opts =
+ENTRYPOINT ModeSpecOpt pipes_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -498,7 +495,7 @@ MakeShape(ModeInfo * mi, int newdir)
 	}
 }
 
-static void
+ENTRYPOINT void
 reshape(ModeInfo * mi, int width, int height)
 {
 	pipesstruct *pp = &pipes[MI_SCREEN(mi)];
@@ -630,6 +627,9 @@ pinit(ModeInfo * mi, int zera)
 static void
 free_factory(Display *display, pipesstruct *pp)
 {
+	if (pp == NULL) {
+		return;
+	}
 	if (pp->glx_context) {
 		/* Display lists MUST be freed while their glXContext is current. */
 #ifdef WIN32
@@ -674,9 +674,16 @@ free_factory(Display *display, pipesstruct *pp)
 			pp->guageconnector = 0;
 		}
 	}
+	pp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_pipes(ModeInfo * mi)
+{
+	free_factory(MI_DISPLAY(mi), &pipes[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 release_pipes(ModeInfo * mi)
 {
 	if (pipes != NULL) {
@@ -690,16 +697,12 @@ release_pipes(ModeInfo * mi)
 	FreeAllGL(mi);
 }
 
-void
+ENTRYPOINT void
 init_pipes(ModeInfo * mi)
 {
 	pipesstruct *pp;
 
-	if (pipes == NULL) {
-		if ((pipes = (pipesstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (pipesstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, pipes);
 	pp = &pipes[MI_SCREEN(mi)];
 
 	pp->window = MI_WINDOW(mi);
@@ -759,7 +762,7 @@ init_pipes(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_pipes(ModeInfo * mi)
 {
 #if !defined(WIN32) || (defined( MESA ) && defined( SLOW ))
@@ -1071,7 +1074,8 @@ draw_pipes(ModeInfo * mi)
 #endif
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 change_pipes(ModeInfo * mi)
 {
 	pipesstruct *pp;
@@ -1089,5 +1093,8 @@ change_pipes(ModeInfo * mi)
 #endif
 	pinit(mi, 1);
 }
-
 #endif
+
+XSCREENSAVER_MODULE ("Pipes", pipes)
+
+#endif /* MODE_pipes */

@@ -38,21 +38,19 @@ static const char sccsid[] = "@(#)dragon.c	5.24 2007/01/18 xlockmore";
 */
 
 #ifdef STANDALONE
-#define MODE_dragon
-#define PROGCLASS "Dragon"
-#define HACK_INIT init_dragon
-#define HACK_DRAW draw_dragon
-#define dragon_opts xlockmore_opts
-#define DEFAULTS "*delay: 2000000 \n" \
- "*cycles: 16 \n" \
- "*size: -24 \n" \
- "*ncolors: 64 \n" \
- "*neighbors: 6 \n"
-#define UNIFORM_COLORS
-#include "xlockmore.h"		/* in xscreensaver distribution */
-#else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# define MODE_dragon
+# define DEFAULTS "*delay: 2000000 \n" \
+	"*cycles: 16 \n" \
+	"*size: -24 \n" \
+	"*ncolors: 64 \n" \
+	"*neighbors: 6 \n" \
 
+# define reshape_dragon 0
+# define dragon_handle_event 0
+# define UNIFORM_COLORS
+# include "xlockmore.h"		/* in xscreensaver distribution */
+#else /* STANDALONE */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 #include "automata.h"
 
@@ -77,13 +75,13 @@ static OptionStruct desc[] =
         {(char *) "-/+vertical", (char *) "change orientation for hexagons"}
 };
 
-ModeSpecOpt dragon_opts =
+ENTRYPOINT ModeSpecOpt dragon_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   dragon_description =
 {"dragon", "init_dragon", "draw_dragon", "release_dragon",
- "refresh_dragon", "init_dragon", (char *) NULL, &dragon_opts,
+ "refresh_dragon", "init_dragon", "free_dragon", &dragon_opts,
  2000000, 1, 16, -24, 64, 1.0, "",
  "Shows Deventer's Hexagonal Dragons Maze", 0, NULL};
 
@@ -250,8 +248,11 @@ free_struct(dragonstruct * dp)
 }
 
 static void
-free_dragon(Display *display, dragonstruct *dp)
+free_dragon_screen(Display *display, dragonstruct *dp)
 {
+	if (dp == NULL) {
+		return;
+	}
 	if (dp->stippledGC != None) {
 		XFreeGC(display, dp->stippledGC);
 		dp->stippledGC = None;
@@ -261,6 +262,13 @@ free_dragon(Display *display, dragonstruct *dp)
 		dp->graypix = None;
 	}
 	free_struct(dp);
+	dp = NULL;
+}
+
+ENTRYPOINT void
+free_dragon(ModeInfo * mi)
+{
+	free_dragon_screen(MI_DISPLAY(mi), &dragons[MI_SCREEN(mi)]);
 }
 
 #if 0
@@ -337,7 +345,7 @@ SetSoup(ModeInfo * mi)
 	return True;
 }
 
-void
+ENTRYPOINT void
 init_dragon(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -345,11 +353,7 @@ init_dragon(ModeInfo * mi)
 	int         size = MI_SIZE(mi);
 	dragonstruct *dp;
 
-	if (dragons == NULL) {
-		if ((dragons = (dragonstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (dragonstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, dragons);
 	dp = &dragons[MI_SCREEN(mi)];
 
 	dp->generation = 0;
@@ -361,14 +365,14 @@ init_dragon(ModeInfo * mi)
 			gcv.fill_style = FillOpaqueStippled;
 			if ((dp->stippledGC = XCreateGC(display, window,
 				 GCFillStyle, &gcv)) == None) {
-				free_dragon(display, dp);
+				free_dragon_screen(display, dp);
 				return;
 			}
 		}
 		if (dp->graypix == None) {
 			if ((dp->graypix = XCreateBitmapFromData(display, window,
 				(char *) gray1_bits, gray1_width, gray1_height)) == None) {
-				free_dragon(display, dp);
+				free_dragon_screen(display, dp);
 				return;
 			}
 		}
@@ -379,11 +383,11 @@ init_dragon(ModeInfo * mi)
 
 	if ((dp->cellList = (CellList **) calloc(STATES,
 			sizeof (CellList *))) == NULL) {
-		free_dragon(display, dp);
+		free_dragon_screen(display, dp);
 		return;
 	}
 	if ((dp->ncells = (int *) calloc(STATES, sizeof (int))) == NULL) {
-		free_dragon(display, dp);
+		free_dragon_screen(display, dp);
 		return;
 	}
 
@@ -447,16 +451,16 @@ init_dragon(ModeInfo * mi)
 	if ((dp->oldcell = (unsigned char *)
 		calloc(dp->ncols * dp->nrows,
 			sizeof (unsigned char))) == NULL) {
-		free_dragon(display, dp);
+		free_dragon_screen(display, dp);
 		return;
 	}
 	if (!SetSoup(mi)) {
-		free_dragon(display, dp);
+		free_dragon_screen(display, dp);
 		return;
 	}
 }
 
-void
+ENTRYPOINT void
 draw_dragon(ModeInfo * mi)
 {
 	int white, black;
@@ -520,7 +524,7 @@ draw_dragon(ModeInfo * mi)
 			dp->oldcell[j * dp->ncols + i] = 0;
 			drawcell(mi, i, j, 0);
 			if (!addtolist(mi, i, j)) {
-				free_dragon(MI_DISPLAY(mi), dp);
+				free_dragon_screen(MI_DISPLAY(mi), dp);
 				return;
 			}
 		} else if (black == k) {
@@ -555,20 +559,21 @@ draw_dragon(ModeInfo * mi)
 	}
 	dp->generation++;
 }
-void
+ENTRYPOINT void
 release_dragon(ModeInfo * mi)
 {
 	if (dragons != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_dragon(MI_DISPLAY(mi), &dragons[screen]);
+			free_dragon_screen(MI_DISPLAY(mi), &dragons[screen]);
 		free(dragons);
 		dragons = (dragonstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_dragon(ModeInfo * mi)
 {
 	dragonstruct *dp;
@@ -580,6 +585,7 @@ refresh_dragon(ModeInfo * mi)
 	dp->redrawing = 1;
 	dp->redrawpos = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Dragon", dragon)
 

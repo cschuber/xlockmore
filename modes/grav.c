@@ -30,13 +30,12 @@ static const char sccsid[] = "@(#)grav.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_grav
-#define PROGCLASS "Grav"
-#define HACK_INIT init_grav
-#define HACK_DRAW draw_grav
-#define grav_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*count: -12 \n" \
- "*ncolors: 64 \n"
+	"*count: -12 \n" \
+	"*ncolors: 64 \n" \
+
+# define reshape_grav 0
+# define grav_handle_event 0
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -70,13 +69,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+trail", (char *) "turn on/off trail dots"}
 };
 
-ModeSpecOpt grav_opts =
+ENTRYPOINT ModeSpecOpt grav_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   grav_description =
 {"grav", "init_grav", "draw_grav", "release_grav",
- "refresh_grav", "init_grav", (char *) NULL, &grav_opts,
+ "refresh_grav", "init_grav", "free_grav", &grav_opts,
  10000, -12, 1, 1, 64, 1.0, "",
  "Shows orbiting planets", 0, NULL};
 
@@ -233,7 +232,24 @@ draw_planet(ModeInfo * mi, planetstruct * planet)
 	Planet(gp->x, gp->y);
 }
 
-void
+static void
+free_grav_screen(gravstruct *gp)
+{
+	if (gp == NULL) {
+		return;
+	}
+	if (gp->planets)
+		free(gp->planets);
+	gp = NULL;
+}
+
+ENTRYPOINT void
+free_grav(ModeInfo * mi)
+{
+	free_grav_screen(&gravs[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_grav(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -241,11 +257,7 @@ init_grav(ModeInfo * mi)
 	unsigned char ball;
 	gravstruct *gp;
 
-	if (gravs == NULL) {
-		if ((gravs = (gravstruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (gravstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, gravs);
 	gp = &gravs[MI_SCREEN(mi)];
 
 	gp->width = MI_WIDTH(mi);
@@ -282,7 +294,7 @@ init_grav(ModeInfo * mi)
 		 0, 23040);
 }
 
-void
+ENTRYPOINT void
 draw_grav(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -325,28 +337,27 @@ draw_grav(ModeInfo * mi)
 		draw_planet(mi, &gp->planets[ball]);
 }
 
-void
+ENTRYPOINT void
 release_grav(ModeInfo * mi)
 {
 	if (gravs != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			gravstruct *gp = &gravs[screen];
-
-			if (gp->planets)
-				free(gp->planets);
+			free_grav_screen(&gravs[screen]);
 		}
 		free(gravs);
 		gravs = (gravstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_grav(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Grav", grav)
 

@@ -53,10 +53,6 @@ static const char sccsid[] = "@(#)star.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_star
-#define PROGCLASS "Star"
-#define HACK_INIT init_star
-#define HACK_DRAW draw_star
-#define star_opts xlockmore_opts
 #define DEFAULTS "*delay: 40000 \n" \
  "*count: 100 \n" \
  "*size: 100 \n" \
@@ -66,7 +62,10 @@ static const char sccsid[] = "@(#)star.c	5.00 2000/11/01 xlockmore";
  "*right3d: red \n" \
  "*left3d: blue \n" \
  "*both3d: magenta \n" \
- "*none3d: black \n"
+ "*none3d: black \n" \
+
+# define reshape_star 0
+# define star_handle_event 0
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -107,13 +106,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+straight", (char *) "turn on/off spin and shifting origin"}
 };
 
-ModeSpecOpt star_opts =
+ENTRYPOINT ModeSpecOpt star_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   star_description =
 {"star", "init_star", "draw_star", "release_star",
- "refresh_star", "init_star", (char *) NULL, &star_opts,
+ "refresh_star", "init_star", "free_star", &star_opts,
  40000, 100, 1, 100, 64, 0.3, "",
  "Shows a star field with a twist", 0, NULL};
 
@@ -332,10 +331,13 @@ move_trek(starstruct * sp, int direction, int width, int height)
 }
 
 static void
-free_star(Display *display, starstruct *sp)
+free_star_screen(Display *display, starstruct *sp)
 {
 	int         i;
 
+	if (sp == NULL) {
+		return;
+	}
 	if (sp->astars != NULL) {
 		free(sp->astars);
 		sp->astars = (astar *) NULL;
@@ -353,7 +355,14 @@ free_star(Display *display, starstruct *sp)
 	for (i = 0; i < sp->init_treks; i++) {
 		XFreePixmap(display, sp->trekPixmaps[i]);
 	}
-	sp->init_treks = 0;
+	/*sp->init_treks = 0;*/
+	sp = NULL;
+}
+
+ENTRYPOINT void
+free_star(ModeInfo * mi)
+{
+	free_star_screen(MI_DISPLAY(mi), &stars[MI_SCREEN(mi)]);
 }
 
 static void
@@ -679,7 +688,7 @@ compute_move(starstruct * sp, int axe)
 	return (sp->current_dep[axe]);
 }
 
-void
+ENTRYPOINT void
 init_star(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
@@ -687,9 +696,7 @@ init_star(ModeInfo * mi)
 	starstruct *sp;
 
 	if (stars == NULL) {
-		if ((stars = (starstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (starstruct))) == NULL)
-			return;
+		MI_INIT(mi, stars);
 		for (i = 0; i < RESOLUTION; i++) {
 			sin_array[i] = SINF((((float) i) / (RESOLUTION / 2.0)) * M_PI);
 			cos_array[i] = COSF((((float) i) / (RESOLUTION / 2.0)) * M_PI);
@@ -727,12 +734,12 @@ init_star(ModeInfo * mi)
 	if (sp->astars == NULL)
 		if ((sp->astars = (astar *) calloc(sp->nstars,
 				sizeof (astar))) == NULL) {
-			free_star(display, sp);
+			free_star_screen(display, sp);
 			return;
 		}
 	if (sp->pixmaps == NULL)
 		if (!init_pixmaps(mi)) {
-			free_star(display, sp);
+			free_star_screen(display, sp);
 			return;
 		}
 
@@ -745,7 +752,7 @@ init_star(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_star(ModeInfo * mi)
 {
 	starstruct *sp;
@@ -783,20 +790,21 @@ draw_star(ModeInfo * mi)
 #endif
 }
 
-void
+ENTRYPOINT void
 release_star(ModeInfo * mi)
 {
 	if (stars != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_star(MI_DISPLAY(mi), &stars[screen]);
+			free_star_screen(MI_DISPLAY(mi), &stars[screen]);
 		free(stars);
 		stars = (starstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_star(ModeInfo * mi)
 {
 	if (MI_IS_INSTALL(mi) && MI_IS_USE3D(mi)) {
@@ -805,6 +813,7 @@ refresh_star(ModeInfo * mi)
 		MI_CLEARWINDOW(mi);
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Star", star)
 

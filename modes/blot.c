@@ -43,23 +43,22 @@ static const char sccsid[] = "@(#)blot.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_blot
-#define PROGCLASS "Blot"
-#define DEFAULTS "*delay: 2000000 \n" \
-	"*count: 6 \n" \
-	"*cycles: 30 \n" \
-	"*ncolors: 200 \n" \
+# define MODE_blot
+# define DEFAULTS	"*delay: 2000000 \n" \
+			"*count: 6 \n" \
+			"*cycles: 30 \n" \
+			"*ncolors: 200 \n" \
 
 # define reshape_blot 0
 # define blot_handle_event 0
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_blot
 
-ModeSpecOpt blot_opts =
+ENTRYPOINT ModeSpecOpt blot_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES

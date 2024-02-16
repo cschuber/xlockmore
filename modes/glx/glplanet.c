@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* glplanet --- 3D rotating planet, e.g., Earth. */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)glplanet.c	5.01 01/04/13 xlockmore";
-
 #endif
 
 /*-
@@ -63,11 +62,6 @@ static const char sccsid[] = "@(#)glplanet.c	5.01 01/04/13 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_glplanet
-# define PROGCLASS						"Planet"
-# define HACK_INIT						init_planet
-# define HACK_DRAW						draw_glplanet
-# define HACK_RESHAPE					reshape_planet
-# define planet_opts					xlockmore_opts
 #define DEFAULTS	"*delay:			15000   \n"	\
 					"*showFPS:			False   \n" \
                     "*rotate:           True    \n" \
@@ -81,9 +75,12 @@ static const char sccsid[] = "@(#)glplanet.c	5.01 01/04/13 xlockmore";
 					"*imageForeground:	Green	\n" \
 					"*imageBackground:	Blue	\n"
 
-# include "xlockmore.h"				/* from the xscreensaver distribution */
+#define free_glplanet 0
+#define reshape_glplanet 0
+#define glplanet_handle_event 0
+# include "xlockmore.h"			/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
-# include "xlock.h"					/* from the xlockmore distribution */
+# include "xlock.h"			/* from the xlockmore distribution */
 # include "visgl.h"
 #endif /* !STANDALONE */
 
@@ -171,7 +168,8 @@ static OptionStruct desc[] = {
   {(char *) "-pimage", (char *) "set image"},
 };
 
-ModeSpecOpt glplanet_opts = {countof(opts), opts, countof(vars), vars, desc};
+ENTRYPOINT ModeSpecOpt glplanet_opts =
+{countof(opts), opts, countof(vars), vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   glplanet_description =
@@ -621,7 +619,7 @@ rotate_and_move (ModeInfo * mi)
 
 
 /* Standard reshape function */
-void
+ENTRYPOINT void
 reshape_planet(ModeInfo *mi, int width, int height)
 {
   GLfloat light[4];
@@ -645,18 +643,14 @@ reshape_planet(ModeInfo *mi, int width, int height)
 }
 
 
-void
+ENTRYPOINT void
 init_glplanet(ModeInfo * mi)
 {
   int         screen = MI_SCREEN(mi);
 
   planetstruct *gp;
 
-  if (planets == NULL) {
-	if ((planets = (planetstruct *) calloc(MI_NUM_SCREENS(mi),
-		  sizeof (planetstruct))) == NULL)
-	  return;
-  }
+  MI_INIT(mi, planets);
   gp = &planets[screen];
 
   pick_velocity (mi);
@@ -702,7 +696,7 @@ init_glplanet(ModeInfo * mi)
   }
 }
 
-void
+ENTRYPOINT void
 draw_glplanet(ModeInfo * mi)
 {
   planetstruct *gp = &planets[MI_SCREEN(mi)];
@@ -763,7 +757,7 @@ draw_glplanet(ModeInfo * mi)
   rotate_and_move (mi);
 }
 
-void
+ENTRYPOINT void
 release_glplanet(ModeInfo * mi)
 {
   if (planets != NULL) {
@@ -792,4 +786,6 @@ release_glplanet(ModeInfo * mi)
   FreeAllGL(mi);
 }
 
-#endif
+XSCREENSAVER_MODULE ("Glplanet", glplanet)
+
+#endif /* MODE_glplanet */

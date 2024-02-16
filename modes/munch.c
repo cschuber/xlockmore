@@ -53,12 +53,11 @@ static const char sccsid[] = "@(#)munch.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_munch
-#define PROGCLASS "Munch"
-#define HACK_INIT init_munch
-#define HACK_DRAW draw_munch
-#define munch_opts xlockmore_opts
 #define DEFAULTS "*delay: 5000 \n" \
- "*cycles: 7 \n"
+	"*cycles: 7 \n" \
+
+# define reshape_munch 0
+# define munch_handle_event 0
 #include "xlockmore.h"		/* from the xscreensaver distribution */
 #else /* !STANDALONE */
 #include "xlock.h"		/* from the xlockmore distribution */
@@ -66,13 +65,13 @@ static const char sccsid[] = "@(#)munch.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_munch
 
-ModeSpecOpt munch_opts =
+ENTRYPOINT ModeSpecOpt munch_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   munch_description =
 {"munch", "init_munch", "draw_munch", "release_munch",
- "init_munch", "init_munch", (char *) NULL, &munch_opts,
+ "init_munch", "init_munch", "free_munch", &munch_opts,
  5000, 1, 7, 1, 64, 1.0, "",
  "Shows munching squares", 0, NULL};
 
@@ -157,17 +156,30 @@ dumb_log_2(int k)
 	return r;
 }
 
-void
+static void
+free_munch_screen(Display * display, munchstruct * mp)
+{
+	if (mp == NULL) {
+		return;
+	}
+	if (mp->gc)
+		XFreeGC(display, mp->gc);
+	mp = NULL;
+}
+
+ENTRYPOINT void
+free_munch(ModeInfo * mi)
+{
+	free_munch_screen(MI_DISPLAY(mi), &munches[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_munch(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
 	munchstruct *mp;
 
-	if (munches == NULL) {
-		if ((munches = (munchstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (munchstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, munches);
 	mp = &munches[MI_SCREEN(mi)];
 
 	if (mp->gc == None) {
@@ -197,7 +209,7 @@ init_munch(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_munch(ModeInfo * mi)
 {
 	munchstruct *mp;
@@ -248,7 +260,7 @@ draw_munch(ModeInfo * mi)
 		mp->t = 0;
 }
 
-void
+ENTRYPOINT void
 release_munch(ModeInfo * mi)
 {
 	if (munches != NULL) {
@@ -256,9 +268,7 @@ release_munch(ModeInfo * mi)
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
 			munchstruct *mp = &munches[screen];
-
-			if (mp->gc != None)
-				XFreeGC(MI_DISPLAY(mi), mp->gc);
+			free_munch_screen(MI_DISPLAY(mi), mp);
 		}
 		free(munches);
 		munches = (munchstruct *) NULL;

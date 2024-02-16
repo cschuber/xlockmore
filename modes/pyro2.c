@@ -2,8 +2,7 @@
 /* pyro --- fireworks */
 
 #if 0
-static const char sccsid[] = "@(#)pyro.c	5.26 2008/02/07 xlockmore";
-
+static const char sccsid[] = "@(#)pyro2.c	5.26 2008/02/07 xlockmore";
 #endif
 
 
@@ -26,24 +25,26 @@ static const char sccsid[] = "@(#)pyro.c	5.26 2008/02/07 xlockmore";
  */
 
 #ifdef STANDALONE
-#define PROGCLASS "Pyro"
-#define HACK_INIT init_pyro2
-#define HACK_DRAW draw_pyro2
-#define pyro2_opts xlockmore_opts
+#define MODE_pyro2
 #define DEFAULTS "*delay: 15000 \n" \
- "*count: 1 \n" \
- "*size: -3 \n" \
- "*ncolors: 200 \n" \
- "*use3d: False \n" \
- "*delta3d: 1.5 \n" \
- "*right3d: red \n" \
- "*left3d: blue \n" \
- "*both3d: magenta \n" \
- "*none3d: black \n"
-#define UNIFORM_COLORS
-#include "xlockmore.h"		/* in xscreensaver distribution */
+	"*count: 1 \n" \
+	"*size: -3 \n" \
+	"*ncolors: 200 \n" \
+	"*use3d: False \n" \
+	"*delta3d: 1.5 \n" \
+	"*right3d: red \n" \
+	"*left3d: blue \n" \
+	"*both3d: magenta \n" \
+	"*none3d: black \n" \
+
+# define reshape_pyro2 0
+# define pyro2_handle_event 0
+# define UNIFORM_COLORS
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
+# include "color.h"
+# include "iostuff.h"
 #endif /* STANDALONE */
 
 #define PYRO_NHUES    7
@@ -76,36 +77,36 @@ static char *modparam_msg, *modparam_fnt;
 static XFontStruct *messagefont = None;
 
 static XrmOptionDescRec opts[] = {
-	{(char *) "-invert", ".pyro2.invert", XrmoptionNoArg, (caddr_t) "on"},
-	{(char *) "+invert", ".pyro2.invert", XrmoptionNoArg, (caddr_t) "off"},
-	{(char *) "-msg", ".pyro2.msg", XrmoptionSepArg, (caddr_t) NULL},
-	{(char *) "-fnt", ".pyro2.fnt", XrmoptionSepArg, (caddr_t) NULL}
+	{(char *) "-invert", (char *) ".pyro2.invert", XrmoptionNoArg, (caddr_t) "on"},
+	{(char *) "+invert", (char *) ".pyro2.invert", XrmoptionNoArg, (caddr_t) "off"},
+	{(char *) "-msg", (char *) ".pyro2.msg", XrmoptionSepArg, (caddr_t) NULL},
+	{(char *) "-fnt", (char *) ".pyro2.fnt", XrmoptionSepArg, (caddr_t) NULL}
 };
 
 static argtype vars[] = {
-	{(void *) &invert, "invert", "Invert", DEF_INVERT, t_Bool},
-	{(void *) &modparam_msg, "msg", "Msg", "", t_String},
-	{(void *) &modparam_fnt, "fnt", "Fnt", DEFAULT_FNT, t_String}
+	{(void *) &invert, (char *) "invert", (char *) "Invert", (char *) DEF_INVERT, t_Bool},
+	{(void *) &modparam_msg, (char *) "msg", (char *) "Msg", (char *) DEFAULT_MSG, t_String},
+	{(void *) &modparam_fnt, (char *) "fnt", (char *) "Fnt", (char *) DEFAULT_FNT, t_String}
 };
 
 static OptionStruct desc[] = {
-        {"-/+invert", "turn on/off inverting of sparks for image"},
-	{"-msg str", "Pyro command (default: " DEFAULT_MSG ")"},
-	{"-fnt font", "Font to use (default " DEFAULT_FNT ")"}
+        {(char *) "-/+invert", (char *) "turn on/off inverting of sparks for image"},
+	{(char *) "-msg str", (char *) "Pyro command (default: " DEFAULT_MSG ")"},
+	{(char *) "-fnt font", (char *) "Font to use (default " DEFAULT_FNT ")"}
 };
 
-ModeSpecOpt pyro2_opts =
-{	sizeof(opts) / sizeof(opts[0]), opts, sizeof(vars)/sizeof(vars[0]), vars, desc };
+ENTRYPOINT ModeSpecOpt pyro2_opts =
+{	sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
-ModStruct   pyro_description =
+ModStruct   pyro2_description =
 {	"pyro2",		/* cmdline_arg: mode name */
 	"init_pyro2",		/* init_name: name of init a mode */
 	"draw_pyro2",		/* callback_name: name of run (tick) a mode */
 	"release_pyro2",	/* release_name: name of shutdown of a mode */
 	"refresh_pyro2",	/* refresh_name: name of mode to repaint */
 	"init_pyro2",		/* change_name: name of mode to change */
-	NULL,			/* unused_name: name for future expansion */
+	"free_pyro2",		/* unused_name: name for future expansion */
 	&pyro2_opts,		/* msopt: this mode's def resources */
 	30000,			/* def_delay: default delay for mode */
 	400,			/* def_count: */
@@ -132,8 +133,6 @@ static char * ostext = NULL;
 #include <errno.h>
 #include <string.h>
 #include <math.h>
-#include "color.h"
-#include "iostuff.h"
 
 #ifdef USE_XVMSUTILS
 #include <X11/unix_time.h>
@@ -154,7 +153,6 @@ static char * ostext = NULL;
 #define TRUE	1
 #endif /* !defined(TRUE) */
 
-#define Rand(x)	(rand()%(x))
 #define RAD(x)	((x) / 180.0 * M_PI)
 #define DEG(x)	((x)/M_PI * 180.0)
 #if !defined(ABS)
@@ -177,7 +175,9 @@ static char * ostext = NULL;
 #define LOGO_HEIGHT    image_height
 #define LOGO_BITS    image_bits
 
+#ifndef STANDALONE
 #include "pyro2.xbm"
+#endif
 
 #ifdef HAVE_XPM
 #define LOGO_NAME  image_name
@@ -197,9 +197,6 @@ static char * ostext = NULL;
 #endif /* USE_XVMSUTILS */
 #endif
 #endif
-
-static int rbits, gbits, bbits;
-static int rpos, gpos, bpos;
 
 typedef struct para {
 	int init;	/* == true : initialization needed */
@@ -291,7 +288,8 @@ static PYRO *pyro;
 
 static pyrostruct *pyros = NULL;
 
-static void free_pyro(PYRO *p)
+static void
+free_a_pyro(PYRO *p)
 {
 
 	if(p->expl.time)	{free(p->expl.time);	p->expl.time = NULL;}
@@ -303,6 +301,47 @@ static void free_pyro(PYRO *p)
 	if(p->expl.ttl)		{free(p->expl.ttl);	p->expl.ttl = NULL;}
 
 	return;
+}
+
+static void
+free_pyro2_screen(ModeInfo *mi, Display *display, pyrostruct *pp)
+{
+	if (pp == NULL) {
+		return;
+	}
+	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
+		if(pp->colors && pp->ncolors) { /* FIXME: if !no_colors */
+			free_colors(
+#ifdef STANDALONE
+				MI_SCREENPTR(mi),
+#else
+				display,
+#endif
+				pp->cmap, pp->colors, pp->ncolors);
+		}
+		if (pp->colors != NULL) {
+			free(pp->colors);
+		}
+		if (pp->cmap) {
+			XFreeColormap(display, pp->cmap);
+		}
+		if (pp->gc != None) {
+			MI_WHITE_PIXEL(mi) = pp->whitepixel;
+			MI_BLACK_PIXEL(mi) = pp->blackpixel;
+#ifndef STANDALONE
+			MI_FG_PIXEL(mi) = pp->fg;
+			MI_BG_PIXEL(mi) = pp->bg;
+#endif
+			XFreeGC(display, pp->gc);
+		}
+	}
+	pp = NULL;
+}
+
+ENTRYPOINT void
+free_pyro2(ModeInfo * mi)
+{
+	free_pyro2_screen(mi, MI_DISPLAY(mi), &pyros[MI_SCREEN(mi)]);
 }
 
 
@@ -335,7 +374,7 @@ static int calc(ModeInfo * mi, PYRO *pyro)
 				break;
 			default:
 				pyro[i].stat = READY;
-				free_pyro(&pyro[i]);
+				free_a_pyro(&pyro[i]);
 				/*delay(1);*/
 		}
 
@@ -384,10 +423,10 @@ static void parabel(ModeInfo * mi, PYRO *p)
 	pa = &p->para;
 
 	if(pa->init == FALSE) {
-		pa->phi = 80.0 + (double)Rand(20);
-		/*pa->phi = 60.0 + (double)Rand(60);*/
+		pa->phi = 80.0 + (double)NRAND(20);
+		/*pa->phi = 60.0 + (double)NRAND(60);*/
 		pa->v0 = 23.0;
-		/*pa->v0 = 10.0 + Rand(10);*/
+		/*pa->v0 = 10.0 + NRAND(10);*/
 		pa->th = pa->v0 * SIN(pa->phi) / 9.81;
 		pa->t = 0.0;
 	}
@@ -441,22 +480,27 @@ static void parabel(ModeInfo * mi, PYRO *p)
 #define EXP_MAX_SPARKS		(EXP_MIN_SPARKS + EXP_RND_SPARKS)
 #define EXP_MAX_DOTS		(EXP_MAX_GENERATION * EXP_MAX_SPARKS * 20)
 
-int get_red(double val)
+/*
+static int rbits, gbits, bbits;
+static int rpos, gpos, bpos;
+
+static int get_red(double val)
 {
 	return ((int)(val*(double)((1<<rbits)-1))&((1<<rbits)-1)) << rpos;
 }
 
-int get_green(double val)
+static int get_green(double val)
 {
 	return ((int)(val*(double)((1<<gbits)-1))&((1<<gbits)-1)) << gpos;
 }
 
-int get_blue(double val)
+static int get_blue(double val)
 {
 	return (int)(val*(double)((1<<bbits)-1))&((1<<bbits)-1) << bpos;
 }
 
 #define COLOR(r,g,b)	(get_red(r)|get_green(g)|get_blue(b))
+*/
 
 double heart[] = {
 0.80999300,0.80999300,0.82499300,0.82599300,0.82699300,0.82799300,0.82899300,0.83099300,
@@ -640,80 +684,80 @@ static void explosion(ModeInfo * mi, PYRO *p)
 	}
 	e->firsttime = 1;
 
-	sparks = (p->bitmap != NULL && (e->type == 42 || e->type == 23))? p->bitmap->dotcnt:EXP_MIN_SPARKS+Rand(EXP_RND_SPARKS);
+	sparks = (p->bitmap != NULL && (e->type == 42 || e->type == 23))? p->bitmap->dotcnt:EXP_MIN_SPARKS+NRAND(EXP_RND_SPARKS);
 
 	if(e->type == 42 && e->current_generation > 0) {
 		return;
 	}
 
 	step = 360.0 / sparks;
-	phi = 1.0+(double)Rand(10);
+	phi = 1.0+(double)NRAND(10);
 
 	for(i=0;i<sparks;++i)	{
 		e->angle[e->sparkcnt] = phi;
 		e->color[e->sparkcnt] = ( (e->sparkcnt & 1) && p->color2!=-1) ? p->color2 : p->color1;
 
-		e->ttl[e->sparkcnt] = EXP_MAX_TTL/2+Rand(EXP_MAX_TTL/1);
+		e->ttl[e->sparkcnt] = EXP_MAX_TTL/2+NRAND(EXP_MAX_TTL/1);
 		e->generation[e->sparkcnt] = e->current_generation;
 		e->time[e->sparkcnt] = 0.0;
 		e->delta_t[e->sparkcnt] = 0; /*0.001;*/
-		/*e->m[e->sparkcnt] = 0.5 + Rand(10)/10.0;*/ /*Rand(2)? 1.0:1.3;*/
-		e->m[e->sparkcnt] = 2 + Rand(2)/2.0; /*Rand(2)? 1.0:1.3;*/
+		/*e->m[e->sparkcnt] = 0.5 + NRAND(10)/10.0;*/ /*NRAND(2)? 1.0:1.3;*/
+		e->m[e->sparkcnt] = 2 + NRAND(2)/2.0; /*NRAND(2)? 1.0:1.3;*/
 
 		switch(e->type)	{
 			case 0:	{/* ? */
 				double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;
 
-				e->ttl[e->sparkcnt] = EXP_MAX_TTL/10+Rand(EXP_MAX_TTL/2);
-				e->v0[e->sparkcnt] = Rand(30)+SIN(tmp *90.0) * MI_WIDTH(mi)/10 * factor;
+				e->ttl[e->sparkcnt] = EXP_MAX_TTL/10+NRAND(EXP_MAX_TTL/2);
+				e->v0[e->sparkcnt] = NRAND(30)+SIN(tmp *90.0) * MI_WIDTH(mi)/10 * factor;
 			}
 			break;
 			case 1:	{
 				double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;
-				e->v0[e->sparkcnt] = Rand(30)+SIN(tmp *360.0) * MI_WIDTH(mi)/10 * factor;
+				e->v0[e->sparkcnt] = NRAND(30)+SIN(tmp *360.0) * MI_WIDTH(mi)/10 * factor;
 			}
 			break;
 			case 2:	{
 					double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;
-					e->v0[e->sparkcnt] = Rand(30)+COS(tmp *180.0) * MI_WIDTH(mi)/5 * factor;
-					/*e->v0[e->sparkcnt] = Rand(30)+COS(tmp *180.0) * 200;*/
+					e->v0[e->sparkcnt] = NRAND(30)+COS(tmp *180.0) * MI_WIDTH(mi)/5 * factor;
+					/*e->v0[e->sparkcnt] = NRAND(30)+COS(tmp *180.0) * 200;*/
 				}
 			break;
 			case 3:	{
 					double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;
-					e->v0[e->sparkcnt] = Rand(30)+SIN(tmp*360.0) * COS(tmp*360.0) * MI_WIDTH(mi)/5 * factor;
+					e->v0[e->sparkcnt] = NRAND(30)+SIN(tmp*360.0) * COS(tmp*360.0) * MI_WIDTH(mi)/5 * factor;
 				}
 			break;
 			case 4: {
 					if(i == 0)	e->typedata.integer = -e->typedata.integer;
-					e->v0[e->sparkcnt] = Rand(30)+(i+2)*e->typedata.integer*MI_WIDTH(mi)/200 * factor;
+					e->v0[e->sparkcnt] = NRAND(30)+(i+2)*e->typedata.integer*MI_WIDTH(mi)/200 * factor;
 				}
 			break;
 			case 5:	{
 				/*double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;*/
-				e->v0[e->sparkcnt] = Rand(30)+COS((int)((double)e->current_generation/(double)EXP_MAX_GENERATION *360.0) % 90) * COS((double)e->current_generation/(double)EXP_MAX_GENERATION *360.0) * MI_WIDTH(mi)/5 * factor;
+				e->v0[e->sparkcnt] = NRAND(30)+COS((int)((double)e->current_generation/(double)EXP_MAX_GENERATION *360.0) % 90) * COS((double)e->current_generation/(double)EXP_MAX_GENERATION *360.0) * MI_WIDTH(mi)/5 * factor;
 			}
 			break;
 			case 6:	{
 				double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;
-				e->v0[e->sparkcnt] = Rand(30)+((i-sparks/2)*SIN(phi*10)*SIN(tmp*360.0))*MI_WIDTH(mi)/100 * factor;
+				e->v0[e->sparkcnt] = NRAND(30)+((i-sparks/2)*SIN(phi*10)*SIN(tmp*360.0))*MI_WIDTH(mi)/100 * factor;
 			}
 			break;
 			case 7:	{
 				/*double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;*/
-				e->v0[e->sparkcnt] = Rand(30)+((i-sparks/2)*SIN(phi*10)*SIN((int)((double)e->current_generation/(EXP_MAX_GENERATION)*360.0)%90))*MI_WIDTH(mi)/50 * factor;
+				e->v0[e->sparkcnt] = NRAND(30)+((i-sparks/2)*SIN(phi*10)*SIN((int)((double)e->current_generation/(EXP_MAX_GENERATION)*360.0)%90))*MI_WIDTH(mi)/50 * factor;
 			}
 			break;
 			case 8:
-				e->v0[e->sparkcnt] = Rand(30)+(SIN((i+1.0)/(EXP_MIN_SPARKS+EXP_RND_SPARKS)*360.0)*(1.0*i))*MI_WIDTH(mi)/100 * factor;
+				e->v0[e->sparkcnt] = NRAND(30)+(SIN((i+1.0)/(EXP_MIN_SPARKS+EXP_RND_SPARKS)*360.0)*(1.0*i))*MI_WIDTH(mi)/100 * factor;
 				break;
 			case 9:	{
 				double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;
-				e->v0[e->sparkcnt] = Rand(30)+SIN(tmp *360.0*4.0) * MI_WIDTH(mi)/10 * factor;
+				e->v0[e->sparkcnt] = NRAND(30)+SIN(tmp *360.0*4.0) * MI_WIDTH(mi)/10 * factor;
 			}
 			break;
 			case 10:
-				e->ttl[e->sparkcnt] = EXP_MAX_TTL/2+Rand(EXP_MAX_TTL/1)+5;
+				e->ttl[e->sparkcnt] = EXP_MAX_TTL/2+NRAND(EXP_MAX_TTL/1)+5;
 				e->v0[e->sparkcnt] = heart[(int)((double)i/(double)sparks *360.0)] * (e->current_generation)*MI_WIDTH(mi)/150 * factor;
 				if (MI_IS_INSTALL(mi))
 					e->color[e->sparkcnt] = PYRO_NSHADES; /* pp->love; MI_RED_MASK(mi); */
@@ -722,18 +766,18 @@ static void explosion(ModeInfo * mi, PYRO *p)
 				break;
 			case 11:	{
 				double tmp = (double)i/(double)sparks;
-				e->v0[e->sparkcnt] = Rand(30) + SIN(tmp*90)*COS(tmp*180)*i*(i&1? 1:-1)*MI_WIDTH(mi)/100 * factor;
+				e->v0[e->sparkcnt] = NRAND(30) + SIN(tmp*90)*COS(tmp*180)*i*(i&1? 1:-1)*MI_WIDTH(mi)/100 * factor;
 				break;
 			}
 			case 13:	{
 				/*double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;*/
-				e->v0[e->sparkcnt] = Rand(2)? i * 20:(sparks-i)*20;
+				e->v0[e->sparkcnt] = NRAND(2)? i * 20:(sparks-i)*20;
 				break;
 
 			}
 			case 14:	{
 				/*double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;*/
-				e->v0[e->sparkcnt] = 5+ (Rand(20) == 3? i:(sparks-i))*20;
+				e->v0[e->sparkcnt] = 5+ (NRAND(20) == 3? i:(sparks-i))*20;
 				break;
 
 			}
@@ -747,7 +791,7 @@ static void explosion(ModeInfo * mi, PYRO *p)
 				e->angle[e->sparkcnt] = (double)p->bitmap->phi[i];
 				e->v0[e->sparkcnt] = (double)p->bitmap->v0[i] * MI_WIDTH(mi)/4 * factor;
 				/*e->v0[e->sparkcnt] = (double)p->bitmap->v0[i] * 300.0;*/
-				e->m[e->sparkcnt] = 1.0 + Rand(50)/800.0;
+				e->m[e->sparkcnt] = 1.0 + NRAND(50)/800.0;
 
 				e->current_generation = EXP_MAX_GENERATION;
 				break;
@@ -755,10 +799,10 @@ static void explosion(ModeInfo * mi, PYRO *p)
 			default:
 			case 12:	{
 				double tmp = (double)e->current_generation/(double)EXP_MAX_GENERATION;
-				/*e->v0[e->sparkcnt] = Rand(30) + ABS(SIN(tmp * 90.0 * 3) * tmp ) * 200;*/
-				/*e->v0[e->sparkcnt] = Rand(30) + (tmp <= 0.3 ? SIN(tmp * 90.0):tmp <= 0.6? SIN((tmp-0.3) * 90.0):SIN((tmp-0.6)*90.0)) * (tmp + 0.5)* 200+10;*/
-				e->v0[e->sparkcnt] = Rand(10)+15 + (tmp <= 0.3 ? SIN(tmp * 90.0):tmp <= 0.6? SIN((tmp-0.3) * 90.0):SIN((tmp-0.6)*90.0)) * (tmp + 0.5)* MI_WIDTH(mi)/5 * factor;
-				/*e->v0[e->sparkcnt] = Rand(10)+15 + (tmp <= 0.3 ? SIN(tmp * 90.0):tmp <= 0.6? SIN((tmp-0.3) * 90.0):SIN((tmp-0.6)*90.0)) * (tmp + 0.5)* 200;*/
+				/*e->v0[e->sparkcnt] = NRAND(30) + ABS(SIN(tmp * 90.0 * 3) * tmp ) * 200;*/
+				/*e->v0[e->sparkcnt] = NRAND(30) + (tmp <= 0.3 ? SIN(tmp * 90.0):tmp <= 0.6? SIN((tmp-0.3) * 90.0):SIN((tmp-0.6)*90.0)) * (tmp + 0.5)* 200+10;*/
+				e->v0[e->sparkcnt] = NRAND(10)+15 + (tmp <= 0.3 ? SIN(tmp * 90.0):tmp <= 0.6? SIN((tmp-0.3) * 90.0):SIN((tmp-0.6)*90.0)) * (tmp + 0.5)* MI_WIDTH(mi)/5 * factor;
+				/*e->v0[e->sparkcnt] = NRAND(10)+15 + (tmp <= 0.3 ? SIN(tmp * 90.0):tmp <= 0.6? SIN((tmp-0.3) * 90.0):SIN((tmp-0.6)*90.0)) * (tmp + 0.5)* 200;*/
 				break;
 			}
 		}
@@ -962,10 +1006,33 @@ static LOGO_BITMAP *text2bitmap(ModeInfo *mi, char *text)
 	extern char *foreground;
 #endif
 
-void init_pyro2(ModeInfo * mi)
+ENTRYPOINT void
+release_pyro2(ModeInfo * mi)
+{
+	if (pyros != NULL) {
+		int         screen;
+		Display *display = MI_DISPLAY(mi);
+
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_pyro2_screen(mi, display, &pyros[screen]);
+		free(pyros);
+		pyros = (pyrostruct *) NULL;
+	}
+	if (messagefont != None) {
+		XFreeFont(MI_DISPLAY(mi), messagefont);
+		messagefont = None;
+	}
+	if (ostext != NULL) {
+		free(ostext);
+		ostext = NULL;
+	}
+}
+
+ENTRYPOINT void
+init_pyro2(ModeInfo * mi)
 {
 	int i;
-	time_t t = time(NULL);
+	/*time_t t = time(NULL);*/
 	int text_in_buffer = FALSE;
 	char *rov;
 	/*static char defaultString[] =
@@ -976,11 +1043,9 @@ void init_pyro2(ModeInfo * mi)
 #endif*/
 	Display *display = MI_DISPLAY(mi);
 	Window  window = MI_WINDOW(mi);
-
 	pyrostruct *pp;
 
-	if(pyros == NULL && (pyros = (pyrostruct *) calloc(MI_NUM_SCREENS(mi), sizeof (pyrostruct))) == NULL)
-			return;
+	MI_INIT(mi, pyros);
         if (messagefont == None) {
 		if (modparam_fnt != NULL &&
 				!(messagefont = XLoadQueryFont(display, modparam_fnt)))	{
@@ -997,6 +1062,10 @@ void init_pyro2(ModeInfo * mi)
 	pp = &pyros[MI_SCREEN(mi)];
 	if(!pp->gc) {
 		if(MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
+#ifdef STANDALONE
+			Screen *screen = MI_SCREENPTR(mi);
+			Visual *visual = MI_VISUAL(mi);
+#endif
 			XColor      color;
 			int hue, ncol;
 
@@ -1036,7 +1105,13 @@ void init_pyro2(ModeInfo * mi)
 #undef PYRO_RAMP
 #ifdef PYRO_RAMP
 			/* glitter, huebsch */
-			make_color_ramp(display, pp->cmap,
+			make_color_ramp(
+#ifdef STANDALONE
+							screen, visual,
+#else
+							display,
+#endif
+							pp->cmap,
 							45,(double)0.0,(double)0.0,
 							0,(double)1.0,(double)1.0,
 							pp->colors,
@@ -1054,7 +1129,13 @@ void init_pyro2(ModeInfo * mi)
 				h = hue ? (360/(PYRO_NHUES-1)) * (hue-1) : 0;
 
 				ncol = PYRO_NSHADES/10;
-				make_color_ramp(display, pp->cmap,
+				make_color_ramp(
+#ifdef STANDALONE
+								screen, visual,
+#else
+								display,
+#endif
+								pp->cmap,
 								h,!hue?0.0:(double)atof(getenv("S1") ? getenv("S1") : "0.0"),(double)atof(getenv("B1") ? getenv("B1") : "1.0"),
 								h,!hue?0.0:(double)atof(getenv("S2") ? getenv("S2") : "0.8"),(double)atof(getenv("B2") ? getenv("B1") : "1.0"),
 								&pp->colors[hue*PYRO_NSHADES],
@@ -1069,7 +1150,13 @@ void init_pyro2(ModeInfo * mi)
 				pp->ncolors += ncol;
 
 				ncol = PYRO_NSHADES/10*9;
-				make_color_ramp(display, pp->cmap,
+				make_color_ramp(
+#ifdef STANDALONE
+								screen, visual,
+#else
+								display,
+#endif
+								pp->cmap,
 								h,!hue?0.0:(double)atof(getenv("S2") ? getenv("S2") : "0.8"),(double)atof(getenv("B2") ? getenv("B2") : "1.0"),
 								h,!hue?0.0:(double)atof(getenv("S3") ? getenv("S3") : "1.0"),(double)atof(getenv("B3") ? getenv("B3") : "0.0"),
 								&pp->colors[hue*PYRO_NSHADES+PYRO_NSHADES/10],
@@ -1103,8 +1190,6 @@ void init_pyro2(ModeInfo * mi)
 
 	/* Clear Display */
 	MI_CLEARWINDOW(mi);
-
-	srand(t);
 
 	if(pyro) {
 		for(i=0;i<pyrocnt;++i)
@@ -1212,7 +1297,7 @@ void init_pyro2(ModeInfo * mi)
 				++i;
 			}
 			break;
-#ifndef WIN32
+#if !defined(STANDALONE) && !defined(WIN32)
 			case '#':	{	/* logo */
 				XImage *image;
 				int graphics_format;
@@ -1289,11 +1374,10 @@ void init_pyro2(ModeInfo * mi)
 		pyro[i].color1 = NRAND(PYRO_NHUES)*PYRO_NSHADES; /* offset into pp->colors */
 		pyro[i].color2 = getenv("MULTICOL") ? NRAND(PYRO_NHUES)*PYRO_NSHADES : -1; /* offset into pp->colors */
 	}
-
-	return;
 }
 
-void draw_pyro2(ModeInfo * mi)
+ENTRYPOINT void
+draw_pyro2(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
 	GC          gc = MI_GC(mi);
@@ -1321,64 +1405,19 @@ void draw_pyro2(ModeInfo * mi)
 #endif
 
 	if(!calc(mi, pyro)) init_pyro2(mi);
-
-	return;
 }
 
-void release_pyro2(ModeInfo * mi)
-{
-	if(pyros != NULL) {
-		int         screen;
-		Display *display = MI_DISPLAY(mi);
-
-		if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
-
-			for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-				pyrostruct *pp = &pyros[screen];
-
-				if(pp->colors && pp->ncolors) { /* FIXME: if !no_colors */
-					free_colors(display, pp->cmap, pp->colors, pp->ncolors);
-				}
-				if (pp->colors != NULL) {
-					free(pp->colors);
-				}
-				if (pp->cmap) {
-					XFreeColormap(display, pp->cmap);
-				}
-				if (pp->gc != None) {
-					MI_WHITE_PIXEL(mi) = pp->whitepixel;
-					MI_BLACK_PIXEL(mi) = pp->blackpixel;
 #ifndef STANDALONE
-					MI_FG_PIXEL(mi) = pp->fg;
-					MI_BG_PIXEL(mi) = pp->bg;
-#endif
-					XFreeGC(display, pp->gc);
-				}
-			}
-		}
-		free(pyros);
-		pyros = (pyrostruct *) NULL;
-	}
-	if (messagefont != None) {
-		XFreeFont(MI_DISPLAY(mi), messagefont);
-		messagefont = None;
-	}
-	if (ostext != NULL)
-		free(ostext);
-	ostext = NULL;
-	return;
-}
-
-void refresh_pyro2(ModeInfo * mi)
+ENTRYPOINT void
+refresh_pyro2(ModeInfo * mi)
 {
 	if (MI_IS_INSTALL(mi) && MI_IS_USE3D(mi)) {
 		MI_CLEARWINDOWCOLOR(mi, MI_NONE_COLOR(mi));
-	}
-	else {
+	} else {
 		MI_CLEARWINDOW(mi);
 	}
-	return;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Pyro2", pyro2)
 

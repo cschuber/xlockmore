@@ -327,7 +327,7 @@ AH_TEMPLATE([GETTIMEOFDAY_TWO_ARGS],
 	    [Define this if gettimeofday() takes two arguments.])
 
 AH_TEMPLATE([XPointer],
-	    [Define this to void* if you're using X11R4 or earlier.])
+	    [Define this to void* if you are using X11R4 or earlier.])
 
 AH_TEMPLATE([HAVE_PTHREAD],
 	    [Define this if your system supports POSIX threads.])
@@ -342,7 +342,7 @@ AH_TEMPLATE([HAVE_RECORD_ANIM],
 # check for some random other files that come later in the tar file,
 # to make sure everything is here.
 #
-for d in utils jwxyz hacks xlockmore/xlock xlockmore/modes hacks/glx driver ; do
+for d in utils jwxyz hacks xlockmore/xlock xlockmore/modes xlockmore/modes/glx hacks/glx driver ; do
   f=$srcdir/$d/Makefile.in
   if test \! -r $f ; then
     echo ""
@@ -4324,6 +4324,7 @@ AC_OUTPUT(Makefile
           hacks/Makefile
 	  xlockmore/xlock/Makefile
           xlockmore/modes/Makefile
+          xlockmore/modes/glx/Makefile
           hacks/images/Makefile
           hacks/glx/Makefile
           po/Makefile.in

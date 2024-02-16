@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* stairs --- Infinite Stairs, and Escher-like scene. */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)stairs.c	5.01 2001/03/01 xlockmore";
-
 #endif
 
 #undef DEBUG_LISTS
@@ -63,16 +62,15 @@ static const char sccsid[] = "@(#)stairs.c	5.01 2001/03/01 xlockmore";
 #endif
 
 #ifdef STANDALONE
-#define MODE_stairs
-#define PROGCLASS "stairs"
-#define HACK_INIT init_stairs
-#define HACK_DRAW draw_stairs
-#define stairs_opts xlockmore_opts
-#define DEFAULTS "*delay: 200000 \n"
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+# define MODE_stairs
+# define DEFAULTS	"*delay: 200000 \n"
+
+#define free_stairs 0
+#define stairs_handle_event 0
+# include "xlockmore.h"		/* from the xscreensaver distribution */
 #else /* !STANDALONE */
-#include "xlock.h"		/* from the xlockmore distribution */
-#include "visgl.h"
+# include "xlock.h"		/* from the xlockmore distribution */
+# include "visgl.h"
 #endif /* !STANDALONE */
 
 #ifdef MODE_stairs
@@ -80,7 +78,7 @@ static const char sccsid[] = "@(#)stairs.c	5.01 2001/03/01 xlockmore";
 #include <GL/glu.h>
 #include "e_textures.h"
 
-ModeSpecOpt stairs_opts =
+ENTRYPOINT ModeSpecOpt stairs_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -340,7 +338,7 @@ draw_stairs_internal(ModeInfo * mi)
 	return True;
 }
 
-static void
+ENTRYPOINT void
 reshape_stairs(ModeInfo * mi, int width, int height)
 {
 	stairsstruct *sp = &stairs[MI_SCREEN(mi)];
@@ -396,7 +394,7 @@ pinit(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, front_specular);
 }
 
-void
+ENTRYPOINT void
 release_stairs(ModeInfo * mi)
 {
 	if (stairs != NULL) {
@@ -420,16 +418,12 @@ release_stairs(ModeInfo * mi)
 	FreeAllGL(mi);
 }
 
-void
+ENTRYPOINT void
 init_stairs(ModeInfo * mi)
 {
 	stairsstruct *sp;
 
-	if (stairs == NULL) {
-		if ((stairs = (stairsstruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (stairsstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, stairs);
 	sp = &stairs[MI_SCREEN(mi)];
 
 	sp->step = 0.0;
@@ -450,7 +444,7 @@ init_stairs(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_stairs(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -503,7 +497,8 @@ draw_stairs(ModeInfo * mi)
 	sp->step += 0.025;
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 change_stairs(ModeInfo * mi)
 {
 	stairsstruct *sp;
@@ -521,5 +516,8 @@ change_stairs(ModeInfo * mi)
 #endif
 	pinit();
 }
-
 #endif
+
+XSCREENSAVER_MODULE ("Stairs", stairs)
+
+#endif /* MODE_stairs */

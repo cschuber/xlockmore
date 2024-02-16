@@ -44,23 +44,26 @@ static const char sccsid[] = "@(#)deco.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_deco
-#define PROGCLASS "Deco"
-#define HACK_INIT init_deco
-#define HACK_DRAW draw_deco
-#define deco_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000000 \n" \
- "*count: -30 \n" \
- "*cycles: 2 \n" \
- "*size: -10 \n" \
- "*ncolors: 200 \n"
+	"*count: -30 \n" \
+	"*cycles: 2 \n" \
+	"*size: -10 \n" \
+	"*ncolors: 200 \n" \
+
+# define free_deco 0
+# define reshape_deco 0
+# define deco_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
+#define UNIFORM_COLORS
+#define BRIGHT_COLORS
+#define SMOOTH_COLORS
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_deco
 
-ModeSpecOpt deco_opts =
+ENTRYPOINT ModeSpecOpt deco_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -116,18 +119,14 @@ deco(ModeInfo * mi, int x, int y, int w, int h, int depth)
 	}
 }
 
-void
+ENTRYPOINT void
 init_deco(ModeInfo * mi)
 {
 	decostruct *dp;
 	int         depth = MI_COUNT(mi);
 	int         size = MI_SIZE(mi);
 
-	if (decos == NULL) {
-		if ((decos = (decostruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (decostruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, decos);
 	dp = &decos[MI_SCREEN(mi)];
 
 	if (MI_NPIXELS(mi) > 2) {
@@ -151,7 +150,7 @@ init_deco(ModeInfo * mi)
 	dp->time = 0;
 }
 
-void
+ENTRYPOINT void
 draw_deco(ModeInfo * mi)
 {
 	decostruct *dp;
@@ -180,7 +179,7 @@ draw_deco(ModeInfo * mi)
 
 }
 
-void
+ENTRYPOINT void
 release_deco(ModeInfo * mi)
 {
 	if (decos != NULL) {

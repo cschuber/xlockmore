@@ -32,19 +32,19 @@ static const char sccsid[] = "@(#)ant3d.c	5.13 2004/07/23 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_ant3d
-#define DEFAULTS "*delay: 5000 \n" \
-	"*count: -3 \n" \
-	"*cycles: 10000 \n" \
-	"*ncolors: 200 \n" \
-	"*wireframe: False \n" \
-	"*fullrandom: False \n" \
-	"*verbose: False \n"\
+# define DEFAULTS	"*delay: 5000 \n" \
+			"*count: -3 \n" \
+			"*cycles: 10000 \n" \
+			"*ncolors: 200 \n" \
+			"*wireframe: False \n" \
+			"*fullrandom: False \n" \
+			"*verbose: False \n"\
 
 # define reshape_ant3d 0
 # define ant3d_handle_event 0
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 #define DO_STIPPLE
 #include "automata.h"
@@ -92,7 +92,7 @@ static OptionStruct desc[] =
 	{(char *) "-/+eyes", (char *) "turn on/off eyes"}
 };
 
-ModeSpecOpt ant3d_opts =
+ENTRYPOINT ModeSpecOpt ant3d_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -2053,9 +2053,7 @@ free_ant3d_screen(Display *display, antfarm3dstruct *ap)
 ENTRYPOINT void
 free_ant3d(ModeInfo * mi)
 {
-	Display *display = MI_DISPLAY(mi);
-	antfarm3dstruct *ap = &antfarm3ds[MI_SCREEN(mi)];
-	free_ant3d_screen(display, ap);
+	free_ant3d_screen(MI_DISPLAY(mi), &antfarm3ds[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

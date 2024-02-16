@@ -1,8 +1,7 @@
 /* atlantis --- Shows moving 3D sea animals */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)atlantis.c	5.12 2004/03/03 xlockmore";
-
 #endif
 
 /* Copyright (c) E. Lassauge, 1998. */
@@ -118,11 +117,6 @@ static const char sccsid[] = "@(#)atlantis.c	5.12 2004/03/03 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_atlantis
-# define PROGCLASS	"Atlantis"
-# define HACK_INIT	init_atlantis
-# define HACK_DRAW	draw_atlantis
-# define HACK_RESHAPE	reshape_atlantis
-# define atlantis_opts	xlockmore_opts
 # define DEFAULTS	"*delay:       25000 \n" \
 			 "*count:          4 \n" \
 			 "*showFPS:    False \n" \
@@ -131,7 +125,10 @@ static const char sccsid[] = "@(#)atlantis.c	5.12 2004/03/03 xlockmore";
 			 "*wireframe:  False \n" \
 			 "*texture:    " DEF_TEXTURE    " \n" \
 			 "*gradient:   " DEF_GRADIENT   " \n" \
-			 "*whalespeed: " DEF_WHALESPEED " \n"
+			 "*whalespeed: " DEF_WHALESPEED " \n" \
+
+#define free_atlantis 0
+#define atlantis_handle_event 0
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 #else /* !STANDALONE */
 # include "xlock.h"		/* from the xlockmore distribution */
@@ -180,13 +177,13 @@ static OptionStruct desc[] =
 	{(char *) "-gradient",       (char *) "whether to introduce gradient-filled background"},
 };
 
-ModeSpecOpt atlantis_opts =
+ENTRYPOINT ModeSpecOpt atlantis_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   atlantis_description =
 {"atlantis", "init_atlantis", "draw_atlantis", "release_atlantis",
- "refresh_atlantis", "change_atlantis", (char *) NULL, &atlantis_opts,
+ (char *) NULL, "change_atlantis", (char *) NULL, &atlantis_opts,
  25000, NUM_SHARKS, SHARKSPEED, SHARKSIZE, 64, 1.0, "",
  "Shows moving sharks/whales/dolphin", 0, NULL};
 
@@ -365,7 +362,7 @@ Init(ModeInfo * mi)
 	glClearColor(0.0, fgreen, fblue, 0.0);
 }
 
-void
+ENTRYPOINT void
 reshape_atlantis(ModeInfo * mi, int width, int height)
 {
 	atlantisstruct *ap = &atlantis[MI_SCREEN(mi)];
@@ -492,7 +489,7 @@ AllDisplay(atlantisstruct * ap)
  *-----------------------------------------------------------------------------
  */
 
-void
+ENTRYPOINT void
 init_atlantis(ModeInfo * mi)
 {
 	int         screen = MI_SCREEN(mi);
@@ -500,11 +497,7 @@ init_atlantis(ModeInfo * mi)
 	Display    *display = MI_DISPLAY(mi);
 	Window      window = MI_WINDOW(mi);
 
-	if (atlantis == NULL) {
-		if ((atlantis = (atlantisstruct *) calloc(MI_NUM_SCREENS(mi),
-					   sizeof (atlantisstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, atlantis);
 	ap = &atlantis[screen];
 	ap->num_sharks = MI_COUNT(mi);
 	if (ap->sharks == NULL) {
@@ -552,7 +545,7 @@ init_atlantis(ModeInfo * mi)
  *    Called by the mainline code periodically to update the display.
  *-----------------------------------------------------------------------------
  */
-void
+ENTRYPOINT void
 draw_atlantis(ModeInfo * mi)
 {
 	atlantisstruct *ap = &atlantis[MI_SCREEN(mi)];
@@ -586,7 +579,7 @@ draw_atlantis(ModeInfo * mi)
  *-----------------------------------------------------------------------------
  */
 
-void
+ENTRYPOINT void
 release_atlantis(ModeInfo * mi)
 {
 	int         screen;
@@ -608,12 +601,8 @@ release_atlantis(ModeInfo * mi)
 	FreeAllGL(mi);
 }
 
-void
-refresh_atlantis(ModeInfo * mi)
-{
-}
-
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 change_atlantis(ModeInfo * mi)
 {
 	atlantisstruct *ap = &atlantis[MI_SCREEN(mi)];
@@ -627,5 +616,8 @@ change_atlantis(ModeInfo * mi)
 #endif
 	Init(mi);
 }
+#endif
+
+XSCREENSAVER_MODULE ("Atlantis", atlantis)
 
 #endif /* MODE_atlantis */

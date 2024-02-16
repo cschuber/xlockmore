@@ -37,12 +37,11 @@ static const char sccsid[] = "@(#)ifs.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_ifs
-#define PROGCLASS "IFS"
-#define HACK_INIT init_ifs
-#define HACK_DRAW draw_ifs
-#define ifs_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000 \n" \
- "*ncolors: 100 \n"
+	"*ncolors: 100 \n" \
+
+# define reshape_ifs 0
+# define ifs_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -51,13 +50,13 @@ static const char sccsid[] = "@(#)ifs.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_ifs
 
-ModeSpecOpt ifs_opts =
+ENTRYPOINT ModeSpecOpt ifs_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   ifs_description =
 {"ifs", "init_ifs", "draw_ifs", "release_ifs",
- "init_ifs", "init_ifs", (char *) NULL, &ifs_opts,
+ "init_ifs", "init_ifs", "free_ifs", &ifs_opts,
  1000, 1, 1, 1, 64, 1.0, "",
  "Shows a modified iterated function system", 0, NULL};
 
@@ -225,8 +224,11 @@ free_ifs_buffers(FRACTAL *Fractal)
 
 
 static void
-free_ifs(Display *display, FRACTAL *Fractal)
+free_ifs_screen(Display *display, FRACTAL *Fractal)
 {
+	if (Fractal == NULL) {
+		return;
+	}
 	free_ifs_buffers(Fractal);
 	if (Fractal->dbuf != None) {
 		XFreePixmap(display, Fractal->dbuf);
@@ -236,11 +238,18 @@ free_ifs(Display *display, FRACTAL *Fractal)
 		XFreeGC(display, Fractal->dbuf_gc);
 		Fractal->dbuf_gc = None;
 	}
+	Fractal = NULL;
 }
 
 /***************************************************************/
 
-void
+ENTRYPOINT void
+free_ifs(ModeInfo * mi)
+{
+	free_ifs_screen(MI_DISPLAY(mi), &Root[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_ifs(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -249,12 +258,7 @@ init_ifs(ModeInfo * mi)
 	int         i;
 	FRACTAL    *Fractal;
 
-	if (Root == NULL) {
-		Root = (FRACTAL *) calloc(
-				       MI_NUM_SCREENS(mi), sizeof (FRACTAL));
-		if (Root == NULL)
-			return;
-	}
+	MI_INIT(mi, Root);
 	Fractal = &Root[MI_SCREEN(mi)];
 
 	free_ifs_buffers(Fractal);
@@ -297,12 +301,12 @@ init_ifs(ModeInfo * mi)
 
 	if ((Fractal->Buffer1 = (XPoint *) calloc(Fractal->Max_Pt,
 			sizeof (XPoint))) == NULL) {
-		free_ifs(display, Fractal);
+		free_ifs_screen(display, Fractal);
 		return;
 	}
 	if ((Fractal->Buffer2 = (XPoint *) calloc(Fractal->Max_Pt,
 			sizeof (XPoint))) == NULL) {
-		free_ifs(display, Fractal);
+		free_ifs_screen(display, Fractal);
 		return;
 	}
 	Fractal->Speed = 6;
@@ -476,7 +480,7 @@ Draw_Fractal(ModeInfo * mi)
 }
 
 
-void
+ENTRYPOINT void
 draw_ifs(ModeInfo * mi)
 {
 	int         i;
@@ -549,14 +553,14 @@ draw_ifs(ModeInfo * mi)
 
 /***************************************************************/
 
-void
+ENTRYPOINT void
 release_ifs(ModeInfo * mi)
 {
 	if (Root != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_ifs(MI_DISPLAY(mi), &Root[screen]);
+			free_ifs_screen(MI_DISPLAY(mi), &Root[screen]);
 		free(Root);
 		Root = (FRACTAL *) NULL;
 	}

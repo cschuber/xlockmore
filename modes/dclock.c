@@ -89,22 +89,20 @@ static const char sccsid[] = "@(#)dclock.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_dclock
-#define PROGCLASS "Dclock"
-#define HACK_INIT init_dclock
-#define HACK_DRAW draw_dclock
-#define dclock_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*cycles: 10000 \n" \
- "*ncolors: 64 \n"
+	"*cycles: 10000 \n" \
+	"*ncolors: 64 \n" \
+
+# define reshape_dclock 0
+# define dclock_handle_event 0
 #define BRIGHT_COLORS
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
-#include "mode.h"
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
+#include "iostuff.h"
 #include "util.h"
 #endif /* STANDALONE */
-#include "iostuff.h"
 
 #ifdef MODE_dclock
 
@@ -271,13 +269,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+mayan", (char *) "turn on/off 13 bak'tun (21 December 2012) countdown"},
 };
 
-ModeSpecOpt dclock_opts =
+ENTRYPOINT ModeSpecOpt dclock_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct dclock_description =
 {"dclock", "init_dclock", "draw_dclock", "release_dclock",
- "refresh_dclock", "init_dclock", (char *) NULL, &dclock_opts,
+ "refresh_dclock", "init_dclock", "free_dclock", &dclock_opts,
  10000, 1, 10000, 1, 64, 0.3, "",
  "Shows a floating digital clock or message", 0, NULL};
 
@@ -375,6 +373,10 @@ static dclockstruct *dclocks = (dclockstruct *) NULL;
 
 extern char *message;
 
+#ifdef STANDALONE
+char * message = NULL;
+#endif
+
 static time_t
 timeAtLastNewYear(time_t timeNow)
 {
@@ -391,7 +393,7 @@ timeAtLastNewYear(time_t timeNow)
 }
 
 #ifndef HAVE_SNPRINTF
-static double logbase;
+static double logbase = 0.0;
 #define BASE 10.0
 #define GROUP 3
 #endif
@@ -632,8 +634,11 @@ drawabinary(ModeInfo * mi, int startx, int starty, int dotcount, int digit)
 }
 
 static void
-free_dclock(Display *display, dclockstruct *dp)
+free_dclock_screen(Display *display, dclockstruct *dp)
 {
+	if (dp == NULL) {
+		return;
+	}
 	if (dp->fgGC != None) {
 		XFreeGC(display, dp->fgGC);
 		dp->fgGC = None;
@@ -646,7 +651,15 @@ free_dclock(Display *display, dclockstruct *dp)
 		XFreePixmap(display, dp->pixmap);
 		dp->pixmap = None;
 	}
- }
+	dp = NULL;
+}
+
+
+ENTRYPOINT void
+free_dclock(ModeInfo * mi)
+{
+        free_dclock_screen(MI_DISPLAY(mi), &dclocks[MI_SCREEN(mi)]);
+}
 
 static void
 drawDclock(ModeInfo * mi)
@@ -807,7 +820,7 @@ drawDclock(ModeInfo * mi)
 
 		if (dp->pixmap)
 			MI_CLEARWINDOWCOLORMAPFAST(mi, gc, MI_BLACK_PIXEL(mi));
-		free_dclock(display, dp);
+		free_dclock_screen(display, dp);
 		dp->pixw = dp->text_width;
 		if (dp->led)
 			dp->pixh = dp->text_height;
@@ -815,7 +828,7 @@ drawDclock(ModeInfo * mi)
 			dp->pixh = (dp->lines + DELTA) * dp->text_height;
 		if ((dp->pixmap = XCreatePixmap(display, window,
 				dp->pixw, dp->pixh, 1)) == None) {
-			free_dclock(display, dp);
+			free_dclock_screen(display, dp);
 			dp->pixw = 0;
 			dp->pixh = 0;
 			return;
@@ -832,7 +845,7 @@ drawDclock(ModeInfo * mi)
 			| GCFont
 #endif
 			, &gcv)) == None) {
-			free_dclock(display, dp);
+			free_dclock_screen(display, dp);
 			dp->pixw = 0;
 			dp->pixh = 0;
 			return;
@@ -844,7 +857,7 @@ drawDclock(ModeInfo * mi)
 			| GCFont
 #endif
 			, &gcv)) == None) {
-			free_dclock(display, dp);
+			free_dclock_screen(display, dp);
 			dp->pixw = 0;
 			dp->pixh = 0;
 			return;
@@ -926,14 +939,14 @@ drawDclock(ModeInfo * mi)
 		1L);
 }
 
-void
+ENTRYPOINT void
 release_dclock(ModeInfo * mi)
 {
 	if (dclocks != NULL) {
 		int screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_dclock(MI_DISPLAY(mi), &dclocks[screen]);
+			free_dclock_screen(MI_DISPLAY(mi), &dclocks[screen]);
 		free(dclocks);
 		dclocks = (dclockstruct *) NULL;
 	}
@@ -951,7 +964,7 @@ release_dclock(ModeInfo * mi)
 extern long timezone;
 #endif
 
-void
+ENTRYPOINT void
 init_dclock(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
@@ -959,16 +972,13 @@ init_dclock(ModeInfo * mi)
 	time_t timeNow, timeLocal;
 	int i, j;
 
-	if (dclocks == NULL) {
-#ifndef HAVE_SNPRINTF
-		logbase = log(BASE);
-#endif
-		if ((dclocks = (dclockstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (dclockstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, dclocks);
 	dp = &dclocks[MI_SCREEN(mi)];
 
+#ifndef HAVE_SNPRINTF
+	if (logbase == 0.0)
+		logbase = log(BASE);
+#endif
 	dp->width = MI_WIDTH(mi);
 	dp->height = MI_HEIGHT(mi);
 
@@ -1317,7 +1327,7 @@ init_dclock(ModeInfo * mi)
 	XSetGraphicsExposures(display, MI_GC(mi), False);
 }
 
-void
+ENTRYPOINT void
 draw_dclock(ModeInfo * mi)
 {
 	dclockstruct *dp;
@@ -1336,11 +1346,13 @@ draw_dclock(ModeInfo * mi)
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_dclock(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Dclock", dclock)
 

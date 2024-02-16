@@ -33,20 +33,19 @@ static const char sccsid[] = "@(#)image.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_image
-#define PROGCLASS "Image"
-#define HACK_INIT init_image
-#define HACK_DRAW draw_image
-#define image_opts xlockmore_opts
 #define DEFAULTS "*delay: 2000000 \n" \
- "*count: -10 \n" \
- "*ncolors: 200 \n" \
- "*bitmap: \n"
+	"*count: -10 \n" \
+	"*ncolors: 200 \n" \
+	"*bitmap: \n" \
+
+# define reshape_image 0
+# define image_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #include "color.h"
-#endif /* STANDALONE */
 #include "iostuff.h"
+#endif /* STANDALONE */
 
 #ifdef MODE_image
 #define DEF_ICONONLY "FALSE"
@@ -67,13 +66,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+icononly", (char *) "turn on/off drawing only to password window"},
 };
 
-ModeSpecOpt image_opts =
+ENTRYPOINT ModeSpecOpt image_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct image_description =
 {"image", "init_image", "draw_image", "release_image",
- "refresh_image", "init_image", (char *) NULL, &image_opts,
+ "refresh_image", "init_image", "free_image", &image_opts,
  2000000, -10, 1, 1, 64, 1.0, "",
  "Shows randomly appearing logos", 0, NULL};
 
@@ -84,7 +83,9 @@ ModStruct image_description =
 #define IMAGE_HEIGHT	image_height
 #define IMAGE_BITS	image_bits
 
+#ifndef STANDALONE
 #include "image.xbm"
+#endif
 
 #ifdef HAVE_XPM
 #define IMAGE_NAME	image_name
@@ -168,6 +169,10 @@ static imagestruct *ims = (imagestruct *) NULL;
 
 extern char *message;
 
+#ifdef STANDALONE
+char * message = NULL;
+#endif
+
 static void
 freeLogo(Display * display, imagestruct * ip)
 {
@@ -183,17 +188,22 @@ freeLogo(Display * display, imagestruct * ip)
 }
 
 static void
-free_image(Display * display, imagestruct * ip)
+free_image_screen(Display * display, imagestruct * ip)
 {
+	if (ip == NULL) {
+		return;
+	}
 	if (ip->icons != NULL) {
 		free(ip->icons);
 		ip->icons = (imagetype *) NULL;
 	}
 	freeLogo(display, ip);
+#ifndef STANDALONE
 	if (ip->logo != None) {
 		destroyImage(&ip->logo, &ip->graphics_format);
 		ip->logo = None;
 	}
+#endif
 	if (ip->fgGC != None) {
 		XFreeGC(display, ip->fgGC);
 		ip->fgGC = None;
@@ -206,14 +216,21 @@ free_image(Display * display, imagestruct * ip)
 		XFreePixmap(display, ip->pixmap);
 		ip->pixmap = None;
 	}
+	ip = NULL;
+}
+
+ENTRYPOINT void
+free_image(ModeInfo * mi)
+{
+	free_image_screen(MI_DISPLAY(mi), &ims[MI_SCREEN(mi)]);
 }
 
 static Bool
 initLogo(ModeInfo * mi)
 {
-	Display *display = MI_DISPLAY(mi);
-	Window window = MI_WINDOW(mi);
 	imagestruct *ip = &ims[MI_SCREEN(mi)];
+#ifndef STANDALONE
+	Display *display = MI_DISPLAY(mi);
 
 	if (ip->logo == None) {
 		getImage(mi, &ip->logo, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_BITS,
@@ -222,14 +239,14 @@ initLogo(ModeInfo * mi)
 #endif
 			&ip->graphics_format, &ip->cmap, &ip->black);
 		if (ip->logo == None) {
-			free_image(display, ip);
+			free_image_screen(display, ip);
 			return False;
 		}
 		ip->pixw = ip->logo->width;
 		ip->pixh = ip->logo->height;
 	}
-#ifndef STANDALONE
 	if (ip->cmap != None) {
+		Window window = MI_WINDOW(mi);
 		setColormap(display, window, ip->cmap, MI_IS_INWINDOW(mi));
 		if (ip->bgGC == None) {
 			XGCValues xgcv;
@@ -237,7 +254,7 @@ initLogo(ModeInfo * mi)
 			xgcv.background = ip->black;
 			if ((ip->bgGC = XCreateGC(display, window, GCBackground,
 					&xgcv)) == None) {
-				free_image(display, ip);
+				free_image_screen(display, ip);
 				return False;
 			}
 		}
@@ -343,125 +360,7 @@ drawImages(ModeInfo * mi)
 	}
 }
 
-void
-init_image(ModeInfo * mi)
-{
-	Display *display = MI_DISPLAY(mi);
-	Window window = MI_WINDOW(mi);
-	imagestruct *ip;
-	int i;
-
-	if (ims == NULL) {
-		if ((ims = (imagestruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (imagestruct))) == NULL)
-			return;
-	}
-	ip = &ims[MI_SCREEN(mi)];
-	if (message && *message) {
-		XGCValues gcv;
-
-#ifdef USE_MB
-		mode_font = getFontSet(display);
-		ip->text_descent = 0;
-		ip->text_ascent = getFontHeight(mode_font);
-#else
-		mode_font = getFont(display);
-		ip->text_descent = mode_font->descent;
-		ip->text_ascent = mode_font->ascent;
-#endif
-		if (mode_font == None) {
-			return;
-		}
-		initStrings(mi);
-		ip->black = MI_BLACK_PIXEL(mi);
-
-		free_image(display, ip);
-		ip->pixh = (ip->lines + DELTA) * ip->text_height;
-		if ((ip->pixmap = XCreatePixmap(display, window,
-				ip->pixw, ip->pixh, 1)) == None) {
-			free_image(display, ip);
-			ip->pixw = 0;
-			ip->pixh = 0;
-			return;
-		}
-#ifndef USE_MB
-		gcv.font = mode_font->fid;
-#endif
-		gcv.background = 0;
-		gcv.foreground = 1;
-		gcv.graphics_exposures = False;
-		if ((ip->fgGC = XCreateGC(display, ip->pixmap,
-				GCForeground | GCBackground | GCGraphicsExposures
-#ifndef USE_MB
-				| GCFont
-#endif
-				, &gcv)) == None) {
-			free_image(display, ip);
-			ip->pixw = 0;
-			ip->pixh = 0;
-			return;
-		}
-		gcv.foreground = 0;
-		if ((ip->bgGC = XCreateGC(display, ip->pixmap,
-				GCForeground | GCBackground | GCGraphicsExposures
-#ifndef USE_MB
-				| GCFont
-#endif
-				, &gcv)) == None) {
-			free_image(display, ip);
-			ip->pixw = 0;
-			ip->pixh = 0;
-			return;
-		}
-		XFillRectangle(display, ip->pixmap, ip->bgGC,
-			0, 0, ip->pixw, ip->pixh);
-		XSetForeground(display, MI_GC(mi), MI_WHITE_PIXEL(mi));
-		for (i = 0; i < ip->lines; i++) {
-			DrawString(display, ip->pixmap, ip->fgGC,
-				ip->textStart[i],
-				ip->text_ascent + i * ip->text_height,
-				ip->strnew[i], strlen(ip->strnew[i]));
-		}
-		/* don't want any exposure events from XCopyPlane */
-		XSetGraphicsExposures(display, MI_GC(mi), False);
-	} else if (!initLogo(mi))
-		return;
-
-	ip->width = MI_WIDTH(mi);
-	ip->height = MI_HEIGHT(mi);
-	if (ip->width > ip->pixw)
-		ip->ncols = ip->width / ip->pixw;
-	else
-		ip->ncols = 1;
-	if (ip->height > ip->pixh)
-		ip->nrows = ip->height / ip->pixh;
-	else
-		ip->nrows = 1;
-	ip->border.x = ip->width - ip->ncols * ip->pixw;
-	ip->border.y = ip->height - ip->nrows * ip->pixh;
-	ip->iconcount = MI_COUNT(mi);
-	if (ip->iconcount < -MINICONS)
-		ip->iconcount = NRAND(-ip->iconcount - MINICONS + 1) + MINICONS;
-	else if (ip->iconcount < MINICONS)
-		ip->iconcount = MINICONS;
-	if (ip->iconcount > ip->ncols * ip->nrows)
-		ip->iconcount = ip->ncols * ip->nrows;
-	if (ip->icons != NULL)
-		free(ip->icons);
-	if ((ip->icons = (imagetype *) malloc(ip->iconcount *
-			sizeof (imagetype))) == NULL) {
-		free_image(display, ip);
-		return;
-	}
-	for (i = 0; i < ip->iconcount; i++)
-		ip->icons[i].x = -1;
-	if (!(message && *message)) {
-		MI_CLEARWINDOWCOLORMAP(mi, ip->bgGC, ip->black);
-	}
-	draw_image(mi);
-}
-
-void
+ENTRYPOINT void
 draw_image(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
@@ -507,20 +406,135 @@ draw_image(ModeInfo * mi)
 	drawImages(mi);
 }
 
-void
+ENTRYPOINT void
+init_image(ModeInfo * mi)
+{
+	Display *display = MI_DISPLAY(mi);
+	Window window = MI_WINDOW(mi);
+	imagestruct *ip;
+	int i;
+
+	MI_INIT(mi, ims);
+	ip = &ims[MI_SCREEN(mi)];
+	if (message && *message) {
+		XGCValues gcv;
+
+#ifdef USE_MB
+		mode_font = getFontSet(display);
+		ip->text_descent = 0;
+		ip->text_ascent = getFontHeight(mode_font);
+#else
+		mode_font = getFont(display);
+		ip->text_descent = mode_font->descent;
+		ip->text_ascent = mode_font->ascent;
+#endif
+		if (mode_font == None) {
+			return;
+		}
+		initStrings(mi);
+		ip->black = MI_BLACK_PIXEL(mi);
+
+		free_image_screen(display, ip);
+		ip->pixh = (ip->lines + DELTA) * ip->text_height;
+		if ((ip->pixmap = XCreatePixmap(display, window,
+				ip->pixw, ip->pixh, 1)) == None) {
+			free_image_screen(display, ip);
+			ip->pixw = 0;
+			ip->pixh = 0;
+			return;
+		}
+#ifndef USE_MB
+		gcv.font = mode_font->fid;
+#endif
+		gcv.background = 0;
+		gcv.foreground = 1;
+		gcv.graphics_exposures = False;
+		if ((ip->fgGC = XCreateGC(display, ip->pixmap,
+				GCForeground | GCBackground | GCGraphicsExposures
+#ifndef USE_MB
+				| GCFont
+#endif
+				, &gcv)) == None) {
+			free_image_screen(display, ip);
+			ip->pixw = 0;
+			ip->pixh = 0;
+			return;
+		}
+		gcv.foreground = 0;
+		if ((ip->bgGC = XCreateGC(display, ip->pixmap,
+				GCForeground | GCBackground | GCGraphicsExposures
+#ifndef USE_MB
+				| GCFont
+#endif
+				, &gcv)) == None) {
+			free_image_screen(display, ip);
+			ip->pixw = 0;
+			ip->pixh = 0;
+			return;
+		}
+		XFillRectangle(display, ip->pixmap, ip->bgGC,
+			0, 0, ip->pixw, ip->pixh);
+		XSetForeground(display, MI_GC(mi), MI_WHITE_PIXEL(mi));
+		for (i = 0; i < ip->lines; i++) {
+			DrawString(display, ip->pixmap, ip->fgGC,
+				ip->textStart[i],
+				ip->text_ascent + i * ip->text_height,
+				ip->strnew[i], strlen(ip->strnew[i]));
+		}
+		/* don't want any exposure events from XCopyPlane */
+		XSetGraphicsExposures(display, MI_GC(mi), False);
+	} else if (!initLogo(mi))
+		return;
+
+	ip->width = MI_WIDTH(mi);
+	ip->height = MI_HEIGHT(mi);
+	if (ip->width > ip->pixw && ip->pixw != 0)
+		ip->ncols = ip->width / ip->pixw;
+	else
+		ip->ncols = 1;
+	if (ip->height > ip->pixh && ip->pixh != 0)
+		ip->nrows = ip->height / ip->pixh;
+	else
+		ip->nrows = 1;
+	ip->border.x = ip->width - ip->ncols * ip->pixw;
+	ip->border.y = ip->height - ip->nrows * ip->pixh;
+	ip->iconcount = MI_COUNT(mi);
+	if (ip->iconcount < -MINICONS)
+		ip->iconcount = NRAND(-ip->iconcount - MINICONS + 1) + MINICONS;
+	else if (ip->iconcount < MINICONS)
+		ip->iconcount = MINICONS;
+	if (ip->iconcount > ip->ncols * ip->nrows)
+		ip->iconcount = ip->ncols * ip->nrows;
+	if (ip->icons != NULL)
+		free(ip->icons);
+	if ((ip->icons = (imagetype *) malloc(ip->iconcount *
+			sizeof (imagetype))) == NULL) {
+		free_image_screen(display, ip);
+		return;
+	}
+	for (i = 0; i < ip->iconcount; i++)
+		ip->icons[i].x = -1;
+	if (!(message && *message)) {
+		MI_CLEARWINDOWCOLORMAP(mi, ip->bgGC, ip->black);
+	}
+	draw_image(mi);
+}
+
+ENTRYPOINT void
 release_image(ModeInfo * mi)
 {
 	if (ims != NULL) {
 		int screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_image(MI_DISPLAY(mi), &ims[screen]);
+			free_image_screen(MI_DISPLAY(mi), &ims[screen]);
 		free(ims);
 		ims = (imagestruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_image(ModeInfo * mi)
 {
 #ifdef HAVE_XPM
@@ -533,13 +547,14 @@ refresh_image(ModeInfo * mi)
 		return;
 	if (ip->graphics_format >= IS_XPM) {
 		/* This is needed when another program changes the colormap. */
-		free_image(MI_DISPLAY(mi), ip);
+		free_image_screen(MI_DISPLAY(mi), ip);
 		init_image(mi);
 		return;
 	}
 #endif
 	drawImages(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Image", image)
 

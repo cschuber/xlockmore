@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* rubik --- Shows an auto-solving Rubik's cube */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)rubik.c	5.01 2001/03/01 xlockmore";
-
 #endif
 
 /*-
@@ -109,21 +108,21 @@ static const char sccsid[] = "@(#)rubik.c	5.01 2001/03/01 xlockmore";
 #endif
 
 #ifdef STANDALONE
-#define MODE_rubik
-#define PROGCLASS "Rubik"
-#define HACK_INIT init_rubik
-#define HACK_DRAW draw_rubik
-#define rubik_opts xlockmore_opts
-#define DEFAULTS "*delay: 100000 \n" \
- "*count: -30 \n" \
- "*showFps: False \n" \
- "*cycles: 5 \n" \
- "*size: -6 \n"
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+# define MODE_rubik
+# define DEFAULTS	"*delay: 100000 \n" \
+			"*count: -30 \n" \
+			"*showFps: False \n" \
+			"*cycles: 5 \n" \
+			"*size: -6 \n" \
+			"*suppressRotationAnimation: True\n" \
+
+# include "xlockmore.h"		/* from the xscreensaver distribution */
+# include "gltrackball.h"
 #else /* !STANDALONE */
-#include "xlock.h"		/* from the xlockmore distribution */
-#include "visgl.h"
+# include "xlock.h"		/* from the xlockmore distribution */
+# include "visgl.h"
 #endif /* !STANDALONE */
+
 
 #ifdef MODE_rubik
 
@@ -163,13 +162,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+hideshuffling", (char *) "turn on/off hidden shuffle phase"}
 };
 
-ModeSpecOpt rubik_opts =
+ENTRYPOINT ModeSpecOpt rubik_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   rubik_description =
 {"rubik", "init_rubik", "draw_rubik", "release_rubik",
- "draw_rubik", "change_rubik", (char *) NULL, &rubik_opts,
+ "draw_rubik", "change_rubik", "free_rubik", &rubik_opts,
  100000, -30, 5, -6, 64, 1.0, "",
  "Shows an auto-solving Rubik's Cube", 0, NULL};
 
@@ -384,6 +383,10 @@ typedef struct {
 	RubikMove   movement;
 	GLfloat     rotateStep;
 	GLfloat     PX, PY, VX, VY;
+#ifdef STANDALONE
+	Bool button_down_p;
+	trackball_state *trackball;
+#endif
 } rubikstruct;
 
 static float front_shininess[] =
@@ -545,7 +548,7 @@ sizeRow(rubikstruct * rp, int face)
 }
 
 static Bool
-draw_stickerless_cubit()
+draw_stickerless_cubit(void)
 {
 	glBegin(GL_QUADS);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray);
@@ -1974,14 +1977,38 @@ static void
 reshape_rubik(ModeInfo * mi, int width, int height)
 {
 	rubikstruct *rp = &rubik[MI_SCREEN(mi)];
+    int y = 0;
 
-	glViewport(0, 0, rp->WindW = (GLint) width, rp->WindH = (GLint) height);
+    if (width > height * 5) {   /* tiny window: show middle */
+      height = width;
+      y = -height/2;
+    }
+
+	glViewport(0, y, rp->WindW = (GLint) width, rp->WindH = (GLint) height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glFrustum(-1.0, 1.0, -1.0, 1.0, 5.0, 15.0);
 	glMatrixMode(GL_MODELVIEW);
 
 }
+
+#ifdef STANDALONE
+ENTRYPOINT Bool
+rubik_handle_event (ModeInfo *mi, XEvent *event)
+{
+	rubikstruct *rp = &rubik[MI_SCREEN(mi)];
+
+	if (gltrackball_event_handler (event, rp->trackball,
+			MI_WIDTH (mi), MI_HEIGHT (mi),
+			&rp->button_down_p))
+		return True;
+	else if (screenhack_event_helper (MI_DISPLAY(mi), MI_WINDOW(mi), event)) {
+ 		rp->done = 1;
+		return True;
+	}
+	return False;
+}
+#endif
 
 static Bool
 pinit(ModeInfo * mi)
@@ -2013,10 +2040,17 @@ pinit(ModeInfo * mi)
 }
 
 static void
-free_rubik(rubikstruct *rp)
+free_rubik_screen(rubikstruct *rp)
 {
 	int         i;
 
+	if (rp == NULL) {
+		return;
+	}
+#ifdef STANDALONE
+	if (rp->trackball)
+		gltrackball_free (rp->trackball);
+#endif
 	for (i = 0; i < MAX_FACES; i++)
 		if (rp->cubeLoc[i] != NULL) {
 			free(rp->cubeLoc[i]);
@@ -2031,44 +2065,49 @@ free_rubik(rubikstruct *rp)
 		free(rp->moves);
 		rp->moves = (RubikMove *) NULL;
 	}
+	rp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_rubik(ModeInfo * mi)
+{
+	free_rubik_screen(&rubik[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 release_rubik(ModeInfo * mi)
 {
 	if (rubik != NULL) {
 		int         screen;
 
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			rubikstruct *rp = &rubik[screen];
-
-			free_rubik(rp);
-		}
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_rubik_screen(&rubik[screen]);
 		free(rubik);
 		rubik = (rubikstruct *) NULL;
 	}
 	FreeAllGL(mi);
 }
 
-void
+ENTRYPOINT void
 init_rubik(ModeInfo * mi)
 {
 	rubikstruct *rp;
 
-	if (rubik == NULL) {
-		if ((rubik = (rubikstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (rubikstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, rubik);
 	rp = &rubik[MI_SCREEN(mi)];
 	rp->step = NRAND(90);
 	rp->PX = ((float) LRAND() / (float) MAXRAND) * 2.0 - 1.0;
 	rp->PY = ((float) LRAND() / (float) MAXRAND) * 2.0 - 1.0;
+
+#ifdef STANDALONE
+	rp->trackball = gltrackball_init (True);
+#endif
+
 	if ((rp->glx_context = init_GL(mi)) != NULL) {
 		reshape_rubik(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 		glDrawBuffer(GL_BACK);
 		if (!pinit(mi)) {
-			free_rubik(rp);
+			free_rubik_screen(rp);
 			if (MI_IS_VERBOSE(mi)) {
 				(void) fprintf(stderr,
 					"Could not allocate memory for rubik\n");
@@ -2080,7 +2119,7 @@ init_rubik(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_rubik(ModeInfo * mi)
 {
 	Bool bounced = False;
@@ -2149,6 +2188,22 @@ draw_rubik(ModeInfo * mi)
 		glScalef(Scale4Iconic * rp->WindH / rp->WindW, Scale4Iconic, Scale4Iconic);
 	}
 
+# ifdef HAVE_MOBILE     /* Keep it the same relative size when rotated. */
+	{
+		GLfloat h = MI_HEIGHT(mi) / (GLfloat) MI_WIDTH(mi);
+ 		int o = (int) current_device_rotation();
+		if (o != 0 && o != 180 && o != -180) {
+ 			glScalef (1/h, h, 1); /* #### not quite right */
+			h = 1.8;
+			glScalef (h, h, h);
+		}
+	}
+# endif
+
+#ifdef STANDALONE
+	gltrackball_rotate (rp->trackball);
+#endif
+
 	glRotatef(rp->step * 100.0, 1, 0, 0);
 	glRotatef(rp->step * 95.0, 0, 1, 0);
 	glRotatef(rp->step * 90.0, 0, 0, 1);
@@ -2188,7 +2243,7 @@ draw_rubik(ModeInfo * mi)
 				rp->rotateStep += rp->anglestep;
 				if (rp->rotateStep > rp->degreeTurn) {
 					if (!evalmovement(mi, rp->movement)) {
-						free_rubik(rp);
+						free_rubik_screen(rp);
 						if (MI_IS_VERBOSE(mi)) {
 							(void) fprintf(stderr,
 								"Could not allocate memory for rubik\n");
@@ -2204,7 +2259,7 @@ draw_rubik(ModeInfo * mi)
 		if (rp->done) {
 			if (++rp->rotateStep > DELAY_AFTER_SOLVING)
 				if (!shuffle(mi)) {
-					free_rubik(rp);
+					free_rubik_screen(rp);
 					if (MI_IS_VERBOSE(mi)) {
 						(void) fprintf(stderr,
 							"Could not allocate memory for rubik\n");
@@ -2232,7 +2287,7 @@ draw_rubik(ModeInfo * mi)
 				rp->rotateStep += rp->anglestep;
 				if (rp->rotateStep > rp->degreeTurn) {
 					if (!evalmovement(mi, rp->movement)) {
-						free_rubik(rp);
+						free_rubik_screen(rp);
 						if (MI_IS_VERBOSE(mi)) {
 							(void) fprintf(stderr,
 								"Could not allocate memory for rubik\n");
@@ -2253,7 +2308,8 @@ draw_rubik(ModeInfo * mi)
 	rp->step += 0.05;
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 change_rubik(ModeInfo * mi)
 {
 	rubikstruct *rp;
@@ -2265,7 +2321,7 @@ change_rubik(ModeInfo * mi)
 	if (!rp->glx_context)
 		return;
 	if (!pinit(mi)) {
-		free_rubik(rp);
+		free_rubik_screen(rp);
 		if (MI_IS_VERBOSE(mi)) {
 			(void) fprintf(stderr,
 				"Could not allocate memory for rubik\n");
@@ -2273,5 +2329,8 @@ change_rubik(ModeInfo * mi)
 		return;
 	}
 }
-
 #endif
+
+XSCREENSAVER_MODULE ("Rubik", rubik)
+
+#endif /* MODE_rubik */

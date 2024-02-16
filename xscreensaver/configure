@@ -2663,7 +2663,7 @@ echo "command line was: $0 $@"
 # check for some random other files that come later in the tar file,
 # to make sure everything is here.
 #
-for d in utils jwxyz hacks xlockmore/xlock xlockmore/modes hacks/glx driver ; do
+for d in utils jwxyz hacks xlockmore/xlock xlockmore/modes xlockmore/modes/glx hacks/glx driver ; do
   f=$srcdir/$d/Makefile.in
   if test \! -r $f ; then
     echo ""
@@ -16615,7 +16615,7 @@ APPDEFAULTS=$ac_x_app_defaults
 
 
 
-ac_config_files="$ac_config_files Makefile utils/Makefile jwxyz/Makefile hacks/Makefile xlockmore/xlock/Makefile xlockmore/modes/Makefile hacks/images/Makefile hacks/glx/Makefile po/Makefile.in driver/Makefile driver/xscreensaver.pam driver/xscreensaver-demo.glade2 driver/XScreenSaver.ad"
+ac_config_files="$ac_config_files Makefile utils/Makefile jwxyz/Makefile hacks/Makefile xlockmore/xlock/Makefile xlockmore/modes/Makefile xlockmore/modes/glx/Makefile hacks/images/Makefile hacks/glx/Makefile po/Makefile.in driver/Makefile driver/xscreensaver.pam driver/xscreensaver-demo.glade2 driver/XScreenSaver.ad"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -17328,6 +17328,7 @@ do
     "hacks/Makefile") CONFIG_FILES="$CONFIG_FILES hacks/Makefile" ;;
     "xlockmore/xlock/Makefile") CONFIG_FILES="$CONFIG_FILES xlockmore/xlock/Makefile" ;;
     "xlockmore/modes/Makefile") CONFIG_FILES="$CONFIG_FILES xlockmore/modes/Makefile" ;;
+    "xlockmore/modes/glx/Makefile") CONFIG_FILES="$CONFIG_FILES xlockmore/modes/glx/Makefile" ;;
     "hacks/images/Makefile") CONFIG_FILES="$CONFIG_FILES hacks/images/Makefile" ;;
     "hacks/glx/Makefile") CONFIG_FILES="$CONFIG_FILES hacks/glx/Makefile" ;;
     "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;

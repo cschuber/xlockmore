@@ -97,21 +97,20 @@ static const char sccsid[] = "@(#)flow.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_flow
-# define PROGCLASS "Flow"
-# define HACK_INIT init_flow
-# define HACK_DRAW draw_flow
-# define flow_opts xlockmore_opts
 # define DEFAULTS   "*delay: 1000 \n" \
-					"*count:        3000 \n" \
-					"*size:         -10 \n" \
-					"*cycles:       10000 \n" \
-					"*ncolors:      200 \n" \
-					"*rotate:       True \n" \
-					"*ride:         True \n" \
-					"*box:          True \n" \
-					"*periodic:     True \n" \
-					"*search:       True \n" \
-					"*dbuf:         True \n"
+	"*count: 3000 \n" \
+	"*size:  -10 \n" \
+	"*cycles: 10000 \n" \
+	"*ncolors: 200 \n" \
+	"*rotate: True \n" \
+	"*ride: True \n" \
+	"*box: True \n" \
+	"*periodic: True \n" \
+	"*search: True \n" \
+	"*dbuf: True \n" \
+
+# define reshape_flow 0
+# define flow_handle_event 0
 # include "xlockmore.h"		/* in xscreensaver distribution */
 # ifndef MI_DEPTH
 #  define MI_DEPTH MI_WIN_DEPTH
@@ -175,14 +174,13 @@ static OptionStruct desc[] = {
 	{(char *) "-/+dbuf", (char *) "turn on/off double buffering."},
 };
 
-ModeSpecOpt flow_opts =
-{sizeof opts / sizeof opts[0], opts,
- sizeof vars / sizeof vars[0], vars, desc};
+ENTRYPOINT ModeSpecOpt flow_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   flow_description = {
 	"flow", "init_flow", "draw_flow", "release_flow",
-	"refresh_flow", "init_flow", (char *) NULL, &flow_opts,
+	"refresh_flow", "init_flow", "free_flow", &flow_opts,
 	1000, 1024, 10000, -10, 200, 1.0, "",
 	"Shows dynamic strange attractors", 0, NULL
 };
@@ -404,15 +402,19 @@ Iterate(dvector *p, dvector(*ODE)(Par par, double x, double y, double z),
 
 #define deallocate(p,t) if (p!=NULL) {free(p); p=(t*)NULL; }
 #define allocate(p,t,s) if ((p=(t*)malloc(sizeof(t)*s))==NULL)\
-{free_flow(sp);return;}
+{free_flow_screen(sp);return;}
 
 static void
-free_flow(flowstruct *sp)
+free_flow_screen(flowstruct *sp)
 {
+	if (sp == NULL) {
+		return;
+	}
 	deallocate(sp->csegs, XSegment);
 	deallocate(sp->cnsegs, int);
 	deallocate(sp->old_segs, XSegment);
 	deallocate(sp->p, dvector);
+	sp = NULL;
 }
 
 /* Generate Gaussian random number: mean 0, "amplitude" A (actually
@@ -637,7 +639,13 @@ clip(double nx, double ny, double nz, double d, dvector *s, dvector *e)
  * Public functions
  */
 
-void
+ENTRYPOINT void
+free_flow(ModeInfo * mi)
+{
+	free_flow_screen(&flows[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_flow(ModeInfo * mi)
 {
 	flowstruct *sp;
@@ -656,11 +664,7 @@ init_flow(ModeInfo * mi)
 #endif
 
 
-	if (flows == NULL) {
-		if ((flows = (flowstruct *) calloc(MI_NUM_SCREENS(mi),
-										   sizeof (flowstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, flows);
 	sp = &flows[MI_SCREEN(mi)];
 
 	sp->count2 = 0;
@@ -802,7 +806,7 @@ init_flow(ModeInfo * mi)
 
 	sp->count2 = 0; /* Reset search */
 
-	free_flow(sp);
+	free_flow_screen(sp);
 	sp->beecount = MI_COUNT(mi);
 	if (sp->beecount < 0) {	/* random variations */
 		sp->beecount = NRAND(-sp->beecount) + 1; /* Minimum 1 */
@@ -844,7 +848,7 @@ init_flow(ModeInfo * mi)
 	Z(1, 0) = sp->cam[1].z = 0;
 }
 
-void
+ENTRYPOINT void
 draw_flow(ModeInfo * mi)
 {
 	int         b, i;
@@ -1223,24 +1227,26 @@ draw_flow(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_flow(ModeInfo * mi)
 {
 	if (flows != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_flow(&flows[screen]);
+			free_flow_screen(&flows[screen]);
 		free(flows);
 		flows = (flowstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_flow(ModeInfo * mi)
 {
 	if(!dbufp) MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Flow", flow)
 

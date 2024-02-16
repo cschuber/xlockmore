@@ -34,15 +34,13 @@ static const char sccsid[] = "@(#)wator.c	5.24 2007/01/18 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_wator
-#define PROGCLASS "Wator"
-#define HACK_INIT init_wator
-#define HACK_DRAW draw_wator
-#define wator_opts xlockmore_opts
 #define DEFAULTS "*delay: 750000 \n" \
- "*cycles: 32767 \n" \
- "*size: 0 \n" \
- "*ncolors: 200 \n" \
- "*neighbors: 0 \n"
+	"*cycles: 32767 \n" \
+	"*size: 0 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_wator 0
+# define wator_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -79,13 +77,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+vertical", (char *) "change orientation for hexagons and triangles"}
 };
 
-ModeSpecOpt wator_opts =
+ENTRYPOINT ModeSpecOpt wator_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   wator_description =
 {"wator", "init_wator", "draw_wator", "release_wator",
- "refresh_wator", "init_wator", (char *) NULL, &wator_opts,
+ "refresh_wator", "init_wator", "free_wator", &wator_opts,
  750000, 1, 32767, 0, 64, 1.0, "",
  "Shows Dewdney's Water-Torus planet of fish and sharks", 0, NULL};
 
@@ -836,10 +834,13 @@ positionOfNeighbor(watorstruct * wp, int n, int col, int row)
 }
 
 static void
-free_wator(watorstruct *wp)
+free_wator_screen(watorstruct *wp)
 {
 	int kind;
 
+	if (wp == NULL) {
+		return;
+	}
 	for (kind = 0; kind <= KINDS; kind++) {
 		if (wp->firstkind[kind] != NULL) {
 			flush_kindlist(wp, kind);
@@ -855,9 +856,16 @@ free_wator(watorstruct *wp)
 		free(wp->arr);
 		wp->arr = (CellList **) NULL;
 	}
+	wp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_wator(ModeInfo * mi)
+{
+	free_wator_screen(&wators[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_wator(ModeInfo * mi)
 {
 	int         size = MI_SIZE(mi);
@@ -865,11 +873,7 @@ init_wator(ModeInfo * mi)
 	cellstruct  info;
 	watorstruct *wp;
 
-	if (wators == NULL) {
-		if ((wators = (watorstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (watorstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, wators);
 	wp = &wators[MI_SCREEN(mi)];
 
 	wp->generation = 0;
@@ -880,7 +884,7 @@ init_wator(ModeInfo * mi)
 		   doubly linked list, doubly linked to an array */
 		for (kind = FISH; kind <= KINDS; kind++)
 			if (!init_kindlist(wp, kind)) {
-				free_wator(wp);
+				free_wator_screen(wp);
 				return;
 			}
 		for (i = 0; i < BITMAPS; i++) {
@@ -1052,7 +1056,7 @@ init_wator(ModeInfo * mi)
 		free(wp->arr);
 	if ((wp->arr = (CellList **) calloc(wp->positions,
 			sizeof (CellList *))) == NULL) {
-		free_wator(wp);
+		free_wator_screen(wp);
 		return;
 	}
 
@@ -1092,7 +1096,7 @@ init_wator(ModeInfo * mi)
 				info.col = col;
 				info.row = row;
 				if (!addto_kindlist(wp, kind, info)) {
-					free_wator(wp);
+					free_wator_screen(wp);
 					return;
 				}
 				wp->arr[colrow] = wp->currkind;
@@ -1103,7 +1107,7 @@ init_wator(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_wator(ModeInfo * mi)
 {
 	int         col, row;
@@ -1164,7 +1168,7 @@ draw_wator(ModeInfo * mi)
 						cutfrom_kindlist(wp);	/* This rotates out who goes first */
 						wp->babykind->info.age = 0;
 						if (!dupin_kindlist(wp)) {
-							free_wator(wp);
+							free_wator_screen(wp);
 							return;
 						}
 						wp->arr[colrow] = wp->babykind;
@@ -1223,7 +1227,7 @@ draw_wator(ModeInfo * mi)
 						cutfrom_kindlist(wp);	/* This rotates out who goes first */
 						wp->babykind->info.age = 0;
 						if (!dupin_kindlist(wp)) {
-							free_wator(wp);
+							free_wator_screen(wp);
 							return;
 						}
 						wp->arr[colrow] = wp->babykind;
@@ -1258,20 +1262,21 @@ draw_wator(ModeInfo * mi)
 		wp->generation++;
 }
 
-void
+ENTRYPOINT void
 release_wator(ModeInfo * mi)
 {
 	if (wators != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_wator(&wators[screen]);
+			free_wator_screen(&wators[screen]);
 		free(wators);
 		wators = (watorstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_wator(ModeInfo * mi)
 {
 	watorstruct *wp;
@@ -1285,6 +1290,7 @@ refresh_wator(ModeInfo * mi)
 		wp->painted = False;
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Wator", wator)
 

@@ -34,15 +34,14 @@ static const char sccsid[] = "@(#)rotor.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_rotor
-#define PROGCLASS "Rotor"
-#define HACK_INIT init_rotor
-#define HACK_DRAW draw_rotor
-#define rotor_opts xlockmore_opts
 #define DEFAULTS "*delay: 100 \n" \
- "*count: 4 \n" \
- "*cycles: 100 \n" \
- "*size: -6 \n" \
- "*ncolors: 200 \n"
+	"*count: 4 \n" \
+	"*cycles: 100 \n" \
+	"*size: -6 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_rotor 0
+# define rotor_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -51,7 +50,7 @@ static const char sccsid[] = "@(#)rotor.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_rotor
 
-ModeSpecOpt rotor_opts =
+ENTRYPOINT ModeSpecOpt rotor_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -108,8 +107,11 @@ typedef struct {
 static rotorstruct *rotors = (rotorstruct *) NULL;
 
 static void
-free_rotor(rotorstruct *rp)
+free_rotor_screen(rotorstruct *rp)
 {
+	if (rp == NULL) {
+		return;
+	}
 	if (rp->elements != NULL) {
 		free(rp->elements);
 		rp->elements = (elem *) NULL;
@@ -118,9 +120,16 @@ free_rotor(rotorstruct *rp)
 		free(rp->save);
 		rp->save = (XPoint *) NULL;
 	}
+	rp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_rotor(ModeInfo * mi)
+{
+	free_rotor_screen(&rotors[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_rotor(ModeInfo * mi)
 {
 	int         x;
@@ -128,11 +137,7 @@ init_rotor(ModeInfo * mi)
 	unsigned char wasiconified;
 	rotorstruct *rp;
 
-	if (rotors == NULL) {
-		if ((rotors = (rotorstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (rotorstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, rotors);
 	rp = &rotors[MI_SCREEN(mi)];
 
 	rp->prevcenterx = rp->centerx;
@@ -176,7 +181,7 @@ init_rotor(ModeInfo * mi)
 		if (rp->elements == NULL)
 			if ((rp->elements = (elem *) calloc(rp->num,
 					sizeof (elem))) == NULL) {
-				free_rotor(rp);
+				free_rotor_screen(rp);
 				return;
 			}
 		rp->nsave = MI_CYCLES(mi);
@@ -185,7 +190,7 @@ init_rotor(ModeInfo * mi)
 		if (rp->save == NULL)
 			if ((rp->save = (XPoint *) malloc(rp->nsave *
 					sizeof (XPoint))) == NULL) {
-				free_rotor(rp);
+				free_rotor_screen(rp);
 				return;
 			}
 		for (x = 0; x < rp->nsave; x++) {
@@ -225,7 +230,7 @@ init_rotor(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_rotor(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -366,20 +371,21 @@ draw_rotor(ModeInfo * mi)
 			   LineSolid, CapButt, JoinMiter);
 }
 
-void
+ENTRYPOINT void
 release_rotor(ModeInfo * mi)
 {
 	if (rotors != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_rotor(&rotors[screen]);
+			free_rotor_screen(&rotors[screen]);
 		free(rotors);
 		rotors = (rotorstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_rotor(ModeInfo * mi)
 {
 	rotorstruct *rp;
@@ -392,6 +398,7 @@ refresh_rotor(ModeInfo * mi)
 	rp->redrawing = 1;
 	rp->redrawpos = 1;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Rotor", rotor)
 

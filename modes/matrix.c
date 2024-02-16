@@ -69,24 +69,22 @@ static const char sccsid[] = "@(#)matrix.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_matrix
-#define PROGCLASS "Matrix"
-#define HACK_INIT init_matrix
-#define HACK_DRAW draw_matrix
-#define matrix_opts xlockmore_opts
-#define DEFAULTS "*delay: 1000\n"
+#define DEFAULTS "*delay: 1000\n" \
+
+# define reshape_matrix 0
+# define matrix_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
-ModeSpecOpt matrix_opts =
+ENTRYPOINT ModeSpecOpt matrix_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   matrix_description =
 {"matrix", "init_matrix", "draw_matrix", "release_matrix",
- "refresh_matrix", "change_matrix", (char *) NULL, &matrix_opts,
+ "refresh_matrix", "change_matrix", "free_matrix", &matrix_opts,
  1000, 1, 1, 1, 64, 1.0, "",
  "Shows the Matrix", 0, NULL};
 #endif
@@ -439,15 +437,18 @@ static void new_column(const ModeInfo *mi, column_t *c)
 	}
 }
 
-/* NAME: free_matrix
+/* NAME: free_matrix_screen
  *
  * FUNCTION: delete the data associated with a single screen.  Be careful
  * not to do spurious free()s of nonexistent data, and to nullify all
  * freed pointers that might be reused past the end of this call.
  */
 static void
-free_matrix(Display *display, matrix_t *mp)
+free_matrix_screen(Display *display, matrix_t *mp)
 {
+	if (mp == NULL) {
+		return;
+	}
 	if (mp->columns != NULL) {
 	  int c;
 
@@ -469,6 +470,13 @@ free_matrix(Display *display, matrix_t *mp)
 	  XFreePixmap(display, mp->kana[1]);
 	  mp->kana[1] = None;
 	}
+	mp = NULL;
+}
+
+ENTRYPOINT void
+free_matrix(ModeInfo * mi)
+{
+        free_matrix_screen(MI_DISPLAY(mi), &matrix[MI_SCREEN(mi)]);
 }
 
 /* NAME: setup_matrix()
@@ -486,7 +494,7 @@ static void setup_matrix(const ModeInfo *mi)
   int c;
 
   /* screen may have changed size/depth/who-knows-what */
-  free_matrix(display, mp);
+  free_matrix_screen(display, mp);
 
   if (MI_NPIXELS(mi) > 2) {
 	  mp->fg   = MI_PIXEL(mi, GREEN);
@@ -499,14 +507,14 @@ static void setup_matrix(const ModeInfo *mi)
   if ((mp->kana[0] = XCreatePixmapFromBitmapData(display, window,
 		(char *) katakana_bits, katakana_width, katakana_height,
 		mp->bg, mp->fg, MI_DEPTH(mi))) == None) {
-	free_matrix(display, mp);
+	free_matrix_screen(display, mp);
 	return;
   }
 
   if ((mp->kana[1] = XCreatePixmapFromBitmapData(display, window,
 		(char *) katakana_bits, katakana_width, katakana_height,
 		mp->bg, mp->bold, MI_DEPTH(mi))) == None) {
-	free_matrix(display, mp);
+	free_matrix_screen(display, mp);
 	return;
   }
 
@@ -519,7 +527,7 @@ static void setup_matrix(const ModeInfo *mi)
 
   if ((mp->columns = (column_t *) calloc(mp->num_cols,
 		sizeof(column_t))) == NULL) {
-	free_matrix(display, mp);
+	free_matrix_screen(display, mp);
 	return;
   }
 
@@ -542,7 +550,7 @@ static void setup_matrix(const ModeInfo *mi)
   for (c = 0; c < mp->num_cols; c++)
 	if ((mp->columns[c].pixmap  = XCreatePixmap(display, window,
 		  PIXMAP_WIDTH, mp->pixmapHeight, MI_DEPTH(mi))) == None) {
-		free_matrix(display, mp);
+		free_matrix_screen(display, mp);
 		return;
 	}
 
@@ -574,13 +582,10 @@ static void setup_matrix(const ModeInfo *mi)
  *           create columns of "matrix" data
  */
 
-void init_matrix(ModeInfo *mi)
+ENTRYPOINT void
+init_matrix(ModeInfo *mi)
 {
-  if (matrix == NULL) {
-	if ((matrix = (matrix_t *) calloc(MI_NUM_SCREENS(mi),
-			 sizeof(matrix_t))) == NULL)
-		return;
-  }
+  MI_INIT(mi, matrix);
 
   /* don't want any exposure events from XCopyArea */
   XSetGraphicsExposures(MI_DISPLAY(mi), MI_GC(mi), False);
@@ -594,7 +599,8 @@ void init_matrix(ModeInfo *mi)
  *
  * FUNCTION: update the matrix waterfall display
  */
-void draw_matrix(ModeInfo *mi)
+ENTRYPOINT void
+draw_matrix(ModeInfo *mi)
 {
   double xDistance;
   int i;
@@ -693,29 +699,31 @@ void draw_matrix(ModeInfo *mi)
  * FUNCTION: frees all allocated resources
  */
 
-void release_matrix(ModeInfo *mi)
+ENTRYPOINT void
+release_matrix(ModeInfo *mi)
 {
 
   /* If the matrix exists, free all data associated with all screens.
-   * free_matrix() does no harm if given nonexistent screens.
+   * free_matrix_screen() does no harm if given nonexistent screens.
    */
   if (matrix != NULL) {
 	int screen;
 
 	for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-		free_matrix(MI_DISPLAY(mi), &matrix[screen]);
+		free_matrix_screen(MI_DISPLAY(mi), &matrix[screen]);
 	free(matrix);
 	matrix = (matrix_t *) NULL;
   }
 }
 
-
+#ifndef STANDALONE
 /* NAME: refresh_matrix
  *
  * FUNCTION: refresh the screen
  */
 
-void refresh_matrix(ModeInfo *mi)
+ENTRYPOINT void
+refresh_matrix(ModeInfo *mi)
 {
   int c;
   matrix_t *mp;
@@ -742,7 +750,8 @@ void refresh_matrix(ModeInfo *mi)
  * FUNCTION: resets column offsets and speeds and generates new pixmaps
  */
 
-void change_matrix(ModeInfo *mi)
+ENTRYPOINT void
+change_matrix(ModeInfo *mi)
 {
   int c;
   matrix_t *mp;
@@ -766,6 +775,7 @@ void change_matrix(ModeInfo *mi)
 	  new_column(mi, column);
   }
 }
+#endif
 
 XSCREENSAVER_MODULE ("Matrix", matrix)
 

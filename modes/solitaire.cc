@@ -1293,10 +1293,11 @@ init_solitaire(ModeInfo * mi)
 {
 	solitairestruct *bp;
 
+	/*MI_INIT(mi, solitaire);*/
 	if (solitaire == NULL) {
 		if ((solitaire = (solitairestruct *) calloc(MI_NUM_SCREENS(mi),
-					sizeof(solitairestruct))) == NULL)
-		return;
+				sizeof(solitairestruct))) == NULL)
+			return;
 	}
 	bp = &solitaire[MI_SCREEN(mi)];
 

@@ -44,15 +44,14 @@ static const char sccsid[] = "@(#)julia.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_julia
-#define PROGCLASS "Julia"
-#define HACK_INIT init_julia
-#define HACK_DRAW draw_julia
-#define julia_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*count: 1000 \n" \
- "*cycles: 20 \n" \
- "*ncolors: 200 \n" \
- "*mouse: False \n"
+	"*count: 1000 \n" \
+	"*cycles: 20 \n" \
+	 "*ncolors: 200 \n" \
+	 "*mouse: False \n" \
+
+# define reshape_julia 0
+# define julia_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 
@@ -83,14 +82,14 @@ static OptionStruct desc[] =
         {(char *) "-/+trackmouse", (char *) "turn on/off the tracking of the mouse"}
 };
 
-ModeSpecOpt julia_opts =
+ENTRYPOINT ModeSpecOpt julia_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 
 #ifdef USE_MODULES
 ModStruct   julia_description =
 {"julia", "init_julia", "draw_julia", "release_julia",
- "refresh_julia", "init_julia", (char *) NULL, &julia_opts,
+ "refresh_julia", "init_julia", "free_julia", &julia_opts,
  10000, 1000, 20, 1, 64, 1.0, "",
  "Shows the Julia set", 0, NULL};
 
@@ -186,8 +185,11 @@ incr(ModeInfo * mi, juliastruct * jp)
 }
 
 static void
-free_julia(Display *display, juliastruct *jp)
+free_julia_screen(Display *display, juliastruct *jp)
 {
+	if (jp == NULL) {
+		return;
+	}
 	if (jp->pointBuffer != NULL) {
 		int         buffer;
 
@@ -209,8 +211,16 @@ free_julia(Display *display, juliastruct *jp)
 		XFreeCursor(display, jp->cursor);
 		jp->cursor = None;
 	}
+	jp = NULL;
 }
-void
+
+ENTRYPOINT void
+free_julia(ModeInfo * mi)
+{
+	free_julia_screen(MI_DISPLAY(mi), &julias[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_julia(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -219,11 +229,7 @@ init_julia(ModeInfo * mi)
 	XGCValues   gcv;
 	int         i, j;
 
-	if (julias == NULL) {
-		if ((julias = (juliastruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (juliastruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, julias);
 	jp = &julias[MI_SCREEN(mi)];
 
 	jp->centerx = MI_WIDTH(mi) / 2;
@@ -246,7 +252,7 @@ init_julia(ModeInfo * mi)
 		if ((bit = XCreatePixmapFromBitmapData(display, window,
 				(char *) "\000", 1, 1, MI_BLACK_PIXEL(mi),
 				MI_BLACK_PIXEL(mi), 1)) == None) {
-			free_julia(display, jp);
+			free_julia_screen(display, jp);
 			return;
 		}
 
@@ -254,7 +260,7 @@ init_julia(ModeInfo * mi)
 				bit, bit,
 				&black, &black, 0, 0)) == None) {
 			XFreePixmap(display, bit);
-			free_julia(display, jp);
+			free_julia_screen(display, jp);
 			return;
 		}
 		XFreePixmap(display, bit);
@@ -271,20 +277,20 @@ init_julia(ModeInfo * mi)
 		jp->circsize = (MIN(jp->centerx, jp->centery) / 96) * 2 + 1;
 		if ((jp->pixmap = XCreatePixmap(display, window,
 				jp->circsize, jp->circsize, 1)) == None) {
-			free_julia(display, jp);
+			free_julia_screen(display, jp);
 			return;
 		}
 		gcv.foreground = 1;
 		if ((fg_gc = XCreateGC(display, (Drawable) jp->pixmap,
 				GCForeground, &gcv)) == None) {
-			free_julia(display, jp);
+			free_julia_screen(display, jp);
 			return;
 		}
 		gcv.foreground = 0;
 		if ((bg_gc = XCreateGC(display, (Drawable) jp->pixmap,
 				GCForeground, &gcv)) == None) {
 			XFreeGC(display, fg_gc);
-			free_julia(display, jp);
+			free_julia_screen(display, jp);
 			return;
 		}
 		XFillRectangle(display, (Drawable) jp->pixmap, bg_gc,
@@ -303,7 +309,7 @@ init_julia(ModeInfo * mi)
 		gcv.background = MI_BLACK_PIXEL(mi);
 		if ((jp->stippledGC = XCreateGC(display, window,
 				 GCForeground | GCBackground, &gcv)) == None) {
-			free_julia(display, jp);
+			free_julia_screen(display, jp);
 			return;
 		}
 	}
@@ -314,7 +320,7 @@ init_julia(ModeInfo * mi)
 	if (jp->pointBuffer == NULL) {
 		if ((jp->pointBuffer = (XPoint **) calloc(jp->nbuffers,
 				sizeof (XPoint *))) == NULL) {
-			free_julia(display, jp);
+			free_julia_screen(display, jp);
 			return;
 		}
 	}
@@ -322,7 +328,7 @@ init_julia(ModeInfo * mi)
 		if (jp->pointBuffer[i] == NULL) {
 			if ((jp->pointBuffer[i] = (XPoint *) malloc(numpoints *
 					sizeof (XPoint))) == NULL) {
-				free_julia(display, jp);
+				free_julia_screen(display, jp);
 				return;
 			}
 		}
@@ -336,7 +342,7 @@ init_julia(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_julia(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -442,20 +448,21 @@ draw_julia(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_julia(ModeInfo * mi)
 {
 	if (julias != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_julia(MI_DISPLAY(mi), &julias[screen]);
+			free_julia_screen(MI_DISPLAY(mi), &julias[screen]);
 		free(julias);
 		julias = (juliastruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_julia(ModeInfo * mi)
 {
 	juliastruct *jp;
@@ -468,6 +475,7 @@ refresh_julia(ModeInfo * mi)
 	jp->redrawing = 1;
 	jp->redrawpos = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Julia", julia)
 

@@ -35,51 +35,34 @@ static const char sccsid[] = "@(#)blank.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define PROGCLASS "Blank"
-#define HACK_INIT init_blank
-#define HACK_DRAW draw_blank
-#define blank_opts xlockmore_opts
-#define DEFAULTS "*delay: 1000000 \n"
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# define DEFAULTS	"*delay: 1000000 \n" \
+
+#define draw_blank 0
+#define release_blank 0
+#define free_blank 0
+#define reshape_blank 0
+#define blank_handle_event 0
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
-ModeSpecOpt blank_opts =
+ENTRYPOINT ModeSpecOpt blank_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 const ModStruct blank_description =
-{"blank", "init_blank", "draw_blank", "release_blank",
- "refresh_blank", "init_blank", (char *) NULL, &blank_opts,
+{"blank", "init_blank", (char *) NULL, (char *) NULL,
+ (char *) NULL, "init_blank", (char *) NULL, &blank_opts,
  3000000, 1, 1, 1, 64, 1.0, "",
  "Shows nothing but a black screen", 0, NULL};
 
 #endif
 
-void
+ENTRYPOINT void
 init_blank(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
-}
-
-/* ARGSUSED */
-void
-draw_blank(ModeInfo * mi)
-{
-	/* Leave the lights on while user types password */
-}
-
-void
-release_blank(ModeInfo * mi)
-{
-	/* clear screensaver settings, just in case */
-}
-
-void
-refresh_blank(ModeInfo * mi)
-{
-	/* Do nothing, it will refresh by itself :) */
 }
 
 XSCREENSAVER_MODULE ("Blank", blank)

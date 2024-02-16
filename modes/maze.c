@@ -71,22 +71,21 @@ static const char sccsid[] = "@(#)maze.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_maze
-#define PROGCLASS "Maze"
-#define HACK_INIT init_maze
-#define HACK_DRAW draw_maze
-#define maze_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000 \n" \
- "*cycles: 3000 \n" \
- "*size: -10 \n" \
- "*ncolors: 64 \n" \
- "*bitmap: \n" \
- "*trackmouse: False \n"
+	"*cycles: 3000 \n" \
+	"*size: -10 \n" \
+	"*ncolors: 64 \n" \
+	"*bitmap: \n" \
+	"*trackmouse: False \n" \
+
+# define reshape_maze 0
+# define maze_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #include "color.h"
-#endif /* STANDALONE */
 #include "iostuff.h"
+#endif /* STANDALONE */
 
 #ifdef MODE_maze
 
@@ -127,13 +126,13 @@ static OptionStruct desc[] =
   {(char *) "-/+threed", (char *) "turn on/off the Three D look"},
 };
 
-ModeSpecOpt maze_opts =
+ENTRYPOINT ModeSpecOpt maze_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   maze_description =
 {"maze", "init_maze", "draw_maze", "release_maze",
- "refresh_maze", "init_maze", (char *) NULL, &maze_opts,
+ "refresh_maze", "init_maze", "free_maze", &maze_opts,
  1000, 1, 3000, -40, 64, 1.0, "",
  "Shows a random maze and a depth first search solution", 0, NULL};
 
@@ -141,6 +140,7 @@ ModStruct   maze_description =
 
 #include "bitmaps/gray1.xbm"
 
+#ifndef STANDALONE
 /* aliases for vars defined in the bitmap file */
 #define ICON_WIDTH   image_width
 #define ICON_HEIGHT    image_height
@@ -153,8 +153,12 @@ ModStruct   maze_description =
 #include "maze.xpm"
 #define DEFAULT_XPM 1
 #endif
+#endif
 
 #define MINGRIDSIZE	2
+
+#define LOGOWIDTH ((mp->logo == NULL)?64:mp->logo->width)
+#define LOGOHEIGHT ((mp->logo == NULL)?64:mp->logo->height)
 
 #define WALL_TOP	0x8000
 #define WALL_RIGHT	0x4000
@@ -357,8 +361,11 @@ free_stuff(Display * display, mazestruct * mp)
 }
 
 static void
-free_maze(Display * display, mazestruct * mp)
+free_maze_screen(Display * display, mazestruct * mp)
 {
+	if (mp == NULL) {
+		return;
+	}
 	free_path(mp);
 	if (mp->grayGC != None) {
 		XFreeGC(display, mp->grayGC);
@@ -369,10 +376,21 @@ free_maze(Display * display, mazestruct * mp)
 		mp->graypix = None;
 	}
 	free_stuff(display, mp);
+#ifndef STANDALONE
+/* this used to work there I think */
+
 	if (mp->logo != None) {
 		destroyImage(&mp->logo, &mp->graphics_format);
 		mp->logo = None;
 	}
+#endif
+	mp = NULL;
+}
+
+ENTRYPOINT void
+free_maze(ModeInfo * mi)
+{
+	free_maze_screen(MI_DISPLAY(mi), &mazes[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -406,9 +424,13 @@ set_maze_sizes(ModeInfo * mi)
 		mp->ys = MIN(size, MAX(minsize, (MIN(mp->width, mp->height) - 1) /
 				       MINGRIDSIZE));
 	mp->xs = mp->ys;
-	mp->logo_size_x = mp->logo->width / mp->xs + 1;
-	mp->logo_size_y = mp->logo->height / mp->ys + 1;
-
+	if (mp->logo == NULL) {
+		mp->logo_size_x = 64 / mp->xs + 1;
+		mp->logo_size_y = 64 / mp->ys + 1;
+	} else {
+		mp->logo_size_x = LOGOWIDTH / mp->xs + 1;
+		mp->logo_size_y = LOGOHEIGHT / mp->ys + 1;
+	}
 	mp->ncols = MAX((mp->width - 1) / mp->xs, MINGRIDSIZE);
 	mp->nrows = MAX((mp->height - 1) / mp->ys, MINGRIDSIZE);
 
@@ -418,25 +440,25 @@ set_maze_sizes(ModeInfo * mi)
 	if (!mp->maze)
 		if ((mp->maze = (unsigned int *) calloc(mp->maze_size,
 				 sizeof (unsigned int))) == NULL) {
-			free_maze(display, mp);
+			free_maze_screen(display, mp);
 			return False;
 		}
 	if (!mp->move_list)
 		if ((mp->move_list = (paths *) calloc(mp->maze_size,
 				sizeof (paths))) == NULL) {
-			free_maze(display, mp);
+			free_maze_screen(display, mp);
 			return False;
 		}
 	if (!mp->save_path)
 		if ((mp->save_path = (paths *) calloc(mp->maze_size,
 				sizeof (paths))) == NULL) {
-			free_maze(display, mp);
+			free_maze_screen(display, mp);
 			return False;
 		}
 	if (!mp->path)
 		if (( mp->path = (paths *) calloc(mp->maze_size,
 				sizeof (paths))) == NULL) {
-			free_maze(display, mp);
+			free_maze_screen(display, mp);
 			return False;
 		}
 	return True;
@@ -732,15 +754,17 @@ draw_maze_border(ModeInfo * mi)
 	GC          gc = mp->backGC;
 	register int i, j;
 
+#ifndef STANDALONE
 	if (mp->logo_x != -1) {
 		(void) XPutImage(display, window, gc, mp->logo,
 				 0, 0,
 				 mp->xb + mp->xs * mp->logo_x +
-			(mp->xs * mp->logo_size_x - mp->logo->width + 1) / 2,
+			(mp->xs * mp->logo_size_x - LOGOWIDTH + 1) / 2,
 				 mp->yb + mp->ys * mp->logo_y +
-		       (mp->ys * mp->logo_size_y - mp->logo->height + 1) / 2,
-				 mp->logo->width, mp->logo->height);
+		       (mp->ys * mp->logo_size_y - LOGOHEIGHT + 1) / 2,
+				 LOGOWIDTH, LOGOHEIGHT);
 	}
+#endif
 	for (i = 0; i < mp->ncols; i++) {
 		if (mp->maze[i * mp->nrows] & WALL_TOP) {
 			XDrawLine(display, window, gc,
@@ -931,9 +955,9 @@ mouse_maze(ModeInfo * mi)
 static Bool
 init_stuff(ModeInfo * mi)
 {
-	Display    *display = MI_DISPLAY(mi);
-	Window      window = MI_WINDOW(mi);
 	mazestruct *mp = &mazes[MI_SCREEN(mi)];
+#ifndef STANDALONE
+	Display    *display = MI_DISPLAY(mi);
 
 	if (mp->logo == None) {
 		getImage(mi, &mp->logo, ICON_WIDTH, ICON_HEIGHT, ICON_BITS,
@@ -942,12 +966,12 @@ init_stuff(ModeInfo * mi)
 #endif
 			 &mp->graphics_format, &mp->cmap, &mp->black);
 		if (mp->logo == None) {
-			free_maze(display, mp);
+			free_maze_screen(display, mp);
 			return False;
 		}
 	}
-#ifndef STANDALONE
 	if (mp->cmap != None) {
+		Window      window = MI_WINDOW(mi);
 		setColormap(display, window, mp->cmap, MI_IS_INWINDOW(mi));
 		if (mp->backGC == None) {
 			XGCValues   xgcv;
@@ -955,7 +979,7 @@ init_stuff(ModeInfo * mi)
 			xgcv.background = mp->black;
 			if ((mp->backGC = XCreateGC(display, window, GCBackground,
 					 &xgcv)) == None) {
-				free_maze(display, mp);
+				free_maze_screen(display, mp);
 				return False;
 			}
 		}
@@ -968,17 +992,13 @@ init_stuff(ModeInfo * mi)
 	return True;
 }
 
-void
+ENTRYPOINT void
 init_maze(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
 	mazestruct *mp;
 
-	if (mazes == NULL) {
-		if ((mazes = (mazestruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (mazestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, mazes);
 	mp = &mazes[MI_SCREEN(mi)];
 
 	if (!init_stuff(mi))
@@ -992,13 +1012,13 @@ init_maze(ModeInfo * mi)
 	if (mp->graypix == None)
 		if ((mp->graypix = XCreateBitmapFromData(display, MI_WINDOW(mi),
 			     (char *) gray1_bits, gray1_width, gray1_height)) == None) {
-			free_maze(display, mp);
+			free_maze_screen(display, mp);
 			return;
 		}
 	if (!mp->grayGC) {
 		if ((mp->grayGC = XCreateGC(display, MI_WINDOW(mi),
 				 0L, (XGCValues *) 0)) == None) {
-			free_maze(display, mp);
+			free_maze_screen(display, mp);
 			return;
 		}
 		XSetBackground(display, mp->grayGC, mp->black);
@@ -1013,7 +1033,7 @@ init_maze(ModeInfo * mi)
 		mp->cycles = 4;
 }
 
-void
+ENTRYPOINT void
 draw_maze(ModeInfo * mi)
 {
 	mazestruct *mp;
@@ -1070,20 +1090,21 @@ draw_maze(ModeInfo * mi)
 	}
 }				/*  end of draw_maze() */
 
-void
+ENTRYPOINT void
 release_maze(ModeInfo * mi)
 {
 	if (mazes != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_maze(MI_DISPLAY(mi), &mazes[screen]);
+			free_maze_screen(MI_DISPLAY(mi), &mazes[screen]);
 		free(mazes);
 		mazes = (mazestruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_maze(ModeInfo * mi)
 {
 	mazestruct *mp;
@@ -1097,7 +1118,7 @@ refresh_maze(ModeInfo * mi)
 #ifdef HAVE_XPM
 	if (mp->graphics_format >= IS_XPM) {
 		/* This is needed when another program changes the colormap. */
-		free_maze(MI_DISPLAY(mi), mp);
+		free_maze_screen(MI_DISPLAY(mi), mp);
 		init_maze(mi);
 		return;
 	}
@@ -1124,6 +1145,7 @@ refresh_maze(ModeInfo * mi)
 	}
 	mp->solving = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Maze", maze)
 

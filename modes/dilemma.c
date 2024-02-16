@@ -65,16 +65,14 @@ static const char sccsid[] = "@(#)dilemma.c	5.24 2007/01/18 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_dilemma
-#define PROGCLASS "Dilemma"
-#define HACK_INIT init_dilemma
-#define HACK_DRAW draw_dilemma
-#define dilemma_opts xlockmore_opts
 #define DEFAULTS "*delay: 200000 \n" \
- "*batchcount: -2 \n" \
- "*cycles: 1000 \n" \
- "*size: 0 \n" \
- "*ncolors: 6 \n" \
- "*neighbors: 0 \n"
+	"*batchcount: -2 \n" \
+	"*cycles: 1000 \n" \
+	"*size: 0 \n" \
+	"*ncolors: 6 \n" \
+
+# define reshape_dilemma 0
+# define dilemma_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #define UNIFORM_COLORS
 #define BRIGHT_COLORS
@@ -123,13 +121,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+vertical", (char *) "change orientation for hexagons and triangles"}
 };
 
-ModeSpecOpt dilemma_opts =
+ENTRYPOINT ModeSpecOpt dilemma_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   dilemma_description =
 {"dilemma", "init_dilemma", "draw_dilemma", "release_dilemma",
- "refresh_dilemma", "init_dilemma", (char *) NULL, &dilemma_opts,
+ "refresh_dilemma", "init_dilemma", "free_dilemma", &dilemma_opts,
  200000, -2, 1000, 0, 64, 1.0, "",
  "Shows Lloyd's Prisoner's Dilemma simulation", 0, NULL};
 
@@ -430,8 +428,11 @@ free_list(dilemmastruct * dp)
 }
 
 static void
-free_dilemma(dilemmastruct *dp)
+free_dilemma_screen(dilemmastruct *dp)
 {
+	if (dp == NULL) {
+		return;
+	}
 	free_list(dp);
 	if (dp->sn != NULL) {
 		free(dp->sn);
@@ -445,22 +446,29 @@ free_dilemma(dilemmastruct *dp)
 		free(dp->payoff);
 		dp->payoff = (float *) NULL;
 	}
+	dp = NULL;
+}
+
+ENTRYPOINT void
+free_dilemma(ModeInfo * mi)
+{
+	free_dilemma_screen(&dilemmas[MI_SCREEN(mi)]);
 }
 
 static void
 alloc_dilemma(dilemmastruct *dp)
 {
 	if ((dp->s = (char *) calloc(dp->npositions, sizeof (char))) == NULL) {
-		free_dilemma(dp);
+		free_dilemma_screen(dp);
 		return;
 	}
 	if ((dp->sn = (char *) calloc(dp->npositions, sizeof (char))) == NULL) {
-		free_dilemma(dp);
+		free_dilemma_screen(dp);
 		return;
 	}
 	if ((dp->payoff = (float *) calloc(dp->npositions,
 			sizeof (float))) == NULL) {
-		free_dilemma(dp);
+		free_dilemma_screen(dp);
 		return;
 	}
 }
@@ -853,24 +861,20 @@ draw_state(ModeInfo * mi, int state)
 	XFlush(MI_DISPLAY(mi));
 }
 
-void
+ENTRYPOINT void
 init_dilemma(ModeInfo * mi)
 {
 	int         size = MI_SIZE(mi);
 	int         i, col, row, colrow, mrow;
 	dilemmastruct *dp;
 
-	if (dilemmas == NULL) {
-		if ((dilemmas = (dilemmastruct *) calloc(MI_NUM_SCREENS(mi),
-					    sizeof (dilemmastruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, dilemmas);
 	dp = &dilemmas[MI_SCREEN(mi)];
 
 	dp->generation = 0;
 	dp->redrawing = 0;
 	dp->state = 0;
-	free_dilemma(dp);
+	free_dilemma_screen(dp);
 
 	if (!dp->initialized) {	/* Genesis */
 		icon_width = cooperat_width;
@@ -1096,7 +1100,7 @@ init_dilemma(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_dilemma(ModeInfo * mi)
 {
 	int         col, row, mrow, colrow, n, i;
@@ -1180,20 +1184,21 @@ draw_dilemma(ModeInfo * mi)
 #endif
 }
 
-void
+ENTRYPOINT void
 release_dilemma(ModeInfo * mi)
 {
 	if (dilemmas != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_dilemma(&dilemmas[screen]);
+			free_dilemma_screen(&dilemmas[screen]);
 		free(dilemmas);
 		dilemmas = (dilemmastruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_dilemma(ModeInfo * mi)
 {
 	dilemmastruct *dp = &dilemmas[MI_SCREEN(mi)];
@@ -1201,6 +1206,7 @@ refresh_dilemma(ModeInfo * mi)
 	dp->redrawing = 1;
 	dp->redrawpos = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Dilemma", dilemma)
 

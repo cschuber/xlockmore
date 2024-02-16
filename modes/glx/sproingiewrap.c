@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* sproingiewrap.c - sproingies wrapper */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)sproingiewrap.c	5.00 2000/11/01 xlockmore";
-
 #endif
 
 /*-
@@ -55,31 +54,31 @@ static const char sccsid[] = "@(#)sproingiewrap.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_sproingies
-#define PROGCLASS "Sproingies"
-#define HACK_INIT init_sproingies
-#define HACK_DRAW draw_sproingies
-#define sproingies_opts xlockmore_opts
-#define DEFAULTS "*delay: 80000 \n" \
- "*count: 5 \n" \
- "*cycles: 0 \n" \
- "*size: 0 \n" \
- "*wireframe: False \n"
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+# define MODE_sproingies
+# define DEFAULTS "*delay: 80000 \n" \
+	"*count: 5 \n" \
+	"*cycles: 0 \n" \
+	"*size: 0 \n" \
+	"*wireframe: False \n"
+
+# define free_sproingies 0
+# define reshape_sproingies 0
+# define sproingies_handle_event 0
+# include "xlockmore.h"		/* from the xscreensaver distribution */
 #else /* !STANDALONE */
-#include "xlock.h"		/* from the xlockmore distribution */
-#include "visgl.h"
+# include "xlock.h"		/* from the xlockmore distribution */
+# include "visgl.h"
 #endif /* !STANDALONE */
 
 #ifdef MODE_sproingies
 
-ModeSpecOpt sproingies_opts =
+ENTRYPOINT ModeSpecOpt sproingies_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   sproingies_description =
 {"sproingies", "init_sproingies", "draw_sproingies", "release_sproingies",
- "refresh_sproingies", "init_sproingies", (char *) NULL, &sproingies_opts,
+ (char *) NULL, "init_sproingies", (char *) NULL, &sproingies_opts,
  80000, 5, 0, 0, 64, 1.0, "",
  "Shows Sproingies!  Nontoxic.  Safe for pets and small children", 0, NULL};
 
@@ -130,7 +129,7 @@ SproingieSwap(void)
 }
 
 
-void
+ENTRYPOINT void
 init_sproingies(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -142,11 +141,7 @@ init_sproingies(ModeInfo * mi)
 	int         wfmode = 0, grnd, mspr, w, h;
 	sproingiesstruct *sp;
 
-	if (sproingies == NULL) {
-		if ((sproingies = (sproingiesstruct *) calloc(MI_NUM_SCREENS(mi),
-					 sizeof (sproingiesstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, sproingies);
 	sp = &sproingies[MI_SCREEN(mi)];
 
 	sp->mono = (MI_IS_MONO(mi) ? 1 : 0);
@@ -197,7 +192,7 @@ init_sproingies(ModeInfo * mi)
 }
 
 /* ARGSUSED */
-void
+ENTRYPOINT void
 draw_sproingies(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -226,17 +221,7 @@ draw_sproingies(ModeInfo * mi)
 	NextSproingieDisplay(MI_SCREEN(mi));	/* It will swap. */
 }
 
-void
-refresh_sproingies(ModeInfo * mi)
-{
-	/* No need to do anything here... The whole screen is updated
-	 * every frame anyway.  Otherwise this would be just like
-	 * draw_sproingies, above, but replace NextSproingieDisplay(...)
-	 * with DisplaySproingies(...).
-	 */
-}
-
-void
+ENTRYPOINT void
 release_sproingies(ModeInfo * mi)
 {
 	if (sproingies != NULL) {
@@ -261,6 +246,20 @@ release_sproingies(ModeInfo * mi)
 	FreeAllGL(mi);
 }
 
+#if 0
+ENTRYPOINT void
+refresh_sproingies(ModeInfo * mi)
+{
+	/* No need to do anything here... The whole screen is updated
+	 * every frame anyway.  Otherwise this would be just like
+	 * draw_sproingies, above, but replace NextSproingieDisplay(...)
+	 * with DisplaySproingies(...).
+	 */
+}
 #endif
+
+XSCREENSAVER_MODULE ("Sproingies", sproingies)
+
+#endif /* MODE_sproingies */
 
 /* End of sproingiewrap.c */

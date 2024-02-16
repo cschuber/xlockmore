@@ -1,4 +1,4 @@
-xlockmore-5.58 as of 18 August 2019, the maintained version of xlock
+xlockmore-5.59 as of 2 October 2019, the maintained version of xlock
 Adapted from Patrick J. Naughton's original xlock
 
 Primary site: http://www.sillycycle.com/xlock
@@ -14,6 +14,20 @@ Please send all bug reports to bagleyd AT verizon.net .
 Adapted from Patrick J. Naughton's original xlock, with lots of help
  from others.
 BUGS to fix and other stuff to do see docs/TODO.
+
+5.59
+  Thanks to tobik, ohartmann AT walstatt.org, and Jason Helfman,
+    jgh AT FreeBSD.org for xglock fixes for "failed due to signal" for
+    clang.
+  Syncing with xscreensaver and many modes modified, more than
+    half working there.  pacman and puzzle run but need some
+    obvious work, others run too fast or flash on the screen.
+    Various fixes from Jouk Jansen and EoflaOE ViceCity.
+    Updated GL modes also, inaddition to overlap: biof, skewb, and
+    fire (needs images). See xscreensaver/README for new directions.
+  Updated in linux to build with modules, must have broken somewhere
+    down the line.  imake build fixed too.
+  bomb mode fixed for xlock.
 
 5.58
   Syncing with xscreensaver.  Much has changed since last time this

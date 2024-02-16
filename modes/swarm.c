@@ -30,14 +30,13 @@ static const char sccsid[] = "@(#)swarm.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_swarm
-#define PROGCLASS "Swarm"
-#define HACK_INIT init_swarm
-#define HACK_DRAW draw_swarm
-#define swarm_opts xlockmore_opts
 #define DEFAULTS "*delay: 15000 \n" \
- "*count: -100 \n" \
- "*size: -100 \n" \
- "*trackmouse: False \n"
+	"*count: -100 \n" \
+	"*size: -100 \n" \
+	"*trackmouse: False \n" \
+
+# define reshape_swarm 0
+# define swarm_handle_event 0
 #define BRIGHT_COLORS
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* from the xscreensaver distribution */
@@ -68,14 +67,14 @@ static OptionStruct desc[] =
         {(char *) "-/+trackmouse", (char *) "turn on/off the tracking of the mouse"}
 };
 
-ModeSpecOpt swarm_opts =
+ENTRYPOINT ModeSpecOpt swarm_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 
 #ifdef USE_MODULES
 ModStruct   swarm_description =
 {"swarm", "init_swarm", "draw_swarm", "release_swarm",
- "refresh_swarm", "init_swarm", (char *) NULL, &swarm_opts,
+ "refresh_swarm", "init_swarm", "free_swarm", &swarm_opts,
  15000, -100, 1, -100, 64, 1.0, "",
  "Shows a swarm of bees following a wasp", 0, NULL};
 
@@ -151,16 +150,26 @@ free_bees(swarmstruct *sp)
 }
 
 static void
-free_swarm(Display *display, swarmstruct *sp)
+free_swarm_screen(Display *display, swarmstruct *sp)
 {
+	if (sp == NULL) {
+		return;
+	}
 	free_bees(sp);
 	if (sp->cursor != None) {
 		XFreeCursor(display, sp->cursor);
 		sp->cursor = None;
 	}
+	sp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_swarm(ModeInfo * mi)
+{
+	free_swarm_screen(MI_DISPLAY(mi), &swarms[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_swarm(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -168,11 +177,7 @@ init_swarm(ModeInfo * mi)
 	int         b, t;
 	swarmstruct *sp;
 
-	if (swarms == NULL) {
-		if ((swarms = (swarmstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (swarmstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, swarms);
 	sp = &swarms[MI_SCREEN(mi)];
 
 	sp->beecount = MI_COUNT(mi);
@@ -238,7 +243,7 @@ init_swarm(ModeInfo * mi)
 			sp->beecount)) == NULL) ||
 		    ((sp->yv = (float *) malloc(sizeof (float) *
 			sp->beecount)) == NULL)) {
-			free_swarm(display, sp);
+			free_swarm_screen(display, sp);
 			return;
 		}
 	}
@@ -267,7 +272,7 @@ init_swarm(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_swarm(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -394,24 +399,26 @@ draw_swarm(ModeInfo * mi)
 	XDrawSegments(display, window, gc, sp->segs, sp->beecount);
 }
 
-void
+ENTRYPOINT void
 release_swarm(ModeInfo * mi)
 {
 	if (swarms != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_swarm(MI_DISPLAY(mi), &swarms[screen]);
+			free_swarm_screen(MI_DISPLAY(mi), &swarms[screen]);
 		free(swarms);
 		swarms = (swarmstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_swarm(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Swarm", swarm)
 

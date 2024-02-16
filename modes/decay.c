@@ -46,34 +46,34 @@ static const char sccsid[] = "@(#)decay.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_decay
-#define PROGCLASS "Decay"
-#define HACK_INIT init_decay
-#define HACK_DRAW draw_decay
-#define decay_opts xlockmore_opts
-#define DEFAULTS "*delay: 200000 \n" \
+# define MODE_decay
+# define DEFAULTS "*delay: 200000 \n" \
  "*count: 6 \n" \
  "*cycles: 30 \n" \
  "*ncolors: 200 \n"
-#include "xlockmore.h"    /* in xscreensaver distribution */
-#else /* STANDALONE */
-#include "xlock.h"    /* in xlockmore distribution */
-#endif /* STANDALONE */
 
-#include "iostuff.h"
-#include "color.h"
+# define reshape_decay 0
+# define decay_handle_event 0
+# include "xlockmore.h"    /* in xscreensaver distribution */
+#else /* STANDALONE */
+# include "xlock.h"    /* in xlockmore distribution */
+# include "color.h"
+# include "iostuff.h"
+#endif /* STANDALONE */
 
 #ifdef MODE_decay
 
+#ifndef STANDALONE
 extern Bool hide;
+#endif
 
-ModeSpecOpt decay_opts =
+ENTRYPOINT ModeSpecOpt decay_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   decay_description =
 {"decay", "init_decay", "draw_decay", "release_decay",
- "refresh_decay", "init_decay", (char *) NULL, &decay_opts,
+ "refresh_decay", "init_decay", "free_decay", &decay_opts,
  200000, 6, 30, 1, 64, 0.3, "",
  "Shows a decaying screen", 0, NULL};
 
@@ -82,7 +82,10 @@ ModStruct   decay_description =
 #define DECAY_WIDTH   image_width
 #define DECAY_HEIGHT    image_height
 #define DECAY_BITS    image_bits
+
+#ifndef STANDALONE
 #include "decay.xbm"
+#endif
 
 #ifdef HAVE_XPM
 #define DECAY_NAME    image_name
@@ -120,8 +123,11 @@ static decaystruct *decay_info = (decaystruct *) NULL;
 #define	DEGREE	1
 
 static void
-free_decay(Display * display, decaystruct * dp)
+free_decay_screen(Display * display, decaystruct * dp)
 {
+	if (dp == NULL) {
+		return;
+	}
 	if (dp->cmap != None) {
 		XFreeColormap(display, dp->cmap);
 		if (dp->backGC != None) {
@@ -131,18 +137,28 @@ free_decay(Display * display, decaystruct * dp)
 		dp->cmap = None;
 	} else
 		dp->backGC = None;
+#ifndef STANDALONE
 	if (dp->hide && (dp->logo != None)) {
 		destroyImage(&dp->logo, &dp->graphics_format);
 		dp->logo = None;
 	}
+#endif
+	dp = NULL;
+}
+
+ENTRYPOINT void
+free_decay(ModeInfo * mi)
+{
+	free_decay_screen(MI_DISPLAY(mi), &decay_info[MI_SCREEN(mi)]);
 }
 
 static void
 alloc_decay(ModeInfo * mi)
 {
+	decaystruct *dp = &decay_info[MI_SCREEN(mi)];
+#ifndef STANDALONE
 	Display    *display = MI_DISPLAY(mi);
 	Window      window = MI_WINDOW(mi);
-	decaystruct *dp = &decay_info[MI_SCREEN(mi)];
 
 	if (dp->hide) {
 		if (dp->logo == None) {
@@ -152,11 +168,10 @@ alloc_decay(ModeInfo * mi)
 #endif
 				&dp->graphics_format, &dp->cmap, &dp->black);
 			if (dp->logo == None) {
-				free_decay(display, dp);
+				free_decay_screen(display, dp);
 				return;
 			}
 		}
-#ifndef STANDALONE
 		if (dp->cmap != None) {
 			setColormap(display, window, dp->cmap, MI_IS_INWINDOW(mi));
 			if (dp->backGC == None) {
@@ -165,7 +180,7 @@ alloc_decay(ModeInfo * mi)
 				xgcv.background = dp->black;
 				dp->backGC = XCreateGC(display, window, GCBackground, &xgcv);
 				if (dp->backGC == None) {
-					free_decay(display, dp);
+					free_decay_screen(display, dp);
 					return;
 				}
 			}
@@ -175,16 +190,15 @@ alloc_decay(ModeInfo * mi)
 			dp->black = MI_BLACK_PIXEL(mi);
 			dp->backGC = MI_GC(mi);
 		}
-	}
 #ifndef STANDALONE
-	else {
+	} else {
 		setColormap(display, window, DefaultColormapOfScreen(MI_SCREENPTR(mi)), MI_IS_INWINDOW(mi));
 		dp->backGC = MI_GC(mi);
 	}
 #endif /* STANDALONE */
 }
 
-void
+ENTRYPOINT void
 init_decay(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
@@ -193,11 +207,7 @@ init_decay(ModeInfo * mi)
 
 	char *s = (char*) "random";
 
-	if (decay_info == NULL) {
-		if ((decay_info = (decaystruct *) calloc(MI_NUM_SCREENS(mi),
-						sizeof(decaystruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, decay_info);
 	dp = &decay_info[MI_SCREEN(mi)];
 
 	if      (s && !strcmp(s, "shuffle")) dp->mode = SHUFFLE;
@@ -211,6 +221,7 @@ init_decay(ModeInfo * mi)
 	else if (s && !strcmp(s, "downright")) dp->mode = DOWNRIGHT;
 	else if (s && !strcmp(s, "in")) dp->mode = INSIDE;
 	else if (s && !strcmp(s, "out")) dp->mode = OUTSIDE;
+#ifndef STANDALONE
 	else {
 		if (s && *s && !!strcmp(s, "random"))
 			(void) fprintf(stderr, "%s: unknown mode %s\n", ProgramName, s);
@@ -221,6 +232,7 @@ init_decay(ModeInfo * mi)
 		dp->hide = (Bool) (LRAND() & 1);
 	else
 		dp->hide = hide;
+#endif
 
 
 	dp->windowsize.x = MI_WIDTH(mi);
@@ -246,19 +258,22 @@ init_decay(ModeInfo * mi)
                                  dp->randompos.x, dp->randompos.y,
                                  dp->windowsize.x, dp->windowsize.y);
 
-	} else {
+	}
+#ifndef STANDALONE
+	else {
 		XCopyArea (MI_DISPLAY(mi), MI_ROOT_PIXMAP(mi), MI_WINDOW(mi),
 		       dp->backGC, 0, 0, MI_WIDTH(mi), MI_HEIGHT(mi),
 		       0, 0);
 		XFlush(MI_DISPLAY(mi));
 	}
+#endif
 }
 
 
 /*
  * perform one iteration of decay
  */
-void
+ENTRYPOINT void
 draw_decay (ModeInfo * mi)
 {
     int left, top, width, height, toleft, totop;
@@ -353,7 +368,21 @@ draw_decay (ModeInfo * mi)
 
 }
 
-void
+ENTRYPOINT void
+release_decay(ModeInfo * mi)
+{
+	if (decay_info != NULL) {
+		int	screen;
+
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_decay_screen(MI_DISPLAY(mi), &decay_info[screen]);
+		free(decay_info);
+		decay_info = (decaystruct *) NULL;
+	}
+}
+
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_decay(ModeInfo * mi)
 {
 #ifdef HAVE_XPM
@@ -365,25 +394,13 @@ refresh_decay(ModeInfo * mi)
 
 	if (dp->graphics_format >= IS_XPM) {
 		/* This is needed when another program changes the colormap. */
-		free_decay(MI_DISPLAY(mi), dp);
+		free_decay_screen(MI_DISPLAY(mi), dp);
 		init_decay(mi);
 		return;
 	}
 #endif
 }
-
-void
-release_decay(ModeInfo * mi)
-{
-	if (decay_info != NULL) {
-		int	screen;
-
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_decay(MI_DISPLAY(mi), &decay_info[screen]);
-		free(decay_info);
-		decay_info = (decaystruct *) NULL;
-	}
-}
+#endif
 
 XSCREENSAVER_MODULE ("Decay", decay)
 

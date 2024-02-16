@@ -56,14 +56,14 @@ static const char sccsid[] = "@(#)ant.c	5.24 2007/01/18 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_ant
-# define DEFAULTS "*delay: 20000 \n" \
-	"*count: -3 \n" \
-	"*cycles: 40000 \n" \
-	"*size: -12 \n" \
-	"*ncolors: 64 \n" \
-	"*fullrandom: True \n" \
-	"*verbose: False \n" \
-	"*fpsSolid: True \n" \
+# define DEFAULTS	"*delay: 20000 \n" \
+			"*count: -3 \n" \
+			"*cycles: 40000 \n" \
+			"*size: -12 \n" \
+			"*ncolors: 64 \n" \
+			"*fullrandom: True \n" \
+			"*verbose: False \n" \
+			"*fpsSolid: True \n" \
 
 # define reshape_ant 0
 # define ant_handle_event 0
@@ -71,7 +71,7 @@ static const char sccsid[] = "@(#)ant.c	5.24 2007/01/18 xlockmore";
 #else /* STANDALONE */
 # include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
-# define DO_STIPPLE
+#define DO_STIPPLE
 #include "automata.h"
 
 #ifdef MODE_ant
@@ -1462,8 +1462,7 @@ draw_anant(ModeInfo * mi, int direction, int col, int row)
 
 #if 0
 static void
-RandomSoup(mi)
-	ModeInfo   *mi;
+RandomSoup(ModeInfo * mi);
 {
 	antfarmstruct *ap = &antfarms[MI_SCREEN(mi)];
 	int         row, col, mrow = 0;
@@ -1707,9 +1706,7 @@ free_ant_screen(Display *display, antfarmstruct *ap)
 ENTRYPOINT void
 free_ant(ModeInfo * mi)
 {
-	Display *display = MI_DISPLAY(mi);
-	antfarmstruct *ap = &antfarms[MI_SCREEN(mi)];
-	free_ant_screen(display, ap);
+	free_ant_screen(MI_DISPLAY(mi), &antfarms[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void
@@ -1725,11 +1722,6 @@ init_ant(ModeInfo * mi)
 	int         i;
 
 	MI_INIT(mi, antfarms);
-	/*if (antfarms == NULL) {
-		if ((antfarms = (antfarmstruct *) calloc(MI_NUM_SCREENS(mi),
-					    sizeof (antfarmstruct))) == NULL)
-			return;
-	}*/
 	ap = &antfarms[MI_SCREEN(mi)];
 
 	ap->redrawing = 0;

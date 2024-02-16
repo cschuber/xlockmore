@@ -47,25 +47,24 @@ static const char sccsid[] = "@(#)life1d.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_life1d
-#define PROGCLASS "Life1D"
-#define HACK_INIT init_life1d
-#define HACK_DRAW draw_life1d
-#define life1d_opts xlockmore_opts
-#define DEFAULTS "*delay: 10000 \n" \
- "*cycles: 10 \n" \
- "*size: 0 \n" \
- "*ncolors: 200 \n" \
- "*bitmap: \n" \
- "*verbose: \n"
+# define MODE_life1d
+# define DEFAULTS	"*delay: 10000 \n" \
+			"*cycles: 10 \n" \
+			"*size: 0 \n" \
+			"*ncolors: 200 \n" \
+			"*bitmap: \n" \
+			"*verbose: \n" \
+
+# define reshape_life1d 0
+# define life1d_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
-#include "color.h"
+# include "xlock.h"		/* in xlockmore distribution */
+# include "color.h"
 #define DO_STIPPLE
+#include "iostuff.h"
 #endif /* STANDALONE */
 #include "automata.h"
-#include "iostuff.h"
 
 #ifdef MODE_life1d
 
@@ -87,22 +86,23 @@ static OptionStruct desc[] =
 	{(char *) "-/+totalistic", (char *) "turn on/off totalistic rules (else LCAU rules)"}
 };
 
-ModeSpecOpt life1d_opts =
+ENTRYPOINT ModeSpecOpt life1d_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   life1d_description =
 {"life1d", "init_life1d", "draw_life1d", "release_life1d",
- "refresh_life1d", "init_life1d", (char *) NULL, &life1d_opts,
+ "refresh_life1d", "init_life1d", "free_life1d", &life1d_opts,
  10000, 1, 10, 0, 64, 1.0, "",
  "Shows Wolfram's game of 1D Life", 0, NULL};
 
 #endif
 
+#ifndef STANDALONE
 #define LIFE1DBITS(n,w,h)\
   if ((lp->pixmaps[lp->init_bits]=\
   XCreatePixmapFromBitmapData(display,window,(char *)n,w,h,1,0,1))==None){\
-  free_life1d(display,lp); return;} else {lp->init_bits++;}
+  free_life1d_screen(display,lp); return;} else {lp->init_bits++;}
 
 /* aliases for vars defined in the bitmap file */
 #define CELL_WIDTH   image_width
@@ -114,6 +114,7 @@ ModStruct   life1d_description =
 #ifdef HAVE_XPM
 static char *image_name[] =
 {(char *) ""};
+#endif
 
 #define CELL_NAME image_name
 #define DEFAULT_XPM 0
@@ -423,6 +424,7 @@ drawcell(ModeInfo * mi, int col, int row, unsigned int state)
 	if (MI_NPIXELS(mi) > 2)
 		XSetForeground(display, gc, MI_PIXEL(mi, lp->colors[state - 1]));
 	if (lp->pixelmode || (MI_NPIXELS(mi) <= 2)) {
+#ifndef STANDALONE
 		if (MI_NPIXELS(mi) <= 2) {
 			XGCValues   gcv;
 
@@ -435,6 +437,7 @@ drawcell(ModeInfo * mi, int col, int row, unsigned int state)
 			XFillRectangle(display, window, lp->stippledGC,
 				       lp->xb + lp->xs * col, lp->yb + lp->ys * row, lp->xs, lp->ys);
 		} else
+#endif
 			XFillRectangle(display, window, gc,
 				       lp->xb + lp->xs * col, lp->yb + lp->ys * row, lp->xs, lp->ys);
 	}
@@ -571,9 +574,8 @@ compare(ModeInfo * mi)
 static Bool
 init_stuff(ModeInfo * mi)
 {
-	Display    *display = MI_DISPLAY(mi);
-	Window      window = MI_WINDOW(mi);
 	life1dstruct *lp = &life1ds[MI_SCREEN(mi)];
+#ifndef STANDALONE
 
 	if (lp->logo == None) {
 		getImage(mi, &lp->logo, CELL_WIDTH, CELL_HEIGHT, CELL_BITS,
@@ -585,9 +587,14 @@ init_stuff(ModeInfo * mi)
 			return False;
 		}
 	}
-#ifndef STANDALONE
+#endif /* STANDALONE */
 	if (lp->cmap != None) {
+		Display    *display = MI_DISPLAY(mi);
+		Window      window = MI_WINDOW(mi);
+
+#ifndef STANDALONE
 		setColormap(display, window, lp->cmap, MI_IS_INWINDOW(mi));
+#endif
 		if (lp->backGC == None) {
 			XGCValues   xgcv;
 
@@ -598,7 +605,6 @@ init_stuff(ModeInfo * mi)
 			}
 		}
 	} else
-#endif /* STANDALONE */
 	{
 		lp->black = MI_BLACK_PIXEL(mi);
 		lp->backGC = MI_GC(mi);
@@ -609,6 +615,9 @@ init_stuff(ModeInfo * mi)
 static void
 free_stuff(Display * display, life1dstruct * lp)
 {
+	if (lp == NULL) {
+		return;
+	}
 	if (lp->cmap != None) {
 		XFreeColormap(display, lp->cmap);
 		if (lp->backGC != None) {
@@ -618,13 +627,17 @@ free_stuff(Display * display, life1dstruct * lp)
 		lp->cmap = None;
 	} else
 		lp->backGC = None;
+	lp = NULL;
 }
 
 static void
-free_life1d(Display * display, life1dstruct * lp)
+free_life1d_screen(Display * display, life1dstruct * lp)
 {
 	int         shade;
 
+	if (lp == NULL) {
+		return;
+	}
 	if (lp->stippledGC != None) {
 		XFreeGC(display, lp->stippledGC);
 		lp->stippledGC = None;
@@ -655,30 +668,34 @@ free_life1d(Display * display, life1dstruct * lp)
 		lp->nextstate = (char *) NULL;
 	}
 	free_stuff(display, lp);
+#ifndef STANDALONE
 	if (lp->logo != None) {
 		destroyImage(&lp->logo, &lp->graphics_format);
 		lp->logo = None;
 	}
+#endif
+	lp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_life1d(ModeInfo * mi)
+{
+	free_life1d_screen(MI_DISPLAY(mi), &life1ds[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_life1d(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
-	Window      window = MI_WINDOW(mi);
 	int         size = MI_SIZE(mi);
 	int         i;
 	life1dstruct *lp;
 
-	if (life1ds == NULL) {
-		if ((life1ds = (life1dstruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (life1dstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, life1ds);
 	lp = &life1ds[MI_SCREEN(mi)];
 
 	if (!init_stuff(mi)) {
-		free_life1d(display, lp);
+		free_life1d_screen(display, lp);
 		return;
 	}
 
@@ -697,18 +714,19 @@ init_life1d(ModeInfo * mi)
 	if (lp->nextstate == NULL) {
 		if ((lp->nextstate = (char *) malloc(maxsum_size *
 				sizeof (char))) == NULL) {
-			free_life1d(display, lp);
+			free_life1d_screen(display, lp);
 			return;
 		}
 	}
-
+#ifndef STANDALONE
 	if (lp->init_bits == 0) {
+		Window      window = MI_WINDOW(mi);
 		XGCValues   gcv;
 
 		gcv.fill_style = FillOpaqueStippled;
 		if ((lp->stippledGC = XCreateGC(display, window, GCFillStyle,
 				&gcv)) == None) {
-			free_life1d(display, lp);
+			free_life1d_screen(display, lp);
 			return;
 		}
 		for (i = 0; i < MAXSTATES - 1; i++) {
@@ -718,6 +736,7 @@ init_life1d(ModeInfo * mi)
 		LIFE1DBITS(stipples[NUMSTIPPLES / 2],
 			   STIPPLESIZE, STIPPLESIZE);	/* grey */
 	}
+#endif
 	if (lp->newcells != NULL)
 		free(lp->newcells);
 	if (lp->oldcells != NULL)
@@ -733,6 +752,9 @@ init_life1d(ModeInfo * mi)
 		lp->width = 2;
 	if (lp->height < 2)
 		lp->height = 2;
+#ifdef STANDALONE
+	if (size == 0)
+#else
 	if (size == 0 ||
 	 MINGRIDSIZE * size > lp->width || MINGRIDSIZE * size > lp->height) {
 		if (lp->width > MINGRIDSIZE * lp->logo->width &&
@@ -741,6 +763,7 @@ init_life1d(ModeInfo * mi)
 			lp->xs = lp->logo->width;
 			lp->ys = lp->logo->height;
 		} else
+#endif
 		{
 			int min = MIN(lp->width, lp->height) / (12 * MINGRIDSIZE);
 			int max = MIN(lp->width, lp->height) / (4 * MINGRIDSIZE);
@@ -749,7 +772,10 @@ init_life1d(ModeInfo * mi)
 			lp->xs = lp->ys = MAX(MINSIZE, min + NRAND(max - min + 1));
 			lp->pixelmode = True;
 		}
-	} else {
+#ifndef STANDALONE
+	}
+#endif
+	else {
 		lp->pixelmode = True;
 		if (size < -MINSIZE) {
 			lp->ys = NRAND(MIN(-size, MAX(MINSIZE, MIN(lp->width, lp->height) /
@@ -767,20 +793,20 @@ init_life1d(ModeInfo * mi)
 	lp->border = (lp->nrows / 2 + 1) * MI_CYCLES(mi);
 	if ((lp->newcells = (unsigned char *) calloc(lp->ncols + 2 * lp->border,
 			sizeof (unsigned char))) == NULL) {
-		free_life1d(display, lp);
+		free_life1d_screen(display, lp);
 		return;
 	}
 
 	if ((lp->oldcells = (unsigned char *) calloc(lp->ncols + 2 *
 			(maxradius + lp->border),
 			sizeof (unsigned char))) == NULL) {
-		free_life1d(display, lp);
+		free_life1d_screen(display, lp);
 		return;
 	}
 
 	if ((lp->buffer = (unsigned char *) calloc(lp->ncols * lp->nrows,
 			sizeof (unsigned char))) == NULL) {
-		free_life1d(display, lp);
+		free_life1d_screen(display, lp);
 		return;
 	}
 
@@ -819,7 +845,7 @@ init_life1d(ModeInfo * mi)
 	MI_CLEARWINDOWCOLORMAP(mi, lp->backGC, lp->black);
 }
 
-void
+ENTRYPOINT void
 draw_life1d(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -896,6 +922,7 @@ draw_life1d(ModeInfo * mi)
 		lp->repeating += (lp->row == lp->nrows - 1) ?
 			(lp->nrows - 1) * compare(mi) : 0;
 	}
+#ifndef STANDALONE
 	if (lp->repeating >= 1) {
 		XGCValues   gcv;
 
@@ -908,6 +935,7 @@ draw_life1d(ModeInfo * mi)
 			       0, lp->yb + lp->ys * lp->row,
 			       lp->width, lp->ys);
 	}
+#endif
 	lp->row++;
 	if (lp->repeating >= lp->nrows - 1) {
 		if (lp->row < lp->nrows) {
@@ -926,20 +954,21 @@ draw_life1d(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_life1d(ModeInfo * mi)
 {
 	if (life1ds != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_life1d(MI_DISPLAY(mi), &life1ds[screen]);
+			free_life1d_screen(MI_DISPLAY(mi), &life1ds[screen]);
 		free(life1ds);
 		life1ds = (life1dstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_life1d(ModeInfo * mi)
 {
 	int         row, col, nrow;
@@ -954,7 +983,7 @@ refresh_life1d(ModeInfo * mi)
 #ifdef HAVE_XPM
         if (lp->graphics_format >= IS_XPM) {
 		/* This is needed when another program changes the colormap. */
-		free_life1d(MI_DISPLAY(mi), lp);
+		free_life1d_screen(MI_DISPLAY(mi), lp);
 		init_life1d(mi);
 		return;
 	}
@@ -966,6 +995,7 @@ refresh_life1d(ModeInfo * mi)
 			drawcell(mi, col, row, lp->buffer[col + nrow]);
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Life1d", life1d)
 

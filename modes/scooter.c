@@ -34,17 +34,16 @@ static const char sccsid[] = "@(#)scooter.c	5.01 2001/03/02 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_scooter
-#define PROGCLASS "Scooter"
-#define HACK_INIT init_scooter
-#define HACK_DRAW draw_scooter
-#define scooter_opts xlockmore_opts
 #define DEFAULTS "*delay: 20000 \n" \
- "*count: 24 \n" \
- "*cycles: 5 \n" \
- "*size: 100 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n" \
- "*verbose: False \n"
+	"*count: 24 \n" \
+	"*cycles: 3 \n" \
+	"*size: 100 \n" \
+	"*ncolors: 200 \n" \
+	"*fullrandom: True \n" \
+	"*verbose: False \n" \
+
+# define reshape_scooter 0
+# define scooter_handle_event 0
 #include "xlockmore.h"          /* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"              /* in xlockmore distribution */
@@ -52,14 +51,14 @@ static const char sccsid[] = "@(#)scooter.c	5.01 2001/03/02 xlockmore";
 
 #ifdef MODE_scooter
 
-ModeSpecOpt scooter_opts =
+ENTRYPOINT ModeSpecOpt scooter_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct scooter_description =
 {"scooter", "init_scooter", "draw_scooter", "release_scooter",
- "refresh_scooter", "change_scooter", (char *) NULL, &scooter_opts,
- 20000, 24, 5, 100, 64, 1.0, "",
+ "refresh_scooter", "change_scooter", "free_scooter", &scooter_opts,
+ 20000, 24, 3, 100, 64, 1.0, "",
  "Shows a journey through space tunnel and stars", 0, NULL};
 /*
  *  count = number of doors
@@ -266,8 +265,11 @@ static void nextdoorcolor(ModeInfo *mi, Door *door)
 }
 
 static void
-free_scooter(scooterstruct *sp)
+free_scooter_screen(scooterstruct *sp)
 {
+	if (sp == NULL) {
+		return;
+	}
 	if (sp->doors != NULL) {
 		free(sp->doors);
 		sp->doors = (Door *) NULL;
@@ -280,15 +282,23 @@ free_scooter(scooterstruct *sp)
 		free(sp->zelements);
 		sp->zelements = (ZElement *) NULL;
 	}
+	sp = NULL;
 }
 
-void release_scooter(ModeInfo *mi)
+ENTRYPOINT void
+free_scooter(ModeInfo * mi)
+{
+	free_scooter_screen(&scooters[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
+release_scooter(ModeInfo *mi)
 {
         if (scooters != NULL) {
                 int         screen;
 
                 for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-                        free_scooter(&scooters[screen]);
+                        free_scooter_screen(&scooters[screen]);
                 free(scooters);
                 scooters = (scooterstruct *) NULL;
         }
@@ -298,16 +308,13 @@ void release_scooter(ModeInfo *mi)
 	}
 }
 
-void init_scooter(ModeInfo *mi)
+ENTRYPOINT void
+init_scooter(ModeInfo *mi)
 {
 	int i;
 	scooterstruct *sp;
 
-	if (scooters == NULL) {
-		if ((scooters = (scooterstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (scooterstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, scooters);
 	sp = &scooters[MI_SCREEN(mi)];
 
 	sp->doorcount = MAX(MI_COUNT(mi),MIN_DOORS);
@@ -329,7 +336,7 @@ void init_scooter(ModeInfo *mi)
 	sp->halt_scooter = False;
 
 	initdoorcolors(sp);
-	free_scooter(sp);
+	free_scooter_screen(sp);
 	if (sintable == NULL) {
 		if ((sintable = (float *) malloc(sizeof(float) *
 			SINUSTABLE_SIZE)) == NULL) {
@@ -348,7 +355,7 @@ void init_scooter(ModeInfo *mi)
 
 	if ((sp->zelements = (ZElement *) malloc(sizeof(ZElement) *
 		 sp->ztotal)) == NULL) {
-		free_scooter(sp);
+		free_scooter_screen(sp);
 		return;
 	}
 	for (i = 0; i <  sp->doorcount; i++) {
@@ -366,7 +373,7 @@ void init_scooter(ModeInfo *mi)
 
 	if ((sp->stars = (Star *) malloc(sizeof(Star) *
 			sp->starcount)) == NULL) {
-		free_scooter(sp);
+		free_scooter_screen(sp);
 		return;
 	}
 	for (i = 0; i < sp->starcount; i++) {
@@ -895,7 +902,8 @@ static void drawstars(ModeInfo *mi)
 	}
 }
 
-void draw_scooter(ModeInfo *mi)
+ENTRYPOINT void
+draw_scooter(ModeInfo *mi)
 {
 	scooterstruct *sp;
 
@@ -929,12 +937,16 @@ void draw_scooter(ModeInfo *mi)
 	drawdoors(mi);
 }
 
-void refresh_scooter(ModeInfo *mi)
+
+#ifndef STANDALONE
+ENTRYPOINT void
+refresh_scooter(ModeInfo *mi)
 {
 	MI_CLEARWINDOW(mi);
 }
 
-void change_scooter(ModeInfo *mi)
+ENTRYPOINT void
+change_scooter(ModeInfo *mi)
 {
 	scooterstruct *sp;
 
@@ -944,6 +956,7 @@ void change_scooter(ModeInfo *mi)
 
 	sp->halt_scooter = !sp->halt_scooter;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Scooter", scooter)
 

@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* noof --- SGI Diatoms */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)noof.c	5.04 2002/02/10 xlockmore";
-
 #endif
 
 /*-
@@ -30,12 +29,10 @@ static const char sccsid[] = "@(#)noof.c	5.04 2002/02/10 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_noof
-# define PROGCLASS					"Noof"
-# define HACK_INIT					init_noof
-# define HACK_DRAW					draw_noof
-# define HACK_RESHAPE					reshape_noof
-# define noof_opts					xlockmore_opts
 # define DEFAULTS			"*delay:		1000   \n"
+
+# define free_noof 0
+# define noof_handle_event 0
 # include "xlockmore.h"				/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
 # include "xlock.h"				/* from the xlockmore distribution */
@@ -49,7 +46,7 @@ static const char sccsid[] = "@(#)noof.c	5.04 2002/02/10 xlockmore";
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
 
-ModeSpecOpt noof_opts =
+ENTRYPOINT ModeSpecOpt noof_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -104,7 +101,7 @@ static void drawleaf(noofstruct *np, int l);
 static void initshapes(noofstruct *np, int i);
 
 /* new window size or exposure */
-static void
+ENTRYPOINT void
 reshape_noof(ModeInfo *mi, int width, int height)
 {
 	noofstruct *np;
@@ -163,16 +160,12 @@ pinit(ModeInfo * mi)
 	np->tko = 0;
 }
 
-void
+ENTRYPOINT void
 init_noof(ModeInfo * mi)
 {
 	noofstruct *np;
 
-	if (noof == NULL) {
-		if ((noof = (noofstruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (noofstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, noof);
 	np = &noof[MI_SCREEN(mi)];
 
 	if ((np->glx_context = init_GL(mi)) != NULL)
@@ -189,7 +182,7 @@ init_noof(ModeInfo * mi)
 
 }
 
-void
+ENTRYPOINT void
 draw_noof(ModeInfo * mi)
 {
 	noofstruct *np;
@@ -207,7 +200,7 @@ draw_noof(ModeInfo * mi)
 	oneFrame(np);
 }
 
-void
+ENTRYPOINT void
 release_noof(ModeInfo * mi)
 {
 	if (noof != NULL) {
@@ -582,4 +575,6 @@ oneFrame(noofstruct *np)
   glFlush();
 }
 
-#endif
+XSCREENSAVER_MODULE ("Noof", noof)
+
+#endif /* MODE_noof */

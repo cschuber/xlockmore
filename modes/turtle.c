@@ -31,13 +31,13 @@ static const char sccsid[] = "@(#)turtle.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_turtle
-#define PROGCLASS "Turtle"
-#define HACK_INIT init_turtle
-#define HACK_DRAW draw_turtle
-#define turtle_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000000 \n" \
- "*cycles: 20 \n" \
- "*ncolors: 64 \n"
+	"*cycles: 20 \n" \
+	"*ncolors: 64 \n" \
+
+# define free_turtle 0
+# define reshape_turtle 0
+# define turtle_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -45,7 +45,7 @@ static const char sccsid[] = "@(#)turtle.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_turtle
 
-ModeSpecOpt turtle_opts =
+ENTRYPOINT ModeSpecOpt turtle_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -233,18 +233,13 @@ generate_harter_heightway(ModeInfo * mi, double pt1x, double pt1y,
 	}
 }
 
-
-void
+ENTRYPOINT void
 init_turtle(ModeInfo * mi)
 {
 	int         i;
 	turtlestruct *tp;
 
-	if (turtles == NULL) {
-		if ((turtles = (turtlestruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (turtlestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, turtles);
 	tp = &turtles[MI_SCREEN(mi)];
 
 	tp->width = MI_WIDTH(mi);
@@ -347,7 +342,7 @@ init_turtle(ModeInfo * mi)
 		XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_WHITE_PIXEL(mi));
 }
 
-void
+ENTRYPOINT void
 draw_turtle(ModeInfo * mi)
 {
 	turtlestruct *tp;
@@ -407,7 +402,7 @@ draw_turtle(ModeInfo * mi)
 		}
 }
 
-void
+ENTRYPOINT void
 release_turtle(ModeInfo * mi)
 {
 	if (turtles != NULL) {

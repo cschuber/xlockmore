@@ -91,14 +91,13 @@ SOFTWARE.
 
 #ifdef STANDALONE
 #define MODE_ico
-#define PROGCLASS "Ico"
-#define HACK_INIT init_ico
-#define HACK_DRAW draw_ico
-#define ico_opts xlockmore_opts
 #define DEFAULTS "*delay: 100000 \n" \
- "*count: 0 \n" \
- "*cycles: 300 \n" \
- "*ncolors: 200 \n"
+	"*count: 0 \n" \
+	"*cycles: 300 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_ico 0
+# define ico_handle_event 0
 #define UNIFORM_COLORS
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -140,13 +139,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+opaque", (char *) "turn on/off drawing of bottom (unless faces true)"}
 };
 
-ModeSpecOpt ico_opts =
+ENTRYPOINT ModeSpecOpt ico_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   ico_description =
 {"ico", "init_ico", "draw_ico", "release_ico",
- "refresh_ico", "change_ico", (char *) NULL, &ico_opts,
+ "refresh_ico", "change_ico", "free_ico", &ico_opts,
  200000, 0, 400, 0, 64, 1.0, "",
  "Shows a bouncing polyhedron", 0, NULL};
 
@@ -725,7 +724,7 @@ static int  polysize = sizeof (polygons) / sizeof (polygons[0]);
 #define POLYBITS(n,w,h)\
   if ((ip->pixmaps[ip->init_bits]=\
   XCreatePixmapFromBitmapData(display,window,(char *)n,w,h,1,0,1))==None){\
-  free_ico(display,ip);return;} else {ip->init_bits++;}
+  free_ico_screen(display,ip);return;} else {ip->init_bits++;}
 
 typedef double Transform3D[4][4];
 
@@ -1151,10 +1150,13 @@ drawPoly(ModeInfo * mi, Polyinfo * poly, GC gc,
 }
 
 static void
-free_ico(Display *display, icostruct *ip)
+free_ico_screen(Display *display, icostruct *ip)
 {
 	int shade;
 
+	if (ip == NULL) {
+		return;
+	}
 	if (ip->stippledGC != None) {
 		XFreeGC(display, ip->stippledGC);
 		ip->stippledGC = None;
@@ -1173,9 +1175,16 @@ free_ico(Display *display, icostruct *ip)
 		XFreeGC(display, ip->dbuf_gc);
 		ip->dbuf_gc = None;
 	}
+	ip = NULL;
 }
 
-void
+ENTRYPOINT void
+free_ico(ModeInfo * mi)
+{
+	free_ico_screen(MI_DISPLAY(mi), &icos[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_ico(ModeInfo * mi)
 {
 	Display * display = MI_DISPLAY(mi);
@@ -1183,11 +1192,7 @@ init_ico(ModeInfo * mi)
 	int         size = MI_SIZE(mi);
 	icostruct  *ip;
 
-	if (icos == NULL) {
-		if ((icos = (icostruct *) calloc(MI_NUM_SCREENS(mi),
-						 sizeof (icostruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, icos);
 	ip = &icos[MI_SCREEN(mi)];
 
 	ip->width = MI_WIDTH(mi);
@@ -1201,7 +1206,7 @@ init_ico(ModeInfo * mi)
 			gcv.fill_style = FillOpaqueStippled;
 			if ((ip->stippledGC = XCreateGC(display, window, GCFillStyle,
 					 &gcv)) == None) {
-				free_ico(display, ip);
+				free_ico_screen(display, ip);
 				return;
 			}
 		}
@@ -1307,7 +1312,7 @@ init_ico(ModeInfo * mi)
 	initPoly(mi, ip->poly, ip->polyW, ip->polyH, True);
 }
 
-void
+ENTRYPOINT void
 draw_ico(ModeInfo * mi)
 {
 	icostruct  *ip;
@@ -1343,26 +1348,27 @@ draw_ico(ModeInfo * mi)
 	drawPoly(mi, ip->poly, MI_GC(mi),
 	   ip->currX, ip->currY, ip->polyW, ip->polyH, ip->prevX, ip->prevY);
 }
-void
-refresh_ico(ModeInfo * mi)
-{
-	MI_CLEARWINDOW(mi);
-}
-
-void
+ENTRYPOINT void
 release_ico(ModeInfo * mi)
 {
 	if (icos != NULL) {
 		int screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_ico(MI_DISPLAY(mi), &icos[screen]);
+			free_ico_screen(MI_DISPLAY(mi), &icos[screen]);
 		free(icos);
 		icos = (icostruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
+refresh_ico(ModeInfo * mi)
+{
+	MI_CLEARWINDOW(mi);
+}
+
+ENTRYPOINT void
 change_ico(ModeInfo * mi)
 {
 	icostruct  *ip;
@@ -1383,6 +1389,7 @@ change_ico(ModeInfo * mi)
 
 	initPoly(mi, ip->poly, ip->polyW, ip->polyH, True);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Ico", ico)
 

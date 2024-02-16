@@ -30,33 +30,32 @@ static const char sccsid[] = "@(#)marquee.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_marquee
-#define PROGCLASS "Marquee"
-#define HACK_INIT init_marquee
-#define HACK_DRAW draw_marquee
-#define marquee_opts xlockmore_opts
 #define DEFAULTS "*delay: 100000 \n" \
- "*ncolors: 64 \n" \
- "*font: \n" \
- "*text: \n" \
- "*filename: \n" \
- "*fortunefile: \n" \
- "*program: \n"
+	"*ncolors: 64 \n" \
+	"*font: fixed \n" \
+	"*text:\n" \
+	"*filename: \n" \
+	"*fortunefile: \n" \
+	"*program: \n" \
+
+# define reshape_marquee 0
+# define marquee_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
-#endif /* STANDALONE */
 #include "iostuff.h"
+#endif /* STANDALONE */
 
 #ifdef MODE_marquee
 
-ModeSpecOpt marquee_opts =
+ENTRYPOINT ModeSpecOpt marquee_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   marquee_description =
 {"marquee", "init_marquee", "draw_marquee", "release_marquee",
- "init_marquee", "init_marquee", (char *) NULL, &marquee_opts,
+ "init_marquee", "init_marquee", "free_marquee", &marquee_opts,
  100000, 1, 1, 1, 64, 1.0, "",
  "Shows messages", 0, NULL};
 
@@ -363,7 +362,24 @@ add_letter(marqueestruct * mp, char * letter)
 		mp->nonblanks = mp->t;
 }
 
-void
+static void
+free_marquee_screen(Display * display, marqueestruct * mp)
+{
+	if (mp == NULL) {
+		return;
+	}
+	if (mp->gc != None)
+		XFreeGC(display, mp->gc);
+	mp = NULL;
+}
+
+ENTRYPOINT void
+free_marquee(ModeInfo * mi)
+{
+	free_marquee_screen(MI_DISPLAY(mi), &marquees[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_marquee(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -371,11 +387,7 @@ init_marquee(ModeInfo * mi)
 	XGCValues   gcv;
 	int         i;
 
-	if (marquees == NULL) {
-		if ((marquees = (marqueestruct *) calloc(MI_NUM_SCREENS(mi),
-					    sizeof (marqueestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, marquees);
 	mp = &marquees[MI_SCREEN(mi)];
 
 	mp->win_width = MI_WIDTH(mi);
@@ -439,7 +451,7 @@ init_marquee(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_marquee(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -553,7 +565,7 @@ draw_marquee(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_marquee(ModeInfo * mi)
 {
 	if (marquees != NULL) {
@@ -561,9 +573,7 @@ release_marquee(ModeInfo * mi)
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
 			marqueestruct *mp = &marquees[screen];
-
-			if (mp->gc != None)
-				XFreeGC(MI_DISPLAY(mi), mp->gc);
+			free_marquee_screen(MI_DISPLAY(mi), mp);
 		}
 		free(marquees);
 		marquees = (marqueestruct *) NULL;

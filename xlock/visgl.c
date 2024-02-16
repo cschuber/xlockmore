@@ -1,4 +1,4 @@
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)visgl.c	5.24 2007/01/18 xlockmore";
 
 #endif

@@ -36,13 +36,13 @@ static const char sccsid[] = "@(#)anemone.c	5.22 2006/03/04 xlockmore";
 
 
 #ifdef STANDALONE
-#define MODE_anemone
-#define DEFAULTS "*delay: 100000 \n" \
-	"*size: 4 \n" \
-	"*ncolors: 8 \n" \
-	"*fullrandom: True \n" \
-	"*verbose: False \n" \
-	"*delay: 40000 \n" \
+# define MODE_anemone
+# define DEFAULTS	"*delay: 100000 \n" \
+			"*size: 4 \n" \
+			"*ncolors: 8 \n" \
+			"*fullrandom: True \n" \
+			"*verbose: False \n" \
+			"*delay: 40000 \n" \
 
 #if 0
 	".background: black \n" \
@@ -56,9 +56,9 @@ static const char sccsid[] = "@(#)anemone.c	5.22 2006/03/04 xlockmore";
 #endif
 # define reshape_anemone 0
 # define anemone_handle_event 0
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_anemone
@@ -179,7 +179,7 @@ static OptionStruct desc[] =
    {(char *) "-turnspeed num", (char *) "turning speed"}
 };
 
-ModeSpecOpt anemone_opts =
+ENTRYPOINT ModeSpecOpt anemone_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -237,9 +237,7 @@ free_anemone_screen(Display *display, anemonestruct *sp)
 ENTRYPOINT void
 free_anemone(ModeInfo * mi)
 {
-  Display *display = MI_DISPLAY(mi);
-  anemonestruct *sp = &anemones[MI_SCREEN(mi)];
-  free_anemone_screen(display, sp);
+  free_anemone_screen(MI_DISPLAY(mi), &anemones[MI_SCREEN(mi)]);
 }
 
 static void *

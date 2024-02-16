@@ -41,35 +41,35 @@ static const char sccsid[] = "@(#)puzzle.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_puzzle
-#define PROGCLASS "Puzzle"
-#define HACK_INIT init_puzzle
-#define HACK_DRAW draw_puzzle
-#define puzzle_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*count: 250 \n" \
- "*ncolors: 64 \n" \
- "*bitmap: \n"
+	"*count: 250 \n" \
+	"*ncolors: 64 \n" \
+	"*bitmap: \n" \
+
+# define reshape_puzzle 0
+# define puzzle_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #include "color.h"
-#endif /* STANDALONE */
 #include "iostuff.h"
+#endif /* STANDALONE */
 
 #ifdef MODE_puzzle
 
-ModeSpecOpt puzzle_opts =
+ENTRYPOINT ModeSpecOpt puzzle_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   puzzle_description =
 {"puzzle", "init_puzzle", "draw_puzzle", "release_puzzle",
- "init_puzzle", "init_puzzle", (char *) NULL, &puzzle_opts,
+ "init_puzzle", "init_puzzle", "free_puzzle", &puzzle_opts,
  10000, 250, 1, 1, 64, 1.0, "",
  "Shows a puzzle being scrambled and then solved", 0, NULL};
 
 #endif
 
+#ifndef STANDALONE
 #define PUZZLE_WIDTH   image_width
 #define PUZZLE_HEIGHT    image_height
 #define PUZZLE_BITS    image_bits
@@ -79,6 +79,7 @@ ModStruct   puzzle_description =
 #define PUZZLE_NAME    image_name
 #include "puzzle.xpm"
 #define DEFAULT_XPM 1
+#endif
 #endif
 
 #define NOWAY 255
@@ -138,8 +139,11 @@ free_stuff(Display * display, puzzlestruct * pp)
 }
 
 static void
-free_puzzle(Display * display, puzzlestruct * pp)
+free_puzzle_screen(Display * display, puzzlestruct * pp)
 {
+	if (pp == NULL) {
+		return;
+	}
 	if (pp->fixbuff != NULL) {
 		free(pp->fixbuff);
 		pp->fixbuff = (int *) NULL;
@@ -149,10 +153,20 @@ free_puzzle(Display * display, puzzlestruct * pp)
 		pp->bufferBox = None;
 	}
 	free_stuff(display, pp);
+#ifndef STANDALONE
+/* this used to work there I think */
+
 	if (pp->logo != None) {
 		destroyImage(&pp->logo, &pp->graphics_format);
 		pp->logo = None;
 	}
+#endif
+	pp = NULL;
+}
+
+ENTRYPOINT void
+free_puzzle(ModeInfo * mi) {
+	free_puzzle_screen(MI_DISPLAY(mi), &puzzles[MI_SCREEN(mi)]);
 }
 
 #ifdef NUMBERED
@@ -191,7 +205,7 @@ NumberScreen(ModeInfo * mi)
 		if ((pp->gc = XCreateGC(display, window,
 				GCForeground | GCBackground | GCGraphicsExposures | GCFont,
 				&gcv)) == None) {
-			free_puzzle(display, pp);
+			free_puzzle_screen(display, pp);
 			return False;
 		}
 		pp->ascent = mode_font->ascent;
@@ -318,7 +332,7 @@ setupmovedelta(ModeInfo * mi)
 	}
 	if ((pp->bufferBox = XCreatePixmap(display, MI_WINDOW(mi),
 				 pp->boxsize.x, pp->boxsize.y, MI_DEPTH(mi))) == None) {
-		free_puzzle(display, pp);
+		free_puzzle_screen(display, pp);
 		return;
 	}
 	XCopyArea(MI_DISPLAY(mi), MI_WINDOW(mi), pp->bufferBox, pp->backGC,
@@ -428,9 +442,9 @@ moveboxdelta(ModeInfo * mi)
 static Bool
 init_stuff(ModeInfo * mi)
 {
-	Display    *display = MI_DISPLAY(mi);
-	Window      window = MI_WINDOW(mi);
 	puzzlestruct *pp = &puzzles[MI_SCREEN(mi)];
+#ifndef STANDALONE
+	Display    *display = MI_DISPLAY(mi);
 
 	if (pp->logo == None)
 		getImage(mi, &pp->logo, PUZZLE_WIDTH, PUZZLE_HEIGHT, PUZZLE_BITS,
@@ -439,11 +453,11 @@ init_stuff(ModeInfo * mi)
 #endif
 			 &pp->graphics_format, &pp->cmap, &pp->black);
 	if (pp->logo == None) {
-		free_puzzle(display, pp);
+		free_puzzle_screen(display, pp);
 		return False;
 	}
-#ifndef STANDALONE
 	if (pp->cmap != None) {
+		Window      window = MI_WINDOW(mi);
 		setColormap(display, window, pp->cmap, MI_IS_INWINDOW(mi));
 		if (pp->backGC == None) {
 			XGCValues   xgcv;
@@ -451,7 +465,7 @@ init_stuff(ModeInfo * mi)
 			xgcv.background = pp->black;
 			if ((pp->backGC = XCreateGC(display, window, GCBackground,
 					 &xgcv)) == None) {
-				free_puzzle(display, pp);
+				free_puzzle_screen(display, pp);
 				return False;
 			}
 		}
@@ -464,7 +478,7 @@ init_stuff(ModeInfo * mi)
 	return True;
 }
 
-void
+ENTRYPOINT void
 init_puzzle(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -473,11 +487,7 @@ init_puzzle(ModeInfo * mi)
 	int         x, y;
 	XPoint      size;
 
-	if (puzzles == NULL) {
-		if ((puzzles = (puzzlestruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (puzzlestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, puzzles);
 	pp = &puzzles[MI_SCREEN(mi)];
 
 	if (pp->painted && pp->windowsize.x == MI_WIDTH(mi) &&
@@ -487,7 +497,7 @@ init_puzzle(ModeInfo * mi)
 #ifdef HAVE_XPM
 	if (pp->graphics_format >= IS_XPM) {
         	/* This is needed when another program changes the colormap. */
-        	free_puzzle(display, pp);
+        	free_puzzle_screen(display, pp);
 	}
 #endif
 	if (!init_stuff(mi))
@@ -517,14 +527,14 @@ init_puzzle(ModeInfo * mi)
 
 	MI_CLEARWINDOWCOLORMAP(mi, pp->backGC, pp->black);
 
-	if (pp->logo) {
+	if (pp->logo == None) {
+		size.x = pp->windowsize.x;
+		size.y = pp->windowsize.y;
+	} else {
 		size.x = (pp->logo->width < pp->windowsize.x) ?
 			pp->logo->width : pp->windowsize.x;
 		size.y = (pp->logo->height < pp->windowsize.y) ?
 			pp->logo->height : pp->windowsize.y;
-	} else {
-		size.x = pp->windowsize.x;
-		size.y = pp->windowsize.y;
 	}
 	pp->boxsize.y = NRAND(1 + size.y / 4) + 6;
 	pp->boxsize.x = NRAND(1 + size.x / 4) + 6;
@@ -546,7 +556,7 @@ init_puzzle(ModeInfo * mi)
 	pp->incrementOfMove = MIN(pp->usablewindow.x, pp->usablewindow.y) / 20;
 	pp->incrementOfMove = MAX(pp->incrementOfMove, 1);
 
-	if (pp->logo) {
+	if (pp->logo != None) {
 		pp->randompos.x = NRAND(MAX((pp->windowsize.x - pp->logo->width),
 					    2 * pp->offsetwindow.x + 1));
 		pp->randompos.y = NRAND(MAX((pp->windowsize.y - pp->logo->height),
@@ -597,7 +607,7 @@ init_puzzle(ModeInfo * mi)
 				      pp->usablewindow.x, pp->usablewindow.y,
 				      AllPlanes,
 				 (MI_NPIXELS(mi) <= 2) ? XYPixmap : ZPixmap)) == None) {
-			free_puzzle(display, pp);
+			free_puzzle_screen(display, pp);
 			return;
 		}
 	}
@@ -612,13 +622,13 @@ init_puzzle(ModeInfo * mi)
 	if ((pp->excount) && (pp->fixbuff == NULL))
 		if ((pp->fixbuff = (int *) calloc(pp->excount,
 				sizeof (int))) == NULL) {
-			free_puzzle(display, pp);
+			free_puzzle_screen(display, pp);
 			return;
 		}
 	pp->painted = True;
 }
 
-void
+ENTRYPOINT void
 draw_puzzle(ModeInfo * mi)
 {
 	puzzlestruct *pp;
@@ -647,14 +657,14 @@ draw_puzzle(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_puzzle(ModeInfo * mi)
 {
 	if (puzzles != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_puzzle(MI_DISPLAY(mi), &puzzles[screen]);
+			free_puzzle_screen(MI_DISPLAY(mi), &puzzles[screen]);
 		free(puzzles);
 		puzzles = (puzzlestruct *) NULL;
 	}

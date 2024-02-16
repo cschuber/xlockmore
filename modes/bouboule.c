@@ -69,41 +69,35 @@ static const char sccsid[] = "@(#)bouboule.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_bouboule
-#define PROGCLASS "Bouboule"
-#define HACK_INIT init_bouboule
-#define HACK_DRAW draw_bouboule
-#define bouboule_opts xlockmore_opts
-#define DEFAULTS "*delay: 10000 \n" \
-	"*count: 100 \n" \
-	"*size: 15 \n" \
-	"*ncolors: 64 \n" \
-	"*use3d: False \n" \
-	"*delta3d: 1.5 \n" \
-	"*right3d: red \n" \
-	"*left3d: blue \n" \
-	"*both3d: magenta \n" \
-	"*none3d: black \n" \
+# define MODE_bouboule
+# define DEFAULTS	"*delay: 10000 \n" \
+			"*count: 100 \n" \
+			"*size: 15 \n" \
+			"*ncolors: 64 \n" \
+			"*use3d: False \n" \
+			"*delta3d: 1.5 \n" \
+			"*right3d: red \n" \
+			"*left3d: blue \n" \
+			"*both3d: magenta \n" \
+			"*none3d: black \n" \
 
 # define reshape_bouboule 0
-# define free_bouboule 0
 # define bouboule_handle_event 0
-#define SMOOTH_COLORS
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# define SMOOTH_COLORS
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
-
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_bouboule
 
-ModeSpecOpt bouboule_opts =
+ENTRYPOINT ModeSpecOpt bouboule_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 const ModStruct bouboule_description =
 {"bouboule", "init_bouboule", "draw_bouboule", "release_bouboule",
- "refresh_bouboule", "init_bouboule", (char *) NULL, &bouboule_opts,
+ "refresh_bouboule", "init_bouboule", "free_bouboule", &bouboule_opts,
  10000, 100, 1, 15, 64, 1.0, "",
  "Shows Mimi's bouboule of moving stars", 0, NULL};
 
@@ -351,6 +345,9 @@ free_stars(StarField *sp)
 static void
 free_bouboule_screen(StarField *sp)
 {
+	if (sp == NULL) {
+		return;
+	}
 	free_stars(sp);
 	sinfree(&(sp->x));
 	sinfree(&(sp->y));
@@ -360,10 +357,19 @@ free_bouboule_screen(StarField *sp)
 	sinfree(&(sp->thetax));
 	sinfree(&(sp->thetay));
 	sinfree(&(sp->thetaz));
+	sp = NULL;
+}
+
+
+ENTRYPOINT void
+free_bouboule(ModeInfo * mi)
+{
+	free_bouboule_screen(&starfield[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void
 init_bouboule(ModeInfo * mi)
+
 
 /*-
  *  The stars init part was first inspirated from the net3d game starfield
@@ -377,11 +383,7 @@ init_bouboule(ModeInfo * mi)
 	int         i;
 	double      theta, omega;
 
-	if (starfield == NULL) {
-		if ((starfield = (StarField *) calloc(MI_NUM_SCREENS(mi),
-						sizeof (StarField))) == NULL)
-			return;
-	}
+	MI_INIT(mi, starfield);
 	sp = &starfield[MI_SCREEN(mi)];
 
 	sp->width = MI_WIDTH(mi);

@@ -33,16 +33,12 @@ static const char sccsid[] = "@(#)fiberlamp.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_fiberlamp
-#define PROGCLASS "Fiberlamp"
-#define HACK_INIT init_fiberlamp
-#define HACK_DRAW draw_fiberlamp
-#define HACK_RESHAPE reshape_fiberlamp
-#define _no_HACK_FREE release_fiberlamp
-#define fiberlamp_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*count: 500 \n" \
- "*cycles: 10000 \n" \
- "*ncolors: 64 \n"
+	"*count: 500 \n" \
+	"*cycles: 10000 \n" \
+	"*ncolors: 64 \n" \
+
+# define fiberlamp_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 # ifndef MI_DEPTH
@@ -54,13 +50,13 @@ static const char sccsid[] = "@(#)fiberlamp.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_fiberlamp
 
-ModeSpecOpt fiberlamp_opts =
+ENTRYPOINT ModeSpecOpt fiberlamp_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   fiberlamp_description =
 {"fiberlamp", "init_fiberlamp", "draw_fiberlamp", "release_fiberlamp",
- "draw_fiberlamp", "change_fiberlamp", (char *) NULL, &fiberlamp_opts,
+ "draw_fiberlamp", "change_fiberlamp", "free_fiberlamp", &fiberlamp_opts,
  1000, 500, 10000, 0, 64, 1.0, "", "Shows a Fiber Optic Lamp", 0, NULL};
 
 #endif
@@ -112,20 +108,6 @@ typedef struct {
 
 static fiberlampstruct *fiberlamps = (fiberlampstruct *) NULL;
 
-void
-change_fiberlamp(ModeInfo * mi)
-{
-  fiberlampstruct *fl;
-  if (fiberlamps == NULL)
-	return;
-  fl = &fiberlamps[MI_SCREEN(mi)];
-  fl->cx = (DRAND(SCALE/4)-SCALE/8)/SCALE; /* Knock the lamp */
-  fl->count = 0; /* Reset counter */
-  XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_BLACK_PIXEL(mi));
-  XFillRectangle(MI_DISPLAY(mi), (Drawable) fl->buffer, MI_GC(mi), 0, 0,
-				 MI_WIDTH(mi), MI_HEIGHT(mi));
-}
-
 static void
 free_fiber(fiberlampstruct *fl)
 {
@@ -148,27 +130,49 @@ free_fiber(fiberlampstruct *fl)
 }
 
 static void
-free_fiberlamp(Display *display, fiberlampstruct *fl)
+free_fiberlamp_screen(Display *display, fiberlampstruct *fl)
 {
+	if (fl == NULL) {
+		return;
+	}
   	if (fl->buffer != None) {
                 XFreePixmap(display, fl->buffer);
                 fl->buffer = None;
         }
 	free_fiber(fl);
+	fl = NULL;
 }
 
-void
+ENTRYPOINT void
+free_fiberlamp(ModeInfo * mi)
+{
+	free_fiberlamp_screen(MI_DISPLAY(mi), &fiberlamps[MI_SCREEN(mi)]);
+}
+
+
+ENTRYPOINT void
+change_fiberlamp(ModeInfo * mi)
+{
+  fiberlampstruct *fl;
+  if (fiberlamps == NULL)
+	return;
+  fl = &fiberlamps[MI_SCREEN(mi)];
+  fl->cx = (DRAND(SCALE/4)-SCALE/8)/SCALE; /* Knock the lamp */
+  fl->count = 0; /* Reset counter */
+  XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_BLACK_PIXEL(mi));
+  XFillRectangle(MI_DISPLAY(mi), (Drawable) fl->buffer, MI_GC(mi), 0, 0,
+				 MI_WIDTH(mi), MI_HEIGHT(mi));
+}
+
+ENTRYPOINT void
 init_fiberlamp(ModeInfo * mi)
 {
   fiberlampstruct *fl;
   Bool init = False;
 
   if (fiberlamps == NULL) {
-	init = True;
-	if ((fiberlamps =
-		 (fiberlampstruct *) calloc(MI_NUM_SCREENS(mi),
-			sizeof (fiberlampstruct))) == NULL)
-	  return;
+    init = True;
+    MI_INIT(mi, fiberlamps);
   }
   fl = &fiberlamps[MI_SCREEN(mi)];
 
@@ -178,7 +182,7 @@ init_fiberlamp(ModeInfo * mi)
   fl->buffer = XCreatePixmap(MI_DISPLAY(mi), MI_WINDOW(mi),
 		MI_WIDTH(mi), MI_HEIGHT(mi), MI_DEPTH(mi));
   if (fl->buffer == None) {
-	free_fiberlamp(MI_DISPLAY(mi), fl);
+	free_fiberlamp_screen(MI_DISPLAY(mi), fl);
 	return;
   }
   XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_BLACK_PIXEL(mi));
@@ -192,7 +196,7 @@ init_fiberlamp(ModeInfo * mi)
   /* Allocate fibers */
   if((fl->fiber =
 	  (fiberstruct*) calloc(fl->nfibers, sizeof (fiberstruct))) == NULL) {
-	free_fiberlamp(MI_DISPLAY(mi), fl);
+	free_fiberlamp_screen(MI_DISPLAY(mi), fl);
 	return;
   } else {
 	int f;
@@ -204,7 +208,7 @@ init_fiberlamp(ModeInfo * mi)
 			(XPoint*) calloc(NODES, sizeof (XPoint))) == NULL
 		 ||(fs->erase =
 			(XPoint*) calloc(NODES,	sizeof (XPoint))) == NULL) {
-		free_fiberlamp(MI_DISPLAY(mi), fl);
+		free_fiberlamp_screen(MI_DISPLAY(mi), fl);
 		return;
 	  }
 	}
@@ -273,15 +277,6 @@ init_fiberlamp(ModeInfo * mi)
   change_fiberlamp(mi);
 }
 
-#ifdef STANDALONE
-/* Used by xscreensaver.  xlock just uses init_fiberlamp */
-void
-reshape_fiberlamp(ModeInfo * mi, int width, int height)
-{
-  init_fiberlamp(mi);
-}
-#endif
-
 /* sort fibers so they get drawn back-to-front, one bubble pass is
    enough as the order only changes slowly */
 static void
@@ -298,7 +293,7 @@ sort_fibers(fiberlampstruct *fl)
   }
 }
 
-void
+ENTRYPOINT void
 draw_fiberlamp(ModeInfo * mi)
 {
   fiberlampstruct *fl;
@@ -450,18 +445,27 @@ draw_fiberlamp(ModeInfo * mi)
   }
 }
 
-void
+ENTRYPOINT void
 release_fiberlamp(ModeInfo * mi)
 {
 	if (fiberlamps != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_fiberlamp(MI_DISPLAY(mi), &fiberlamps[screen]);
+			free_fiberlamp_screen(MI_DISPLAY(mi), &fiberlamps[screen]);
 		free(fiberlamps);
 		fiberlamps = (fiberlampstruct *) NULL;
 	}
 }
+
+#ifdef STANDALONE
+/* Used by xscreensaver.  xlock just uses init_fiberlamp */
+ENTRYPOINT void
+reshape_fiberlamp(ModeInfo * mi, int width, int height)
+{
+  init_fiberlamp(mi);
+}
+#endif
 
 XSCREENSAVER_MODULE ("Fiberlamp", fiberlamp)
 

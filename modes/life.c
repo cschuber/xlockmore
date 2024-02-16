@@ -137,9 +137,6 @@ static const char sccsid[] = "@(#)life.c	5.24 2007/01/18 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_life
-#define PROGCLASS "Life"
-#define HACK_INIT init_life
-#define HACK_DRAW draw_life
 #define life_opts xlockmore_opts
 #define DEFAULTS "*delay: 750000 \n" \
  "*count: 40 \n" \
@@ -147,16 +144,18 @@ static const char sccsid[] = "@(#)life.c	5.24 2007/01/18 xlockmore";
  "*size: 0 \n" \
  "*ncolors: 200 \n" \
  "*bitmap: \n" \
- "*neighbors: 0 \n" \
- "*verbose: False \n"
+ "*verbose: False \n" \
+
+# define reshape_life 0
+# define life_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #include "color.h"
 #define DO_STIPPLE
-#endif /* STANDALONE */
 #include "iostuff.h"
+#endif /* STANDALONE */
 #include "automata.h"
 
 #ifdef MODE_life
@@ -273,7 +272,7 @@ static XrmOptionDescRec opts[] =
 	{(char *) "-pent", (char *) ".life.pent", XrmoptionNoArg, (caddr_t) "on"},
 	{(char *) "+pent", (char *) ".life.pent", XrmoptionNoArg, (caddr_t) "off"},
 	{(char *) "-pent2", (char *) ".life.pent2", XrmoptionNoArg, (caddr_t) "on"},
-	{(char *) "+pent2", (char *) ".life.pent2", XrmoptionNoArg, (caddr_t) "off"},
+	{(char *) "+pent2", (char *) ".life.pent2", XrmoptionNoArg, (caddr_t) "off"}
 };
 static argtype vars[] =
 {
@@ -284,7 +283,11 @@ static argtype vars[] =
 	{(void *) & neighbors, (char *) "neighbors", (char *) "Neighbors", (char *) DEF_NEIGHBORS, t_Int},
 	{(void *) & repeat, (char *) "repeat", (char *) "Repeat", (char *) DEF_REPEAT, t_Int},
 	{(void *) & rule, (char *) "rule", (char *) "Rule", (char *) DEF_RULE, t_String},
+#ifdef STANDALONE
+	{(void *) & lifefile, (char *) "lifefile", (char *) "LifeFile", (char *) "/dev/null", t_String},
+#else
 	{(void *) & lifefile, (char *) "lifefile", (char *) "LifeFile", (char *) "", t_String},
+#endif
 	{(void *) & serial, (char *) "serial", (char *) "Serial", (char *) DEF_SERIAL, t_Bool},
 	{(void *) & vertical, (char *) "vertical", (char *) "Vertical", (char *) DEF_VERTICAL, t_Bool},
 	{(void *) & glidersearch, (char *) "glidersearch", (char *) "GliderSearch", (char *) DEF_GLIDERSEARCH, t_Bool},
@@ -300,7 +303,7 @@ static argtype vars[] =
 	{(void *) & trilife1, (char *) "trilife1", (char *) "TriLife1", (char *) DEF_TRILIFE1, t_Bool},
 	{(void *) & trilife2, (char *) "trilife2", (char *) "TriLife2", (char *) DEF_TRILIFE2, t_Bool},
 	{(void *) & pent, (char *) "pent", (char *) "Pent", (char *) DEF_PENT, t_Bool},
-	{(void *) & pent2, (char *) "pent2", (char *) "Pent2", (char *) DEF_PENT2, t_Bool},
+	{(void *) & pent2, (char *) "pent2", (char *) "Pent2", (char *) DEF_PENT2, t_Bool}
 };
 static OptionStruct desc[] =
 {
@@ -310,7 +313,7 @@ static OptionStruct desc[] =
 	{(char *) "-/+draw", (char *) "turn on/off drawing to speed search"},
 	{(char *) "-neighbors num", (char *) "squares 4 or 8, hexagons 6, triangles 3, 9 or 12, pentagons 5 or 7"},
 	{(char *) "-repeat num", (char *) "repeat for period to exclude in search"}, /* this is not as good as Bays' signature idea */
-	{(char *) "-rule string", (char *) "B<birth_neighborhood/S<survival_neighborhood> parameters"},
+	{(char *) "-rule string", (char *) "B<birth_neighborhood>/S<survival_neighborhood> parameters"},
 	{(char *) "-lifefile file", (char *) "life file"},
 	{(char *) "-/+serial", (char *) "turn on/off picking of sequential patterns"},
 	{(char *) "-/+vertical", (char *) "change orientation for hexagons and triangles"},
@@ -327,21 +330,22 @@ static OptionStruct desc[] =
 	{(char *) "-/+trilife1", (char *) "turn on/off Bays' tri rule B456/S45"},
 	{(char *) "-/+trilife2", (char *) "turn on/off Bays' tri rule B45/S23"},
 	{(char *) "-/+pent", (char *) "turn on/off Bagley's pentagon rule B2/S24"},
-	{(char *) "-/+pent2", (char *) "turn on/off Bays' pentagon rule B346/S23"},
+	{(char *) "-/+pent2", (char *) "turn on/off Bays' pentagon rule B346/S23"}
 };
 
-ModeSpecOpt life_opts =
+ENTRYPOINT ModeSpecOpt life_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   life_description =
 {"life", "init_life", "draw_life", "release_life",
- "refresh_life", "change_life", (char *) NULL, &life_opts,
+ "refresh_life", "change_life", "free_life", &life_opts,
  750000, 40, 140, 0, 64, 1.0, "",
  "Shows Conway's game of Life", 0, NULL};
 
 #endif
 
+#ifndef STANDALONE
 /* aliases for vars defined in the bitmap file */
 #define CELL_WIDTH   image_width
 #define CELL_HEIGHT    image_height
@@ -357,6 +361,7 @@ static XImage bimage =
 {
   0, 0, 0, XYBitmap, 0, LSBFirst, 8, LSBFirst, 8, 1
 };
+#endif
 #endif
 
 #ifdef HAVE_XPM
@@ -1340,6 +1345,7 @@ parseRule(ModeInfo * mi, char * string)
 	}
 }
 
+#ifndef STANDALONE
 static void
 parseFile(ModeInfo *mi)
 {
@@ -1423,6 +1429,7 @@ parseFile(ModeInfo *mi)
 	(void) fclose(file);
 	filePattern[i] = 127;
 }
+#endif
 
 static Bool
 initList(lifestruct * lp, int state)
@@ -1749,10 +1756,13 @@ free_stuff(Display * display, lifestruct * lp)
 }
 
 static void
-free_life(Display * display, lifestruct * lp)
+free_life_screen(Display * display, lifestruct * lp)
 {
 	int state;
 
+	if (lp == NULL) {
+		return;
+	}
 	for (state = 0; state < STATES; state++) {
 		if (lp->first[state])
 			flushList(lp, state);
@@ -1765,10 +1775,21 @@ free_life(Display * display, lifestruct * lp)
 	}
 	free_cells(lp);
 	free_stuff(display, lp);
+#ifndef STANDALONE
+/* this used to work there I think */
+
 	if (lp->logo != None) {
 		destroyImage(&lp->logo, &lp->graphics_format);
 		lp->logo = None;
 	}
+#endif
+	lp = NULL;
+}
+
+ENTRYPOINT void
+free_life(ModeInfo * mi)
+{
+	free_life_screen(MI_DISPLAY(mi), &lifes[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -1794,7 +1815,7 @@ setcellfromtoggle(ModeInfo * mi, int col, int row)
 				info.state = DEAD;
 				info.toggle = False;
 				if (!addToList(lp, DEAD, info)) {
-					free_life(MI_DISPLAY(mi), lp);
+					free_life_screen(MI_DISPLAY(mi), lp);
 					return False;
 				}
 			}
@@ -1810,7 +1831,7 @@ setcellfromtoggle(ModeInfo * mi, int col, int row)
 			info.toggle = False;
 			info.state = LIVE;
 			if (!addToList(lp, LIVE, info)) {
-				free_life(MI_DISPLAY(mi), lp);
+				free_life_screen(MI_DISPLAY(mi), lp);
 				return False;
 			}
 			drawCell(mi, info);
@@ -1876,7 +1897,7 @@ setcell(ModeInfo * mi, int col, int row, int state)
 					info.state = DEAD;
 					info.toggle = False;
 					if (!addToList(lp, DEAD, info)) {
-						free_life(MI_DISPLAY(mi), lp);
+						free_life_screen(MI_DISPLAY(mi), lp);
 						return False;
 					}
 				}
@@ -1886,7 +1907,7 @@ setcell(ModeInfo * mi, int col, int row, int state)
 			info.state = LIVE;
 			info.toggle = False;
 			if (!addToList(lp, LIVE, info)) {
-				free_life(MI_DISPLAY(mi), lp);
+				free_life_screen(MI_DISPLAY(mi), lp);
 				return False;
 			}
 			drawCell(mi, info);
@@ -1902,7 +1923,7 @@ setcell(ModeInfo * mi, int col, int row, int state)
 		info.toggle = False;
 		removeFromList(lp, LIVE, curr);	/* Just in case... */
 		if (!addToList(lp, DEAD, info)) {
-			free_life(MI_DISPLAY(mi), lp);
+			free_life_screen(MI_DISPLAY(mi), lp);
 			return False;
 		}
 		drawCell(mi, info);
@@ -2161,7 +2182,7 @@ RandomSoup(ModeInfo * mi, int symmetryIndex, int percent, int fieldX, int fieldY
 		(void) strcpy(lp->nameString, "Antisym Y Random");
 		break;
 	case 6: /* Half Antisym Random */
-		// Diagonal, Triangular (on face, on corner)
+		/* Diagonal, Triangular (on face, on corner) */
 		if (lp->polygon == 3) {
 			int odd = (halfcols + halfrows) % 2;
 
@@ -2276,7 +2297,7 @@ RandomSoup(ModeInfo * mi, int symmetryIndex, int percent, int fieldX, int fieldY
 		(void) strcpy(lp->nameString, "Half Antisym Random");
 		break;
 	case 7: /* Half Sym Random */
-		// Diagonal, Triangular (on face, on corner)
+		/* Diagonal, Triangular (on face, on corner) */
 		if (lp->polygon == 3) {
 			int odd = (halfcols + halfrows) % 2;
 
@@ -2329,7 +2350,7 @@ RandomSoup(ModeInfo * mi, int symmetryIndex, int percent, int fieldX, int fieldY
 			if (even == 1) {
 				vx = vy =  2 * (vx + vy) / 3;
 				for (row = 0; row < vy; ++row) {
-					for (col = 0; col < row / 2 + 1; ++col) { // 2 6 10
+					for (col = 0; col < row / 2 + 1; ++col) { /* 2 6 10 */
 						if (NRAND(100) < percent) {
 							SetList(halfcols + (col + row + (halfrows + 1) % 2) / 2 - 1 + halfrows % 2, halfrows - row + col + 2);
 							SetList(halfcols + row - (col + (halfrows + 1) % 2) / 2 - 1, halfrows - col + 1);
@@ -2342,7 +2363,7 @@ RandomSoup(ModeInfo * mi, int symmetryIndex, int percent, int fieldX, int fieldY
 				}
 				for (row = 0; row < vy; ++row) {
 					for (col = 0; col < row / 2; ++col) {
-						if (NRAND(100) < percent) { // 0 4 8
+						if (NRAND(100) < percent) { /* 0 4 8 */
 							SetList(halfcols + col - (row + halfrows % 2) / 2 + 1 + halfrows % 2, halfrows - row + 2);
 							SetList(halfcols - col + (row + (halfrows + 1) % 2) / 2 + halfrows % 2 - 1, halfrows - row + 2);
 							SetList(halfcols + row - (col + (halfrows + 1) % 2) / 2 - 1, halfrows + col + 1);
@@ -2374,7 +2395,7 @@ RandomSoup(ModeInfo * mi, int symmetryIndex, int percent, int fieldX, int fieldY
 		(void) strcpy(lp->nameString, "Half Sym Random");
 		break;
 	case 8: /* Full Antisym Random */
-		// Square, Hexagonal (on face hex, on corner tri)
+		/* Square, Hexagonal (on face hex, on corner tri) */
 		if (lp->polygon == 3) {
 			int odd = (halfcols + halfrows) % 2;
 
@@ -2427,7 +2448,7 @@ RandomSoup(ModeInfo * mi, int symmetryIndex, int percent, int fieldX, int fieldY
 		(void) strcpy(lp->nameString, "Full Antisym Random");
 		break;
 	case 9: /* Full Sym Random */
-		// Square, Hexagonal (on face hex, on corner tri)
+		/* Square, Hexagonal (on face hex, on corner tri) */
 		if (lp->polygon == 3) {
 			int odd = (halfcols + halfrows) % 2;
 
@@ -3941,7 +3962,7 @@ shooter(ModeInfo * mi)
 	} else if (lp->neighbors == 12 &&
 			(lp->patterned_rule == LIFE_12B3S2 ||
 			lp->patterned_rule == LIFE_12B46S24)) {
-		Bool sides = LRAND() & 1; // beware, sides offset by 1
+		Bool sides = LRAND() & 1; /* beware, sides offset by 1 */
 
 		if (sides) { /* lower right */
 			if (LRAND() & 1) {
@@ -4067,10 +4088,11 @@ randomSymmetry(lifestruct *lp, Bool gliderSearch) {
 static Bool
 init_stuff(ModeInfo * mi)
 {
-	Display *display = MI_DISPLAY(mi);
-	Window window = MI_WINDOW(mi);
 	lifestruct *lp = &lifes[MI_SCREEN(mi)];
+#ifndef STANDALONE
+	Display *display = MI_DISPLAY(mi);
 
+/* this used to work there I think */
 	if (lp->logo == NULL) {
 		getImage(mi, &lp->logo, CELL_WIDTH, CELL_HEIGHT, CELL_BITS,
 #ifdef HAVE_XPM
@@ -4078,7 +4100,7 @@ init_stuff(ModeInfo * mi)
 #endif
 			 &lp->graphics_format, &lp->cmap, &lp->black);
 		if (lp->logo == NULL) {
-			free_life(display, lp);
+			free_life_screen(display, lp);
 			return False;
 		}
 #ifdef XBM_GRELB
@@ -4094,8 +4116,9 @@ init_stuff(ModeInfo * mi)
 		}
 #endif
 	}
-#ifndef STANDALONE
 	if (lp->cmap != None) {
+		Window window = MI_WINDOW(mi);
+
 		setColormap(display, window, lp->cmap, MI_IS_INWINDOW(mi));
 		if (lp->backGC == None) {
 			XGCValues xgcv;
@@ -4105,7 +4128,7 @@ init_stuff(ModeInfo * mi)
 			if ((lp->backGC = XCreateGC(display, window,
 					GCForeground | GCBackground,
 					&xgcv)) == None) {
-				free_life(display, lp);
+				free_life_screen(display, lp);
 				return False;
 			}
 		}
@@ -4118,18 +4141,14 @@ init_stuff(ModeInfo * mi)
 	return True;
 }
 
-void
+ENTRYPOINT void
 init_life(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
 	int size = MI_SIZE(mi), npats, i;
 	lifestruct *lp;
 
-	if (lifes == NULL) {
-		if ((lifes = (lifestruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (lifestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, lifes);
 	lp = &lifes[MI_SCREEN(mi)];
 
 	lp->generation = 0;
@@ -4236,7 +4255,9 @@ init_life(ModeInfo * mi)
 	parseRule(mi, lp->ruleString);
 	lp->labelOffsetX = NRAND(8);
 	lp->labelOffsetY = NRAND(8);
+#ifndef STANDALONE
 	parseFile(mi);
+#endif
 	if (lp->allPatterns) {
 		switch (lp->neighbors) {
 		case 5:
@@ -4305,7 +4326,7 @@ init_life(ModeInfo * mi)
 	} else {
 		for (i = 0; i < STATES; i++)
 			if (!initList(lp, i)) {
-				free_life(display, lp);
+				free_life_screen(display, lp);
 				return;
 			}
 	}
@@ -4385,6 +4406,9 @@ init_life(ModeInfo * mi)
 			lp->ys = lp->logo->height;
 		}
 #else
+#ifdef STANDALONE
+		if (size == 0)
+#else
 		if (size == 0 ||
 		    MINGRIDSIZE * size > lp->width || MINGRIDSIZE * size > lp->height) {
 			if (lp->width > MINGRIDSIZE * lp->logo->width &&
@@ -4393,6 +4417,7 @@ init_life(ModeInfo * mi)
 				lp->xs = lp->logo->width;
 				lp->ys = lp->logo->height;
 			} else
+#endif
 			{
 				int min = MIN(lp->width, lp->height) / (8 * MINGRIDSIZE);
 				int max = MIN(lp->width, lp->height) / (2 * MINGRIDSIZE);
@@ -4403,7 +4428,9 @@ init_life(ModeInfo * mi)
 				lp->xs = lp->ys = MAX(MINSIZE, max);
 				lp->pixelmode = True;
 			}
+#ifndef STANDALONE
 		}
+#endif
 		else
 #endif
 		{
@@ -4533,7 +4560,7 @@ init_life(ModeInfo * mi)
 	lp->painted = False;
 	if ((lp->arr = (CellList **) calloc(lp->npositions,
 			sizeof (CellList *))) == NULL) {
-		free_life(display, lp);
+		free_life_screen(display, lp);
 		return;
 	}
 
@@ -4580,7 +4607,7 @@ init_life(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_life(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
@@ -4676,11 +4703,11 @@ draw_life(ModeInfo * mi)
 	info.state = 0;		/* dummy value */
 	info.toggle = 0;	/* dummy value */
 	if (!addToList(lp, DEAD, info)) {
-		free_life(MI_DISPLAY(mi), lp);
+		free_life_screen(MI_DISPLAY(mi), lp);
 		return;
 	}
 	if (!addToList(lp, LIVE, info)) {
-		free_life(MI_DISPLAY(mi), lp);
+		free_life_screen(MI_DISPLAY(mi), lp);
 		return;
 	}
 	middle[DEAD] = lp->last[DEAD]->previous;
@@ -4769,20 +4796,21 @@ draw_life(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_life(ModeInfo * mi)
 {
 	if (lifes != NULL) {
 		int screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_life(MI_DISPLAY(mi), &lifes[screen]);
+			free_life_screen(MI_DISPLAY(mi), &lifes[screen]);
 		free(lifes);
 		lifes = (lifestruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_life(ModeInfo * mi)
 {
 	lifestruct *lp;
@@ -4794,7 +4822,7 @@ refresh_life(ModeInfo * mi)
 #ifdef HAVE_XPM
 	if (lp->graphics_format >= IS_XPM) {
 		/* This is needed when another program changes the colormap. */
-		free_life(MI_DISPLAY(mi), lp);
+		free_life_screen(MI_DISPLAY(mi), lp);
 		init_life(mi);
 		return;
 	}
@@ -4824,14 +4852,14 @@ change_life(ModeInfo * mi)
 	} else {
 		for (i = 0; i < STATES; i++)
 			if (!initList(lp, i)) {
-				free_life(MI_DISPLAY(mi), lp);
+				free_life_screen(MI_DISPLAY(mi), lp);
 				return;
 			}
 	}
 	free_cells(lp);
 	if ((lp->arr = (CellList **) calloc(lp->npositions,
 			sizeof (CellList *))) == NULL) {
-		free_life(MI_DISPLAY(mi), lp);
+		free_life_screen(MI_DISPLAY(mi), lp);
 		return;
 	}
 
@@ -4949,6 +4977,7 @@ change_life(ModeInfo * mi)
 			GetPattern(mi, lp->patterned_rule, lp->pattern);
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Life", life)
 

@@ -51,16 +51,14 @@ static const char sccsid[] = "@(#)demon.c	5.24 2007/01/18 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_demon
-#define PROGCLASS "Demon"
-#define HACK_INIT init_demon
-#define HACK_DRAW draw_demon
-#define demon_opts xlockmore_opts
 #define DEFAULTS "*delay: 50000 \n" \
- "*count: 0 \n" \
- "*cycles: 1000 \n" \
- "*size: -7 \n" \
- "*ncolors: 64 \n" \
- "*neighbors: 0 \n"
+	"*count: 0 \n" \
+	"*cycles: 1000 \n" \
+	"*size: -7 \n" \
+	"*ncolors: 64 \n" \
+
+# define reshape_demon 0
+# define demon_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -104,13 +102,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+colorsonly", (char *) "no black cells"}
 };
 
-ModeSpecOpt demon_opts =
+ENTRYPOINT ModeSpecOpt demon_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   demon_description =
 {"demon", "init_demon", "draw_demon", "release_demon",
- "refresh_demon", "init_demon", (char *) NULL, &demon_opts,
+ "refresh_demon", "init_demon", "free_demon", &demon_opts,
  50000, 0, 1000, -7, 64, 1.0, "",
  "Shows Griffeath's cellular automata", 0, NULL};
 
@@ -119,7 +117,7 @@ ModStruct   demon_description =
 #define DEMONBITS(n,w,h)\
   if ((dp->pixmaps[dp->init_bits]=\
   XCreatePixmapFromBitmapData(display,window,(char *)n,w,h,1,0,1))==None){\
-  free_demon(display,dp); return;} else {dp->init_bits++;}
+  free_demon_screen(display,dp); return;} else {dp->init_bits++;}
 
 #define REDRAWSTEP 2000		/* How many cells to draw per cycle */
 #define MINSTATES 2
@@ -378,10 +376,13 @@ free_struct(demonstruct * dp)
 }
 
 static void
-free_demon(Display *display, demonstruct *dp)
+free_demon_screen(Display *display, demonstruct *dp)
 {
 	int         shade;
 
+	if (dp == NULL) {
+		return;
+	}
 	if (dp->stippledGC != None) {
 		XFreeGC(display, dp->stippledGC);
 		dp->stippledGC = None;
@@ -391,6 +392,13 @@ free_demon(Display *display, demonstruct *dp)
 	}
 	dp->init_bits = 0;
 	free_struct(dp);
+	dp = NULL;
+}
+
+ENTRYPOINT void
+free_demon(ModeInfo * mi)
+{
+	free_demon_screen(MI_DISPLAY(mi), &demons[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -947,7 +955,7 @@ positionOfNeighbor(demonstruct * dp, int n, int col, int row)
 	return (row * dp->ncols + col);
 }
 
-void
+ENTRYPOINT void
 init_demon(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -955,11 +963,7 @@ init_demon(ModeInfo * mi)
 	int         size = MI_SIZE(mi), nk;
 	demonstruct *dp;
 
-	if (demons == NULL) {
-		if ((demons = (demonstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (demonstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, demons);
 	dp = &demons[MI_SCREEN(mi)];
 
 	dp->generation = 0;
@@ -971,7 +975,7 @@ init_demon(ModeInfo * mi)
 			gcv.fill_style = FillOpaqueStippled;
 			if ((dp->stippledGC = XCreateGC(display, window,
 				 GCFillStyle, &gcv)) == None) {
-				free_demon(display, dp);
+				free_demon_screen(display, dp);
 				return;
 			}
 		}
@@ -1004,11 +1008,11 @@ init_demon(ModeInfo * mi)
 		dp->states = plots[1][nk];
 	if ((dp->cellList = (CellList **) calloc(dp->states,
 		sizeof (CellList *))) == NULL) {
-		free_demon(display, dp);
+		free_demon_screen(display, dp);
 		return;
 	}
 	if ((dp->ncells = (int *) calloc(dp->states, sizeof (int))) == NULL) {
-		free_demon(display, dp);
+		free_demon_screen(display, dp);
 		return;
 	}
 
@@ -1169,20 +1173,20 @@ init_demon(ModeInfo * mi)
 
 	if ((dp->oldcell = (unsigned char *)
 		malloc(dp->ncols * dp->nrows * sizeof (unsigned char))) == NULL) {
-		free_demon(display, dp);
+		free_demon_screen(display, dp);
 		return;
 	}
 
 	if ((dp->newcell = (unsigned char *)
 		malloc(dp->ncols * dp->nrows * sizeof (unsigned char))) == NULL) {
-		free_demon(display, dp);
+		free_demon_screen(display, dp);
 		return;
 	}
 
 	RandomSoup(mi);
 }
 
-void
+ENTRYPOINT void
 draw_demon(ModeInfo * mi)
 {
 	int         i, j, k, l, n, mj = 0;
@@ -1218,7 +1222,7 @@ draw_demon(ModeInfo * mi)
 				if (dp->oldcell[i + mj] != dp->newcell[i + mj]) {
 					dp->oldcell[i + mj] = dp->newcell[i + mj];
 					if (!addtolist(mi, i, j, dp->oldcell[i + mj])) {
-						free_demon(MI_DISPLAY(mi), dp);
+						free_demon_screen(MI_DISPLAY(mi), dp);
 						return;
 					}
 					change = True;
@@ -1231,7 +1235,7 @@ draw_demon(ModeInfo * mi)
 	} else {
 		if (dp->ncells[dp->state])
 			if (!draw_state(mi, dp->state)) {
-				free_demon(MI_DISPLAY(mi), dp);
+				free_demon_screen(MI_DISPLAY(mi), dp);
 				return;
 			}
 		dp->state++;
@@ -1250,20 +1254,21 @@ draw_demon(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_demon(ModeInfo * mi)
 {
 	if (demons != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_demon(MI_DISPLAY(mi), &demons[screen]);
+			free_demon_screen(MI_DISPLAY(mi), &demons[screen]);
 		free(demons);
 		demons = (demonstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_demon(ModeInfo * mi)
 {
 	demonstruct *dp;
@@ -1275,6 +1280,7 @@ refresh_demon(ModeInfo * mi)
 	dp->redrawing = 1;
 	dp->redrawpos = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Demon", demon)
 

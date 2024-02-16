@@ -66,22 +66,22 @@ static const char sccsid[] = "@(#)life3d.c	5.27 2008/07/28 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_life3d
-#define PROGCLASS "Life3D"
-#define HACK_INIT init_life3d
-#define HACK_DRAW draw_life3d
 #define life3d_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000000 \n" \
- "*count: 35 \n" \
- "*cycles: 85 \n" \
- "*ncolors: 200 \n" \
- "*wireframe: False \n" \
- "*fullrandom: False \n" \
- "*verbose: False \n"
+	"*count: 35 \n" \
+	"*cycles: 85 \n" \
+	"*ncolors: 200 \n" \
+	"*wireframe: False \n" \
+	"*fullrandom: False \n" \
+	"*verbose: False \n" \
+
+# define reshape_life3d 0
+# define life3d_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
-#endif /* STANDALONE */
 #include "iostuff.h"
+#endif /* STANDALONE */
 #define DO_STIPPLE
 #include "automata.h"
 
@@ -154,7 +154,11 @@ static argtype vars[] =
 	{(void *) & neighbors, (char *) "neighbors", (char *) "Neighbors", (char *) DEF_NEIGHBORS, t_Int},
 	{(void *) & repeat, (char *) "repeat", (char *) "Repeat", (char *) DEF_REPEAT, t_Int},
 	{(void *) & rule, (char *) "rule", (char *) "Rule", (char *) DEF_RULE, t_String},
+#ifdef STANDALONE
+	{(void *) & lifefile, (char *) "lifefile", (char *) "LifeFile", (char *) "/dev/null", t_String},
+#else
 	{(void *) & lifefile, (char *) "lifefile", (char *) "LifeFile", (char *) "", t_String},
+#endif
 	{(void *) & serial, (char *) "serial", (char *) "Serial", (char *) DEF_SERIAL, t_Bool},
 	{(void *) & glidersearch, (char *) "glidersearch", (char *) "GliderSearch", (char *) DEF_GLIDERSEARCH, t_Bool},
 	{(void *) & patternsearch, (char *) "patternsearch", (char *) "PatternSearch", (char *) DEF_PATTERNSEARCH, t_Bool},
@@ -174,13 +178,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+patternsearch", (char *) "search for patterns"},
 };
 
-ModeSpecOpt life3d_opts =
+ENTRYPOINT ModeSpecOpt life3d_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct life3d_description =
 {"life3d", "init_life3d", "draw_life3d", "release_life3d",
- "refresh_life3d", "change_life3d", (char *) NULL, &life3d_opts,
+ "refresh_life3d", "change_life3d", "free_life3d", &life3d_opts,
  1000000, 35, 85, 1, 64, 1.0, "",
  "Shows Bays' game of 3D Life", 0, NULL};
 
@@ -189,7 +193,7 @@ ModStruct life3d_description =
 #define LIFE3DBITS(n,w,h)\
   if ((lp->pixmaps[lp->init_bits]=\
   XCreatePixmapFromBitmapData(display,window,(char *)n,w,h,1,0,1))==None){\
-  free_life3d(display,lp); return;} else {lp->init_bits++;}
+  free_life3d_screen(display,lp); return;} else {lp->init_bits++;}
 
 #define ON 0x40
 #define OFF 0
@@ -442,8 +446,8 @@ static void
 positionOfNeighbor(life3dstruct * lp, int n, unsigned int *col,
 	unsigned int *row, unsigned int *stack)
 {
-	// 16 and 22 are tetrahedral, extra space was given to
-	// allow for octahedron positions not present here
+	/* 16 and 22 are tetrahedral, extra space was given to */
+	/* allow for octahedron positions not present here */
 	if (lp->neighbors == 16 || lp->neighbors == 22) {
 		if (rTetra(*col, *row, *stack)) {
 			if (lp->neighbors == 16) {
@@ -456,7 +460,7 @@ positionOfNeighbor(life3dstruct * lp, int n, unsigned int *col,
 				n = n + 4;
 			}
 			switch(n) {
-			// edges (tetra)
+			/* edges (tetra) */
 			case 4:
 				*col = (*col < 2) ? lp->ncols - 2 + *col : *col - 2;
 				break;
@@ -475,7 +479,7 @@ positionOfNeighbor(life3dstruct * lp, int n, unsigned int *col,
 			case 9:
 				*stack = (*stack + 2 >= lp->nstacks) ? *stack + 2 - lp->nstacks : *stack + 2;
 				break;
-			// points (tetra)
+			/* points (tetra) */
 			case 10:
 				*col = (*col < 2) ? lp->ncols - 2 + *col : *col - 2;
 				*row = (*row < 2) ? lp->nrows - 2 + *row : *row - 2;
@@ -524,7 +528,7 @@ positionOfNeighbor(life3dstruct * lp, int n, unsigned int *col,
 				*col = (*col + 2 >= lp->ncols) ? *col + 2 - lp->ncols : *col + 2;
 				*stack = (*stack + 2 >= lp->nstacks) ? *stack + 2 - lp->nstacks : *stack + 2;
 				break;
-			// far points (tetra)
+			/* far points (tetra) */
 			case 22:
 				*col = (*col < 2) ? lp->ncols - 2 + *col : *col - 2;
 				*row = (*row < 2) ? lp->nrows - 2 + *row : *row - 2;
@@ -559,7 +563,7 @@ positionOfNeighbor(life3dstruct * lp, int n, unsigned int *col,
 				n = n + 4;
 			}
 			switch(n) {
-			// edges (tetra)
+			/* edges (tetra) */
 			case 4:
 				*col = (*col < 2) ? lp->ncols - 2 + *col : *col - 2;
 				break;
@@ -578,7 +582,7 @@ positionOfNeighbor(life3dstruct * lp, int n, unsigned int *col,
 			case 9:
 				*stack = (*stack + 2 >= lp->nstacks) ? *stack + 2 - lp->nstacks : *stack + 2;
 				break;
-			// points (tetra)
+			/* points (tetra) */
 			case 10:
 				*col = (*col < 2) ? lp->ncols - 2 + *col : *col - 2;
 				*row = (*row < 2) ? lp->nrows - 2 + *row : *row - 2;
@@ -627,7 +631,7 @@ positionOfNeighbor(life3dstruct * lp, int n, unsigned int *col,
 				*col = (*col + 2 >= lp->ncols) ? *col + 2 - lp->ncols : *col + 2;
 				*stack = (*stack + 2 >= lp->nstacks) ? *stack + 2 - lp->nstacks : *stack + 2;
 				break;
-			// far points (tetra)
+			/* far points (tetra) */
 			case 22:
 				*col = (*col + 2 >= lp->ncols) ? *col + 2 - lp->ncols : *col + 2;
 				*row = (*row < 2) ? lp->nrows - 2 + *row : *row - 2;
@@ -818,7 +822,7 @@ positionOfNeighbor(life3dstruct * lp, int n, unsigned int *col,
 	} else {
 		n += 8;
 	}
-	// far corners
+	/* far corners */
 	if (neighbors == -18) {
 		switch (n) {
 		case 26:
@@ -911,6 +915,7 @@ parseRule(ModeInfo * mi, char * string)
 	printRule(lp->neighbors, string, lp->input_param, MI_IS_VERBOSE(mi));
 }
 
+#ifndef STANDALONE
 static void
 parseFile(ModeInfo *mi)
 {
@@ -982,6 +987,7 @@ parseFile(ModeInfo *mi)
 	(void) fclose(file);
 	filePattern[i] = 127;
 }
+#endif
 
 /*--- list ---*/
 /* initialise the state of all cells to OFF */
@@ -2610,9 +2616,9 @@ DrawTetrahedron(ModeInfo * mi, CellList * cell) {
 		return DrawTetrahedronTrBl(mi, cell);
 	} else if (lTetra(cell->x, cell->y, cell->z)) {
 		return DrawTetrahedronTlBr(mi, cell);
-	//} else {
-	//	(void) fprintf(stderr, "bad cell %d %d %d\n",
-	//		cell->x, cell->y, cell->z);
+	/*} else {
+		(void) fprintf(stderr, "bad cell %d %d %d\n",
+			cell->x, cell->y, cell->z); */
 	}
 	return (0);
 }
@@ -3592,10 +3598,13 @@ shooter(life3dstruct * lp)
 }
 
 static void
-free_life3d(Display *display, life3dstruct *lp)
+free_life3d_screen(Display *display, life3dstruct *lp)
 {
 	int shade;
 
+	if (lp == NULL) {
+		return;
+	}
 	if (lp->eraserhead.next != NULL)
 		endList(lp);
 	if (lp->dbuf != None) {
@@ -3610,9 +3619,16 @@ free_life3d(Display *display, life3dstruct *lp)
 		XFreePixmap(display, lp->pixmaps[shade]);
 	}
 	lp->init_bits = 0;
+	lp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_life3d(ModeInfo * mi)
+{
+	free_life3d_screen(MI_DISPLAY(mi), &life3ds[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_life3d(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
@@ -3620,11 +3636,7 @@ init_life3d(ModeInfo * mi)
 	life3dstruct *lp;
 	int i, npats;
 
-	if (life3ds == NULL) {
-		if ((life3ds = (life3dstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (life3dstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, life3ds);
 	lp = &life3ds[MI_SCREEN(mi)];
 
 	if (MI_NPIXELS(mi) <= 2) {
@@ -3633,7 +3645,7 @@ init_life3d(ModeInfo * mi)
 			gcv.fill_style = FillOpaqueStippled;
 			if ((lp->stippledGC = XCreateGC(display, window,
 					GCFillStyle, &gcv)) == None) {
-				free_life3d(display, lp);
+				free_life3d_screen(display, lp);
 				return;
 			}
 		}
@@ -3693,7 +3705,9 @@ init_life3d(ModeInfo * mi)
 	lp->labelOffsetX = NRAND(8);
 	lp->labelOffsetY = NRAND(8);
 	parseRule(mi, lp->ruleString);
+#ifndef STANDALONE
 	parseFile(mi);
+#endif
 	if (lp->allPatterns) {
 		switch (lp->neighbors) {
 		case 12:
@@ -3887,13 +3901,13 @@ init_life3d(ModeInfo * mi)
 	}
 	if ((lp->dbuf = XCreatePixmap(display, window,
 		lp->width, lp->height, MI_DEPTH(mi))) == None) {
-		free_life3d(display, lp);
+		free_life3d_screen(display, lp);
 		return;
 	}
 	DrawScreen(mi);
 }
 
-void
+ENTRYPOINT void
 draw_life3d(ModeInfo * mi)
 {
 	life3dstruct *lp;
@@ -3948,20 +3962,21 @@ draw_life3d(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_life3d(ModeInfo * mi)
 {
 	if (life3ds != NULL) {
 		int screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_life3d(MI_DISPLAY(mi), &life3ds[screen]);
+			free_life3d_screen(MI_DISPLAY(mi), &life3ds[screen]);
 		free(life3ds);
 		life3ds = (life3dstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_life3d(ModeInfo * mi)
 {
 	life3dstruct *lp;
@@ -3975,7 +3990,7 @@ refresh_life3d(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 change_life3d(ModeInfo * mi)
 {
 	int npats;
@@ -4121,6 +4136,7 @@ change_life3d(ModeInfo * mi)
 	}
 	DrawScreen(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Life3d", life3d)
 

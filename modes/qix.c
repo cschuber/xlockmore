@@ -38,15 +38,14 @@ static const char sccsid[] = "@(#)qix.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_qix
-#define PROGCLASS "Qix"
-#define HACK_INIT init_qix
-#define HACK_DRAW draw_qix
-#define qix_opts xlockmore_opts
 #define DEFAULTS "*delay: 30000 \n" \
- "*count: -5 \n" \
- "*cycles: 32 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n"
+	"*count: -5 \n" \
+	"*cycles: 32 \n" \
+	"*ncolors: 200 \n" \
+	"*fullrandom: True \n" \
+
+# define reshape_qix 0
+# define qix_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -85,13 +84,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+solid", (char *) "turn on/off fills"}
 };
 
-ModeSpecOpt qix_opts =
+ENTRYPOINT ModeSpecOpt qix_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   qix_description =
 {"qix", "init_qix", "draw_qix", "release_qix",
- "refresh_qix", "init_qix", (char *) NULL, &qix_opts,
+ "refresh_qix", "init_qix", "free_qix", &qix_opts,
  30000, -5, 32, 1, 64, 1.0, "",
  "Shows spinning lines a la Qix(tm)", 0, NULL};
 
@@ -134,8 +133,11 @@ static qixstruct *qixs = (qixstruct *) NULL;
 }
 
 static void
-free_qix(qixstruct *qp)
+free_qix_screen(qixstruct *qp)
 {
+	if (qp == NULL) {
+		return;
+	}
 	if (qp->lineq != NULL) {
 		free(qp->lineq);
 		qp->lineq = (XPoint *) NULL;
@@ -152,19 +154,22 @@ free_qix(qixstruct *qp)
 		free(qp->position);
 		qp->position = (XPoint *) NULL;
 	}
+	qp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_qix(ModeInfo * mi)
+{
+	free_qix_screen(&qixs[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_qix(ModeInfo * mi)
 {
 	qixstruct  *qp;
 	int         i;
 
-	if (qixs == NULL) {
-		if ((qixs = (qixstruct *) calloc(MI_NUM_SCREENS(mi),
-						 sizeof (qixstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, qixs);
 	qp = &qixs[MI_SCREEN(mi)];
 
 	qp->width = MI_WIDTH(mi);
@@ -219,12 +224,12 @@ init_qix(ModeInfo * mi)
 
 	if ((qp->delta = (XPoint *) malloc(qp->npoints *
 			sizeof (XPoint))) == NULL) {
-		free_qix(qp);
+		free_qix_screen(qp);
 		return;
 	}
 	if ((qp->position = (XPoint *) malloc(qp->npoints *
 			sizeof (XPoint))) == NULL) {
-		free_qix(qp);
+		free_qix_screen(qp);
 		return;
 	}
 	for (i = 0; i < qp->npoints; i++) {
@@ -254,7 +259,7 @@ init_qix(ModeInfo * mi)
 	if (!qp->kaleid) {
 		if ((qp->lineq = (XPoint *) malloc(qp->nlines *
 				sizeof (XPoint))) == NULL) {
-			free_qix(qp);
+			free_qix_screen(qp);
 			return;
 		}
 		for (i = 0; i < qp->nlines; i++)
@@ -262,7 +267,7 @@ init_qix(ModeInfo * mi)
 		if (qp->solid) {
 			if ((qp->points = (XPoint *) malloc(2 * qp->nlines *
 					sizeof (XPoint))) == NULL) {
-				free_qix(qp);
+				free_qix_screen(qp);
 				return;
 			}
 		}
@@ -270,7 +275,7 @@ init_qix(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_qix(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -484,20 +489,21 @@ draw_qix(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_qix(ModeInfo * mi)
 {
 	if (qixs != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_qix(&qixs[screen]);
+			free_qix_screen(&qixs[screen]);
 		free(qixs);
 		qixs = (qixstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_qix(ModeInfo * mi)
 {
 	qixstruct  *qp = &qixs[MI_SCREEN(mi)];
@@ -506,6 +512,7 @@ refresh_qix(ModeInfo * mi)
 	qp->redrawing = 1;
 	qp->redrawpos = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Qix", qix)
 

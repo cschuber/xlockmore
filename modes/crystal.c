@@ -80,22 +80,23 @@ static const char sccsid[] = "@(#)crystal.c	5.24 2007/01/18 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_crystal
-#define PROGCLASS "Crystal"
-#define HACK_INIT init_crystal
-#define HACK_DRAW draw_crystal
-#define crystal_opts xlockmore_opts
-#define DEFAULTS "*delay: 60000 \n" \
- "*count: -500 \n" \
- "*cycles: 200 \n" \
- "*size: -15 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n" \
- "*verbose: False \n"
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# define MODE_crystal
+# define DEFAULTS "*delay: 60000 \n" \
+	"*count: -500 \n" \
+	"*cycles: 200 \n" \
+	"*size: -15 \n" \
+	"*ncolors: 100 \n" \
+	"*fullrandom: True \n" \
+	"*verbose: False \n" \
+	"*fpsSolid: True \n" \
+	"*ignoreRotation: True \n" \
+
+# define reshape_crystal 0
+# define crystal_handle_event 0
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
-#include "color.h"
+# include "xlock.h"		/* in xlockmore distribution */
+# include "color.h"
 #endif /* STANDALONE */
 
 #ifdef MODE_crystal
@@ -156,13 +157,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+vertical", (char *) "change orientation"}
 };
 
-ModeSpecOpt crystal_opts =
+ENTRYPOINT ModeSpecOpt crystal_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   crystal_description =
 {"crystal", "init_crystal", "draw_crystal", "release_crystal",
- "refresh_crystal", "init_crystal", (char *) NULL, &crystal_opts,
+ "refresh_crystal", "init_crystal", "free_cyrstal", &crystal_opts,
  60000, -40, 200, -15, 64, 1.0, "",
  "Shows polygons in 2D plane groups", 0, NULL};
 
@@ -282,7 +283,6 @@ typedef struct {
 	Bool        cycle_p, mono_p, no_colors;
 	unsigned long blackpixel, whitepixel, fg, bg;
 	int         direction , invert;
-	ModeInfo   *mi;
 } crystalstruct;
 
 static crystalstruct *crystals = (crystalstruct *) NULL;
@@ -589,10 +589,12 @@ crystal_drawatom(ModeInfo * mi, crystalatom * atom0)
 }
 
 static void
-free_crystal(Display *display, crystalstruct *cryst)
+free_crystal_screen(ModeInfo *mi, crystalstruct *cryst)
 {
-	ModeInfo *mi = cryst->mi;
-
+	Display *display = MI_DISPLAY(mi);
+	if (cryst == NULL) {
+		return;
+	}
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
 		MI_WHITE_PIXEL(mi) = cryst->whitepixel;
 		MI_BLACK_PIXEL(mi) = cryst->blackpixel;
@@ -601,8 +603,17 @@ free_crystal(Display *display, crystalstruct *cryst)
 		MI_BG_PIXEL(mi) = cryst->bg;
 #endif
 		if (cryst->colors != NULL) {
+#ifdef STANDALONE
+			Screen *screen = MI_SCREENPTR(mi);
+#endif
 			if (cryst->ncolors && !cryst->no_colors)
-				free_colors(display, cryst->cmap, cryst->colors, cryst->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					screen,
+#else
+					display,
+#endif
+					cryst->cmap, cryst->colors, cryst->ncolors);
 			free(cryst->colors);
 			cryst->colors = (XColor *) NULL;
 		}
@@ -619,6 +630,13 @@ free_crystal(Display *display, crystalstruct *cryst)
 		free(cryst->atom);
 		cryst->atom = (crystalatom *) NULL;
 	}
+	cryst = NULL;
+}
+
+ENTRYPOINT void
+free_crystal(ModeInfo * mi)
+{
+	free_crystal_screen(mi, &crystals[MI_SCREEN(mi)]);
 }
 
 
@@ -641,7 +659,7 @@ extern char *background;
 extern char *foreground;
 #endif
 
-void
+ENTRYPOINT void
 init_crystal(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -653,13 +671,8 @@ init_crystal(ModeInfo * mi)
 #define MIN_CELL 200
 
 /* initialize */
-	if (crystals == NULL) {
-		if ((crystals = (crystalstruct *) calloc(MI_NUM_SCREENS(mi),
-					    sizeof (crystalstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, crystals);
 	cryst = &crystals[MI_SCREEN(mi)];
-	cryst->mi = mi;
 
 	if (cryst->gc == None) {
 		if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
@@ -673,7 +686,7 @@ init_crystal(ModeInfo * mi)
 			cryst->whitepixel = MI_WHITE_PIXEL(mi);
 			if ((cryst->cmap = XCreateColormap(display, window,
 					MI_VISUAL(mi), AllocNone)) == None) {
-				free_crystal(display, cryst);
+				free_crystal_screen(mi, cryst);
 				return;
 			}
 			XSetWindowColormap(display, window, cryst->cmap);
@@ -696,7 +709,7 @@ init_crystal(ModeInfo * mi)
 		}
 		if ((cryst->gc = XCreateGC(display, MI_WINDOW(mi),
 			     (unsigned long) 0, (XGCValues *) NULL)) == None) {
-			free_crystal(display, cryst);
+			free_crystal_screen(mi, cryst);
 			return;
 		}
 	}
@@ -779,7 +792,7 @@ init_crystal(ModeInfo * mi)
 	if (cryst->atom == NULL)
 		if ((cryst->atom = (crystalatom *) calloc(max_atoms,
 				sizeof (crystalatom))) == NULL) {
-			free_crystal(display, cryst);
+			free_crystal_screen(mi, cryst);
 			return;
 		}
 
@@ -992,10 +1005,19 @@ init_crystal(ModeInfo * mi)
 	}
 	XSetFunction(display, cryst->gc, GXxor);
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
+#ifdef STANDALONE
+		Screen *screen = MI_SCREENPTR(mi);
+#endif
 /* Set up colour map */
 		if (cryst->colors != NULL) {
 			if (cryst->ncolors && !cryst->no_colors)
-				free_colors(display, cryst->cmap, cryst->colors, cryst->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					screen,
+#else
+					display,
+#endif
+					cryst->cmap, cryst->colors, cryst->ncolors);
 			free(cryst->colors);
 			cryst->colors = (XColor *) NULL;
 		}
@@ -1012,10 +1034,16 @@ init_crystal(ModeInfo * mi)
 		else
 			if ((cryst->colors = (XColor *) malloc(sizeof (*cryst->colors) *
 					(cryst->ncolors + 1))) == NULL) {
-				free_crystal(display, cryst);
+				free_crystal_screen(mi, cryst);
 				return;
 			}
-		cryst->cycle_p = has_writable_cells(mi);
+		cryst->cycle_p = has_writable_cells(
+#ifdef STANDALONE
+			screen, MI_VISUAL(mi)
+#else
+			mi
+#endif
+			);
 		if (cryst->cycle_p) {
 			if (MI_IS_FULLRANDOM(mi)) {
 				if (!NRAND(8))
@@ -1030,30 +1058,39 @@ init_crystal(ModeInfo * mi)
 			if (!(LRAND() % 10))
 				make_random_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					cryst->cmap, cryst->colors, &cryst->ncolors,
+					True, True, &cryst->cycle_p, True
 #else
-            mi,
+            				mi,
+					cryst->cmap, cryst->colors, &cryst->ncolors,
+					True, True, &cryst->cycle_p
 #endif
-						cryst->cmap, cryst->colors, &cryst->ncolors,
-						True, True, &cryst->cycle_p);
+					);
 			else if (!(LRAND() % 2))
 				make_uniform_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+                  			cryst->cmap, cryst->colors, &cryst->ncolors,
+					True, &cryst->cycle_p, True
 #else
-            mi,
+					mi,
+                  			cryst->cmap, cryst->colors, &cryst->ncolors,
+					True, &cryst->cycle_p
 #endif
-                  cryst->cmap, cryst->colors, &cryst->ncolors,
-						      True, &cryst->cycle_p);
+					);
 			else
 				make_smooth_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					cryst->cmap, cryst->colors, &cryst->ncolors,
+					True, &cryst->cycle_p, True
 #else
-            mi,
+					mi,
+					cryst->cmap, cryst->colors, &cryst->ncolors,
+					True, &cryst->cycle_p
 #endif
-                 cryst->cmap, cryst->colors, &cryst->ncolors,
-						     True, &cryst->cycle_p);
+					);
 		}
 		XInstallColormap(display, cryst->cmap);
 		if (cryst->ncolors < 2) {
@@ -1110,7 +1147,7 @@ init_crystal(ModeInfo * mi)
 	XSetFunction(display, cryst->gc, GXcopy);
 }
 
-void
+ENTRYPOINT void
 draw_crystal(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -1124,7 +1161,7 @@ draw_crystal(ModeInfo * mi)
 		return;
 
 	if (cryst->no_colors) {
-		free_crystal(display, cryst);
+		free_crystal_screen(mi, cryst);
 		init_crystal(mi);
 		return;
 	}
@@ -1134,8 +1171,13 @@ draw_crystal(ModeInfo * mi)
 
 /* Rotate colours */
 	if (cryst->cycle_p) {
-		rotate_colors(display, cryst->cmap, cryst->colors, cryst->ncolors,
-			      cryst->direction);
+		rotate_colors(
+#ifdef STANDALONE
+			MI_SCREENPTR(mi),
+#else
+			display,
+#endif
+			cryst->cmap, cryst->colors, cryst->ncolors, cryst->direction);
 		if (!(LRAND() % 1000))
 			cryst->direction = -cryst->direction;
 	}
@@ -1173,7 +1215,21 @@ draw_crystal(ModeInfo * mi)
 	XSetFunction(display, cryst->gc, GXcopy);
 }
 
-void
+ENTRYPOINT void
+release_crystal(ModeInfo * mi)
+{
+	if (crystals != NULL) {
+		int         screen;
+
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_crystal_screen(mi, &crystals[screen]);
+		free(crystals);
+		crystals = (crystalstruct *) NULL;
+	}
+}
+
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_crystal(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -1345,19 +1401,7 @@ refresh_crystal(ModeInfo * mi)
 	}
 	XSetFunction(display, cryst->gc, GXcopy);
 }
-
-void
-release_crystal(ModeInfo * mi)
-{
-	if (crystals != NULL) {
-		int         screen;
-
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_crystal(MI_DISPLAY(mi), &crystals[screen]);
-		free(crystals);
-		crystals = (crystalstruct *) NULL;
-	}
-}
+#endif
 
 XSCREENSAVER_MODULE ("Crystal", crystal)
 

@@ -4876,7 +4876,7 @@ cat >>confdefs.h <<_ACEOF
 #define PACKAGE "$PACKAGE"
 _ACEOF
 
-VERSION=5.57BETA
+VERSION=5.59ALPHA3
 
 
 cat >>confdefs.h <<_ACEOF
@@ -12502,6 +12502,8 @@ $as_echo "#define USE_MODULES 1" >>confdefs.h
 case ${canonical} in
     *-*-linux* )
       MODULEFLAGS="-rdynamic"
+      CFLAGS="$CFLAGS -fPIC"
+      CXXFLAGS="$CXXFLAGS -fPIC"
       ;;
     *)
       MODULEFLAGS=""

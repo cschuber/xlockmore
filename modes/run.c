@@ -27,11 +27,11 @@ static const char sccsid[] = "@(#)run.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_run
-#define PROGCLASS "Run"
-#define HACK_INIT init_run
-#define HACK_DRAW draw_run
-#define run_opts xlockmore_opts
-#define DEFAULTS "*delay: 1000000 \n"
+#define DEFAULTS "*delay: 1000000 \n" \
+
+# define draw_run 0
+# define reshape_run 0
+# define run_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -47,6 +47,10 @@ static const char sccsid[] = "@(#)run.c	5.00 2000/11/01 xlockmore";
 #endif
 #define DEF_GEOMETRYSTRING "geometry"
 /* some programs do not like "-geometry" but like "-g" */
+
+#ifndef SIGKILL
+#define SIGKILL 9
+#endif
 
 static char *runprogram;
 static char *geometrystring;
@@ -69,13 +73,13 @@ static OptionStruct desc[] =
 	{(char *) "-geometrystring string", (char *) "geometry string, could be g for -g, none for none"}
 };
 
-ModeSpecOpt run_opts =
+ENTRYPOINT ModeSpecOpt run_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   run_description =
-{"run", "init_run", "draw_run", "release_run",
- "refresh_run", "init_run", (char *) NULL, &run_opts,
+{"run", "init_run", (char *) NULL, "release_run",
+ (char *) NULL, "init_run", "free_run", &run_opts,
  3000000, 1, 1, 1, 64, 1.0, "",
  "Shows another xprogram", 0, NULL};
 
@@ -88,7 +92,31 @@ typedef struct {
 
 static runstruct *runs = (runstruct *) NULL;
 
-void
+static void
+free_run_screen(runstruct *rp)
+{
+	if (rp == NULL) {
+		return;
+	}
+	if (rp->numberprocess > 0) {
+		int n;
+#ifdef DEBUG
+		(void) printf("killing %d\n",
+			rp->numberprocess);
+#endif
+		(void) kill(rp->numberprocess, SIGKILL);
+		(void) wait(&n);
+	}
+	rp = NULL;
+}
+
+ENTRYPOINT void
+free_run(ModeInfo * mi)
+{
+	free_run_screen(&runs[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_run(ModeInfo * mi)
 {
 	char geom_buf[50];
@@ -97,11 +125,7 @@ init_run(ModeInfo * mi)
 	XWindowAttributes xgwa;
 	runstruct *rp;
 
-	if (runs == NULL) {
-		if ((runs = (runstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (runstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, runs);
 	rp = &runs[MI_SCREEN(mi)];
 
 	if (rp->numberprocess == 0 && !MI_IS_ICONIC(mi)) {
@@ -138,12 +162,6 @@ init_run(ModeInfo * mi)
 	}
 }
 
-/* ARGSUSED */
-void
-draw_run(ModeInfo * mi)
-{
-}
-
 #if defined(__linux__) || defined(__CYGWIN__) || defined(SOLARIS2)
 extern int  kill(pid_t, int);
 extern pid_t  wait(int *);
@@ -155,34 +173,18 @@ extern pid_t  wait(int *);
 #endif
 #endif
 
-void
+ENTRYPOINT void
 release_run(ModeInfo * mi)
 {
 	if (runs != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			runstruct *rp = &runs[screen];
-
-			if (rp->numberprocess > 0) {
-				int n;
-#ifdef DEBUG
-				(void) printf("killing %d\n",
-					rp->numberprocess);
-#endif
-				(void) kill(rp->numberprocess, SIGKILL);
-				(void) wait(&n);
-			}
+			free_run_screen(&runs[screen]);
 		}
 		free(runs);
 		runs = (runstruct *) NULL;
         }
-}
-
-void
-refresh_run(ModeInfo * mi)
-{
-	/* Do nothing, it will refresh by itself :) */
 }
 
 XSCREENSAVER_MODULE ("Run", run)

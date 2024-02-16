@@ -50,11 +50,11 @@ static const char sccsid[] = "@(#)strange.c	5.00 2000/11/01 xlockmore";
 #ifdef STANDALONE
 # define MODE_strange
 # define DEFAULTS	"*delay: 10000 \n" \
-					"*ncolors: 100 \n" \
-					"*fpsSolid: True \n" \
-					"*ignoreRotation: True \n" \
-					"*useSHM: True \n" \
-					"*useThreads: True \n" \
+	"*ncolors: 100 \n" \
+	"*fpsSolid: True \n" \
+	"*ignoreRotation: True \n" \
+	"*useSHM: True \n" \
+	"*useThreads: True \n" \
 
 # define SMOOTH_COLORS
 # define refresh_strange 0
@@ -153,13 +153,12 @@ static OptionStruct desc[] =
 		{"-motion-blur", "adds motion blur"},
 };
 ENTRYPOINT ModeSpecOpt strange_opts =
-{sizeof opts / sizeof opts[0], opts,
-sizeof vars / sizeof vars[0], vars, desc};
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   strange_description =
 {"strange", "init_strange", "draw_strange", "release_strange",
-"init_strange", "init_strange", (char *) NULL, &strange_opts,
+"init_strange", "init_strange", "free_strange", &strange_opts,
 10000, 1, 1, 1, 64, 1.0, "",
 "Shows strange attractors", 0, NULL};
 #endif
@@ -234,6 +233,7 @@ typedef unsigned long PIXEL0X;
 typedef unsigned long ALIGNED PIXEL1;
 #endif
 
+#ifdef useAccumulator
 static const union {
 #ifdef HAVE_INTTYPES_H
 	uint16_t signature;
@@ -245,6 +245,7 @@ static const union {
 } byte_order_union = {MSBFirst};
 
 #define LOCAL_BYTE_ORDER byte_order_union.bytes[1]
+#endif
 
 typedef struct _ATTRACTOR {
 	DBL         Prm1[MAX_PRM], Prm2[MAX_PRM];
@@ -449,10 +450,12 @@ static void (*Funcs[2]) (const ATTRACTOR *, PRM, PRM, PRM *, PRM *) = {
 /***************************************************************/
 
 static void
-free_strange(ModeInfo *mi, ATTRACTOR *A)
+free_strange_screen(ModeInfo *mi, ATTRACTOR *A)
 {
 	Display *display = MI_DISPLAY(mi);
-
+	if (A == NULL) {
+		return;
+	}
 	if (A->Buffer1 != NULL) {
 		free(A->Buffer1);
 		A->Buffer1 = (XPoint *) NULL;
@@ -500,7 +503,15 @@ free_strange(ModeInfo *mi, ATTRACTOR *A)
 		}
 	}
 #endif
+	A = NULL;
 }
+
+ENTRYPOINT void
+free_strange(ModeInfo * mi)
+{
+	free_strange_screen(mi, &Root[MI_SCREEN(mi)]);
+}
+
 
 /* NRAND() is also in use; making three PRNGs in total here. */
 
@@ -996,7 +1007,11 @@ draw_strange(ModeInfo * mi)
 		put_xshm_image (display, A->dbuf != None ? A->dbuf : window,
 		                A->dbuf != None ? A->dbuf_gc : gc, A->accImage,
 		                0, 0, 0, 0, A->accImage->width, A->accImage->height,
-		                &A->shmInfo, False);
+		                &A->shmInfo
+#ifndef STANDALONE
+				, False
+#endif
+				);
 
 		if (A->dbuf != None) {
 			XCopyArea(display, A->dbuf, window, gc, 0, 0, A->Width, A->Height, 0, 0);
@@ -1119,11 +1134,7 @@ init_strange(ModeInfo * mi)
 
 	if (curve <= 0) curve = 10;
 
-	if (Root == NULL) {
-		if ((Root = (ATTRACTOR *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (ATTRACTOR))) == NULL)
-			return;
-	}
+	MI_INIT(mi, Root);
 	Attractor = &Root[MI_SCREEN(mi)];
 
 	if (Attractor->Fold == NULL) {
@@ -1131,7 +1142,7 @@ init_strange(ModeInfo * mi)
 
 		if ((Attractor->Fold = (PRM *) calloc(UNIT2 + 1,
 				sizeof (PRM))) == NULL) {
-			free_strange(mi, Attractor);
+			free_strange_screen(mi, Attractor);
 			return;
 		}
 		for (i = 0; i <= UNIT2; ++i) {
@@ -1153,13 +1164,13 @@ init_strange(ModeInfo * mi)
 	if (Attractor->Buffer1 == NULL)
 		if ((Attractor->Buffer1 = calloc(Attractor->Max_Pt,
 				pointStructSize)) == NULL) {
-			free_strange(mi, Attractor);
+			free_strange_screen(mi, Attractor);
 			return;
 		}
 	if (Attractor->Buffer2 == NULL)
 		if ((Attractor->Buffer2 = calloc(Attractor->Max_Pt,
 				pointStructSize)) == NULL) {
-			free_strange(mi, Attractor);
+			free_strange_screen(mi, Attractor);
 			return;
 		}
 
@@ -1233,7 +1244,7 @@ init_strange(ModeInfo * mi)
 			thread_create,
 			thread_destroy
 		};
-		Screen *screen = ScreenOfDisplay(display, MI_SCREEN(mi));
+		/*Screen *screen = ScreenOfDisplay(display, MI_SCREEN(mi));*/
 		int i;
 		unsigned maxThreads, threadCount;
 		unsigned bpp = visual_pixmap_depth (MI_SCREENPTR(mi), MI_VISUAL(mi));
@@ -1255,7 +1266,7 @@ init_strange(ModeInfo * mi)
 
 		A->cols = (long unsigned int *) calloc (A->numCols,sizeof(*A->cols));
 		if (!A->cols) {
-			free_strange(mi, Attractor);
+			free_strange_screen(mi, Attractor);
 			return;
 		}
 
@@ -1272,7 +1283,7 @@ init_strange(ModeInfo * mi)
 			free (A->palette);
 			A->palette = (XColor *) malloc(MI_NPIXELS(mi) * sizeof(XColor));
 			if (!A->palette) {
-				free_strange (mi, A);
+				free_strange_screen (mi, A);
 				return;
 			}
 
@@ -1313,7 +1324,7 @@ init_strange(ModeInfo * mi)
 				A->numCols = A->numCols * 11 / 12;
 				if (A->numCols < 2) {
 					A->numCols = 0;
-					free_strange (mi, A);
+					free_strange_screen (mi, A);
 					abort();
 					return;
 				}
@@ -1356,7 +1367,7 @@ init_strange(ModeInfo * mi)
 			free (A->threads);
 		A->threads = (THREAD **) malloc (threadCount * sizeof(*A->threads));
 		if (!A->threads) {
-			free_strange (mi, A);
+			free_strange_screen (mi, A);
 			return;
 		}
 
@@ -1364,7 +1375,7 @@ init_strange(ModeInfo * mi)
 			threadpool_destroy (&A->pool);
 		if (threadpool_create (&A->pool, &threadClass, display, threadCount)) {
 			A->pool.count = 0;
-			free_strange (mi, A);
+			free_strange_screen (mi, A);
 			return;
 		}
 	}
@@ -1376,13 +1387,6 @@ init_strange(ModeInfo * mi)
 	XSetGraphicsExposures(display, MI_GC(mi), False);
 }
 
-ENTRYPOINT void
-reshape_strange(ModeInfo * mi, int width, int height)
-{
-  XClearWindow (MI_DISPLAY (mi), MI_WINDOW(mi));
-  init_strange (mi);
-}
-
 /***************************************************************/
 
 ENTRYPOINT void
@@ -1392,13 +1396,20 @@ release_strange(ModeInfo * mi)
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); ++screen)
-			free_strange(mi, &Root[screen]);
+			free_strange_screen(mi, &Root[screen]);
 		free(Root);
 		Root = (ATTRACTOR *) NULL;
 	}
 }
 
 #ifdef STANDALONE
+ENTRYPOINT void
+reshape_strange(ModeInfo * mi, int width, int height)
+{
+  XClearWindow (MI_DISPLAY (mi), MI_WINDOW(mi));
+  init_strange (mi);
+}
+
 ENTRYPOINT Bool
 strange_handle_event (ModeInfo *mi, XEvent *event)
 {

@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* morph3d --- Shows 3D morphing objects */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)morph3d.c	5.01 2001/03/01 xlockmore";
-
 #endif
 
 #undef DEBUG_CULL_FACE
@@ -216,22 +215,21 @@ Update May-24-2005
 #endif
 
 #ifdef STANDALONE
-#define MODE_moebius
-#define PROGCLASS "Morph3d"
-#define HACK_INIT init_morph3d
-#define HACK_DRAW draw_morph3d
-#define morph3d_opts xlockmore_opts
-#define DEFAULTS "*delay: 1000 \n" \
- "*count: 0 \n"
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+# define MODE_moebius
+# define DEFAULTS	"*delay: 1000 \n" \
+			"*count: 0 \n" \
+
+#define free_morph3d 0
+#define morph3d_handle_event 0
+# include "xlockmore.h"		/* from the xscreensaver distribution */
 #else /* !STANDALONE */
-#include "xlock.h"		/* from the xlockmore distribution */
-#include "visgl.h"
+# include "xlock.h"		/* from the xlockmore distribution */
+# include "visgl.h"
 #endif /* !STANDALONE */
 
 #ifdef MODE_moebius
 
-ModeSpecOpt morph3d_opts =
+ENTRYPOINT ModeSpecOpt morph3d_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -772,7 +770,7 @@ draw_icosa(ModeInfo * mi)
 	TRIANGLE(1.5, mp->seno, mp->edgedivisions, (3 * SQRT3 + SQRT15) / 12, mp->VisibleSpikes);
 }
 
-static void
+ENTRYPOINT void
 reshape_morph3d(ModeInfo * mi, int width, int height)
 {
 	morph3dstruct *mp = &morph3d[MI_SCREEN(mi)];
@@ -896,16 +894,12 @@ pinit(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 init_morph3d(ModeInfo * mi)
 {
 	morph3dstruct *mp;
 
-	if (morph3d == NULL) {
-		if ((morph3d = (morph3dstruct *) calloc(MI_NUM_SCREENS(mi),
-					    sizeof (morph3dstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, morph3d);
 	mp = &morph3d[MI_SCREEN(mi)];
 	mp->step = NRAND(90);
 	mp->VisibleSpikes = 1;
@@ -922,7 +916,7 @@ init_morph3d(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_morph3d(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -988,7 +982,18 @@ draw_morph3d(ModeInfo * mi)
 	mp->step += 0.05;
 }
 
-void
+ENTRYPOINT void
+release_morph3d(ModeInfo * mi)
+{
+	if (morph3d != NULL) {
+		free(morph3d);
+		morph3d = (morph3dstruct *) NULL;
+	}
+	FreeAllGL(mi);
+}
+
+#ifndef STANDALONE
+ENTRYPOINT void
 change_morph3d(ModeInfo * mi)
 {
 	morph3dstruct *mp = &morph3d[MI_SCREEN(mi)];
@@ -999,15 +1004,8 @@ change_morph3d(ModeInfo * mi)
 	mp->object = (mp->object) % 5 + 1;
 	pinit(mi);
 }
-
-void
-release_morph3d(ModeInfo * mi)
-{
-	if (morph3d != NULL) {
-		free(morph3d);
-		morph3d = (morph3dstruct *) NULL;
-	}
-	FreeAllGL(mi);
-}
-
 #endif
+
+XSCREENSAVER_MODULE ("Morph3d", morph3d)
+
+#endif /* MODE_morph3d */

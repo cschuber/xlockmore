@@ -1489,7 +1489,7 @@ static void
 create_boolOptions_buttons(GtkScrolledWindow *parent)
 {
     gint         i;
-    guint        iptr = 0;
+    gpointer     iptr = 0;
     GtkWidget   *box0;
     GtkWidget   *box1;
     GtkWidget   *box2;
@@ -1514,7 +1514,7 @@ create_boolOptions_buttons(GtkScrolledWindow *parent)
         gtk_box_pack_start(GTK_BOX(i%2 ? box1 : box2), button, TRUE, TRUE, 0);
         gtk_signal_connect(GTK_OBJECT(button), "clicked",
                            (GtkSignalFunc) bool_option_clicked_cb,
-                           GUINT_TO_POINTER(iptr++));
+                           iptr++);
         gtk_widget_show(button);
     }
 }

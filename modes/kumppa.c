@@ -53,14 +53,12 @@ static const char sccsid[] = "@(#)kumppa.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_kumppa
-#define PROGCLASS "kumppa"
-#define HACK_INIT init_kumppa
-#define HACK_DRAW draw_kumppa
-#define kumppa_opts xlockmore_opts
 #define DEFAULTS "*delay: 0 \n" \
- "*cycles: 1000 \n" \
- ".background: black\n",\
- "*speed: 0.1",\
+	"*cycles: 1000 \n" \
+	".background: black\n" \
+
+# define reshape_kumppa 0
+# define kumppa_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -118,13 +116,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+rrandom", (char *) "turn on/off random"}
 };
 
-ModeSpecOpt kumppa_opts =
+ENTRYPOINT ModeSpecOpt kumppa_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   kumppa_description =
 {"kumppa", "init_kumppa", "draw_kumppa", "release_kumppa",
- "init_kumppa", "init_kumppa", (char *) NULL, &kumppa_opts,
+ "init_kumppa", "init_kumppa", "free_kumppa", &kumppa_opts,
  10000, 1, 1000, 1, 64, 1.0, "",
  "Shows Kumppa", 0, NULL};
 
@@ -183,7 +181,6 @@ typedef struct {
 	int         c;
 	long        c1;
 	Bool        cosilines;
-	ModeInfo   *mi;
 } kumppastruct;
 
 static kumppastruct *kumppas = (kumppastruct *) NULL;
@@ -278,10 +275,13 @@ rotate(ModeInfo * mi)
 }
 
 static void
-free_kumppa(Display *display, kumppastruct *s)
+free_kumppa_screen(ModeInfo *mi, kumppastruct *s)
 {
-	ModeInfo *mi = s->mi;
+	Display *display = MI_DISPLAY(mi);
 
+	if (s == NULL) {
+		return;
+	}
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
 		int i;
 
@@ -346,6 +346,13 @@ free_kumppa(Display *display, kumppastruct *s)
 		free(s->rotateY);
 		s->rotateY = (int *) NULL;
 	}
+	s = NULL;
+}
+
+ENTRYPOINT void
+free_kumppa(ModeInfo * mi)
+{
+	free_kumppa_screen(mi, &kumppas[MI_SCREEN(mi)]);
 }
 
 static void
@@ -383,7 +390,7 @@ make_rots(ModeInfo * mi, double xspeed, double yspeed)
 			sizeof (int))) == NULL) ||
 	    ((chks = (Bool *) malloc(((s->midx > s->midy) ? s->midx : s->midy) *
 			sizeof (Bool))) == NULL)) {
-		free_kumppa(MI_DISPLAY(mi), s);
+		free_kumppa_screen(mi, s);
 		return;
 	}
 
@@ -448,7 +455,7 @@ make_rots(ModeInfo * mi, double xspeed, double yspeed)
 		free(s->rotateX);
 	if ((s->rotateX = (int *) calloc((maxi + 2) << 1,
 			sizeof (int))) == NULL) {
-		free_kumppa(MI_DISPLAY(mi), s);
+		free_kumppa_screen(mi, s);
 		free(chks);
 		return;
 	}
@@ -514,7 +521,7 @@ make_rots(ModeInfo * mi, double xspeed, double yspeed)
 		free(s->rotateY);
 	if ((s->rotateY = (int *) calloc((maxi + 2) << 1,
 			sizeof (int))) == NULL) {
-		free_kumppa(MI_DISPLAY(mi), s);
+		free_kumppa_screen(mi, s);
 		/* free(chks); */
 		/* return; */
 	}
@@ -527,7 +534,7 @@ extern char *background;
 extern char *foreground;
 #endif
 
-void
+ENTRYPOINT void
 init_kumppa(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -537,13 +544,8 @@ init_kumppa(ModeInfo * mi)
 	kumppastruct *s;
 	double      rspeed;
 
-	if (kumppas == NULL) {
-		if ((kumppas = (kumppastruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (kumppastruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, kumppas);
 	s = &kumppas[MI_SCREEN(mi)];
-	s->mi = mi;
 
 	if (!s->acosinus) {
 		if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
@@ -557,7 +559,7 @@ init_kumppa(ModeInfo * mi)
 			s->whitepixel = MI_WHITE_PIXEL(mi);
 			if ((s->cmap = XCreateColormap(display, window,
 					MI_VISUAL(mi), AllocNone)) == None) {
-				free_kumppa(display, s);
+				free_kumppa_screen(mi, s);
 				return;
 			}
 
@@ -582,7 +584,7 @@ init_kumppa(ModeInfo * mi)
 			if ((s->fgc[32] = XCreateGC(display, window,
 					GCForeground | GCFunction,
 					&xgcv)) == None) {
-				free_kumppa(display, s);
+				free_kumppa_screen(mi, s);
 				return;
 			}
 
@@ -594,7 +596,7 @@ init_kumppa(ModeInfo * mi)
 				if ((s->fgc[1] = XCreateGC(display, window,
 						GCForeground | GCFunction,
 						&xgcv)) == None) {
-					free_kumppa(display, s);
+					free_kumppa_screen(mi, s);
 					return;
 				}
 				for (i = 0; i < 32; i += 2)
@@ -613,7 +615,7 @@ init_kumppa(ModeInfo * mi)
 					if ((s->fgc[i] = XCreateGC(display, window,
 							GCForeground | GCFunction,
 							&xgcv)) == None) {
-						free_kumppa(display, s);
+						free_kumppa_screen(mi, s);
 						return;
 					}
 				}
@@ -622,13 +624,13 @@ init_kumppa(ModeInfo * mi)
 			if ((s->cgc = XCreateGC(display, window,
 					GCForeground | GCFunction,
 					&xgcv)) == None) {
-				free_kumppa(display, s);
+				free_kumppa_screen(mi, s);
 				return;
 			}
 		}
 		if ((s->acosinus = (float *) malloc(24 *
 				sizeof (float))) == NULL) {
-			free_kumppa(display, s);
+			free_kumppa_screen(mi, s);
 			return;
 		}
 		(void) memcpy(s->acosinus, acosinus, 24 * sizeof (float));
@@ -691,7 +693,7 @@ init_kumppa(ModeInfo * mi)
 }
 
 
-void
+ENTRYPOINT void
 draw_kumppa(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -803,7 +805,7 @@ draw_kumppa(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_kumppa(ModeInfo * mi)
 {
 
@@ -811,7 +813,7 @@ release_kumppa(ModeInfo * mi)
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_kumppa(MI_DISPLAY(mi), &kumppas[screen]);
+			free_kumppa_screen(mi, &kumppas[screen]);
 		free(kumppas);
 		kumppas = (kumppastruct *) NULL;
 	}

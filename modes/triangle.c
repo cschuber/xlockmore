@@ -50,14 +50,15 @@ static const char sccsid[] = "@(#)triangle.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_triangle
-#define PROGCLASS "Triangle"
-#define HACK_INIT init_triangle
-#define HACK_DRAW draw_triangle
-#define triangle_opts xlockmore_opts
-#define DEFAULTS "*delay: 10000 \n" \
- "*ncolors: 128 \n " \
- "*wireframe: False \n" \
- "*fullrandom: False \n"
+# define DEFAULTS	"*delay: 10000 \n" \
+			"*ncolors: 128 \n " \
+			"fpsSolid: True \n " \
+			"*wireframe: False \n" \
+			"*fullrandom: False \n" \
+
+# define free_triangle 0
+# define reshape_triangle 0
+# define triangle_handle_event 0
 #define SMOOTH_COLORS
 #if 0
 #define UNIFORM_COLORS /* To get blue water uncomment, but ... */
@@ -69,7 +70,7 @@ static const char sccsid[] = "@(#)triangle.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_triangle
 
-ModeSpecOpt triangle_opts =
+ENTRYPOINT ModeSpecOpt triangle_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -86,7 +87,7 @@ ModStruct   triangle_description =
 #define MAX_LEVELS 1000
 
 #define DELTA  0.4
-#define LEFT   -0.25
+#define LEFT   (-0.25)
 #define RIGHT  1.25
 #define TOP    0.3
 #define BOTTOM 1.0
@@ -239,18 +240,14 @@ draw_mesh(ModeInfo * mi, trianglestruct * tp, int d, int count)
 	}
 }
 
-void
+ENTRYPOINT void
 init_triangle(ModeInfo * mi)
 {
 	short      *tmp;
 	int         i, dim, one;
 	trianglestruct *tp;
 
-	if (triangles == NULL) {
-		if ((triangles = (trianglestruct *) calloc(MI_NUM_SCREENS(mi),
-					   sizeof (trianglestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, triangles);
 	tp = &triangles[MI_SCREEN(mi)];
 
 	tp->width = MI_WIDTH(mi);
@@ -302,7 +299,7 @@ init_triangle(ModeInfo * mi)
 		}
 }
 
-void
+ENTRYPOINT void
 draw_triangle(ModeInfo * mi)
 {
 	int         d, d2, i, j, delta;
@@ -352,14 +349,11 @@ draw_triangle(ModeInfo * mi)
 		}
 	}
 	if (tp->stage == tp->steps) {
-#ifdef STANDALONE
-		erase_full_window(MI_DISPLAY(mi), MI_WINDOW(mi));
-#endif
 		init_triangle(mi);
 	}
 }
 
-void
+ENTRYPOINT void
 release_triangle(ModeInfo * mi)
 {
 	if (triangles != NULL) {
@@ -368,11 +362,13 @@ release_triangle(ModeInfo * mi)
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_triangle(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Triangle", triangle)
 

@@ -38,13 +38,12 @@ static const char sccsid[] = "@(#)swirl.c	5.09 2003/06/30 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_swirl
-#define PROGCLASS "Swirl"
-#define HACK_INIT init_swirl
-#define HACK_DRAW draw_swirl
-#define swirl_opts xlockmore_opts
 #define DEFAULTS "*delay: 5000 \n" \
- "*count: 5 \n" \
- "*ncolors: 200 \n"
+	"*count: 5 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_swirl 0
+# define swirl_handle_event 0
 #define SMOOTH_COLORS
 #define WRITABLE_COLORS
 #include "xlockmore.h"		/* from the xscreensaver distribution */
@@ -75,13 +74,13 @@ static OptionStruct desc[] =
   {(char *) "-/+cycle", (char *) "turn on/off colour cycling"}
 };
 
-ModeSpecOpt swirl_opts =
+ENTRYPOINT ModeSpecOpt swirl_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   swirl_description =
 {"swirl", "init_swirl", "draw_swirl", "release_swirl",
- "refresh_swirl", "init_swirl", (char *) NULL, &swirl_opts,
+ "refresh_swirl", "init_swirl", "free_swirl", &swirl_opts,
  5000, 5, 1, 1, 64, 1.0, "",
  "Shows animated swirling patterns", 0, NULL};
 
@@ -164,7 +163,6 @@ typedef struct swirl_data {
 	XColor     *colors;
 	int         ncolors;
 	Bool        cycle_p, mono_p, no_colors, reverse;
-	ModeInfo   *mi;
 } swirlstruct;
 
 /* an array of swirls for each screen */
@@ -188,10 +186,13 @@ random_no(unsigned int n)
 /****************************************************************/
 
 static void
-free_swirl(Display *display, swirlstruct *sp)
+free_swirl_screen(ModeInfo *mi, swirlstruct *sp)
 {
-  ModeInfo *mi = sp->mi;
+	Display *display = MI_DISPLAY(mi);
 
+	if (sp == NULL) {
+		return;
+	}
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
 		MI_WHITE_PIXEL(mi) = sp->whitepixel;
 		MI_BLACK_PIXEL(mi) = sp->blackpixel;
@@ -200,9 +201,17 @@ free_swirl(Display *display, swirlstruct *sp)
 		MI_BG_PIXEL(mi) = sp->bg;
 #endif
 		if (sp->colors != NULL) {
+#ifdef STANDALONE
+			Screen *screen = MI_SCREENPTR(mi);
+#endif
 			if (sp->ncolors && !sp->no_colors)
-				free_colors(display, sp->cmap, sp->colors,
-					sp->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					screen,
+#else
+					display,
+#endif
+					sp->cmap, sp->colors, sp->ncolors);
 			free(sp->colors);
 			sp->colors = (XColor *) NULL;
 		}
@@ -223,7 +232,15 @@ free_swirl(Display *display, swirlstruct *sp)
 		free(sp->knots);
 		sp->knots = (KNOT_P) NULL;
 	}
+	sp = NULL;
 }
+
+ENTRYPOINT void
+free_swirl(ModeInfo * mi)
+{
+	free_swirl_screen(mi, &swirls[MI_SCREEN(mi)]);
+}
+
 
 #ifndef STANDALONE
 extern char *background;
@@ -447,7 +464,7 @@ create_knots(swirlstruct *sp)
  * Returns the value of the point
  */
 static unsigned long
-do_point(swirlstruct *sp, int i, int j)
+do_point(ModeInfo *mi, swirlstruct *sp, int i, int j)
 {
 	int         tT, k, add, value;
 	unsigned long colour_value;
@@ -455,7 +472,6 @@ do_point(swirlstruct *sp, int i, int j)
 	int         ncolours, qcolours;
 	double      rads;
 	KNOT_P      knot;
-	ModeInfo   *mi = sp->mi;
 
 	/* how many colours? */
 	ncolours = sp->ncolors;
@@ -628,13 +644,13 @@ draw_point(ModeInfo * mi, swirlstruct *sp)
 		r2 = r / 2;
 
 		/* interleave blocks at half r */
-		draw_block(sp->ximage, x, y, r2, do_point(sp, x, y));
-		draw_block(sp->ximage, x + r2, y, r2, do_point(sp, x + r2, y));
-		draw_block(sp->ximage, x + r2, y + r2, r2, do_point(sp,
+		draw_block(sp->ximage, x, y, r2, do_point(mi, sp, x, y));
+		draw_block(sp->ximage, x + r2, y, r2, do_point(mi, sp, x + r2, y));
+		draw_block(sp->ximage, x + r2, y + r2, r2, do_point(mi, sp,
 							    x + r2, y + r2));
-		draw_block(sp->ximage, x, y + r2, r2, do_point(sp, x, y + r2));
+		draw_block(sp->ximage, x, y + r2, r2, do_point(mi, sp, x, y + r2));
 	} else
-		draw_block(sp->ximage, x, y, r, do_point(sp, x, y));
+		draw_block(sp->ximage, x, y, r, do_point(mi, sp, x, y));
 
 	/* update the screen */
 /*-
@@ -751,7 +767,7 @@ next_point(swirlstruct *sp)
  *
  * -      win is the window to draw in
  */
-void
+ENTRYPOINT void
 init_swirl(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -760,20 +776,15 @@ init_swirl(ModeInfo * mi)
 
 	/* does the swirls array exist? */
 	if (swirls == NULL) {
-		int         i;
+		int i;
 
-		/* allocate an array, one entry for each screen */
-		if ((swirls = (swirlstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (swirlstruct))) == NULL)
-			return;
-
+		MI_INIT(mi, swirls);
 		/* initialise them all */
 		for (i = 0; i < MI_NUM_SCREENS(mi); i++)
 			initialise_swirl(&swirls[i]);
 	}
 	/* get a pointer to this swirl */
 	sp = &(swirls[MI_SCREEN(mi)]);
-	sp->mi = mi;
 
 	/* get window parameters */
 	sp->width = MI_WIDTH(mi);
@@ -787,7 +798,7 @@ init_swirl(ModeInfo * mi)
 
 	/* initialise image for speeding up drawing */
 	if (!initialise_image(display, sp)) {
-		free_swirl(display, sp);
+		free_swirl_screen(mi, sp);
 		return;
 	}
 	MI_CLEARWINDOW(mi);
@@ -804,7 +815,7 @@ init_swirl(ModeInfo * mi)
 			sp->whitepixel = MI_WHITE_PIXEL(mi);
 			if ((sp->cmap = XCreateColormap(display, window,
 					MI_VISUAL(mi), AllocNone)) == None) {
-				free_swirl(display, sp);
+				free_swirl_screen(mi, sp);
 				return;
 			}
 			XSetWindowColormap(display, window, sp->cmap);
@@ -827,7 +838,7 @@ init_swirl(ModeInfo * mi)
 		}
 		if ((sp->gc = XCreateGC(display, MI_WINDOW(mi),
 			     (unsigned long) 0, (XGCValues *) NULL)) == None) {
-			free_swirl(display, sp);
+			free_swirl_screen(mi, sp);
 			return;
 		}
 	}
@@ -836,9 +847,18 @@ init_swirl(ModeInfo * mi)
   /* Set up colour map */
   sp->direction = (LRAND() & 1) ? 1 : -1;
   if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
+#ifdef STANDALONE
+	Screen *screen = MI_SCREENPTR(mi);
+#endif
     if (sp->colors != NULL) {
       if (sp->ncolors && !sp->no_colors)
-        free_colors(display, sp->cmap, sp->colors, sp->ncolors);
+	free_colors(
+#ifdef STANDALONE
+		screen,
+#else
+		display,
+#endif
+		sp->cmap, sp->colors, sp->ncolors);
       free(sp->colors);
       sp->colors = (XColor *) NULL;
     }
@@ -855,10 +875,16 @@ init_swirl(ModeInfo * mi)
     else
       if ((sp->colors = (XColor *) malloc(sizeof (*sp->colors) *
           (sp->ncolors + 1))) == NULL) {
-        free_swirl(display, sp);
+        free_swirl_screen(mi, sp);
         return;
       }
-    sp->cycle_p = has_writable_cells(mi);
+    sp->cycle_p = has_writable_cells(
+#ifdef STANDALONE
+	screen, MI_VISUAL(mi)
+#else
+	mi
+#endif
+	);
     if (sp->cycle_p) {
       if (MI_IS_FULLRANDOM(mi)) {
         if (!NRAND(8))
@@ -872,31 +898,40 @@ init_swirl(ModeInfo * mi)
     if (!sp->mono_p) {
       if (!(LRAND() % 10))
         make_random_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		sp->cmap, sp->colors, &sp->ncolors,
+		True, True, &sp->cycle_p, True
 #else
-            mi,
+		mi,
+		sp->cmap, sp->colors, &sp->ncolors,
+		True, True, &sp->cycle_p
 #endif
-              sp->cmap, sp->colors, &sp->ncolors,
-              True, True, &sp->cycle_p);
+		);
       else if (!(LRAND() % 2))
         make_uniform_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		sp->cmap, sp->colors, &sp->ncolors,
+		True, &sp->cycle_p, True
 #else
-            mi,
+		mi,
+		sp->cmap, sp->colors, &sp->ncolors,
+		True, &sp->cycle_p
 #endif
-                  sp->cmap, sp->colors, &sp->ncolors,
-                  True, &sp->cycle_p);
+		);
       else
         make_smooth_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		sp->cmap, sp->colors, &sp->ncolors,
+		True, &sp->cycle_p, True
 #else
-            mi,
+		mi,
+		sp->cmap, sp->colors, &sp->ncolors,
+		True, &sp->cycle_p
 #endif
-                 sp->cmap, sp->colors, &sp->ncolors,
-                 True, &sp->cycle_p);
+		);
     }
     XInstallColormap(display, sp->cmap);
     if (sp->ncolors < 2) {
@@ -939,7 +974,7 @@ init_swirl(ModeInfo * mi)
 
 	/* fix the knot values */
 	if (!create_knots(sp)) {
-		free_swirl(display, sp);
+		free_swirl_screen(mi, sp);
 		return;
 	}
 
@@ -957,7 +992,7 @@ init_swirl(ModeInfo * mi)
  *
  * -      win is the window to draw in
  */
-void
+ENTRYPOINT void
 draw_swirl(ModeInfo * mi)
 {
 	swirlstruct *sp;
@@ -975,7 +1010,13 @@ draw_swirl(ModeInfo * mi)
 		/* in the middle of drawing? */
 		if (sp->drawing) {
 		  if(sp->cycle_p) {
-		 rotate_colors(MI_DISPLAY(mi), sp->cmap, sp->colors, sp->ncolors, sp->direction);
+		 rotate_colors(
+#ifdef STANDALONE
+			MI_SCREENPTR(mi),
+#else
+			MI_DISPLAY(mi),
+#endif
+			sp->cmap, sp->colors, sp->ncolors, sp->direction);
 		    if (!(LRAND() % 1000))
       sp->direction = -sp->direction;
                  }
@@ -993,7 +1034,13 @@ draw_swirl(ModeInfo * mi)
 			}
 		} else {
 		  if(sp->cycle_p) {
-		 rotate_colors(MI_DISPLAY(mi), sp->cmap, sp->colors, sp->ncolors, sp->direction);
+		 rotate_colors(
+#ifdef STANDALONE
+			MI_SCREENPTR(mi),
+#else
+			MI_DISPLAY(mi),
+#endif
+			sp->cmap, sp->colors, sp->ncolors, sp->direction);
 		    if (!(LRAND() % 1000))
       sp->direction = -sp->direction;
                  }
@@ -1038,7 +1085,7 @@ draw_swirl(ModeInfo * mi)
 
 /****************************************************************/
 
-void
+ENTRYPOINT void
 release_swirl(ModeInfo * mi)
 {
 	/* does the swirls array exist? */
@@ -1047,7 +1094,7 @@ release_swirl(ModeInfo * mi)
 
 		/* free them all */
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_swirl(MI_DISPLAY(mi), &swirls[screen]);
+			free_swirl_screen(mi, &swirls[screen]);
 		/* deallocate an array, one entry for each screen */
 		free(swirls);
 		swirls = (swirlstruct *) NULL;
@@ -1056,7 +1103,8 @@ release_swirl(ModeInfo * mi)
 
 /****************************************************************/
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_swirl(ModeInfo * mi)
 {
 	swirlstruct *sp;
@@ -1072,6 +1120,7 @@ refresh_swirl(ModeInfo * mi)
 		sp->drawing = False;
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Swirl", swirl)
 

@@ -1,4 +1,4 @@
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)mode.c	5.12 04/03/09 xlockmore";
 
 #endif
@@ -62,13 +62,13 @@ LockStruct  LockProcs[] =
 #endif
 #ifdef MODE_atlantis
 	{(char *) "atlantis", init_atlantis, draw_atlantis, release_atlantis,
-	 refresh_atlantis, change_atlantis, (ModeHook *) NULL, &atlantis_opts,
+	 (ModeHook *) NULL, change_atlantis, (ModeHook *) NULL, &atlantis_opts,
 	 25000, 4, 100, 6000, 64, 1.0, (char *) "",
 	 (char *) "Shows moving sharks/whales/dolphin", 0, NULL},
 #endif
 #ifdef MODE_atunnels
 	{(char *) "atunnels", init_atunnels, draw_atunnels, release_atunnels,
-	 refresh_atunnels, change_atunnels, (ModeHook *) NULL, &atunnels_opts,
+	 draw_atunnels, change_atunnels, (ModeHook *) NULL, &atunnels_opts,
 	 25000, 1, 1, 0, 64, 1.0, (char *) "",
 	 (char *) "Shows an OpenGL advanced tunnel screensaver", 0, NULL},
 #endif
@@ -122,13 +122,13 @@ LockStruct  LockProcs[] =
 #endif
 #ifdef MODE_bubble
 	{(char *) "bubble", init_bubble, draw_bubble, release_bubble,
-	 refresh_bubble, init_bubble, (ModeHook *) NULL, &bubble_opts,
+	 (ModeHook *) NULL, init_bubble, free_bubble, &bubble_opts,
 	 100000, 25, 1, 100, 64, 0.3, (char *) "",
 	 (char *) "Shows popping bubbles", 0, NULL},
 #endif
 #ifdef MODE_bubble3d
 	{(char *) "bubble3d", init_bubble3d, draw_bubble3d, release_bubble3d,
-	 draw_bubble3d, change_bubble3d, (ModeHook *) NULL, &bubble3d_opts,
+	 draw_bubble3d, (ModeHook *) NULL, (ModeHook *) NULL, &bubble3d_opts,
 	 20000, 1, 2, 1, 64, 1.0, (char *) "",
 	 (char *) "Richard Jones's GL bubbles", 0, NULL},
 #endif
@@ -194,7 +194,7 @@ LockStruct  LockProcs[] =
 #endif
 #ifdef MODE_deluxe
 	{(char *) "deluxe", init_deluxe, draw_deluxe, release_deluxe,
-	 refresh_deluxe, init_deluxe, (ModeHook *) NULL, &deluxe_opts,
+	 (ModeHook *) NULL, init_deluxe, (ModeHook *) NULL, &deluxe_opts,
 	 5000, 5, 1, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows pulsing sequence of stars, circles, and lines", 0, NULL},
 #endif
@@ -404,31 +404,31 @@ LockStruct  LockProcs[] =
 #endif
 #ifdef MODE_laser
 	{(char *) "laser", init_laser, draw_laser, release_laser,
-	 refresh_laser, init_laser, (ModeHook *) NULL, &laser_opts,
+	 refresh_laser, init_laser, free_laser, &laser_opts,
 	 20000, -10, 200, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows spinning lasers", 0, NULL},
 #endif
 #ifdef MODE_life
 	{(char *) "life", init_life, draw_life, release_life,
-	 refresh_life, change_life, (ModeHook *) NULL, &life_opts,
+	 refresh_life, change_life, free_life, &life_opts,
 	 750000, 40, 140, 0, 64, 1.0, (char *) "",
 	 (char *) "Shows Conway's game of Life", 0, NULL},
 #endif
 #ifdef MODE_life1d
 	{(char *) "life1d", init_life1d, draw_life1d, release_life1d,
-	 refresh_life1d, init_life1d, (ModeHook *) NULL, &life1d_opts,
+	 refresh_life1d, init_life1d, free_life1d, &life1d_opts,
 	 100000, -5, 1200, -15, 64, 1.0, (char *) "",
 	 (char *) "Shows Wolfram's game of 1D Life", 0, NULL},
 #endif
 #ifdef MODE_life3d
 	{(char *) "life3d", init_life3d, draw_life3d, release_life3d,
-	 refresh_life3d, change_life3d, (ModeHook *) NULL, &life3d_opts,
+	 refresh_life3d, change_life3d, free_life3d, &life3d_opts,
 	 1000000, 35, 85, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows Bays' game of 3D Life", 0, NULL},
 #endif
 #ifdef MODE_lightning
 	{(char *) "lightning", init_lightning, draw_lightning, release_lightning,
-	 refresh_lightning, init_lightning, (ModeHook *) NULL, &lightning_opts,
+	 (ModeHook *) NULL, init_lightning, (ModeHook *) NULL, &lightning_opts,
 	 10000, 1, 1, 1, 64, 0.6, (char *) "",
 	 (char *) "Shows Keith's fractal lightning bolts", 0, NULL},
 #endif
@@ -667,7 +667,7 @@ LockStruct  LockProcs[] =
 #endif
 #ifdef MODE_space
 	{(char *) "space", init_space, draw_space, release_space,
-	 refresh_space, init_space, (ModeHook *) NULL, &space_opts,
+	 (ModeHook *) NULL, init_space, (ModeHook *) NULL, &space_opts,
 	 10000, 100, 1, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows a journey into deep space", 0, NULL},
 #endif
@@ -691,7 +691,7 @@ LockStruct  LockProcs[] =
 #endif
 #ifdef MODE_sproingies
 	{(char *) "sproingies", init_sproingies, draw_sproingies, release_sproingies,
-	 refresh_sproingies, init_sproingies, (ModeHook *) NULL, &sproingies_opts,
+	 (ModeHook *) NULL, init_sproingies, (ModeHook *) NULL, &sproingies_opts,
 	 80000, 5, 0, 0, 64, 1.0, (char *) "",
   (char *) "Shows Sproingies!  Nontoxic.  Safe for pets and small children", 0, NULL},
 #endif
@@ -721,7 +721,7 @@ LockStruct  LockProcs[] =
 #endif
 #ifdef MODE_superquadrics
 	{(char *) "superquadrics", init_superquadrics, draw_superquadrics, release_superquadrics,
-	 refresh_superquadrics, init_superquadrics, (ModeHook *) NULL, &superquadrics_opts,
+	 (ModeHook *) NULL, init_superquadrics, (ModeHook *) NULL, &superquadrics_opts,
 	 40000, 25, 40, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows 3D mathematical shapes", 0, NULL},
 #endif
@@ -848,14 +848,14 @@ LockStruct  LockProcs[] =
 
 /* SPECIAL MODES */
 #ifndef WIN32
-	{(char *) "blank", init_blank, draw_blank, release_blank,
-	 refresh_blank, init_blank, (ModeHook *) NULL, &blank_opts,
+	{(char *) "blank", init_blank, (ModeHook *) NULL, (ModeHook *) NULL,
+	 (ModeHook *) NULL, init_blank, (ModeHook *) NULL, &blank_opts,
 	 3000000, 1, 1, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows nothing but a black screen", 0, NULL},
 #endif /* !WIN32 */
 #ifdef MODE_run
-	{(char *) "run", init_run, draw_run, release_run,
-	 refresh_run, init_run, (ModeHook *) NULL, &run_opts,
+	{(char *) "run", init_run, (ModeHook *) NULL, release_run,
+	 (ModeHook *) NULL, init_run, free_run, &run_opts,
 	 3000000, 1, 1, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows another xprogram", 0, NULL},
 #endif
@@ -1120,13 +1120,13 @@ LoadModules(char *path)
 					}
 				} else
 					newstack->lock->change_hook = NULL;
-				if (desc->unused_name != NULL) {
+				/*if (desc->unused_name != NULL) {
 					newstack->lock->unused_hook = (ModeHook *) dlsym(mp, desc->unused_name);
 					if (newstack->lock->unused_hook == NULL) {
 						nextone;
 					}
 				} else
-					newstack->lock->unused_hook = NULL;
+					newstack->lock->unused_hook = NULL;*/
 				newstack->lock->msopt = desc->msopt;
 				newstack->lock->def_delay = desc->def_delay;
 				newstack->lock->def_count = desc->def_count;
@@ -1363,7 +1363,8 @@ call_callback_hook(LockStruct * ls, ModeInfo * mi)
 	}
 	MI_LOCKSTRUCT(mi) = ls;
 
-	ls->callback_hook(mi);
+	if (ls->callback_hook != NULL)
+		ls->callback_hook(mi);
 
 	MI_SET_FLAG_STATE(mi, WI_FLAG_JUST_INITTED, False);
 }
@@ -1437,3 +1438,24 @@ call_change_hook(LockStruct * ls, ModeInfo * mi)
 		ls->change_hook(mi);
 	}
 }
+
+/*-
+ *    Future?
+ */
+
+/*void
+call_unused_hook(LockStruct * ls, ModeInfo * mi)
+{
+	if (ls == NULL) {
+		if (default_mode == NULL) {
+			return;
+		} else {
+			ls = default_mode;
+		}
+	}
+	MI_LOCKSTRUCT(mi) = ls;
+
+	if (ls->unused_hook != NULL) {
+		ls->unused_hook(mi);
+	}
+}*/

@@ -43,16 +43,15 @@ static const char sccsid[] = "@(#)petal.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_petal
-#define PROGCLASS "Petal"
-#define HACK_INIT init_petal
-#define HACK_DRAW draw_petal
-#define petal_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*count: -500 \n" \
- "*cycles: 400 \n" \
- "*ncolors: 64 \n" \
- "*wireframe: False \n" \
- "*fullrandom: False \n"
+	"*count: -500 \n" \
+	"*cycles: 400 \n" \
+	"*ncolors: 64 \n" \
+	"*wireframe: False \n" \
+	"*fullrandom: False \n" \
+
+# define reshape_petal 0
+# define petal_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -60,13 +59,13 @@ static const char sccsid[] = "@(#)petal.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_petal
 
-ModeSpecOpt petal_opts =
+ENTRYPOINT ModeSpecOpt petal_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   petal_description =
 {"petal", "init_petal", "draw_petal", "release_petal",
- "refresh_petal", "init_petal", (char *) NULL, &petal_opts,
+ "refresh_petal", "init_petal", "free_petal", &petal_opts,
  10000, -500, 400, 1, 64, 1.0, "",
  "Shows various GCD Flowers", 0, NULL};
 
@@ -275,16 +274,30 @@ random_petal(ModeInfo * mi)
 	petal(mi);
 }
 
-void
+
+static void
+free_petal_screen(petalstruct *pp)
+{
+	if (pp == NULL) {
+		return;
+	}
+	if (pp->points)
+		free(pp->points);
+	pp = NULL;
+}
+
+ENTRYPOINT void
+free_petal(ModeInfo * mi)
+{
+	free_petal_screen(&petals[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_petal(ModeInfo * mi)
 {
 	petalstruct *pp;
 
-	if (petals == NULL) {
-		if ((petals = (petalstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (petalstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, petals);
 	pp = &petals[MI_SCREEN(mi)];
 
 	pp->lines = MI_COUNT(mi);
@@ -318,7 +331,7 @@ init_petal(ModeInfo * mi)
 	random_petal(mi);
 }
 
-void
+ENTRYPOINT void
 draw_petal(ModeInfo * mi)
 {
 	petalstruct *pp;
@@ -334,7 +347,7 @@ draw_petal(ModeInfo * mi)
 		pp->painted = True;
 }
 
-void
+ENTRYPOINT void
 release_petal(ModeInfo * mi)
 {
 	if (petals != NULL) {
@@ -343,15 +356,15 @@ release_petal(ModeInfo * mi)
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
 			petalstruct *pp = &petals[screen];
 
-			if (pp->points)
-				free(pp->points);
+			free_petal_screen(pp);
 		}
 		free(petals);
 		petals = (petalstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_petal(ModeInfo * mi)
 {
 	petalstruct *pp;
@@ -366,6 +379,7 @@ refresh_petal(ModeInfo * mi)
 		pp->painted = False;
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Petal", petal)
 

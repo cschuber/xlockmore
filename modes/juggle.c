@@ -131,17 +131,13 @@ static const char sccsid[] = "@(#)juggle.c	5.10 2003/09/02 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_juggle
-#define PROGCLASS "Juggle"
-#define HACK_INIT init_juggle
-#define HACK_DRAW draw_juggle
-#define HACK_RESHAPE reshape_juggle
-#define _no_HACK_FREE release_juggle
-#define juggle_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
-"*count: 200 \n" \
-"*cycles: 1000 \n" \
-"*ncolors: 32 \n" \
-"*font: -*-times-bold-r-normal-*-180-*\n"
+	"*count: 200 \n" \
+	"*cycles: 1000 \n" \
+	"*ncolors: 32 \n" \
+	"*font: -*-times-bold-r-normal-*-180-*\n" \
+
+# define juggle_handle_event 0
 #undef SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #define MI_DELAY(MI)	((MI)->pause)
@@ -259,13 +255,13 @@ static OptionStruct desc[] =
   { "-only",           "Turn off all objects but the named one." },
 };
 
-ModeSpecOpt juggle_opts =
+ENTRYPOINT ModeSpecOpt juggle_opts =
   { XtNumber(opts), opts, XtNumber(vars), vars, desc };
 
 #ifdef USE_MODULES
 ModStruct   juggle_description = {
 	"juggle", "init_juggle", "draw_juggle", "release_juggle",
-	"draw_juggle", "change_juggle", (char *) NULL, &juggle_opts,
+	"draw_juggle", "change_juggle", "free_juggle", &juggle_opts,
 	10000, 200, 1000, 1, 64, 1.0, "",
 	"Shows a Juggler, juggling", 0, NULL
 };
@@ -677,7 +673,10 @@ trajectory_destroy(Trajectory *t) {
 }
 
 static void
-free_juggle(jugglestruct *sp) {
+free_juggle_screen(jugglestruct *sp) {
+  if (sp == NULL) {
+	return;
+  }
   if (sp->head != NULL) {
 	while (sp->head->next != sp->head) {
 	  trajectory_destroy(sp->head->next);
@@ -704,6 +703,13 @@ free_juggle(jugglestruct *sp) {
 	free(sp->pattern);
 	sp->pattern = NULL;
   }
+  sp = NULL;;
+}
+
+ENTRYPOINT void
+free_juggle(ModeInfo * mi)
+{
+	free_juggle_screen(&juggles[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -713,7 +719,7 @@ add_throw(jugglestruct *sp, char type, int h, Notation n, const char* name)
 
   ADD_ELEMENT(Trajectory, t, sp->head->prev);
   if(t == NULL){ /* Out of Memory */
-	free_juggle(sp);
+	free_juggle_screen(sp);
 	return False;
   }
   t->object = NULL;
@@ -954,7 +960,7 @@ part(jugglestruct *sp)
 	  t->action = CATCH;
 	  ADD_ELEMENT(Trajectory, nt, p);
 	  if(nt == NULL){
-		free_juggle(sp);
+		free_juggle_screen(sp);
 		return False;
 	  }
 	  nt->object = NULL;
@@ -2316,14 +2322,14 @@ show_bball(ModeInfo *mi, unsigned long color, Trace *s)
  **************************************************************************/
 
 
-void
+ENTRYPOINT void
 release_juggle(ModeInfo * mi)
 {
   if (juggles != NULL) {
 	int screen;
 
 	for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-	  free_juggle(&juggles[screen]);
+	  free_juggle_screen(&juggles[screen]);
 	free(juggles);
 	juggles = (jugglestruct *) NULL;
   }
@@ -2458,7 +2464,7 @@ refill_juggle(ModeInfo * mi)
   positions(sp);
 
   if (!projectile(sp)) {
-	free_juggle(sp);
+	free_juggle_screen(sp);
 	return;
   }
 
@@ -2467,7 +2473,8 @@ refill_juggle(ModeInfo * mi)
   if(MI_IS_DEBUG(mi)) dump(sp);
 #endif
 }
-void
+
+ENTRYPOINT void
 change_juggle(ModeInfo * mi)
 {
   jugglestruct *sp = NULL;
@@ -2499,16 +2506,7 @@ change_juggle(ModeInfo * mi)
 
 }
 
-#ifdef STANDALONE
-/* Used by xscreensaver.  xlock just uses init_juggle */
-void
-reshape_juggle(ModeInfo * mi, int width, int height)
-{
-  init_juggle(mi);
-}
-#endif
-
-void
+ENTRYPOINT void
 init_juggle(ModeInfo * mi)
 {
   jugglestruct *sp;
@@ -2570,13 +2568,7 @@ init_juggle(ModeInfo * mi)
   XClearWindow(MI_DISPLAY(mi), MI_WINDOW(mi));
 
   if (juggles == NULL) { /* First-time initialisation */
-	/* allocate jugglestruct */
-	if ((juggles =
-		 (jugglestruct *)calloc(MI_NUM_SCREENS(mi),
-								sizeof (jugglestruct))) == NULL) {
-	  release_juggle(mi);
-	  return;
-	}
+	MI_INIT(mi, juggles);
 	for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
 	  	sp = &juggles[screen];
 		sp->Gr = 0;
@@ -2610,21 +2602,21 @@ init_juggle(ModeInfo * mi)
 	/* create circular trajectory list */
 	ADD_ELEMENT(Trajectory, sp->head, sp->head);
 	if(sp->head == NULL){
-	  free_juggle(sp);
+	  free_juggle_screen(sp);
 	  return;
 	}
 
 	/* create circular object list */
 	ADD_ELEMENT(Object, sp->objects, sp->objects);
 	if(sp->objects == NULL){
-	  free_juggle(sp);
+	  free_juggle_screen(sp);
 	  return;
 	}
 
 	/* create circular wander list */
 	ADD_ELEMENT(Wander, sp->wander, sp->wander);
 	if(sp->wander == NULL){
-	  free_juggle(sp);
+	  free_juggle_screen(sp);
 	  return;
 	}
 	(void)wander(sp, 0); /* Initialize wander */
@@ -2648,7 +2640,7 @@ init_juggle(ModeInfo * mi)
   }
 }
 
-void
+ENTRYPOINT void
 draw_juggle(ModeInfo * mi)
 {
   Trajectory *traj = NULL;
@@ -2844,6 +2836,15 @@ draw_juggle(ModeInfo * mi)
 	init_juggle(mi);
   }
 }
+
+#ifdef STANDALONE
+/* Used by xscreensaver.  xlock just uses init_juggle */
+ENTRYPOINT void
+reshape_juggle(ModeInfo * mi, int width, int height)
+{
+  init_juggle(mi);
+}
+#endif
 
 XSCREENSAVER_MODULE ("Juggle", juggle)
 

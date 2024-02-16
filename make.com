@@ -279,6 +279,7 @@ $ call make [.xlock]vis.obj       "xl_cc /object=[.xlock] [.xlock]vis.c"       [
 $ call make [.xlock]visgl.obj     "xl_cc /object=[.xlock] [.xlock]visgl.c"     [.xlock]visgl.c [.xlock]xlock.h [.xlock]visgl.h
 $ call make [.xlock]color.obj     "xl_cc /object=[.xlock] [.xlock]color.c"     [.xlock]color.c [.xlock]xlock.h [.xlock]color.h
 $ call make [.xlock]random.obj    "xl_cc /object=[.xlock] [.xlock]random.c"    [.xlock]random.c [.xlock]xlock.h [.xlock]random.h
+$ call make [.xlock]automata.obj  "xl_cc /object=[.xlock] [.xlock]automata.c"  [.xlock]automata.c [.xlock]xlock.h [.xlock]automata.h
 $ call make [.xlock]spline.obj    "xl_cc /object=[.xlock] [.xlock]spline.c"    [.xlock]spline.c [.xlock]xlock.h [.xlock]spline.h
 $ call make [.xlock]erase.obj     "xl_cc /object=[.xlock] [.xlock]erase.c"     [.xlock]erase.c [.xlock]xlock.h [.xlock]erase.h [.xlock]erase_debug.h [.xlock]erase_init.h
 $ call make [.xlock]xshm.obj           "xl_cc /nowarn/object=[.xlock] [.xlock]xshm.c"           [.xlock]xshm.c [.xlock]xlock.h [.xlock]xshm.h [.xlock]aligned_malloc.h [.xlock]mode.h "[.xlock]random.h,[.xlock]thread_util.h"

@@ -44,23 +44,19 @@ static const char sccsid[] = "@(#)eyes.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_eyes
-#define PROGCLASS "Eyes"
-#define HACK_INIT init_eyes
-#define HACK_DRAW draw_eyes
-#define eyes_opts xlockmore_opts
 #define DEFAULTS "*delay: 20000 \n" \
- "*count: -8 \n" \
- "*cycles: 5 \n" \
- "*ncolors: 200 \n" \
- "*bitmap: \n" \
- "*trackmouse: False \n"
-#include "xlockmore.h"		/* in xscreensaver distribution */
+	"*count: -8 \n" \
+	"*cycles: 5 \n" \
+	"*ncolors: 200 \n" \
+	"*bitmap: \n" \
 
+# define reshape_eyes 0
+# define eyes_handle_event 0
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
-
+# include "xlock.h"		/* in xlockmore distribution */
+# include "iostuff.h"
 #endif /* STANDALONE */
-#include "iostuff.h"
 
 #ifdef MODE_eyes
 
@@ -84,13 +80,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+trackmouse", (char *) "turn on/off the tracking of the mouse"}
 };
 
-ModeSpecOpt eyes_opts =
+ENTRYPOINT ModeSpecOpt eyes_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   eyes_description =
 {"eyes", "init_eyes", "draw_eyes", "release_eyes",
- "refresh_eyes", "init_eyes", (char *) NULL, &eyes_opts,
+ "refresh_eyes", "init_eyes", "free_eyes", &eyes_opts,
  20000, -8, 5, 1, 64, 1.0, "",
  "Shows eyes following a bouncing grelb", 0, NULL};
 
@@ -881,8 +877,11 @@ freePairsOfEyes(Display * display, EyeScrInfo * ep)
 }
 
 static void
-free_eyes(Display * display, EyeScrInfo * ep)
+free_eyes_screen(Display * display, EyeScrInfo * ep)
 {
+	if (ep == NULL) {
+		return;
+	}
 	if (ep->flyGC != None) {
 		XFreeGC(display, ep->flyGC);
 		ep->flyGC = None;
@@ -906,13 +905,20 @@ free_eyes(Display * display, EyeScrInfo * ep)
 		XFreeCursor(display, ep->cursor);
 		ep->cursor = None;
 	}
+	ep = NULL;
+}
+
+ENTRYPOINT void
+free_eyes(ModeInfo * mi)
+{
+	free_eyes_screen(MI_DISPLAY(mi), &eye_info[MI_SCREEN(mi)]);
 }
 
 /*-
  *    Initialize them eyes.  Called each time the window changes.
  */
 
-void
+ENTRYPOINT void
 init_eyes(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -926,33 +932,45 @@ init_eyes(ModeInfo * mi)
          *      function will have to allocate it again next time the
          *      init hook is called.
          */
-	if (eye_info == NULL) {
-		if ((eye_info = (EyeScrInfo *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (EyeScrInfo))) == NULL)
-			return;
-	}
+	MI_INIT(mi, eye_info);
 	ep = &eye_info[MI_SCREEN(mi)];
 
 	if (ep->flypix == None) {
+#ifdef STANDALONE
+		getPixmap(display, window, FLY_WIDTH, FLY_HEIGHT, FLY_BITS,
+			  &(ep->flywidth), &(ep->flyheight), &(ep->flypix));
+#else
 		getPixmap(mi, window, FLY_WIDTH, FLY_HEIGHT, FLY_BITS,
 			  &(ep->flywidth), &(ep->flyheight), &(ep->flypix),
 			  &(ep->graphics_format));
+#endif
 		if (ep->flypix == None) {
-			free_eyes(display, ep);
+			free_eyes_screen(display, ep);
 			return;
 		}
 #ifdef XBM_GRELB
+#ifdef STANDALONE
+			ep->graphics_format = 0;
+			getPixmap(display, window,
+			  FLY2_WIDTH, FLY2_HEIGHT, FLY2_BITS,
+			  &(ep->fly2width), &(ep->fly2height), &(ep->fly2pix));
+			if (ep->fly2pix == None) {
+				free_eyes_screen(display, ep);
+				return;
+			}
+#else
 		if (ep->graphics_format == IS_XBM) {
-			ep->graphics_format =0;
+			ep->graphics_format = 0;
 			getPixmap(mi, window,
 			  FLY2_WIDTH, FLY2_HEIGHT, FLY2_BITS,
 			  &(ep->fly2width), &(ep->fly2height), &(ep->fly2pix),
 			  &(ep->graphics_format));
 			if (ep->fly2pix == None) {
-				free_eyes(display, ep);
+				free_eyes_screen(display, ep);
 				return;
 			}
 		}
+#endif
 #endif
 	}
 	if (ep->flyGC == None) {
@@ -962,14 +980,14 @@ init_eyes(ModeInfo * mi)
 		gcv.background = MI_BLACK_PIXEL(mi);
 		if ((ep->flyGC = XCreateGC(display, window,
 				 GCForeground | GCBackground, &gcv)) == None) {
-			free_eyes(display, ep);
+			free_eyes_screen(display, ep);
 			return;
 		}
 	}
 	if (ep->eyeGC == None) {
 		if ((ep->eyeGC = XCreateGC(display, window,
 			   (unsigned long) 0, (XGCValues *) NULL)) == None) {
-			free_eyes(display, ep);
+			free_eyes_screen(display, ep);
 			return;
 		}
 	}
@@ -994,7 +1012,7 @@ init_eyes(ModeInfo * mi)
 	}
 	if (!ep->eyes) {
 		if ((ep->eyes = (Eyes *) calloc(ep->num_eyes, sizeof (Eyes))) == NULL) {
-			free_eyes(display, ep);
+			free_eyes_screen(display, ep);
 			return;
 		}
 	}
@@ -1018,12 +1036,12 @@ init_eyes(ModeInfo * mi)
 		if ((bit = XCreatePixmapFromBitmapData(display, window,
 				(char *) "\000", 1, 1, MI_BLACK_PIXEL(mi),
 				MI_BLACK_PIXEL(mi), 1)) == None) {
-			free_eyes(display, ep);
+			free_eyes_screen(display, ep);
 			return;
 		}
 		if ((ep->cursor = XCreatePixmapCursor(display, bit, bit,
 				&black, &black, 0, 0)) == None) {
-			free_eyes(display, ep);
+			free_eyes_screen(display, ep);
 			return;
 		}
 		XFreePixmap(display, bit);
@@ -1039,7 +1057,7 @@ init_eyes(ModeInfo * mi)
  *    Called by the mainline code periodically to update the display.
  */
 
-void
+ENTRYPOINT void
 draw_eyes(ModeInfo * mi)
 {
 	int         i;
@@ -1070,14 +1088,14 @@ draw_eyes(ModeInfo * mi)
  *      once, we must zap everything for every screen.
  */
 
-void
+ENTRYPOINT void
 release_eyes(ModeInfo * mi)
 {
 	if (eye_info != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_eyes(MI_DISPLAY(mi), &eye_info[screen]);
+			free_eyes_screen(MI_DISPLAY(mi), &eye_info[screen]);
 		free(eye_info);
 	}
 	eye_info = (EyeScrInfo *) NULL;
@@ -1085,13 +1103,14 @@ release_eyes(ModeInfo * mi)
 
 /* ---------------------------------------------------------------------- */
 
+#ifndef STANDALONE
 /*-
  *    Called when the mainline xlock code notices possible window
  *      damage.  This hook should take steps to repaint the entire
  *      window (no specific damage area information is provided).
  */
 
-void
+ENTRYPOINT void
 refresh_eyes(ModeInfo * mi)
 {
 	int         i;
@@ -1110,6 +1129,7 @@ refresh_eyes(ModeInfo * mi)
 		ep->eyes[i].painted = False;
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Eyes", eyes)
 

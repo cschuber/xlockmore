@@ -59,23 +59,22 @@ static const char sccsid[] = "@(#)bat.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_bat
-#define DEFAULTS "*delay: 100000 \n" \
-	"*count: -8 \n" \
-	"*size: 0 \n" \
-	"*ncolors: 200 \n" \
-	"*verbose: False \n"
+# define MODE_bat
+# define DEFAULTS	"*delay: 100000 \n" \
+			"*count: -8 \n" \
+			"*size: 0 \n" \
+			"*ncolors: 200 \n" \
+			"*verbose: False \n" \
 
 # define reshape_bat 0
 # define bat_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
-#include "common.h"
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
-#include "vis.h"
-#include "color.h"
+# include "xlock.h"		/* in xlockmore distribution */
+# include "vis.h"
+# include "color.h"
+# include "iostuff.h"
 #endif /* STANDALONE */
-#include "iostuff.h"
 
 #ifdef MODE_bat
 
@@ -83,7 +82,7 @@ ModeSpecOpt bat_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
-const ModStruct bat_description =
+ENTRYPOINT ModStruct bat_description =
 {"bat", "init_bat", "draw_bat", "release_bat",
  "refresh_bat", "init_bat", "free_bat", &bat_opts,
  100000, -8, 1, 0, 64, 1.0, "",
@@ -111,7 +110,9 @@ const ModStruct bat_description =
 #define BAT_HEIGHT    image_height
 #define BAT_BITS      image_bits
 
+#ifndef STANDALONE
 #include "bat.xbm"
+#endif
 
 #ifdef HAVE_XPM
 #define BAT_NAME      image_name
@@ -220,13 +221,13 @@ checkCollision(bouncestruct * bp, int a_bat)
 					bp->bats[i].spindir = 0;
 				} else
 					bp->bats[i].spindelay = (int) ((double) M_PI *
-								       bp->avgsize / (ABS(bp->bats[i].vang))) + 1;
+							bp->avgsize / (ABS(bp->bats[i].vang))) + 1;
 				if (!bp->bats[a_bat].vang) {
 					bp->bats[a_bat].spindelay = 1;
 					bp->bats[a_bat].spindir = 0;
 				} else
 					bp->bats[a_bat].spindelay = (int) ((double) M_PI *
-									   bp->avgsize / (ABS(bp->bats[a_bat].vang))) + 1;
+							bp->avgsize / (ABS(bp->bats[a_bat].vang))) + 1;
 				return;
 			}
 		}
@@ -244,7 +245,7 @@ drawbat(ModeInfo * mi, batstruct * bat)
 		if (bat->xlast != -1) {
 			XSetForeground(display, bp->backGC, bp->black);
 			XFillRectangle(display, window, bp->backGC,
-				     bat->xlast, bat->ylast, bp->xs, bp->ys);
+				bat->xlast, bat->ylast, bp->xs, bp->ys);
 		}
 		XSetForeground(display, bp->backGC, bat->color);
 		XCopyPlane(display, bp->pixmap, window, bp->backGC,
@@ -253,18 +254,18 @@ drawbat(ModeInfo * mi, batstruct * bat)
 		XSetForeground(display, bp->backGC, bat->color);
 		if (bp->logo)
 			(void) XPutImage(display, window, bp->backGC, bp->logo,
-				 0, 0, bat->x, bat->y, bp->xs, bp->ys);
-	 	else
+				0, 0, bat->x, bat->y, bp->xs, bp->ys);
+		else
 /* PURIFY 4.0.1 on SunOS4 and on Solaris 2 reports a 15985 byte memory leak on
    * the next line. */
 			(void) XPutImage(display, window, bp->backGC,
-				 bp->images[(bat->orient > ORIENTS / 2) ?
+				bp->images[(bat->orient > ORIENTS / 2) ?
 					ORIENTS - bat->orient : bat->orient],
-				 0, 0, bat->x, bat->y, bp->xs, bp->ys);
+					0, 0, bat->x, bat->y, bp->xs, bp->ys);
 		if (bat->xlast != -1) {
 			XSetForeground(display, bp->backGC, bp->black);
 			ERASE_IMAGE(display, window, bp->backGC,
-				    bat->x, bat->y, bat->xlast, bat->ylast, bp->xs, bp->ys);
+				bat->x, bat->y, bat->xlast, bat->ylast, bp->xs, bp->ys);
 		}
 	}
 }
@@ -273,7 +274,7 @@ static void
 flapbat(batstruct * bat, int dir, int *vel, int avgsize)
 {
 	*vel -= (int) ((*vel + SIGN(*vel * dir) *
-		 bat->spindelay * ORIENTCYCLE / (M_PI * avgsize)) / SLIPAGE);
+			bat->spindelay * ORIENTCYCLE / (M_PI * avgsize)) / SLIPAGE);
 	if (*vel) {
 		bat->spindir = DIR(*vel * dir);
 		bat->vang = *vel * ORIENTCYCLE;
@@ -404,11 +405,11 @@ init_stuff(ModeInfo * mi)
 /* this used to work there I think */
 	if (MI_BITMAP(mi) && strlen(MI_BITMAP(mi))) {
 		if (bp->logo == None) {
-                getImage(mi, &bp->logo, BAT_WIDTH, BAT_HEIGHT, BAT_BITS,
+			getImage(mi, &bp->logo, BAT_WIDTH, BAT_HEIGHT, BAT_BITS,
 #ifdef HAVE_XPM
-                         DEFAULT_XPM, BAT_NAME,
+				DEFAULT_XPM, BAT_NAME,
 #endif
-                         &bp->graphics_format, &bp->cmap, &bp->black);
+				&bp->graphics_format, &bp->cmap, &bp->black);
 			if (bp->logo == None) {
 				free_bat_screen(display, bp);
 				return False;
@@ -417,7 +418,7 @@ init_stuff(ModeInfo * mi)
 	} else
 #endif
 	{
-	if (!bp->cmap) {
+		if (bp->cmap == None) {
 #ifndef STANDALONE
 /* problems here with XpmCreateImageFromData */
 #ifdef HAVE_XPM
@@ -445,7 +446,7 @@ init_stuff(ModeInfo * mi)
 
 			if (bp->graphics_format == IS_NONE
 #ifndef USE_MONOXPM
-			    && MI_NPIXELS(mi) > 2
+					&& MI_NPIXELS(mi) > 2
 #endif
 				) {
 				for (i = 0; i <= ORIENTS / 2; i++)
@@ -473,22 +474,20 @@ init_stuff(ModeInfo * mi)
 		if (total <= ORIENTS / 2)
 #endif
 #endif
-
-		{
-			if (!bimages[0].data)	/* Only need to do this once */
-				for (i = 0; i <= ORIENTS / 2; i++) {
-					bimages[i].data = (char *) bits[i];
-					bimages[i].width = bat0_width;
-					bimages[i].height = bat0_height;
-					bimages[i].bytes_per_line = (bat0_width + 7) / 8;
-				}
-			for (i = 0; i <= ORIENTS / 2; i++)
-				bp->images[i] = &(bimages[i]);
+			{
+				if (!bimages[0].data)	/* Only need to do this once */
+					for (i = 0; i <= ORIENTS / 2; i++) {
+						bimages[i].data = (char *) bits[i];
+						bimages[i].width = bat0_width;
+						bimages[i].height = bat0_height;
+						bimages[i].bytes_per_line = (bat0_width + 7) / 8;
+					}
+				for (i = 0; i <= ORIENTS / 2; i++)
+					bp->images[i] = &(bimages[i]);
+			}
 		}
 	}
-  }
 	if (bp->cmap != None) {
-
 #ifndef STANDALONE
 		setColormap(display, window, bp->cmap, MI_IS_INWINDOW(mi));
 #endif
@@ -512,9 +511,7 @@ init_stuff(ModeInfo * mi)
 ENTRYPOINT void
 free_bat(ModeInfo * mi)
 {
-        Display *display = MI_DISPLAY(mi);
-        bouncestruct *bp = &bounces[MI_SCREEN(mi)];
-        free_bat_screen(display, bp);
+	free_bat_screen(MI_DISPLAY(mi), &bounces[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void
@@ -526,11 +523,7 @@ init_bat(ModeInfo * mi)
 	int         i, tryagain = 0;
 	bouncestruct *bp;
 
-	if (bounces == NULL) {
-		if ((bounces = (bouncestruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (bouncestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, bounces);
 	bp = &bounces[MI_SCREEN(mi)];
 
 	free_stuff(display, bp);
@@ -555,7 +548,7 @@ init_bat(ModeInfo * mi)
 		bp->nbats = MINBATS;
 	if (!bp->bats) {
 		if ((bp->bats = (batstruct *) malloc(bp->nbats *
-				 sizeof (batstruct))) == NULL) {
+					sizeof (batstruct))) == NULL) {
 			free_bat_screen(display, bp);
 			return;
 		}
@@ -563,7 +556,7 @@ init_bat(ModeInfo * mi)
 	if (!init_stuff(mi))
 		return;
 	if (size == 0 ||
-	    MINGRIDSIZE * size > bp->width / 2 || MINGRIDSIZE * size > bp->height) {
+			MINGRIDSIZE * size > bp->width / 2 || MINGRIDSIZE * size > bp->height) {
 		if (bp->logo) {
 			bp->xs = bp->logo->width;
 			bp->ys = bp->logo->height;
@@ -572,7 +565,7 @@ init_bat(ModeInfo * mi)
 			bp->ys = bat0_height;
 		}
 		if (bp->width > MINGRIDSIZE * bp->xs &&
-		    bp->height > MINGRIDSIZE * bp->ys) {
+				bp->height > MINGRIDSIZE * bp->ys) {
 			bp->pixelmode = False;
 		} else {
 			bp->pixelmode = True;
@@ -584,17 +577,17 @@ init_bat(ModeInfo * mi)
 		bp->pixelmode = True;
 		if (size < -MINSIZE)
 			bp->ys = NRAND(MIN(-size, MAX(MINSIZE, MIN(bp->width / 2, bp->height) /
-				      MINGRIDSIZE)) - MINSIZE + 1) + MINSIZE;
+				MINGRIDSIZE)) - MINSIZE + 1) + MINSIZE;
 		else if (size < MINSIZE)
 			bp->ys = MINSIZE;
 		else
 			bp->ys = MIN(size, MAX(MINSIZE, MIN(bp->width / 2, bp->height) /
-					       MINGRIDSIZE));
+				MINGRIDSIZE));
 		bp->xs = 2 * bp->ys;
 	}
 	bp->avgsize = (bp->xs + bp->ys) / 2;
 
-    if (bp->pixelmode) {
+	if (bp->pixelmode) {
 		GC fg_gc, bg_gc;
 		XGCValues gcv;
 
@@ -606,20 +599,20 @@ init_bat(ModeInfo * mi)
 		gcv.foreground = 0;
 		gcv.background = 1;
 		if ((bg_gc = XCreateGC(display, bp->pixmap,
-				 GCForeground | GCBackground, &gcv)) == None) {
+				GCForeground | GCBackground, &gcv)) == None) {
 			free_bat_screen(display, bp);
 			return;
 		}
 		gcv.background = 0;
 		gcv.foreground = 1;
 		if ((fg_gc = XCreateGC(display, bp->pixmap,
-				 GCForeground | GCBackground, &gcv)) == None) {
+				GCForeground | GCBackground, &gcv)) == None) {
 			XFreeGC(display, bg_gc);
 			free_bat_screen(display, bp);
 			return;
 		}
 		XFillRectangle(display, bp->pixmap, bg_gc,
-	   		0, 0, bp->xs, bp->ys);
+			0, 0, bp->xs, bp->ys);
 		XFillArc(display, bp->pixmap, fg_gc,
 			0, 0, bp->xs / 2, 2 * bp->ys,
 			0, 11520);
@@ -628,7 +621,7 @@ init_bat(ModeInfo * mi)
 			0, 11520);
 		XFillRectangle(display, bp->pixmap, fg_gc,
 			bp->xs / 4, bp->ys / 2,
-	        bp->xs / 2, bp->ys / 2);
+			bp->xs / 2, bp->ys / 2);
 		XFillArc(display, bp->pixmap, bg_gc,
 			0, bp->ys / 2, bp->xs / 2, 2 * bp->ys,
 			0, 11520);
@@ -665,14 +658,14 @@ init_bat(ModeInfo * mi)
 			tryagain++;
 	}
 	/* don't want any exposure events from XCopyPlane */
-    XSetGraphicsExposures(display, MI_GC(mi), False);
+	XSetGraphicsExposures(display, MI_GC(mi), False);
 	MI_CLEARWINDOWCOLORMAP(mi, bp->backGC, bp->black);
 }
 
 ENTRYPOINT void
 draw_bat(ModeInfo * mi)
 {
-	int           i;
+	int         i;
 	bouncestruct *bp;
 
 	if (bounces == NULL)

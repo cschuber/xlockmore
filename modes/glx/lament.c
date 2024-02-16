@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* lament --- Shows Lemarchand's Box */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)lament.c	5.03 2001/11/28 xlockmore";
-
 #endif
 
 /* xscreensaver, Copyright (c) 1998 Jamie Zawinski <jwz AT jwz.org>
@@ -98,15 +97,12 @@ static const char sccsid[] = "@(#)lament.c	5.03 2001/11/28 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_lament
-#define PROGCLASS	"Lament"
-#define HACK_INIT	init_lament
-#define HACK_DRAW	draw_lament
-#define HACK_RESHAPE	reshape_lament
-#define lament_opts	xlockmore_opts
 #define DEFAULTS	"*delay:	10000   \n"	\
 			"*showFps:      False   \n"     \
 			"*wireframe:	False	\n"	\
 			"*texture:	True	\n"
+
+#define lament_handle_event 0
 #include "xlockmore.h"
 #else /* !STANDALONE */
 #include "xlock.h"		/* from the xlockmore distribution */
@@ -138,7 +134,7 @@ static OptionStruct desc[] =
 	{(char *) "-/+texture", (char *) "turn on/off texturing"}
 };
 
-ModeSpecOpt lament_opts =
+ENTRYPOINT ModeSpecOpt lament_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -2169,8 +2165,8 @@ rotate(GLfloat * pos, GLfloat * v, GLfloat * dv, GLfloat max_v, Bool verbose)
 /* Window management, etc
  */
 
-static void
-reshape_lament(int width, int height)
+ENTRYPOINT void
+reshape_lament(ModeInfo *mi, int width, int height)
 {
 	int         target_size = 180;
 	int         win_size = (width > height ? height : width);
@@ -2211,8 +2207,11 @@ reshape_lament(int width, int height)
 }
 
 static void
-free_lament(Display *display, lament_configuration *lc)
+free_lament_screen(Display *display, lament_configuration *lc)
 {
+	if (lc == NULL) {
+		return;
+	}
 	if (lc->glx_context) {
 #ifdef WIN32
 		wglMakeCurrent(hdc, lc->glx_context);
@@ -2232,6 +2231,13 @@ free_lament(Display *display, lament_configuration *lc)
 		XDestroyImage(lc->texture);
 		lc->texture = None;
 	}
+	lc = NULL;
+}
+
+ENTRYPOINT void
+free_lament(ModeInfo *mi)
+{
+	free_lament_screen(MI_DISPLAY(mi), &lcs[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -2341,7 +2347,7 @@ gl_init(ModeInfo * mi)
 	}
 #endif
 	if ((lc->box = glGenLists(16)) == 0) {
-		free_lament(MI_DISPLAY(mi), lc);
+		free_lament_screen(MI_DISPLAY(mi), lc);
 		return False;
 	}
 	lc->star1 = lc->box + 1;
@@ -2370,17 +2376,19 @@ gl_init(ModeInfo * mi)
 }
 
 
-void
+ENTRYPOINT void
 init_lament(ModeInfo * mi)
 {
 	lament_configuration *lc;
 
 	if (lcs == NULL) {
-		if ((lcs = (lament_configuration *) calloc(MI_NUM_SCREENS(mi),
-				 sizeof (lament_configuration))) == NULL) {
-			(void) fprintf(stderr, "out of memory\n");
-			return;
+		MI_INIT(mi, lcs);
+#ifdef STANDALONE
+		if (!lcs) {
+			fprintf(stderr, "%s: out of memory\n", progname);
+			exit(1);
 		}
+#endif
 	}
 	lc = &lcs[MI_SCREEN(mi)];
 	lc->window = MI_WINDOW(mi);
@@ -2408,7 +2416,7 @@ init_lament(ModeInfo * mi)
 	lc->anim_pause = 300 + (LRAND() % 100);
 
 	if ((lc->glx_context = init_GL(mi)) != NULL) {
-		reshape_lament(MI_WIDTH(mi), MI_HEIGHT(mi));
+		reshape_lament(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 		if (!gl_init(mi)) {
 			MI_CLEARWINDOW(mi);
 		}
@@ -2418,7 +2426,7 @@ init_lament(ModeInfo * mi)
 }
 
 
-void
+ENTRYPOINT void
 draw_lament(ModeInfo * mi)
 {
 	static int  tick = 0;
@@ -2459,11 +2467,26 @@ draw_lament(ModeInfo * mi)
 
 	if (++tick > 500) {
 		tick = 0;
-		reshape_lament(MI_WIDTH(mi), MI_HEIGHT(mi));
+		reshape_lament(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 	}
 }
 
-void
+ENTRYPOINT void
+release_lament(ModeInfo * mi)
+{
+	if (lcs != NULL) {
+		int         screen;
+
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_lament_screen(MI_DISPLAY(mi), &lcs[screen]);
+		free(lcs);
+		lcs = (lament_configuration *) NULL;
+	}
+	FreeAllGL(mi);
+}
+
+#ifndef STANDALONE
+ENTRYPOINT void
 change_lament(ModeInfo * mi)
 {
 	lament_configuration *lc;
@@ -2476,19 +2499,8 @@ change_lament(ModeInfo * mi)
 		return;
 	/* probably something needs to be added here */
 }
-
-void
-release_lament(ModeInfo * mi)
-{
-	if (lcs != NULL) {
-		int         screen;
-
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_lament(MI_DISPLAY(mi), &lcs[screen]);
-		free(lcs);
-		lcs = (lament_configuration *) NULL;
-	}
-	FreeAllGL(mi);
-}
-
 #endif
+
+XSCREENSAVER_MODULE ("Lament", lament)
+
+#endif /* MODE_lament */

@@ -1,6 +1,5 @@
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)b_lockglue.c  5.01 2001/03/01 xlockmore";
-
 #endif
 
 /*-
@@ -52,11 +51,8 @@ struct glb_config glb_config =
 
 #ifdef STANDALONE
 #define MODE_bubble3d
-#define PROGCLASS "Bubble3D"
-#define HACK_INIT init_bubble3d
-#define HACK_DRAW draw_bubble3d
-#define bubble3d_opts xlockmore_opts
 #define DEFAULTS	"*delay:	20000 \n"
+
 #include "xlockmore.h"
 #else
 #include "xlock.h"
@@ -65,14 +61,14 @@ struct glb_config glb_config =
 
 #ifdef MODE_bubble3d
 
-ModeSpecOpt bubble3d_opts =
+ENTRYPOINT ModeSpecOpt bubble3d_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   bubble3d_description =
 {(char *) "bubble3d", (char *) "init_bubble3d",
  (char *) "draw_bubble3d", (char *) "release_bubble3d",
- (char *) "draw_bubble3d", (char *) "change_bubble3d",
+ (char *) "draw_bubble3d", (char *) NULL,
  (char *) NULL, &bubble3d_opts,
  20000, 1, 1, 1, 64, 1.0, (char *) "",
  (char *) "Richard Jones's GL bubbles", 0, NULL};
@@ -97,8 +93,8 @@ init(struct context *c)
 	c->draw_context = glb_draw_init();
 }
 
-static void
-reshape(int w, int h)
+ENTRYPOINT void
+reshape_bubble3d(ModeInfo *mi, int w, int h)
 {
 	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 	glMatrixMode(GL_PROJECTION);
@@ -115,7 +111,7 @@ do_display(struct context *c)
 	glb_draw_step(c->draw_context);
 }
 
-void
+ENTRYPOINT void
 init_bubble3d(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -130,7 +126,7 @@ init_bubble3d(ModeInfo * mi)
 	c = &contexts[MI_SCREEN(mi)];
 	if ((c->glx_context = init_GL(mi)) != NULL) {
 		init(c);
-		reshape(MI_WIDTH(mi), MI_HEIGHT(mi));
+		reshape_bubble3d(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 		do_display(c);
 		glFinish();
 		glXSwapBuffers(display, window);
@@ -138,7 +134,7 @@ init_bubble3d(ModeInfo * mi)
 		MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_bubble3d(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -167,13 +163,7 @@ draw_bubble3d(ModeInfo * mi)
 	glXSwapBuffers(display, window);
 }
 
-void
-change_bubble3d(ModeInfo * mi)
-{
-	/* nothing */
-}
-
-void
+ENTRYPOINT void
 release_bubble3d(ModeInfo * mi)
 {
 
@@ -199,5 +189,7 @@ release_bubble3d(ModeInfo * mi)
 	}
 	FreeAllGL(mi);
 }
+
+XSCREENSAVER_MODULE ("Bubble3d", bubble3d)
 
 #endif /* MODE_bubble3d */

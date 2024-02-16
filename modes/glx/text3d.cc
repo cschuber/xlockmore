@@ -61,11 +61,6 @@ static const char sccsid[] = "@(#)text3d.cc	5.02 2001/11/09 xlockmore";
 
 #ifdef STANDALONE	/* xscreensaver mode: can't work ! */
 #define MODE_text3d
-#define PROGCLASS 	"Text3d"
-#define HACK_INIT 	init_text3d
-#define HACK_DRAW 	draw_text3d
-#define HACK_RESHAPE 	reshape_text3d
-#define text3d_opts 	xlockmore_opts
 #define DEFAULTS 	"*delay: 	100000 \n" \
  			"*ncolors: 	    64 \n" \
  			"*font: 	       \n" \
@@ -74,6 +69,7 @@ static const char sccsid[] = "@(#)text3d.cc	5.02 2001/11/09 xlockmore";
  			"*fortunefile: 	       \n" \
  			"*program: 	       \n"
 
+#define free_text3d 0
 extern "C"
 {
 #include "xlockmore.h"		/* from the xscreensaver distribution */
@@ -1045,14 +1041,16 @@ static void
  *-----------------------------------------------------------------------------
  */
 
-void
+ENTRYPOINT void
  init_text3d(ModeInfo * mi)
 {
     int i;
     text3dstruct *tp;
 
+
     if (text3d == NULL)
     {
+	/*MI_INIT(mi, text3d);*/
 	if ((text3d = (text3dstruct *) calloc(MI_NUM_SCREENS(mi),
 					      sizeof(text3dstruct))) == NULL)
 	    return;
@@ -1154,7 +1152,7 @@ void
  *    Called by the mainline code periodically to update the display.
  *-----------------------------------------------------------------------------
  */
-void
+ENTRYPOINT void
  draw_text3d(ModeInfo * mi)
 {
     Display *display = MI_DISPLAY(mi);
@@ -1213,7 +1211,7 @@ void
  *-----------------------------------------------------------------------------
  */
 
-void
+ENTRYPOINT void
  release_text3d(ModeInfo * mi)
 {
     if (text3d != NULL)
@@ -1231,13 +1229,14 @@ void
     FreeAllGL(mi);
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
  refresh_text3d(ModeInfo * mi)
 {
     /* Do nothing, it will refresh by itself :) */
 }
 
-void
+ENTRYPOINT void
  change_text3d(ModeInfo * mi)
 {
     text3dstruct *tp;
@@ -1256,5 +1255,6 @@ void
     glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(tp->glx_context));
 #endif
 }
+#endif
 
 #endif				/* MODE_text3d */

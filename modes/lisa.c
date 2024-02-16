@@ -38,18 +38,16 @@ static const char sccsid[] = "@(#)lisa.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_lisa
-#define PROGCLASS "Lisa"
-#define HACK_INIT init_lisa
-#define HACK_DRAW draw_lisa
-#define lisa_opts xlockmore_opts
 #define DEFAULTS "*delay: 25000 \n" \
- "*count: 1 \n" \
- "*cycles: 256 \n" \
- "*size: -1 \n" \
- "*ncolors: 200 \n"
+	"*count: 1 \n" \
+	"*cycles: 256 \n" \
+	"*size: -1 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_lisa 0
+# define lisa_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
-
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 
@@ -77,13 +75,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+additive", (char *) "turn on/off additive functions mode"}
 };
 
-ModeSpecOpt lisa_opts =
+ENTRYPOINT ModeSpecOpt lisa_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   lisa_description =
 {"lisa", "init_lisa", "draw_lisa", "release_lisa",
- "refresh_lisa", "change_lisa", (char *) NULL, &lisa_opts,
+ "refresh_lisa", "change_lisa", "free_lisa", &lisa_opts,
  25000, 1, 256, -1, 64, 1.0, "",
  "Shows animated lisajous loops", 0, NULL};
 
@@ -171,8 +169,11 @@ static lisafuncs Function[NUMSTDFUNCS] =
 };
 
 static void
-free_lisa(lisacons *lc)
+free_lisa_screen(lisacons *lc)
 {
+	if (lc == NULL) {
+		return;
+	}
 	while (lc->lisajous) {
 		int    lctr;
 
@@ -182,6 +183,13 @@ free_lisa(lisacons *lc)
 		free(lc->lisajous);
 		lc->lisajous = (lisas *) NULL;
 	}
+	lc = NULL;
+}
+
+ENTRYPOINT void
+free_lisa(ModeInfo * mi)
+{
+        free_lisa_screen(&Lisa[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -197,7 +205,7 @@ drawlisa(ModeInfo * mi, lisas * loop)
 
 	/* Allocate the np array */
 	if ((np = (XPoint *) calloc(loop->nsteps, sizeof (XPoint))) == NULL) {
-		free_lisa(lc);
+		free_lisa_screen(lc);
 		return False;
 	}
 
@@ -363,7 +371,7 @@ initlisa(ModeInfo * mi, lisas * loop)
 	lf[0] = &Function[lc->loopcount % NUMSTDFUNCS];
 	if ((lp = loop->lastpoint = (XPoint *)
 	     calloc(loop->nsteps, sizeof (XPoint))) == NULL) {
-		free_lisa(lc);
+		free_lisa_screen(lc);
 		return False;
 	}
 	phase = lc->loopcount % loop->nsteps;
@@ -438,26 +446,8 @@ refreshlisa(ModeInfo * mi)
 	}
 }
 
-void
-refresh_lisa(ModeInfo * mi)
-{
-	lisacons   *lc;
-
-	if (Lisa == NULL)
-		return;
-	lc = &Lisa[MI_SCREEN(mi)];
-	if (lc->lisajous == NULL)
-		return;
-
-	if (lc->painted) {
-		lc->painted = False;
-		MI_CLEARWINDOW(mi);
-		refreshlisa(mi);
-	}
-}
-
-void
-change_lisa(ModeInfo * mi)
+static void
+changelisa(ModeInfo * mi)
 {
 	lisas      *loop;
 	int         lctr;
@@ -479,17 +469,13 @@ change_lisa(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 init_lisa(ModeInfo * mi)
 {
 	int         lctr;
 	lisacons   *lc;
 
-	if (Lisa == NULL) {
-		if ((Lisa = (lisacons *) calloc(MI_NUM_SCREENS(mi),
-				 sizeof (lisacons))) == NULL)
-			return;
-	}
+	MI_INIT(mi, Lisa);	
 	lc = &Lisa[MI_SCREEN(mi)];
 	lc->width = MI_WIDTH(mi);
 	lc->height = MI_HEIGHT(mi);
@@ -514,7 +500,7 @@ init_lisa(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_lisa(ModeInfo * mi)
 {
 	lisacons   *lc;
@@ -528,23 +514,49 @@ draw_lisa(ModeInfo * mi)
 	MI_IS_DRAWN(mi) = True;
 	lc->painted = True;
 	if (++lc->loopcount > lc->maxcycles) {
-		change_lisa(mi);
+		changelisa(mi);
 	}
 	refreshlisa(mi);
 }
 
-void
+ENTRYPOINT void
 release_lisa(ModeInfo * mi)
 {
 	if (Lisa) {
 		int    screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_lisa(&Lisa[screen]);
+			free_lisa_screen(&Lisa[screen]);
 		free(Lisa);
 		Lisa = (lisacons *) NULL;
 	}
 }
+
+#ifndef STANDALONE
+ENTRYPOINT void
+refresh_lisa(ModeInfo * mi)
+{
+	lisacons   *lc;
+
+	if (Lisa == NULL)
+		return;
+	lc = &Lisa[MI_SCREEN(mi)];
+	if (lc->lisajous == NULL)
+		return;
+
+	if (lc->painted) {
+		lc->painted = False;
+		MI_CLEARWINDOW(mi);
+		refreshlisa(mi);
+	}
+}
+
+ENTRYPOINT void
+change_lisa(ModeInfo * mi)
+{
+	changelisa(mi);
+}
+#endif
 
 XSCREENSAVER_MODULE ("Lisa", lisa)
 

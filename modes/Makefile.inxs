@@ -103,77 +103,90 @@ UTIL_OBJS	= $(UTILS_BIN)/alpha.o $(UTILS_BIN)/colors.o \
 		  $(UTILS_BIN)/font-retry-xft.o
 
 XLOCKMORE_HDRS = $(XLOCK_SRC)/automata.h $(XLOCK_SRC)/iostuff.h \
-$(XLOCK_SRC)/spline.h $(XLOCK_SRC)/xbm.h
+$(XLOCK_SRC)/spline.h $(XLOCK_SRC)/xbm.h $(XLOCK_SRC)/color.h
 XLOCKMORE_SRCS = $(XLOCK_SRC)/automata.c
 #XLOCKMORE_SRCS = $(XLOCK_SRC)/iostuff.c $(XLOCK_SRC)/spline.c $(XLOCK_SRC)/xbm.c
-#XLOCKMORE_SRCS = $(XLOCK_SRC)/iostuff.c $(XLOCK_SRC)/spline.c $(XLOCK_SRC)/xbm.c
 XLOCKMORE_OBJS = $(XLOCK_SRC)/automata.o
-#XLOCKMORE_OBJS = $(XLOCK_BIN)/iostuff.o $(XLOCK_BIN)/spline.o $(XLOCK_BIN)/xbm.o
-#XLOCKMORE_OBJS = $(XLOCK_BIN)/iostuff.o $(XLOCK_BIN)/spline.o $(XLOCK_BIN)/xbm.o
+#XLOCKMORE_OBJS = $(XLOCK_BIN)/iostuff.o $(XLOCK_BIN)/spline.o $(XLOCK_BIN)/xbm.o 
 
 XLOCKMODESRCS = anemone.c ant.c ant3d.c apollonian.c \
 ball.c bat.c blot.c \
 bouboule.c bounce.c braid.c bubble.c bug.c \
 clock.c coral.c crystal.c \
-daisy.c dclock.c deco.c demon.c dilemma.c discrete.c drift.c \
-eyes.c fadeplot.c flag.c flame.c flow.c forest.c \
+daisy.c dclock.c decay.c deco.c deluxe.c \
+demon.c dilemma.c discrete.c dragon.c drift.c \
+euler2d.c eyes.c fadeplot.c fiberlamp.c \
+flag.c flame.c flow.c forest.c fzort.c \
 galaxy.c goop.c grav.c \
 helix.c hop.c hyper.c \
-ico.c ifs.c image.c julia.c kaleid.c \
+ico.c ifs.c image.c juggle.c julia.c kaleid.c kumppa.c \
 laser.c life.c life1d.c life3d.c \
-lightning.c lisa.c lissie.c loop.c \
-mandelbrot.c marquee.c maze.c mountain.c munch.c nose.c \
-pacman.c penrose.c petal.c puzzle.c pyro.c \
-qix.c roll.c rotor.c \
-shape.c sierpinski.c slip.c \
-sphere.c spiral.c spline.c \
-star.c strange.c swarm.c swirl.c \
-thornbird.c triangle.c tube.c turtle.c \
+lightning.c lisa.c lissie.c loop.c lyapunov.c \
+mandelbrot.c marquee.c maze.c mountain.c munch.c \
+nose.c pacman.c penrose.c petal.c petri.c \
+polyominoes.c puzzle.c pyro.c pyro2.c \
+qix.c rain.c roll.c rotor.c \
+scooter.c shape.c sierpinski.c slip.c \
+space.c sphere.c spiral.c spline.c \
+star.c starfish.c strange.c swarm.c swirl.c \
+t3d.c tetris.c thornbird.c tik_tak.c toneclock.c \
+triangle.c tube.c turtle.c \
 vines.c voters.c \
-wator.c wire.c world.c worm.c xcl.c \
-blank.c bomb.c
+wator.c wire.c world.c worm.c xcl.c xjack.c \
+blank.c bomb.c run.c \
+random.c
 XLOCKMODEOBJS = anemone.o ant.o ant3d.o apollonian.o \
 ball.o bat.o blot.o \
 bouboule.o bounce.o braid.o bubble.o bug.o \
 clock.o coral.o crystal.o \
-daisy.o deco.o dclock.o demon.o dilemma.o discrete.o drift.o \
-eyes.o fadeplot.o flag.o flame.o flow.o forest.o \
+daisy.o dclock.o decay.o deco.o deluxe.o \
+demon.o dilemma.o discrete.o dragon.o drift.o \
+euler2d.o eyes.o fadeplot.o fiberlamp.o \
+flag.o flame.o flow.o forest.o fzort.o \
 galaxy.o goop.o grav.o \
 helix.o hop.o hyper.o \
-ico.o ifs.o image.o julia.o kaleid.o \
+ico.o ifs.o image.o juggle.o julia.o kaleid.o kumppa.o \
 laser.o life.o life1d.o life3d.o \
-lightning.o lisa.o lissie.o loop.o \
-mandelbrot.o marquee.o maze.o mountain.o munch.o nose.o \
-pacman.o penrose.o petal.o puzzle.o pyro.o \
-qix.o roll.o rotor.o \
-shape.o sierpinski.o slip.o \
-sphere.o spiral.o spline.o \
-star.o strange.o swarm.o swirl.o \
-thornbird.o triangle.o tube.o turtle.o \
+lightning.o lisa.o lissie.o loop.o lyapunov.o \
+mandelbrot.o marquee.o maze.o mountain.o munch.o \
+nose.o pacman.o penrose.o petal.o petri.o \
+polyominoes.o puzzle.o pyro.o pyro2.o \
+qix.o rain.o roll.o rotor.o \
+scooter.o shape.o sierpinski.o slip.o \
+space.o sphere.o spiral.o spline.o \
+star.o starfish.o strange.o swarm.o swirl.o \
+t3d.o tetris.o thornbird.o tik_tak.o toneclock.o \
+triangle.o tube.o turtle.o \
 vines.o voters.o \
-wator.o wire.o world.o worm.o xcl.o \
-blank.o bomb.o
+wator.o wire.o world.o worm.o xcl.o xjack.o \
+blank.o bomb.o run.o \
+random.o
 XLOCKMODEEXES = anemone ant ant3d apollonian \
 ball bat blot \
 bouboule bounce braid bubble bug \
 clock coral crystal \
-daisy dclock deco demon dilemma discrete drift \
-eyes fadeplot flame flag flow forest \
+daisy dclock decay deco demon deluxe \
+dilemma discrete dragon drift \
+eyes euler2d fadeplot fiberlamp \
+flag flame flow forest fzort \
 galaxy goop grav \
-helix hop hyper \
-ico ifs image julia kaleid \
+helix hop \
+ico ifs image juggle julia kaleid kumppa \
 laser life life1d life3d \
-lightning lisa lissie loop \
-mandelbrot marquee maze mountain munch nose \
-pacman penrose petal puzzle pyro \
-qix roll rotor \
-shape sierpinski slip \
-sphere spiral spline \
-star strange swarm swirl \
-thornbird triangle tube turtle \
+lightning lisa lissie loop lyapunov \
+mandelbrot marquee maze mountain munch \
+nose pacman penrose petal petri \
+polyominoes puzzle pyro pyro2 \
+qix rain roll rotor \
+scooter shape sierpinski slip \
+space sphere spiral spline \
+star starfish strange swarm swirl \
+t3d tetris thornbird tik_tak toneclock \
+triangle tube turtle \
 vines voters \
-wator wire world worm xcl \
-blank bomb
+wator wire world worm xcl xjack \
+blank bomb run
+#random
 
 # List of source files
 BITMAPS = bat.xbm bounce.xbm decay.xbm eyes.xbm eyes2.xbm flag.xbm \
@@ -808,9 +821,6 @@ greynetic:	greynetic.o	$(HACK_OBJS)
 halo:		halo.o		$(HACK_OBJS) $(COL)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
 
-helix:		helix.o		$(HACK_OBJS) $(HSV) $(ERASE)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HSV) $(ERASE) $(HACK_LIBS)
-
 hypercube:	hypercube.o	$(HACK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HACK_LIBS)
 
@@ -822,9 +832,6 @@ kaleidescope:	kaleidescope.o	$(HACK_OBJS)
 
 lmorph:		lmorph.o	$(HACK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HACK_LIBS)
-
-maze:		maze.o		$(HACK_OBJS) $(ERASE) $(PNG)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(ERASE) $(PNG) $(PNG_LIBS)
 
 moire:		moire.o		$(HACK_OBJS) $(COL) $(SHM)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(SHM) $(HACK_LIBS) $(THRL)
@@ -838,12 +845,6 @@ noseguy:	noseguy.o	$(HACK_OBJS) $(PNG) $(TEXT)
 pedal:		pedal.o		$(HACK_OBJS) $(HSV) $(ERASE)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HSV) $(ERASE) $(HACK_LIBS)
 
-pyro:		pyro.o		$(HACK_OBJS) $(HSV)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HSV) $(HACK_LIBS)
-
-qix:		qix.o		$(HACK_OBJS) $(HSV) $(ALP)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HSV) $(ALP) $(HACK_LIBS)
-
 rocks:		rocks.o		$(HACK_OBJS) $(COL)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
 
@@ -853,23 +854,8 @@ rorschach:	rorschach.o	$(HACK_OBJS) $(HSV) $(ERASE)
 slidescreen:	slidescreen.o	$(HACK_OBJS) $(GRAB)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(GRAB) $(HACK_LIBS)
 
-goop:		goop.o		$(HACK_OBJS) $(HSV) $(ALP) $(SPL)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HSV) $(ALP) $(SPL) $(HACK_LIBS)
-
-starfish:	starfish.o	$(HACK_OBJS) $(COL) $(SPL)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(SPL) $(HACK_LIBS)
-
-munch:		munch.o		$(HACK_OBJS) $(COL) $(SPL)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(SPL) $(HACK_LIBS)
-
 rd-bomb:	rd-bomb.o	$(HACK_OBJS) $(COL) $(SHM)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(SHM) $(HACK_LIBS) $(THRL)
-
-coral:	 	coral.o		$(HACK_OBJS) $(COL) $(ERASE)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(ERASE) $(HACK_LIBS)
-
-xjack:	 	xjack.o		$(HACK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HACK_LIBS)
 
 xlyap:	 	xlyap.o		$(HACK_OBJS) $(COL)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
@@ -913,17 +899,8 @@ clean::
 distort:	distort.o	$(HACK_OBJS) $(GRAB) $(SHM)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(GRAB) $(SHM) $(HACK_LIBS) $(THRL)
 
-kumppa:		kumppa.o	$(HACK_OBJS) $(DBE)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(DBE) $(HACK_LIBS)
-
-t3d:		t3d.o		$(HACK_OBJS) $(COL)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
-
 penetrate:	penetrate.o	$(HACK_OBJS) $(COL)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
-
-deluxe:		deluxe.o	$(HACK_OBJS) $(ALP) $(COL) $(DBE)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(ALP) $(COL) $(DBE) $(HACK_LIBS)
 
 compass:	compass.o	$(HACK_OBJS) $(DBE)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(DBE) $(HACK_LIBS)
@@ -948,9 +925,6 @@ phosphor:	phosphor.o	$(HACK_OBJS) $(TEXT) $(COL) $(PNG)
 
 xmatrix:	xmatrix.o	$(HACK_OBJS) $(TEXT) $(PNG)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(TEXT) $(PNG) $(PNG_LIBS) $(TEXT_LIBS)
-
-petri:		petri.o		$(HACK_OBJS) $(COL) $(SPL)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(SPL) $(HACK_LIBS)
 
 shadebobs:	shadebobs.o	$(HACK_OBJS) $(COL) $(SPL)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(SPL) $(HACK_LIBS)
@@ -1002,9 +976,6 @@ twang:		twang.o		$(HACK_OBJS) $(GRAB) $(SHM)
 
 fluidballs:	fluidballs.o	$(HACK_OBJS) $(DBE)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(DBE) $(HACK_LIBS)
-
-anemone:	anemone.o	$(HACK_OBJS) $(COL) $(DBE)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(DBE) $(HACK_LIBS)
 
 halftone:	halftone.o	$(HACK_OBJS) $(COL)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
@@ -1060,9 +1031,6 @@ fireworkx:	fireworkx.o	$(HACK_OBJS) $(COL)
 boxfit:		boxfit.o	$(HACK_OBJS) $(COL) $(GRAB)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(GRAB) $(HACK_LIBS)
 
-ifs:		ifs.o		$(HACK_OBJS) $(COL)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
-
 celtic:		celtic.o	$(HACK_OBJS) $(COL) $(ERASE)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(ERASE) $(HACK_LIBS)
 
@@ -1103,66 +1071,21 @@ vfeedback: 	vfeedback.o	$(HACK_OBJS) $(ATV) $(GRAB) $(PNG)
 testx11:	testx11.o	glx/rotator.o $(HACK_OBJS) $(COL) $(PNG) $(BARS) $(ERASE)
 	$(CC_HACK) -o $@ $@.o	glx/rotator.o $(HACK_OBJS) $(COL) $(PNG) $(BARS) $(ERASE) $(PNG_LIBS)
 
+# These are not like the others.
+#
+xsublim:	xsublim.o	$(HACK_OBJS_1)
+	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS_1) $(HACK_LIBS)
+
+webcollage-helper: webcollage-helper.o
+	$(CC_HACK) -o $@ $@.o	$(PNG_LIBS) $(JPEG_LIBS)
+
+
 glx/rotator.o:	glx/rotator.c
 	cd glx ; \
 	$(MAKE) $(@F) CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 # The rules for those hacks which follow the `xlockmore' API.
 #
-
-drift:		drift.o		$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-flag:		flag.o		$(XLOCK_OBJS) $(PNG)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(PNG) $(PNG_LIBS)
-
-forest:		forest.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-vines:		vines.o		$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-galaxy:		galaxy.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-grav:		grav.o		$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-hopalong:	hopalong.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-julia:		julia.o		$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-laser:		laser.o		$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-lightning:	lightning.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-lisa:		lisa.o		$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-lissie:		lissie.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-penrose:	penrose.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-sierpinski:	sierpinski.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-slip:		slip.o		$(XLOCK_OBJS) $(GRAB)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(GRAB) $(HACK_LIBS)
-
-sphere:		sphere.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-spiral:		spiral.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
-
-strange:	strange.o	$(XLOCK_OBJS) $(SHM) $(UTILS_BIN)/pow2.o
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(SHM) $(UTILS_BIN)/pow2.o $(HACK_LIBS) $(THRL)
 
 anemone:	anemone.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
@@ -1182,7 +1105,13 @@ ball:		ball.o		$(XLOCK_OBJS)
 bat:		bat.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
+blank:		blank.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
 blot:		blot.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+bomb:		bomb.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 bouboule:	bouboule.o	$(XLOCK_OBJS)
@@ -1194,77 +1123,352 @@ bounce:		bounce.o	$(XLOCK_OBJS)
 braid:		braid.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
+bubble:		bubble.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+bug:		bug.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+clock:		clock.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#coral:	 	coral.o		$(HACK_OBJS) $(COL) $(ERASE)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(ERASE) $(HACK_LIBS)
+coral:		coral.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
 crystal:	crystal.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
-deco:		deco.o		$(HACK_OBJS) $(COL)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
+daisy:		daisy.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+dclock:		dclock.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+decay:		decay.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#deco:		deco.o		$(HACK_OBJS) $(COL)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
+deco:		deco.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#deluxe:		deluxe.o	$(HACK_OBJS) $(ALP) $(COL) $(DBE)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(ALP) $(COL) $(DBE) $(HACK_LIBS)
+deluxe:		deluxe.o	$(XLOCK_OBJS) $(ALP) $(DBE)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(ALP) $(DBE) $(HACK_LIBS)
 
 demon:		demon.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+dilemma:	dilemma.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 discrete:	discrete.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
+dragon:		dragon.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+drift:		drift.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
 euler2d:	euler2d.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+eyes:		eyes.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 fadeplot:	fadeplot.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
-flame:		flame.o		$(HACK_OBJS) $(COL)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
+fiberlamp:	fiberlamp.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#flag:		flag.o		$(XLOCK_OBJS) $(PNG)
+#	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(PNG) $(PNG_LIBS)
+flag:		flag.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#flame:		flame.o		$(HACK_OBJS) $(COL)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
+flame:		flame.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 flow:		flow.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+forest:		forest.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+fzort:		fzort.o		$(XLOCK_OBJS) $(SHM)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(SHM) $(HACK_LIBS) $(THRL)
+
+galaxy:		galaxy.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#goop:		goop.o		$(HACK_OBJS) $(HSV) $(ALP) $(SPL)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HSV) $(ALP) $(SPL) $(HACK_LIBS)
+goop:		goop.o		$(XLOCK_OBJS) $(SPL)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(SPL) $(HACK_LIBS)
+
+grav:		grav.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#helix:		helix.o		$(HACK_OBJS) $(HSV) $(ERASE)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HSV) $(ERASE) $(HACK_LIBS)
+helix:		helix.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#hopalong:	hopalong.o	$(XLOCK_OBJS)
+hop:		hop.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+hyper:		hyper.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+ico:		ico.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#ifs:		ifs.o		$(HACK_OBJS) $(COL)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
+ifs:		ifs.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+image:		image.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+julia:		julia.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 juggle:		juggle.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
+kaleid:		kaleid.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#kumppa:		kumppa.o	$(HACK_OBJS) $(DBE)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(DBE) $(HACK_LIBS)
+kumppa:		kumppa.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+laser:		laser.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+life:		life.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+life1d:		life1d.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+life3d:		life3d.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+lightning:	lightning.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+lisa:		lisa.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+lissie:		lissie.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
 loop:		loop.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+lyapunov:	lyapunov.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+mandelbrot:	mandelbrot.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+marquee:	marquee.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 mountain:	mountain.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
+matrix:		matrix.		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+maze:		maze.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+#maze:		maze.o		$(HACK_OBJS) $(ERASE) $(PNG)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(ERASE) $(PNG) $(PNG_LIBS)
+
+#munch:		munch.o		$(HACK_OBJS) $(COL) $(SPL)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(SPL) $(HACK_LIBS)
+munch:		munch.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+nose:		nose.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#PACOBJS=pacman_ai.o pacman_level.o
+#pacman:		pacman.o 	$(PACOBJS) $(XLOCK_OBJS) $(PNG)
+#	$(CC_HACK) -o $@ $@.o	$(PACOBJS) $(XLOCK_OBJS) $(PNG) $(PNG_LIBS)
+pacman:		pacman.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+penrose:	penrose.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+petal:		petal.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#petri:		petri.o		$(HACK_OBJS) $(COL) $(SPL)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(SPL) $(HACK_LIBS)
+petri:		petri.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
 polyominoes:	polyominoes.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+puzzle:		puzzle.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+pyro2:		pyro2.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#pyro:		pyro.o		$(HACK_OBJS) $(HSV)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HSV) $(HACK_LIBS)
+pyro:		pyro.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#qix:		qix.o		$(HACK_OBJS) $(HSV) $(ALP)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HSV) $(ALP) $(HACK_LIBS)
+qix:		qix.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+rain:		rain.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+random:		random.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 rotor:		rotor.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
-swirl:		swirl.o		$(XLOCK_OBJS) $(SHM)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(SHM) $(HACK_LIBS) $(THRL)
+roll:		roll.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+run:		run.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+scooter:	scooter.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+shape:		shape.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+sierpinski:	sierpinski.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+slip:		slip.o		$(XLOCK_OBJS) $(GRAB)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(GRAB) $(HACK_LIBS)
+
+space:		space.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+sphere:		sphere.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+spiral:		spiral.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+spline:		spline.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+star:		star.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#starfish:	starfish.o	$(HACK_OBJS) $(COL) $(SPL)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(SPL) $(HACK_LIBS)
+starfish:	starfish.o	$(XLOCK_OBJS) $(SPL)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(SPL) $(HACK_LIBS)
+
+strange:	strange.o	$(XLOCK_OBJS) $(SHM) $(UTILS_BIN)/pow2.o
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(SHM) $(UTILS_BIN)/pow2.o $(HACK_LIBS) $(THRL)
+
+swarm:		swarm.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#swirl:		swirl.o		$(XLOCK_OBJS) $(SHM)
+#	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(SHM) $(HACK_LIBS) $(THRL)
+swirl:		swirl.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+#t3d:		t3d.o		$(HACK_OBJS) $(COL)
+#	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
+t3d:		t3d.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+tetris:	tetris.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 thornbird:	thornbird.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+tik_tak:	tik_tak.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+toneclock:	toneclock.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 triangle:	triangle.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
+tube:		tube.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+turtle:		turtle.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+vines:		vines.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+voters:		voters.o	$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+wator:		wator.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+wire:		wire.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
+world:		world.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+
 worm:		worm.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
-PACOBJS=pacman_ai.o pacman_level.o
-pacman:		pacman.o 	$(PACOBJS) $(XLOCK_OBJS) $(PNG)
-	$(CC_HACK) -o $@ $@.o	$(PACOBJS) $(XLOCK_OBJS) $(PNG) $(PNG_LIBS)
-
-fiberlamp:	fiberlamp.o	$(XLOCK_OBJS)
+xcl:		xcl.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
-# These are not like the others.
-#
-xsublim:	xsublim.o	$(HACK_OBJS_1)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS_1) $(HACK_LIBS)
-
-webcollage-helper: webcollage-helper.o
-	$(CC_HACK) -o $@ $@.o	$(PNG_LIBS) $(JPEG_LIBS)
-
+#xjack:	 	xjack.o		$(HACK_OBJS)
+xjack:		xjack.o		$(XLOCK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 ##############################################################################
 #
 # DO NOT DELETE: updated by make distdepend
 
+anemone.o: $(srcdir)/../../config.h
+anemone.o: $(HACKS_SRC)/fps.h
+anemone.o: $(HACKS_SRC)/recanim.h
+anemone.o: $(HACKS_SRC)/screenhackI.h
+anemone.o: $(UTILS_SRC)/colors.h
+anemone.o: $(UTILS_SRC)/font-retry.h
+anemone.o: $(UTILS_SRC)/grabscreen.h
+anemone.o: $(UTILS_SRC)/hsv.h
+anemone.o: $(UTILS_SRC)/resources.h
+anemone.o: $(UTILS_SRC)/usleep.h
+anemone.o: $(UTILS_SRC)/visual.h
+anemone.o: $(UTILS_SRC)/xdbe.h
+anemone.o: $(UTILS_SRC)/yarandom.h
+anemone.o: $(HACKS_SRC)/xlockmoreI.h
+anemone.o: $(HACKS_SRC)/xlockmore.h
 ant.o: $(srcdir)/../../config.h
 ant.o: $(HACKS_SRC)/fps.h
 ant.o: $(HACKS_SRC)/recanim.h
@@ -1333,6 +1537,21 @@ bat.o: $(srcdir)/../bitmaps/bat-3.xbm
 bat.o: $(srcdir)/../bitmaps/bat-4.xbm
 bat.o: $(srcdir)/bat.xbm
 bat.o: $(srcdir)/bat.xpm
+blank.o: $(srcdir)/../../config.h
+blank.o: $(HACKS_SRC)/fps.h
+blank.o: $(HACKS_SRC)/recanim.h
+blank.o: $(HACKS_SRC)/screenhackI.h
+blank.o: $(UTILS_SRC)/colors.h
+blank.o: $(UTILS_SRC)/erase.h
+blank.o: $(UTILS_SRC)/font-retry.h
+blank.o: $(UTILS_SRC)/grabscreen.h
+blank.o: $(UTILS_SRC)/hsv.h
+blank.o: $(UTILS_SRC)/resources.h
+blank.o: $(UTILS_SRC)/usleep.h
+blank.o: $(UTILS_SRC)/visual.h
+blank.o: $(UTILS_SRC)/yarandom.h
+blank.o: $(HACKS_SRC)/xlockmoreI.h
+blank.o: $(HACKS_SRC)/xlockmore.h
 blot.o: $(srcdir)/../../config.h
 blot.o: $(HACKS_SRC)/fps.h
 blot.o: $(HACKS_SRC)/recanim.h
@@ -1348,6 +1567,21 @@ blot.o: $(UTILS_SRC)/visual.h
 blot.o: $(UTILS_SRC)/yarandom.h
 blot.o: $(HACKS_SRC)/xlockmoreI.h
 blot.o: $(HACKS_SRC)/xlockmore.h
+bomb.o: $(srcdir)/../../config.h
+bomb.o: $(HACKS_SRC)/fps.h
+bomb.o: $(HACKS_SRC)/recanim.h
+bomb.o: $(HACKS_SRC)/screenhackI.h
+bomb.o: $(UTILS_SRC)/colors.h
+bomb.o: $(UTILS_SRC)/erase.h
+bomb.o: $(UTILS_SRC)/font-retry.h
+bomb.o: $(UTILS_SRC)/grabscreen.h
+bomb.o: $(UTILS_SRC)/hsv.h
+bomb.o: $(UTILS_SRC)/resources.h
+bomb.o: $(UTILS_SRC)/usleep.h
+bomb.o: $(UTILS_SRC)/visual.h
+bomb.o: $(UTILS_SRC)/yarandom.h
+bomb.o: $(HACKS_SRC)/xlockmoreI.h
+bomb.o: $(HACKS_SRC)/xlockmore.h
 bouboule.o: $(srcdir)/../../config.h
 bouboule.o: $(HACKS_SRC)/fps.h
 bouboule.o: $(HACKS_SRC)/recanim.h
@@ -1400,6 +1634,1416 @@ braid.o: $(UTILS_SRC)/visual.h
 braid.o: $(UTILS_SRC)/yarandom.h
 braid.o: $(HACKS_SRC)/xlockmoreI.h
 braid.o: $(HACKS_SRC)/xlockmore.h
+bubble.o: $(srcdir)/../../config.h
+bubble.o: $(HACKS_SRC)/fps.h
+bubble.o: $(HACKS_SRC)/recanim.h
+bubble.o: $(HACKS_SRC)/screenhackI.h
+bubble.o: $(UTILS_SRC)/colors.h
+bubble.o: $(UTILS_SRC)/erase.h
+bubble.o: $(UTILS_SRC)/font-retry.h
+bubble.o: $(UTILS_SRC)/grabscreen.h
+bubble.o: $(UTILS_SRC)/hsv.h
+bubble.o: $(UTILS_SRC)/resources.h
+bubble.o: $(UTILS_SRC)/usleep.h
+bubble.o: $(UTILS_SRC)/visual.h
+bubble.o: $(UTILS_SRC)/yarandom.h
+bubble.o: $(HACKS_SRC)/xlockmoreI.h
+bubble.o: $(HACKS_SRC)/xlockmore.h
+bug.o: $(srcdir)/../../config.h
+bug.o: $(HACKS_SRC)/fps.h
+bug.o: $(HACKS_SRC)/recanim.h
+bug.o: $(HACKS_SRC)/screenhackI.h
+bug.o: $(UTILS_SRC)/colors.h
+bug.o: $(UTILS_SRC)/erase.h
+bug.o: $(UTILS_SRC)/font-retry.h
+bug.o: $(UTILS_SRC)/grabscreen.h
+bug.o: $(UTILS_SRC)/hsv.h
+bug.o: $(UTILS_SRC)/resources.h
+bug.o: $(UTILS_SRC)/usleep.h
+bug.o: $(UTILS_SRC)/visual.h
+bug.o: $(UTILS_SRC)/yarandom.h
+bug.o: $(HACKS_SRC)/xlockmoreI.h
+bug.o: $(HACKS_SRC)/xlockmore.h
+clock.o: $(srcdir)/../../config.h
+clock.o: $(HACKS_SRC)/fps.h
+clock.o: $(HACKS_SRC)/recanim.h
+clock.o: $(HACKS_SRC)/screenhackI.h
+clock.o: $(UTILS_SRC)/colors.h
+clock.o: $(UTILS_SRC)/erase.h
+clock.o: $(UTILS_SRC)/font-retry.h
+clock.o: $(UTILS_SRC)/grabscreen.h
+clock.o: $(UTILS_SRC)/hsv.h
+clock.o: $(UTILS_SRC)/resources.h
+clock.o: $(UTILS_SRC)/usleep.h
+clock.o: $(UTILS_SRC)/visual.h
+clock.o: $(UTILS_SRC)/yarandom.h
+clock.o: $(HACKS_SRC)/xlockmoreI.h
+clock.o: $(HACKS_SRC)/xlockmore.h
+coral.o: $(srcdir)/../../config.h
+coral.o: $(HACKS_SRC)/fps.h
+coral.o: $(HACKS_SRC)/recanim.h
+coral.o: $(HACKS_SRC)/screenhackI.h
+#coral.o: $(HACKS_SRC)/screenhack.h
+coral.o: $(UTILS_SRC)/colors.h
+coral.o: $(UTILS_SRC)/erase.h
+coral.o: $(UTILS_SRC)/font-retry.h
+coral.o: $(UTILS_SRC)/grabscreen.h
+coral.o: $(UTILS_SRC)/hsv.h
+coral.o: $(UTILS_SRC)/resources.h
+coral.o: $(UTILS_SRC)/usleep.h
+coral.o: $(UTILS_SRC)/visual.h
+coral.o: $(UTILS_SRC)/yarandom.h
+coral.o: $(HACKS_SRC)/xlockmoreI.h
+coral.o: $(HACKS_SRC)/xlockmore.h
+crystal.o: $(srcdir)/../../config.h
+crystal.o: $(HACKS_SRC)/fps.h
+crystal.o: $(HACKS_SRC)/recanim.h
+crystal.o: $(HACKS_SRC)/screenhackI.h
+crystal.o: $(UTILS_SRC)/colors.h
+crystal.o: $(UTILS_SRC)/erase.h
+crystal.o: $(UTILS_SRC)/font-retry.h
+crystal.o: $(UTILS_SRC)/grabscreen.h
+crystal.o: $(UTILS_SRC)/hsv.h
+crystal.o: $(UTILS_SRC)/resources.h
+crystal.o: $(UTILS_SRC)/usleep.h
+crystal.o: $(UTILS_SRC)/visual.h
+crystal.o: $(UTILS_SRC)/yarandom.h
+crystal.o: $(HACKS_SRC)/xlockmoreI.h
+crystal.o: $(HACKS_SRC)/xlockmore.h
+daisy.o: $(srcdir)/../../config.h
+daisy.o: $(HACKS_SRC)/fps.h
+daisy.o: $(HACKS_SRC)/recanim.h
+daisy.o: $(HACKS_SRC)/screenhackI.h
+daisy.o: $(UTILS_SRC)/colors.h
+daisy.o: $(UTILS_SRC)/erase.h
+daisy.o: $(UTILS_SRC)/font-retry.h
+daisy.o: $(UTILS_SRC)/grabscreen.h
+daisy.o: $(UTILS_SRC)/hsv.h
+daisy.o: $(UTILS_SRC)/resources.h
+daisy.o: $(UTILS_SRC)/usleep.h
+daisy.o: $(UTILS_SRC)/visual.h
+daisy.o: $(UTILS_SRC)/yarandom.h
+daisy.o: $(HACKS_SRC)/xlockmoreI.h
+daisy.o: $(HACKS_SRC)/xlockmore.h
+dclock.o: $(srcdir)/../../config.h
+dclock.o: $(HACKS_SRC)/fps.h
+dclock.o: $(HACKS_SRC)/recanim.h
+dclock.o: $(HACKS_SRC)/screenhackI.h
+dclock.o: $(UTILS_SRC)/colors.h
+dclock.o: $(UTILS_SRC)/erase.h
+dclock.o: $(UTILS_SRC)/font-retry.h
+dclock.o: $(UTILS_SRC)/grabscreen.h
+dclock.o: $(UTILS_SRC)/hsv.h
+dclock.o: $(UTILS_SRC)/resources.h
+dclock.o: $(UTILS_SRC)/usleep.h
+dclock.o: $(UTILS_SRC)/visual.h
+dclock.o: $(UTILS_SRC)/yarandom.h
+dclock.o: $(HACKS_SRC)/xlockmoreI.h
+dclock.o: $(HACKS_SRC)/xlockmore.h
+decay.o: $(srcdir)/../../config.h
+decay.o: $(HACKS_SRC)/fps.h
+decay.o: $(HACKS_SRC)/recanim.h
+decay.o: $(HACKS_SRC)/screenhackI.h
+decay.o: $(UTILS_SRC)/colors.h
+decay.o: $(UTILS_SRC)/erase.h
+decay.o: $(UTILS_SRC)/font-retry.h
+decay.o: $(UTILS_SRC)/grabscreen.h
+decay.o: $(UTILS_SRC)/hsv.h
+decay.o: $(UTILS_SRC)/resources.h
+decay.o: $(UTILS_SRC)/usleep.h
+decay.o: $(UTILS_SRC)/visual.h
+decay.o: $(UTILS_SRC)/yarandom.h
+decay.o: $(HACKS_SRC)/xlockmoreI.h
+decay.o: $(HACKS_SRC)/xlockmore.h
+decay.o: $(srcdir)/decay.xbm
+decay.o: $(srcdir)/decay.xpm
+deco.o: $(srcdir)/../../config.h
+deco.o: $(HACKS_SRC)/fps.h
+deco.o: $(HACKS_SRC)/recanim.h
+deco.o: $(HACKS_SRC)/screenhackI.h
+#deco.o: $(HACKS_SRC)/screenhack.h
+deco.o: $(UTILS_SRC)/colors.h
+deco.o: $(UTILS_SRC)/font-retry.h
+deco.o: $(UTILS_SRC)/grabscreen.h
+deco.o: $(UTILS_SRC)/hsv.h
+deco.o: $(UTILS_SRC)/resources.h
+deco.o: $(UTILS_SRC)/usleep.h
+deco.o: $(UTILS_SRC)/visual.h
+deco.o: $(UTILS_SRC)/yarandom.h
+deco.o: $(HACKS_SRC)/xlockmoreI.h
+deco.o: $(HACKS_SRC)/xlockmore.h
+deluxe.o: $(srcdir)/../../config.h
+deluxe.o: $(HACKS_SRC)/fps.h
+deluxe.o: $(HACKS_SRC)/recanim.h
+deluxe.o: $(HACKS_SRC)/screenhackI.h
+deluxe.o: $(UTILS_SRC)/alpha.h
+deluxe.o: $(UTILS_SRC)/colors.h
+deluxe.o: $(UTILS_SRC)/font-retry.h
+deluxe.o: $(UTILS_SRC)/grabscreen.h
+deluxe.o: $(UTILS_SRC)/hsv.h
+deluxe.o: $(UTILS_SRC)/resources.h
+deluxe.o: $(UTILS_SRC)/usleep.h
+deluxe.o: $(UTILS_SRC)/visual.h
+deluxe.o: $(UTILS_SRC)/xdbe.h
+deluxe.o: $(UTILS_SRC)/yarandom.h
+deluxe.o: $(HACKS_SRC)/xlockmoreI.h
+deluxe.o: $(HACKS_SRC)/xlockmore.h
+demon.o: $(HACKS_SRC)/automata.h
+demon.o: $(srcdir)/../../config.h
+demon.o: $(HACKS_SRC)/fps.h
+demon.o: $(HACKS_SRC)/recanim.h
+demon.o: $(HACKS_SRC)/screenhackI.h
+demon.o: $(UTILS_SRC)/colors.h
+demon.o: $(UTILS_SRC)/erase.h
+demon.o: $(UTILS_SRC)/font-retry.h
+demon.o: $(UTILS_SRC)/grabscreen.h
+demon.o: $(UTILS_SRC)/hsv.h
+demon.o: $(UTILS_SRC)/resources.h
+demon.o: $(UTILS_SRC)/usleep.h
+demon.o: $(UTILS_SRC)/visual.h
+demon.o: $(UTILS_SRC)/yarandom.h
+demon.o: $(HACKS_SRC)/xlockmoreI.h
+demon.o: $(HACKS_SRC)/xlockmore.h
+demon.o: $(HACKS_SRC)/automata.h
+dilemma.o: $(srcdir)/../../config.h
+dilemma.o: $(HACKS_SRC)/fps.h
+dilemma.o: $(HACKS_SRC)/recanim.h
+dilemma.o: $(HACKS_SRC)/screenhackI.h
+dilemma.o: $(UTILS_SRC)/colors.h
+dilemma.o: $(UTILS_SRC)/erase.h
+dilemma.o: $(UTILS_SRC)/font-retry.h
+dilemma.o: $(UTILS_SRC)/grabscreen.h
+dilemma.o: $(UTILS_SRC)/hsv.h
+dilemma.o: $(UTILS_SRC)/resources.h
+dilemma.o: $(UTILS_SRC)/usleep.h
+dilemma.o: $(UTILS_SRC)/visual.h
+dilemma.o: $(UTILS_SRC)/yarandom.h
+dilemma.o: $(HACKS_SRC)/xlockmoreI.h
+dilemma.o: $(HACKS_SRC)/xlockmore.h
+dilemma.o: $(HACKS_SRC)/automata.h
+discrete.o: $(srcdir)/../../config.h
+discrete.o: $(HACKS_SRC)/fps.h
+discrete.o: $(HACKS_SRC)/recanim.h
+discrete.o: $(HACKS_SRC)/screenhackI.h
+discrete.o: $(UTILS_SRC)/colors.h
+discrete.o: $(UTILS_SRC)/erase.h
+discrete.o: $(UTILS_SRC)/font-retry.h
+discrete.o: $(UTILS_SRC)/grabscreen.h
+discrete.o: $(UTILS_SRC)/hsv.h
+discrete.o: $(UTILS_SRC)/resources.h
+discrete.o: $(UTILS_SRC)/usleep.h
+discrete.o: $(UTILS_SRC)/visual.h
+discrete.o: $(UTILS_SRC)/yarandom.h
+discrete.o: $(HACKS_SRC)/xlockmoreI.h
+discrete.o: $(HACKS_SRC)/xlockmore.h
+dragon.o: $(srcdir)/../../config.h
+dragon.o: $(HACKS_SRC)/fps.h
+dragon.o: $(HACKS_SRC)/recanim.h
+dragon.o: $(HACKS_SRC)/screenhackI.h
+dragon.o: $(UTILS_SRC)/colors.h
+dragon.o: $(UTILS_SRC)/erase.h
+dragon.o: $(UTILS_SRC)/font-retry.h
+dragon.o: $(UTILS_SRC)/grabscreen.h
+dragon.o: $(UTILS_SRC)/hsv.h
+dragon.o: $(UTILS_SRC)/resources.h
+dragon.o: $(UTILS_SRC)/usleep.h
+dragon.o: $(UTILS_SRC)/visual.h
+dragon.o: $(UTILS_SRC)/yarandom.h
+dragon.o: $(HACKS_SRC)/xlockmoreI.h
+dragon.o: $(HACKS_SRC)/xlockmore.h
+drift.o: $(srcdir)/../../config.h
+drift.o: $(HACKS_SRC)/fps.h
+drift.o: $(HACKS_SRC)/recanim.h
+drift.o: $(HACKS_SRC)/screenhackI.h
+drift.o: $(UTILS_SRC)/colors.h
+drift.o: $(UTILS_SRC)/erase.h
+drift.o: $(UTILS_SRC)/font-retry.h
+drift.o: $(UTILS_SRC)/grabscreen.h
+drift.o: $(UTILS_SRC)/hsv.h
+drift.o: $(UTILS_SRC)/resources.h
+drift.o: $(UTILS_SRC)/usleep.h
+drift.o: $(UTILS_SRC)/visual.h
+drift.o: $(UTILS_SRC)/yarandom.h
+drift.o: $(HACKS_SRC)/xlockmoreI.h
+drift.o: $(HACKS_SRC)/xlockmore.h
+euler2d.o: $(srcdir)/../../config.h
+euler2d.o: $(HACKS_SRC)/fps.h
+euler2d.o: $(HACKS_SRC)/recanim.h
+euler2d.o: $(HACKS_SRC)/screenhackI.h
+euler2d.o: $(UTILS_SRC)/colors.h
+euler2d.o: $(UTILS_SRC)/erase.h
+euler2d.o: $(UTILS_SRC)/font-retry.h
+euler2d.o: $(UTILS_SRC)/grabscreen.h
+euler2d.o: $(UTILS_SRC)/hsv.h
+euler2d.o: $(UTILS_SRC)/resources.h
+euler2d.o: $(UTILS_SRC)/usleep.h
+euler2d.o: $(UTILS_SRC)/visual.h
+euler2d.o: $(UTILS_SRC)/yarandom.h
+euler2d.o: $(HACKS_SRC)/xlockmoreI.h
+euler2d.o: $(HACKS_SRC)/xlockmore.h
+eyes.o: $(srcdir)/../../config.h
+eyes.o: $(HACKS_SRC)/fps.h
+eyes.o: $(HACKS_SRC)/recanim.h
+eyes.o: $(HACKS_SRC)/screenhackI.h
+eyes.o: $(UTILS_SRC)/colors.h
+eyes.o: $(UTILS_SRC)/erase.h
+eyes.o: $(UTILS_SRC)/font-retry.h
+eyes.o: $(UTILS_SRC)/grabscreen.h
+eyes.o: $(UTILS_SRC)/hsv.h
+eyes.o: $(UTILS_SRC)/resources.h
+eyes.o: $(UTILS_SRC)/usleep.h
+eyes.o: $(UTILS_SRC)/visual.h
+eyes.o: $(UTILS_SRC)/yarandom.h
+eyes.o: $(HACKS_SRC)/xlockmoreI.h
+eyes.o: $(HACKS_SRC)/xlockmore.h
+eyes.o: $(srcdir)/eyes.xbm
+eyes.o: $(srcdir)/eyes2.xbm
+fadeplot.o: $(srcdir)/../../config.h
+fadeplot.o: $(HACKS_SRC)/fps.h
+fadeplot.o: $(HACKS_SRC)/recanim.h
+fadeplot.o: $(HACKS_SRC)/screenhackI.h
+fadeplot.o: $(UTILS_SRC)/colors.h
+fadeplot.o: $(UTILS_SRC)/erase.h
+fadeplot.o: $(UTILS_SRC)/font-retry.h
+fadeplot.o: $(UTILS_SRC)/grabscreen.h
+fadeplot.o: $(UTILS_SRC)/hsv.h
+fadeplot.o: $(UTILS_SRC)/resources.h
+fadeplot.o: $(UTILS_SRC)/usleep.h
+fadeplot.o: $(UTILS_SRC)/visual.h
+fadeplot.o: $(UTILS_SRC)/yarandom.h
+fadeplot.o: $(HACKS_SRC)/xlockmoreI.h
+fadeplot.o: $(HACKS_SRC)/xlockmore.h
+fiberlamp.o: $(srcdir)/../../config.h
+fiberlamp.o: $(HACKS_SRC)/fps.h
+fiberlamp.o: $(HACKS_SRC)/recanim.h
+fiberlamp.o: $(HACKS_SRC)/screenhackI.h
+fiberlamp.o: $(UTILS_SRC)/colors.h
+fiberlamp.o: $(UTILS_SRC)/erase.h
+fiberlamp.o: $(UTILS_SRC)/font-retry.h
+fiberlamp.o: $(UTILS_SRC)/grabscreen.h
+fiberlamp.o: $(UTILS_SRC)/hsv.h
+fiberlamp.o: $(UTILS_SRC)/resources.h
+fiberlamp.o: $(UTILS_SRC)/usleep.h
+fiberlamp.o: $(UTILS_SRC)/visual.h
+fiberlamp.o: $(UTILS_SRC)/yarandom.h
+fiberlamp.o: $(HACKS_SRC)/xlockmoreI.h
+fiberlamp.o: $(HACKS_SRC)/xlockmore.h
+flag.o: $(srcdir)/../../config.h
+flag.o: $(HACKS_SRC)/fps.h
+#flag.o: images/gen/bob_png.h
+flag.o: $(HACKS_SRC)/recanim.h
+flag.o: $(HACKS_SRC)/screenhackI.h
+flag.o: $(UTILS_SRC)/colors.h
+flag.o: $(UTILS_SRC)/erase.h
+flag.o: $(UTILS_SRC)/font-retry.h
+flag.o: $(UTILS_SRC)/grabscreen.h
+flag.o: $(UTILS_SRC)/hsv.h
+flag.o: $(UTILS_SRC)/resources.h
+flag.o: $(UTILS_SRC)/usleep.h
+flag.o: $(UTILS_SRC)/visual.h
+flag.o: $(UTILS_SRC)/yarandom.h
+flag.o: $(HACKS_SRC)/ximage-loader.h
+flag.o: $(HACKS_SRC)/xlockmoreI.h
+flag.o: $(HACKS_SRC)/xlockmore.h
+flag.o: $(srcdir)/flag.xbm
+flame.o: $(srcdir)/../../config.h
+flame.o: $(HACKS_SRC)/fps.h
+flame.o: $(HACKS_SRC)/recanim.h
+flame.o: $(HACKS_SRC)/screenhackI.h
+flame.o: $(HACKS_SRC)/screenhack.h
+flame.o: $(UTILS_SRC)/colors.h
+flame.o: $(UTILS_SRC)/font-retry.h
+flame.o: $(UTILS_SRC)/grabscreen.h
+flame.o: $(UTILS_SRC)/hsv.h
+flame.o: $(UTILS_SRC)/resources.h
+flame.o: $(UTILS_SRC)/usleep.h
+flame.o: $(UTILS_SRC)/visual.h
+flame.o: $(UTILS_SRC)/yarandom.h
+flow.o: $(srcdir)/../../config.h
+flow.o: $(HACKS_SRC)/fps.h
+flow.o: $(HACKS_SRC)/recanim.h
+flow.o: $(HACKS_SRC)/screenhackI.h
+flow.o: $(UTILS_SRC)/colors.h
+flow.o: $(UTILS_SRC)/erase.h
+flow.o: $(UTILS_SRC)/font-retry.h
+flow.o: $(UTILS_SRC)/grabscreen.h
+flow.o: $(UTILS_SRC)/hsv.h
+flow.o: $(UTILS_SRC)/resources.h
+flow.o: $(UTILS_SRC)/usleep.h
+flow.o: $(UTILS_SRC)/visual.h
+flow.o: $(UTILS_SRC)/yarandom.h
+flow.o: $(HACKS_SRC)/xlockmoreI.h
+flow.o: $(HACKS_SRC)/xlockmore.h
+forest.o: $(srcdir)/../../config.h
+forest.o: $(HACKS_SRC)/fps.h
+forest.o: $(HACKS_SRC)/recanim.h
+forest.o: $(HACKS_SRC)/screenhackI.h
+forest.o: $(UTILS_SRC)/colors.h
+forest.o: $(UTILS_SRC)/erase.h
+forest.o: $(UTILS_SRC)/font-retry.h
+forest.o: $(UTILS_SRC)/grabscreen.h
+forest.o: $(UTILS_SRC)/hsv.h
+forest.o: $(UTILS_SRC)/resources.h
+forest.o: $(UTILS_SRC)/usleep.h
+forest.o: $(UTILS_SRC)/visual.h
+forest.o: $(UTILS_SRC)/yarandom.h
+forest.o: $(HACKS_SRC)/xlockmoreI.h
+forest.o: $(HACKS_SRC)/xlockmore.h
+fps.o: $(srcdir)/../../config.h
+fps.o: $(HACKS_SRC)/fpsI.h
+fps.o: $(HACKS_SRC)/fps.h
+fps.o: $(HACKS_SRC)/recanim.h
+fps.o: $(HACKS_SRC)/screenhackI.h
+fps.o: $(UTILS_SRC)/colors.h
+fps.o: $(UTILS_SRC)/font-retry.h
+fps.o: $(UTILS_SRC)/grabscreen.h
+fps.o: $(UTILS_SRC)/hsv.h
+fps.o: $(UTILS_SRC)/resources.h
+fps.o: $(UTILS_SRC)/usleep.h
+fps.o: $(UTILS_SRC)/visual.h
+fps.o: $(UTILS_SRC)/yarandom.h
+fzort.o: $(srcdir)/../../config.h
+fzort.o: $(HACKS_SRC)/fps.h
+fzort.o: $(HACKS_SRC)/recanim.h
+fzort.o: $(HACKS_SRC)/screenhackI.h
+fzort.o: $(UTILS_SRC)/colors.h
+fzort.o: $(UTILS_SRC)/erase.h
+fzort.o: $(UTILS_SRC)/font-retry.h
+fzort.o: $(UTILS_SRC)/grabscreen.h
+fzort.o: $(UTILS_SRC)/hsv.h
+fzort.o: $(UTILS_SRC)/resources.h
+fzort.o: $(UTILS_SRC)/usleep.h
+fzort.o: $(UTILS_SRC)/visual.h
+fzort.o: $(UTILS_SRC)/yarandom.h
+fzort.o: $(HACKS_SRC)/xlockmoreI.h
+fzort.o: $(HACKS_SRC)/xlockmore.h
+galaxy.o: $(srcdir)/../../config.h
+galaxy.o: $(HACKS_SRC)/fps.h
+galaxy.o: $(HACKS_SRC)/recanim.h
+galaxy.o: $(HACKS_SRC)/screenhackI.h
+galaxy.o: $(UTILS_SRC)/colors.h
+galaxy.o: $(UTILS_SRC)/erase.h
+galaxy.o: $(UTILS_SRC)/font-retry.h
+galaxy.o: $(UTILS_SRC)/grabscreen.h
+galaxy.o: $(UTILS_SRC)/hsv.h
+galaxy.o: $(UTILS_SRC)/resources.h
+galaxy.o: $(UTILS_SRC)/usleep.h
+galaxy.o: $(UTILS_SRC)/visual.h
+galaxy.o: $(UTILS_SRC)/yarandom.h
+galaxy.o: $(HACKS_SRC)/xlockmoreI.h
+galaxy.o: $(HACKS_SRC)/xlockmore.h
+goop.o: $(srcdir)/../../config.h
+goop.o: $(HACKS_SRC)/fps.h
+goop.o: $(HACKS_SRC)/recanim.h
+goop.o: $(HACKS_SRC)/screenhackI.h
+goop.o: $(HACKS_SRC)/screenhack.h
+goop.o: $(UTILS_SRC)/alpha.h
+goop.o: $(UTILS_SRC)/colors.h
+goop.o: $(UTILS_SRC)/font-retry.h
+goop.o: $(UTILS_SRC)/grabscreen.h
+goop.o: $(UTILS_SRC)/hsv.h
+goop.o: $(UTILS_SRC)/resources.h
+goop.o: $(UTILS_SRC)/spline.h
+goop.o: $(UTILS_SRC)/usleep.h
+goop.o: $(UTILS_SRC)/visual.h
+goop.o: $(UTILS_SRC)/yarandom.h
+grav.o: $(srcdir)/../../config.h
+grav.o: $(HACKS_SRC)/fps.h
+grav.o: $(HACKS_SRC)/recanim.h
+grav.o: $(HACKS_SRC)/screenhackI.h
+grav.o: $(UTILS_SRC)/colors.h
+grav.o: $(UTILS_SRC)/erase.h
+grav.o: $(UTILS_SRC)/font-retry.h
+grav.o: $(UTILS_SRC)/grabscreen.h
+grav.o: $(UTILS_SRC)/hsv.h
+grav.o: $(UTILS_SRC)/resources.h
+grav.o: $(UTILS_SRC)/usleep.h
+grav.o: $(UTILS_SRC)/visual.h
+grav.o: $(UTILS_SRC)/yarandom.h
+grav.o: $(HACKS_SRC)/xlockmoreI.h
+grav.o: $(HACKS_SRC)/xlockmore.h
+helix.o: $(srcdir)/../../config.h
+helix.o: $(HACKS_SRC)/fps.h
+helix.o: $(HACKS_SRC)/recanim.h
+helix.o: $(HACKS_SRC)/screenhackI.h
+helix.o: $(HACKS_SRC)/screenhack.h
+helix.o: $(UTILS_SRC)/colors.h
+helix.o: $(UTILS_SRC)/erase.h
+helix.o: $(UTILS_SRC)/font-retry.h
+helix.o: $(UTILS_SRC)/grabscreen.h
+helix.o: $(UTILS_SRC)/hsv.h
+helix.o: $(UTILS_SRC)/resources.h
+helix.o: $(UTILS_SRC)/usleep.h
+helix.o: $(UTILS_SRC)/visual.h
+helix.o: $(UTILS_SRC)/yarandom.h
+ico.o: $(srcdir)/../../config.h
+ico.o: $(HACKS_SRC)/fps.h
+ico.o: $(HACKS_SRC)/recanim.h
+ico.o: $(HACKS_SRC)/screenhackI.h
+ico.o: $(UTILS_SRC)/colors.h
+ico.o: $(UTILS_SRC)/erase.h
+ico.o: $(UTILS_SRC)/font-retry.h
+ico.o: $(UTILS_SRC)/grabscreen.h
+ico.o: $(UTILS_SRC)/hsv.h
+ico.o: $(UTILS_SRC)/resources.h
+ico.o: $(UTILS_SRC)/usleep.h
+ico.o: $(UTILS_SRC)/visual.h
+ico.o: $(UTILS_SRC)/yarandom.h
+ico.o: $(HACKS_SRC)/xlockmoreI.h
+ico.o: $(HACKS_SRC)/xlockmore.h
+ifs.o: $(srcdir)/../../config.h
+ifs.o: $(HACKS_SRC)/fps.h
+ifs.o: $(HACKS_SRC)/recanim.h
+ifs.o: $(HACKS_SRC)/screenhackI.h
+ifs.o: $(HACKS_SRC)/screenhack.h
+ifs.o: $(UTILS_SRC)/colors.h
+ifs.o: $(UTILS_SRC)/font-retry.h
+ifs.o: $(UTILS_SRC)/grabscreen.h
+ifs.o: $(UTILS_SRC)/hsv.h
+ifs.o: $(UTILS_SRC)/resources.h
+ifs.o: $(UTILS_SRC)/usleep.h
+ifs.o: $(UTILS_SRC)/visual.h
+ifs.o: $(UTILS_SRC)/yarandom.h
+image.o: $(srcdir)/../../config.h
+image.o: $(HACKS_SRC)/fps.h
+image.o: $(HACKS_SRC)/recanim.h
+image.o: $(HACKS_SRC)/screenhackI.h
+image.o: $(UTILS_SRC)/colors.h
+image.o: $(UTILS_SRC)/erase.h
+image.o: $(UTILS_SRC)/font-retry.h
+image.o: $(UTILS_SRC)/grabscreen.h
+image.o: $(UTILS_SRC)/hsv.h
+image.o: $(UTILS_SRC)/resources.h
+image.o: $(UTILS_SRC)/usleep.h
+image.o: $(UTILS_SRC)/visual.h
+image.o: $(UTILS_SRC)/yarandom.h
+image.o: $(HACKS_SRC)/xlockmoreI.h
+image.o: $(HACKS_SRC)/xlockmore.h
+image.o: $(srcdir)/image.xbm
+image.o: $(srcdir)/image.xpm
+juggle.o: $(srcdir)/../../config.h
+juggle.o: $(HACKS_SRC)/fps.h
+juggle.o: $(HACKS_SRC)/recanim.h
+juggle.o: $(HACKS_SRC)/screenhackI.h
+juggle.o: $(UTILS_SRC)/colors.h
+juggle.o: $(UTILS_SRC)/erase.h
+juggle.o: $(UTILS_SRC)/font-retry.h
+juggle.o: $(UTILS_SRC)/grabscreen.h
+juggle.o: $(UTILS_SRC)/hsv.h
+juggle.o: $(UTILS_SRC)/resources.h
+juggle.o: $(UTILS_SRC)/usleep.h
+juggle.o: $(UTILS_SRC)/visual.h
+juggle.o: $(UTILS_SRC)/yarandom.h
+juggle.o: $(HACKS_SRC)/xlockmoreI.h
+juggle.o: $(HACKS_SRC)/xlockmore.h
+julia.o: $(srcdir)/../../config.h
+julia.o: $(HACKS_SRC)/fps.h
+julia.o: $(HACKS_SRC)/recanim.h
+julia.o: $(HACKS_SRC)/screenhackI.h
+julia.o: $(UTILS_SRC)/colors.h
+julia.o: $(UTILS_SRC)/erase.h
+julia.o: $(UTILS_SRC)/font-retry.h
+julia.o: $(UTILS_SRC)/grabscreen.h
+julia.o: $(UTILS_SRC)/hsv.h
+julia.o: $(UTILS_SRC)/resources.h
+julia.o: $(UTILS_SRC)/usleep.h
+julia.o: $(UTILS_SRC)/visual.h
+julia.o: $(UTILS_SRC)/yarandom.h
+julia.o: $(HACKS_SRC)/xlockmoreI.h
+julia.o: $(HACKS_SRC)/xlockmore.h
+kaleid.o: $(srcdir)/../../config.h
+kaleid.o: $(HACKS_SRC)/fps.h
+kaleid.o: $(HACKS_SRC)/recanim.h
+kaleid.o: $(HACKS_SRC)/screenhackI.h
+kaleid.o: $(HACKS_SRC)/screenhack.h
+kaleid.o: $(UTILS_SRC)/colors.h
+kaleid.o: $(UTILS_SRC)/font-retry.h
+kaleid.o: $(UTILS_SRC)/grabscreen.h
+kaleid.o: $(UTILS_SRC)/hsv.h
+kaleid.o: $(UTILS_SRC)/resources.h
+kaleid.o: $(UTILS_SRC)/usleep.h
+kaleid.o: $(UTILS_SRC)/visual.h
+kaleid.o: $(UTILS_SRC)/xdbe.h
+kaleid.o: $(UTILS_SRC)/yarandom.h
+kumppa.o: $(srcdir)/../../config.h
+kumppa.o: $(HACKS_SRC)/fps.h
+kumppa.o: $(HACKS_SRC)/recanim.h
+kumppa.o: $(HACKS_SRC)/screenhackI.h
+kumppa.o: $(HACKS_SRC)/screenhack.h
+kumppa.o: $(UTILS_SRC)/colors.h
+kumppa.o: $(UTILS_SRC)/font-retry.h
+kumppa.o: $(UTILS_SRC)/grabscreen.h
+kumppa.o: $(UTILS_SRC)/hsv.h
+kumppa.o: $(UTILS_SRC)/resources.h
+kumppa.o: $(UTILS_SRC)/usleep.h
+kumppa.o: $(UTILS_SRC)/visual.h
+kumppa.o: $(UTILS_SRC)/xdbe.h
+kumppa.o: $(UTILS_SRC)/yarandom.h
+laser.o: $(srcdir)/../../config.h
+laser.o: $(HACKS_SRC)/fps.h
+laser.o: $(HACKS_SRC)/recanim.h
+laser.o: $(HACKS_SRC)/screenhackI.h
+laser.o: $(UTILS_SRC)/colors.h
+laser.o: $(UTILS_SRC)/erase.h
+laser.o: $(UTILS_SRC)/font-retry.h
+laser.o: $(UTILS_SRC)/grabscreen.h
+laser.o: $(UTILS_SRC)/hsv.h
+laser.o: $(UTILS_SRC)/resources.h
+laser.o: $(UTILS_SRC)/usleep.h
+laser.o: $(UTILS_SRC)/visual.h
+laser.o: $(UTILS_SRC)/yarandom.h
+laser.o: $(HACKS_SRC)/xlockmoreI.h
+laser.o: $(HACKS_SRC)/xlockmore.h
+lightning.o: $(srcdir)/../../config.h
+lightning.o: $(HACKS_SRC)/fps.h
+lightning.o: $(HACKS_SRC)/recanim.h
+lightning.o: $(HACKS_SRC)/screenhackI.h
+lightning.o: $(UTILS_SRC)/colors.h
+lightning.o: $(UTILS_SRC)/erase.h
+lightning.o: $(UTILS_SRC)/font-retry.h
+lightning.o: $(UTILS_SRC)/grabscreen.h
+lightning.o: $(UTILS_SRC)/hsv.h
+lightning.o: $(UTILS_SRC)/resources.h
+lightning.o: $(UTILS_SRC)/usleep.h
+lightning.o: $(UTILS_SRC)/visual.h
+lightning.o: $(UTILS_SRC)/yarandom.h
+lightning.o: $(HACKS_SRC)/xlockmoreI.h
+lightning.o: $(HACKS_SRC)/xlockmore.h
+lisa.o: $(srcdir)/../../config.h
+lisa.o: $(HACKS_SRC)/fps.h
+lisa.o: $(HACKS_SRC)/recanim.h
+lisa.o: $(HACKS_SRC)/screenhackI.h
+lisa.o: $(UTILS_SRC)/colors.h
+lisa.o: $(UTILS_SRC)/erase.h
+lisa.o: $(UTILS_SRC)/font-retry.h
+lisa.o: $(UTILS_SRC)/grabscreen.h
+lisa.o: $(UTILS_SRC)/hsv.h
+lisa.o: $(UTILS_SRC)/resources.h
+lisa.o: $(UTILS_SRC)/usleep.h
+lisa.o: $(UTILS_SRC)/visual.h
+lisa.o: $(UTILS_SRC)/yarandom.h
+lisa.o: $(HACKS_SRC)/xlockmoreI.h
+lisa.o: $(HACKS_SRC)/xlockmore.h
+lissie.o: $(srcdir)/../../config.h
+lissie.o: $(HACKS_SRC)/fps.h
+lissie.o: $(HACKS_SRC)/recanim.h
+lissie.o: $(HACKS_SRC)/screenhackI.h
+lissie.o: $(UTILS_SRC)/colors.h
+lissie.o: $(UTILS_SRC)/erase.h
+lissie.o: $(UTILS_SRC)/font-retry.h
+lissie.o: $(UTILS_SRC)/grabscreen.h
+lissie.o: $(UTILS_SRC)/hsv.h
+lissie.o: $(UTILS_SRC)/resources.h
+lissie.o: $(UTILS_SRC)/usleep.h
+lissie.o: $(UTILS_SRC)/visual.h
+lissie.o: $(UTILS_SRC)/yarandom.h
+lissie.o: $(HACKS_SRC)/xlockmoreI.h
+lissie.o: $(HACKS_SRC)/xlockmore.h
+life.o: $(srcdir)/../../config.h
+life.o: $(HACKS_SRC)/fps.h
+life.o: $(HACKS_SRC)/recanim.h
+life.o: $(HACKS_SRC)/screenhackI.h
+life.o: $(UTILS_SRC)/colors.h
+life.o: $(UTILS_SRC)/erase.h
+life.o: $(UTILS_SRC)/font-retry.h
+life.o: $(UTILS_SRC)/grabscreen.h
+life.o: $(UTILS_SRC)/hsv.h
+life.o: $(UTILS_SRC)/resources.h
+life.o: $(UTILS_SRC)/usleep.h
+life.o: $(UTILS_SRC)/visual.h
+life.o: $(UTILS_SRC)/yarandom.h
+life.o: $(HACKS_SRC)/xlockmoreI.h
+life.o: $(HACKS_SRC)/xlockmore.h
+life.o: $(HACKS_SRC)/automata.h
+life.o: $(srcdir)/life.xbm
+life.o: $(srcdir)/life2.xbm
+life.o: $(srcdir)/life.xpm
+loop.o: $(srcdir)/../../config.h
+loop.o: $(HACKS_SRC)/fps.h
+loop.o: $(HACKS_SRC)/recanim.h
+loop.o: $(HACKS_SRC)/screenhackI.h
+loop.o: $(UTILS_SRC)/colors.h
+loop.o: $(UTILS_SRC)/erase.h
+loop.o: $(UTILS_SRC)/font-retry.h
+loop.o: $(UTILS_SRC)/grabscreen.h
+loop.o: $(UTILS_SRC)/hsv.h
+loop.o: $(UTILS_SRC)/resources.h
+loop.o: $(UTILS_SRC)/usleep.h
+loop.o: $(UTILS_SRC)/visual.h
+loop.o: $(UTILS_SRC)/yarandom.h
+loop.o: $(HACKS_SRC)/xlockmoreI.h
+loop.o: $(HACKS_SRC)/xlockmore.h
+loop.o: $(HACKS_SRC)/automata.h
+lyapunov.o: $(srcdir)/../../config.h
+lyapunov.o: $(HACKS_SRC)/fps.h
+lyapunov.o: $(HACKS_SRC)/recanim.h
+lyapunov.o: $(HACKS_SRC)/screenhackI.h
+lyapunov.o: $(UTILS_SRC)/colors.h
+lyapunov.o: $(UTILS_SRC)/erase.h
+lyapunov.o: $(UTILS_SRC)/font-retry.h
+lyapunov.o: $(UTILS_SRC)/grabscreen.h
+lyapunov.o: $(UTILS_SRC)/hsv.h
+lyapunov.o: $(UTILS_SRC)/resources.h
+lyapunov.o: $(UTILS_SRC)/usleep.h
+lyapunov.o: $(UTILS_SRC)/visual.h
+lyapunov.o: $(UTILS_SRC)/yarandom.h
+lyapunov.o: $(HACKS_SRC)/xlockmoreI.h
+lyapunov.o: $(HACKS_SRC)/xlockmore.h
+maze.o: $(srcdir)/../../config.h
+maze.o: $(HACKS_SRC)/fps.h
+#maze.o: images/gen/logo-180_png.h
+#maze.o: images/gen/logo-50_png.h
+maze.o: $(HACKS_SRC)/recanim.h
+maze.o: $(HACKS_SRC)/screenhackI.h
+#maze.o: $(HACKS_SRC)/screenhack.h
+maze.o: $(UTILS_SRC)/colors.h
+maze.o: $(UTILS_SRC)/erase.h
+maze.o: $(UTILS_SRC)/font-retry.h
+maze.o: $(UTILS_SRC)/grabscreen.h
+maze.o: $(UTILS_SRC)/hsv.h
+maze.o: $(UTILS_SRC)/resources.h
+maze.o: $(UTILS_SRC)/usleep.h
+maze.o: $(UTILS_SRC)/visual.h
+maze.o: $(UTILS_SRC)/yarandom.h
+#maze.o: $(HACKS_SRC)/ximage-loader.h
+maze.o: $(HACKS_SRC)/xlockmoreI.h
+maze.o: $(HACKS_SRC)/xlockmore.h
+maze.o: $(srcdir)/maze.xbm
+maze.o: $(srcdir)/maze.xpm
+mandelbrot.o: $(srcdir)/../../config.h
+mandelbrot.o: $(HACKS_SRC)/fps.h
+mandelbrot.o: $(HACKS_SRC)/recanim.h
+mandelbrot.o: $(HACKS_SRC)/screenhackI.h
+mandelbrot.o: $(UTILS_SRC)/colors.h
+mandelbrot.o: $(UTILS_SRC)/erase.h
+mandelbrot.o: $(UTILS_SRC)/font-retry.h
+mandelbrot.o: $(UTILS_SRC)/grabscreen.h
+mandelbrot.o: $(UTILS_SRC)/hsv.h
+mandelbrot.o: $(UTILS_SRC)/resources.h
+mandelbrot.o: $(UTILS_SRC)/usleep.h
+mandelbrot.o: $(UTILS_SRC)/visual.h
+mandelbrot.o: $(UTILS_SRC)/yarandom.h
+mandelbrot.o: $(HACKS_SRC)/xlockmoreI.h
+mandelbrot.o: $(HACKS_SRC)/xlockmore.h
+mountain.o: $(srcdir)/../../config.h
+mountain.o: $(HACKS_SRC)/fps.h
+mountain.o: $(HACKS_SRC)/recanim.h
+mountain.o: $(HACKS_SRC)/screenhackI.h
+mountain.o: $(UTILS_SRC)/colors.h
+mountain.o: $(UTILS_SRC)/erase.h
+mountain.o: $(UTILS_SRC)/font-retry.h
+mountain.o: $(UTILS_SRC)/grabscreen.h
+mountain.o: $(UTILS_SRC)/hsv.h
+mountain.o: $(UTILS_SRC)/resources.h
+mountain.o: $(UTILS_SRC)/usleep.h
+mountain.o: $(UTILS_SRC)/visual.h
+mountain.o: $(UTILS_SRC)/yarandom.h
+mountain.o: $(HACKS_SRC)/xlockmoreI.h
+mountain.o: $(HACKS_SRC)/xlockmore.h
+marquee.o: $(srcdir)/../../config.h
+marquee.o: $(HACKS_SRC)/fps.h
+marquee.o: $(HACKS_SRC)/recanim.h
+marquee.o: $(HACKS_SRC)/screenhackI.h
+marquee.o: $(UTILS_SRC)/colors.h
+marquee.o: $(UTILS_SRC)/erase.h
+marquee.o: $(UTILS_SRC)/font-retry.h
+marquee.o: $(UTILS_SRC)/grabscreen.h
+marquee.o: $(UTILS_SRC)/hsv.h
+marquee.o: $(UTILS_SRC)/resources.h
+marquee.o: $(UTILS_SRC)/usleep.h
+marquee.o: $(UTILS_SRC)/visual.h
+marquee.o: $(UTILS_SRC)/yarandom.h
+marquee.o: $(HACKS_SRC)/xlockmoreI.h
+marquee.o: $(HACKS_SRC)/xlockmore.h
+munch.o: $(srcdir)/../../config.h
+munch.o: $(HACKS_SRC)/fps.h
+munch.o: $(HACKS_SRC)/recanim.h
+munch.o: $(HACKS_SRC)/screenhackI.h
+munch.o: $(UTILS_SRC)/colors.h
+munch.o: $(UTILS_SRC)/font-retry.h
+munch.o: $(UTILS_SRC)/grabscreen.h
+munch.o: $(UTILS_SRC)/hsv.h
+munch.o: $(UTILS_SRC)/resources.h
+munch.o: $(UTILS_SRC)/usleep.h
+munch.o: $(UTILS_SRC)/visual.h
+munch.o: $(UTILS_SRC)/yarandom.h
+munch.o: $(HACKS_SRC)/xlockmoreI.h
+munch.o: $(HACKS_SRC)/xlockmore.h
+nose.o: $(srcdir)/../../config.h
+nose.o: $(HACKS_SRC)/fps.h
+nose.o: $(HACKS_SRC)/recanim.h
+nose.o: $(HACKS_SRC)/screenhackI.h
+nose.o: $(UTILS_SRC)/colors.h
+nose.o: $(UTILS_SRC)/font-retry.h
+nose.o: $(UTILS_SRC)/grabscreen.h
+nose.o: $(UTILS_SRC)/hsv.h
+nose.o: $(UTILS_SRC)/resources.h
+nose.o: $(UTILS_SRC)/usleep.h
+nose.o: $(UTILS_SRC)/visual.h
+nose.o: $(UTILS_SRC)/yarandom.h
+nose.o: $(HACKS_SRC)/xlockmoreI.h
+nose.o: $(HACKS_SRC)/xlockmore.h
+pacman.o: $(srcdir)/../../config.h
+pacman.o: $(HACKS_SRC)/fps.h
+#pacman.o: images/gen/pacman_png.h
+pacman.o: $(HACKS_SRC)/pacman_ai.h
+pacman.o: $(HACKS_SRC)/pacman.h
+pacman.o: $(HACKS_SRC)/pacman_level.h
+pacman.o: $(HACKS_SRC)/recanim.h
+pacman.o: $(HACKS_SRC)/screenhackI.h
+pacman.o: $(UTILS_SRC)/colors.h
+pacman.o: $(UTILS_SRC)/erase.h
+pacman.o: $(UTILS_SRC)/font-retry.h
+pacman.o: $(UTILS_SRC)/grabscreen.h
+pacman.o: $(UTILS_SRC)/hsv.h
+pacman.o: $(UTILS_SRC)/resources.h
+pacman.o: $(UTILS_SRC)/usleep.h
+pacman.o: $(UTILS_SRC)/visual.h
+pacman.o: $(UTILS_SRC)/yarandom.h
+pacman.o: $(HACKS_SRC)/ximage-loader.h
+pacman.o: $(HACKS_SRC)/xlockmoreI.h
+pacman.o: $(HACKS_SRC)/xlockmore.h
+penrose.o: $(srcdir)/../../config.h
+penrose.o: $(HACKS_SRC)/fps.h
+penrose.o: $(HACKS_SRC)/recanim.h
+penrose.o: $(HACKS_SRC)/screenhackI.h
+penrose.o: $(UTILS_SRC)/colors.h
+penrose.o: $(UTILS_SRC)/erase.h
+penrose.o: $(UTILS_SRC)/font-retry.h
+penrose.o: $(UTILS_SRC)/grabscreen.h
+penrose.o: $(UTILS_SRC)/hsv.h
+penrose.o: $(UTILS_SRC)/resources.h
+penrose.o: $(UTILS_SRC)/usleep.h
+penrose.o: $(UTILS_SRC)/visual.h
+penrose.o: $(UTILS_SRC)/yarandom.h
+penrose.o: $(HACKS_SRC)/xlockmoreI.h
+penrose.o: $(HACKS_SRC)/xlockmore.h
+petal.o: $(srcdir)/../../config.h
+petal.o: $(HACKS_SRC)/fps.h
+petal.o: $(HACKS_SRC)/recanim.h
+petal.o: $(HACKS_SRC)/screenhackI.h
+#petal.o: $(HACKS_SRC)/screenhack.h
+petal.o: $(UTILS_SRC)/colors.h
+petal.o: $(UTILS_SRC)/erase.h
+petal.o: $(UTILS_SRC)/font-retry.h
+petal.o: $(UTILS_SRC)/grabscreen.h
+petal.o: $(UTILS_SRC)/hsv.h
+petal.o: $(UTILS_SRC)/resources.h
+petal.o: $(UTILS_SRC)/usleep.h
+petal.o: $(UTILS_SRC)/visual.h
+petal.o: $(UTILS_SRC)/yarandom.h
+petal.o: $(HACKS_SRC)/xlockmoreI.h
+petal.o: $(HACKS_SRC)/xlockmore.h
+petri.o: $(srcdir)/../../config.h
+petri.o: $(HACKS_SRC)/fps.h
+petri.o: $(HACKS_SRC)/recanim.h
+petri.o: $(HACKS_SRC)/screenhackI.h
+#petri.o: $(HACKS_SRC)/screenhack.h
+petri.o: $(UTILS_SRC)/colors.h
+petri.o: $(UTILS_SRC)/font-retry.h
+petri.o: $(UTILS_SRC)/grabscreen.h
+petri.o: $(UTILS_SRC)/hsv.h
+petri.o: $(UTILS_SRC)/resources.h
+petri.o: $(UTILS_SRC)/spline.h
+petri.o: $(UTILS_SRC)/usleep.h
+petri.o: $(UTILS_SRC)/visual.h
+petri.o: $(UTILS_SRC)/yarandom.h
+petri.o: $(HACKS_SRC)/xlockmoreI.h
+petri.o: $(HACKS_SRC)/xlockmore.h
+polyominoes.o: $(srcdir)/../../config.h
+polyominoes.o: $(HACKS_SRC)/fps.h
+polyominoes.o: $(HACKS_SRC)/recanim.h
+polyominoes.o: $(HACKS_SRC)/screenhackI.h
+polyominoes.o: $(UTILS_SRC)/colors.h
+polyominoes.o: $(UTILS_SRC)/erase.h
+polyominoes.o: $(UTILS_SRC)/font-retry.h
+polyominoes.o: $(UTILS_SRC)/grabscreen.h
+polyominoes.o: $(UTILS_SRC)/hsv.h
+polyominoes.o: $(UTILS_SRC)/resources.h
+polyominoes.o: $(UTILS_SRC)/usleep.h
+polyominoes.o: $(UTILS_SRC)/visual.h
+polyominoes.o: $(UTILS_SRC)/yarandom.h
+polyominoes.o: $(HACKS_SRC)/xlockmoreI.h
+polyominoes.o: $(HACKS_SRC)/xlockmore.h
+puzzle.o: $(srcdir)/../../config.h
+puzzle.o: $(HACKS_SRC)/fps.h
+puzzle.o: $(HACKS_SRC)/recanim.h
+puzzle.o: $(HACKS_SRC)/screenhackI.h
+puzzle.o: $(UTILS_SRC)/colors.h
+puzzle.o: $(UTILS_SRC)/erase.h
+puzzle.o: $(UTILS_SRC)/font-retry.h
+puzzle.o: $(UTILS_SRC)/grabscreen.h
+puzzle.o: $(UTILS_SRC)/hsv.h
+puzzle.o: $(UTILS_SRC)/resources.h
+puzzle.o: $(UTILS_SRC)/usleep.h
+puzzle.o: $(UTILS_SRC)/visual.h
+puzzle.o: $(UTILS_SRC)/yarandom.h
+puzzle.o: $(HACKS_SRC)/xlockmoreI.h
+puzzle.o: $(HACKS_SRC)/xlockmore.h
+puzzle.o: $(srcdir)/puzzle.xbm
+puzzle.o: $(srcdir)/puzzle.xpm
+pyro2.o: $(srcdir)/../../config.h
+pyro2.o: $(HACKS_SRC)/fps.h
+pyro2.o: $(HACKS_SRC)/recanim.h
+pyro2.o: $(HACKS_SRC)/screenhackI.h
+pyro2.o: $(UTILS_SRC)/colors.h
+pyro2.o: $(UTILS_SRC)/font-retry.h
+pyro2.o: $(UTILS_SRC)/grabscreen.h
+pyro2.o: $(UTILS_SRC)/hsv.h
+pyro2.o: $(UTILS_SRC)/resources.h
+pyro2.o: $(UTILS_SRC)/usleep.h
+pyro2.o: $(UTILS_SRC)/visual.h
+pyro2.o: $(UTILS_SRC)/yarandom.h
+pyro2.o: $(HACKS_SRC)/xlockmoreI.h
+pyro2.o: $(HACKS_SRC)/xlockmore.h
+pyro2.o: $(srcdir)/pyro2.xbm
+pyro2.o: $(srcdir)/pyro2.xpm
+pyro.o: $(srcdir)/../../config.h
+pyro.o: $(HACKS_SRC)/fps.h
+pyro.o: $(HACKS_SRC)/recanim.h
+pyro.o: $(HACKS_SRC)/screenhackI.h
+#pyro.o: $(HACKS_SRC)/screenhack.h
+pyro.o: $(UTILS_SRC)/colors.h
+pyro.o: $(UTILS_SRC)/font-retry.h
+pyro.o: $(UTILS_SRC)/grabscreen.h
+pyro.o: $(UTILS_SRC)/hsv.h
+pyro.o: $(UTILS_SRC)/resources.h
+pyro.o: $(UTILS_SRC)/usleep.h
+pyro.o: $(UTILS_SRC)/visual.h
+pyro.o: $(UTILS_SRC)/yarandom.h
+pyro.o: $(HACKS_SRC)/xlockmoreI.h
+pyro.o: $(HACKS_SRC)/xlockmore.h
+qix.o: $(srcdir)/../../config.h
+qix.o: $(HACKS_SRC)/fps.h
+qix.o: $(HACKS_SRC)/recanim.h
+qix.o: $(HACKS_SRC)/screenhackI.h
+#qix.o: $(HACKS_SRC)/screenhack.h
+#qix.o: $(UTILS_SRC)/alpha.h
+qix.o: $(UTILS_SRC)/colors.h
+qix.o: $(UTILS_SRC)/font-retry.h
+qix.o: $(UTILS_SRC)/grabscreen.h
+qix.o: $(UTILS_SRC)/hsv.h
+qix.o: $(UTILS_SRC)/resources.h
+qix.o: $(UTILS_SRC)/usleep.h
+qix.o: $(UTILS_SRC)/visual.h
+qix.o: $(UTILS_SRC)/yarandom.h
+qix.o: $(HACKS_SRC)/xlockmoreI.h
+qix.o: $(HACKS_SRC)/xlockmore.h
+rain.o: $(srcdir)/../../config.h
+rain.o: $(HACKS_SRC)/fps.h
+rain.o: $(HACKS_SRC)/recanim.h
+rain.o: $(HACKS_SRC)/screenhackI.h
+rain.o: $(UTILS_SRC)/colors.h
+rain.o: $(UTILS_SRC)/erase.h
+rain.o: $(UTILS_SRC)/font-retry.h
+rain.o: $(UTILS_SRC)/grabscreen.h
+rain.o: $(UTILS_SRC)/hsv.h
+rain.o: $(UTILS_SRC)/resources.h
+rain.o: $(UTILS_SRC)/usleep.h
+rain.o: $(UTILS_SRC)/visual.h
+rain.o: $(UTILS_SRC)/yarandom.h
+rain.o: $(HACKS_SRC)/xlockmoreI.h
+rain.o: $(HACKS_SRC)/xlockmore.h
+random.o: $(srcdir)/../../config.h
+random.o: $(HACKS_SRC)/fps.h
+random.o: $(HACKS_SRC)/recanim.h
+random.o: $(HACKS_SRC)/screenhackI.h
+random.o: $(UTILS_SRC)/colors.h
+random.o: $(UTILS_SRC)/erase.h
+random.o: $(UTILS_SRC)/font-retry.h
+random.o: $(UTILS_SRC)/grabscreen.h
+random.o: $(UTILS_SRC)/hsv.h
+random.o: $(UTILS_SRC)/resources.h
+random.o: $(UTILS_SRC)/usleep.h
+random.o: $(UTILS_SRC)/visual.h
+random.o: $(UTILS_SRC)/yarandom.h
+random.o: $(HACKS_SRC)/xlockmoreI.h
+random.o: $(HACKS_SRC)/xlockmore.h
+roll.o: $(srcdir)/../../config.h
+roll.o: $(HACKS_SRC)/fps.h
+roll.o: $(HACKS_SRC)/recanim.h
+roll.o: $(HACKS_SRC)/screenhackI.h
+roll.o: $(UTILS_SRC)/colors.h
+roll.o: $(UTILS_SRC)/erase.h
+roll.o: $(UTILS_SRC)/font-retry.h
+roll.o: $(UTILS_SRC)/grabscreen.h
+roll.o: $(UTILS_SRC)/hsv.h
+roll.o: $(UTILS_SRC)/resources.h
+roll.o: $(UTILS_SRC)/usleep.h
+roll.o: $(UTILS_SRC)/visual.h
+roll.o: $(UTILS_SRC)/yarandom.h
+roll.o: $(HACKS_SRC)/xlockmoreI.h
+roll.o: $(HACKS_SRC)/xlockmore.h
+rotor.o: $(srcdir)/../../config.h
+rotor.o: $(HACKS_SRC)/fps.h
+rotor.o: $(HACKS_SRC)/recanim.h
+rotor.o: $(HACKS_SRC)/screenhackI.h
+rotor.o: $(UTILS_SRC)/colors.h
+rotor.o: $(UTILS_SRC)/erase.h
+rotor.o: $(UTILS_SRC)/font-retry.h
+rotor.o: $(UTILS_SRC)/grabscreen.h
+rotor.o: $(UTILS_SRC)/hsv.h
+rotor.o: $(UTILS_SRC)/resources.h
+rotor.o: $(UTILS_SRC)/usleep.h
+rotor.o: $(UTILS_SRC)/visual.h
+rotor.o: $(UTILS_SRC)/yarandom.h
+rotor.o: $(HACKS_SRC)/xlockmoreI.h
+rotor.o: $(HACKS_SRC)/xlockmore.h
+run.o: $(srcdir)/../../config.h
+run.o: $(HACKS_SRC)/fps.h
+run.o: $(HACKS_SRC)/recanim.h
+run.o: $(HACKS_SRC)/screenhackI.h
+run.o: $(UTILS_SRC)/colors.h
+run.o: $(UTILS_SRC)/erase.h
+run.o: $(UTILS_SRC)/font-retry.h
+run.o: $(UTILS_SRC)/grabscreen.h
+run.o: $(UTILS_SRC)/hsv.h
+run.o: $(UTILS_SRC)/resources.h
+run.o: $(UTILS_SRC)/usleep.h
+run.o: $(UTILS_SRC)/visual.h
+run.o: $(UTILS_SRC)/yarandom.h
+run.o: $(HACKS_SRC)/xlockmoreI.h
+run.o: $(HACKS_SRC)/xlockmore.h
+scooter.o: $(srcdir)/../../config.h
+scooter.o: $(HACKS_SRC)/fps.h
+scooter.o: $(HACKS_SRC)/recanim.h
+scooter.o: $(HACKS_SRC)/screenhackI.h
+scooter.o: $(UTILS_SRC)/colors.h
+scooter.o: $(UTILS_SRC)/erase.h
+scooter.o: $(UTILS_SRC)/font-retry.h
+scooter.o: $(UTILS_SRC)/grabscreen.h
+scooter.o: $(UTILS_SRC)/hsv.h
+scooter.o: $(UTILS_SRC)/resources.h
+scooter.o: $(UTILS_SRC)/usleep.h
+scooter.o: $(UTILS_SRC)/visual.h
+scooter.o: $(UTILS_SRC)/yarandom.h
+scooter.o: $(HACKS_SRC)/xlockmoreI.h
+scooter.o: $(HACKS_SRC)/xlockmore.h
+shape.o: $(srcdir)/../../config.h
+shape.o: $(HACKS_SRC)/fps.h
+shape.o: $(HACKS_SRC)/recanim.h
+shape.o: $(HACKS_SRC)/screenhackI.h
+shape.o: $(UTILS_SRC)/colors.h
+shape.o: $(UTILS_SRC)/erase.h
+shape.o: $(UTILS_SRC)/font-retry.h
+shape.o: $(UTILS_SRC)/grabscreen.h
+shape.o: $(UTILS_SRC)/hsv.h
+shape.o: $(UTILS_SRC)/resources.h
+shape.o: $(UTILS_SRC)/usleep.h
+shape.o: $(UTILS_SRC)/visual.h
+shape.o: $(UTILS_SRC)/yarandom.h
+shape.o: $(HACKS_SRC)/xlockmoreI.h
+shape.o: $(HACKS_SRC)/xlockmore.h
+sierpinski.o: $(srcdir)/../../config.h
+sierpinski.o: $(HACKS_SRC)/fps.h
+sierpinski.o: $(HACKS_SRC)/recanim.h
+sierpinski.o: $(HACKS_SRC)/screenhackI.h
+sierpinski.o: $(UTILS_SRC)/colors.h
+sierpinski.o: $(UTILS_SRC)/erase.h
+sierpinski.o: $(UTILS_SRC)/font-retry.h
+sierpinski.o: $(UTILS_SRC)/grabscreen.h
+sierpinski.o: $(UTILS_SRC)/hsv.h
+sierpinski.o: $(UTILS_SRC)/resources.h
+sierpinski.o: $(UTILS_SRC)/usleep.h
+sierpinski.o: $(UTILS_SRC)/visual.h
+sierpinski.o: $(UTILS_SRC)/yarandom.h
+sierpinski.o: $(HACKS_SRC)/xlockmoreI.h
+sierpinski.o: $(HACKS_SRC)/xlockmore.h
+slip.o: $(srcdir)/../../config.h
+slip.o: $(HACKS_SRC)/fps.h
+slip.o: $(HACKS_SRC)/recanim.h
+slip.o: $(HACKS_SRC)/screenhackI.h
+slip.o: $(UTILS_SRC)/colors.h
+slip.o: $(UTILS_SRC)/erase.h
+slip.o: $(UTILS_SRC)/font-retry.h
+slip.o: $(UTILS_SRC)/grabscreen.h
+slip.o: $(UTILS_SRC)/hsv.h
+slip.o: $(UTILS_SRC)/resources.h
+slip.o: $(UTILS_SRC)/usleep.h
+slip.o: $(UTILS_SRC)/visual.h
+slip.o: $(UTILS_SRC)/yarandom.h
+slip.o: $(HACKS_SRC)/xlockmoreI.h
+slip.o: $(HACKS_SRC)/xlockmore.h
+space.o: $(srcdir)/../../config.h
+space.o: $(HACKS_SRC)/fps.h
+space.o: $(HACKS_SRC)/recanim.h
+space.o: $(HACKS_SRC)/screenhackI.h
+space.o: $(UTILS_SRC)/colors.h
+space.o: $(UTILS_SRC)/erase.h
+space.o: $(UTILS_SRC)/font-retry.h
+space.o: $(UTILS_SRC)/grabscreen.h
+space.o: $(UTILS_SRC)/hsv.h
+space.o: $(UTILS_SRC)/resources.h
+space.o: $(UTILS_SRC)/usleep.h
+space.o: $(UTILS_SRC)/visual.h
+space.o: $(UTILS_SRC)/yarandom.h
+space.o: $(HACKS_SRC)/xlockmoreI.h
+space.o: $(HACKS_SRC)/xlockmore.h
+sphere.o: $(srcdir)/../../config.h
+sphere.o: $(HACKS_SRC)/fps.h
+sphere.o: $(HACKS_SRC)/recanim.h
+sphere.o: $(HACKS_SRC)/screenhackI.h
+sphere.o: $(UTILS_SRC)/colors.h
+sphere.o: $(UTILS_SRC)/erase.h
+sphere.o: $(UTILS_SRC)/font-retry.h
+sphere.o: $(UTILS_SRC)/grabscreen.h
+sphere.o: $(UTILS_SRC)/hsv.h
+sphere.o: $(UTILS_SRC)/resources.h
+sphere.o: $(UTILS_SRC)/usleep.h
+sphere.o: $(UTILS_SRC)/visual.h
+sphere.o: $(UTILS_SRC)/yarandom.h
+sphere.o: $(HACKS_SRC)/xlockmoreI.h
+sphere.o: $(HACKS_SRC)/xlockmore.h
+spiral.o: $(srcdir)/../../config.h
+spiral.o: $(HACKS_SRC)/fps.h
+spiral.o: $(HACKS_SRC)/recanim.h
+spiral.o: $(HACKS_SRC)/screenhackI.h
+spiral.o: $(UTILS_SRC)/colors.h
+spiral.o: $(UTILS_SRC)/erase.h
+spiral.o: $(UTILS_SRC)/font-retry.h
+spiral.o: $(UTILS_SRC)/grabscreen.h
+spiral.o: $(UTILS_SRC)/hsv.h
+spiral.o: $(UTILS_SRC)/resources.h
+spiral.o: $(UTILS_SRC)/usleep.h
+spiral.o: $(UTILS_SRC)/visual.h
+spiral.o: $(UTILS_SRC)/yarandom.h
+spiral.o: $(HACKS_SRC)/xlockmoreI.h
+spiral.o: $(HACKS_SRC)/xlockmore.h
+spline.o: $(srcdir)/../../config.h
+spline.o: $(HACKS_SRC)/fps.h
+spline.o: $(HACKS_SRC)/recanim.h
+spline.o: $(HACKS_SRC)/screenhackI.h
+spline.o: $(UTILS_SRC)/colors.h
+spline.o: $(UTILS_SRC)/erase.h
+spline.o: $(UTILS_SRC)/font-retry.h
+spline.o: $(UTILS_SRC)/grabscreen.h
+spline.o: $(UTILS_SRC)/hsv.h
+spline.o: $(UTILS_SRC)/resources.h
+spline.o: $(UTILS_SRC)/usleep.h
+spline.o: $(UTILS_SRC)/visual.h
+spline.o: $(UTILS_SRC)/yarandom.h
+spline.o: $(HACKS_SRC)/xlockmoreI.h
+spline.o: $(HACKS_SRC)/xlockmore.h
+star.o: $(srcdir)/../../config.h
+star.o: $(HACKS_SRC)/fps.h
+star.o: $(HACKS_SRC)/recanim.h
+star.o: $(HACKS_SRC)/screenhackI.h
+star.o: $(UTILS_SRC)/colors.h
+star.o: $(UTILS_SRC)/font-retry.h
+star.o: $(UTILS_SRC)/grabscreen.h
+star.o: $(UTILS_SRC)/hsv.h
+star.o: $(UTILS_SRC)/resources.h
+star.o: $(UTILS_SRC)/spline.h
+star.o: $(UTILS_SRC)/usleep.h
+star.o: $(UTILS_SRC)/visual.h
+star.o: $(UTILS_SRC)/yarandom.h
+star.o: $(HACKS_SRC)/xlockmoreI.h
+star.o: $(HACKS_SRC)/xlockmore.h
+starfish.o: $(srcdir)/../../config.h
+starfish.o: $(HACKS_SRC)/fps.h
+starfish.o: $(HACKS_SRC)/recanim.h
+starfish.o: $(HACKS_SRC)/screenhackI.h
+#starfish.o: $(HACKS_SRC)/screenhack.h
+starfish.o: $(UTILS_SRC)/colors.h
+starfish.o: $(UTILS_SRC)/font-retry.h
+starfish.o: $(UTILS_SRC)/grabscreen.h
+starfish.o: $(UTILS_SRC)/hsv.h
+starfish.o: $(UTILS_SRC)/resources.h
+starfish.o: $(UTILS_SRC)/spline.h
+starfish.o: $(UTILS_SRC)/usleep.h
+starfish.o: $(UTILS_SRC)/visual.h
+starfish.o: $(UTILS_SRC)/yarandom.h
+starfish.o: $(HACKS_SRC)/xlockmoreI.h
+starfish.o: $(HACKS_SRC)/xlockmore.h
+strange.o: $(srcdir)/../../config.h
+strange.o: $(HACKS_SRC)/fps.h
+strange.o: $(HACKS_SRC)/recanim.h
+strange.o: $(HACKS_SRC)/screenhackI.h
+strange.o: $(UTILS_SRC)/aligned_malloc.h
+strange.o: $(UTILS_SRC)/colors.h
+strange.o: $(UTILS_SRC)/erase.h
+strange.o: $(UTILS_SRC)/font-retry.h
+strange.o: $(UTILS_SRC)/grabscreen.h
+strange.o: $(UTILS_SRC)/hsv.h
+strange.o: $(UTILS_SRC)/pow2.h
+strange.o: $(UTILS_SRC)/resources.h
+strange.o: $(UTILS_SRC)/thread_util.h
+strange.o: $(UTILS_SRC)/usleep.h
+strange.o: $(UTILS_SRC)/visual.h
+strange.o: $(UTILS_SRC)/xshm.h
+strange.o: $(UTILS_SRC)/yarandom.h
+strange.o: $(HACKS_SRC)/xlockmoreI.h
+strange.o: $(HACKS_SRC)/xlockmore.h
+swarm.o: $(srcdir)/../../config.h
+swarm.o: $(HACKS_SRC)/fps.h
+swarm.o: $(HACKS_SRC)/recanim.h
+swarm.o: $(HACKS_SRC)/screenhackI.h
+swarm.o: $(UTILS_SRC)/colors.h
+swarm.o: $(UTILS_SRC)/font-retry.h
+swarm.o: $(UTILS_SRC)/grabscreen.h
+swarm.o: $(UTILS_SRC)/hsv.h
+swarm.o: $(UTILS_SRC)/resources.h
+swarm.o: $(UTILS_SRC)/spline.h
+swarm.o: $(UTILS_SRC)/usleep.h
+swarm.o: $(UTILS_SRC)/visual.h
+swarm.o: $(UTILS_SRC)/yarandom.h
+swarm.o: $(HACKS_SRC)/xlockmoreI.h
+swarm.o: $(HACKS_SRC)/xlockmore.h
+swirl.o: $(srcdir)/../../config.h
+swirl.o: $(HACKS_SRC)/fps.h
+swirl.o: $(HACKS_SRC)/recanim.h
+swirl.o: $(HACKS_SRC)/screenhackI.h
+swirl.o: $(UTILS_SRC)/colors.h
+swirl.o: $(UTILS_SRC)/erase.h
+swirl.o: $(UTILS_SRC)/font-retry.h
+swirl.o: $(UTILS_SRC)/grabscreen.h
+swirl.o: $(UTILS_SRC)/hsv.h
+swirl.o: $(UTILS_SRC)/resources.h
+swirl.o: $(UTILS_SRC)/usleep.h
+swirl.o: $(UTILS_SRC)/visual.h
+swirl.o: $(UTILS_SRC)/xshm.h
+swirl.o: $(UTILS_SRC)/yarandom.h
+swirl.o: $(HACKS_SRC)/xlockmoreI.h
+swirl.o: $(HACKS_SRC)/xlockmore.h
+t3d.o: $(srcdir)/../../config.h
+t3d.o: $(HACKS_SRC)/fps.h
+t3d.o: $(HACKS_SRC)/recanim.h
+t3d.o: $(HACKS_SRC)/screenhackI.h
+t3d.o: $(HACKS_SRC)/screenhack.h
+t3d.o: $(UTILS_SRC)/colors.h
+t3d.o: $(UTILS_SRC)/font-retry.h
+t3d.o: $(UTILS_SRC)/grabscreen.h
+t3d.o: $(UTILS_SRC)/hsv.h
+t3d.o: $(UTILS_SRC)/resources.h
+t3d.o: $(UTILS_SRC)/usleep.h
+t3d.o: $(UTILS_SRC)/visual.h
+t3d.o: $(UTILS_SRC)/yarandom.h
+tetris.o: $(srcdir)/../../config.h
+tetris.o: $(HACKS_SRC)/fps.h
+tetris.o: $(HACKS_SRC)/recanim.h
+tetris.o: $(HACKS_SRC)/screenhackI.h
+tetris.o: $(UTILS_SRC)/colors.h
+tetris.o: $(UTILS_SRC)/erase.h
+tetris.o: $(UTILS_SRC)/font-retry.h
+tetris.o: $(UTILS_SRC)/grabscreen.h
+tetris.o: $(UTILS_SRC)/hsv.h
+tetris.o: $(UTILS_SRC)/resources.h
+tetris.o: $(UTILS_SRC)/usleep.h
+tetris.o: $(UTILS_SRC)/visual.h
+tetris.o: $(UTILS_SRC)/yarandom.h
+tetris.o: $(HACKS_SRC)/xlockmoreI.h
+tetris.o: $(HACKS_SRC)/xlockmore.h
+thornbird.o: $(srcdir)/../../config.h
+thornbird.o: $(HACKS_SRC)/fps.h
+thornbird.o: $(HACKS_SRC)/recanim.h
+thornbird.o: $(HACKS_SRC)/screenhackI.h
+thornbird.o: $(UTILS_SRC)/colors.h
+thornbird.o: $(UTILS_SRC)/erase.h
+thornbird.o: $(UTILS_SRC)/font-retry.h
+thornbird.o: $(UTILS_SRC)/grabscreen.h
+thornbird.o: $(UTILS_SRC)/hsv.h
+thornbird.o: $(UTILS_SRC)/resources.h
+thornbird.o: $(UTILS_SRC)/usleep.h
+thornbird.o: $(UTILS_SRC)/visual.h
+thornbird.o: $(UTILS_SRC)/yarandom.h
+thornbird.o: $(HACKS_SRC)/xlockmoreI.h
+thornbird.o: $(HACKS_SRC)/xlockmore.h
+tik_tak.o: $(srcdir)/../../config.h
+tik_tak.o: $(HACKS_SRC)/fps.h
+tik_tak.o: $(HACKS_SRC)/recanim.h
+tik_tak.o: $(HACKS_SRC)/screenhackI.h
+tik_tak.o: $(UTILS_SRC)/colors.h
+tik_tak.o: $(UTILS_SRC)/erase.h
+tik_tak.o: $(UTILS_SRC)/font-retry.h
+tik_tak.o: $(UTILS_SRC)/grabscreen.h
+tik_tak.o: $(UTILS_SRC)/hsv.h
+tik_tak.o: $(UTILS_SRC)/resources.h
+tik_tak.o: $(UTILS_SRC)/usleep.h
+tik_tak.o: $(UTILS_SRC)/visual.h
+tik_tak.o: $(UTILS_SRC)/yarandom.h
+tik_tak.o: $(HACKS_SRC)/xlockmoreI.h
+tik_tak.o: $(HACKS_SRC)/xlockmore.h
+toneclock.o: $(srcdir)/../../config.h
+toneclock.o: $(HACKS_SRC)/fps.h
+toneclock.o: $(HACKS_SRC)/recanim.h
+toneclock.o: $(HACKS_SRC)/screenhackI.h
+toneclock.o: $(UTILS_SRC)/colors.h
+toneclock.o: $(UTILS_SRC)/erase.h
+toneclock.o: $(UTILS_SRC)/font-retry.h
+toneclock.o: $(UTILS_SRC)/grabscreen.h
+toneclock.o: $(UTILS_SRC)/hsv.h
+toneclock.o: $(UTILS_SRC)/resources.h
+toneclock.o: $(UTILS_SRC)/usleep.h
+toneclock.o: $(UTILS_SRC)/visual.h
+toneclock.o: $(UTILS_SRC)/yarandom.h
+toneclock.o: $(HACKS_SRC)/xlockmoreI.h
+toneclock.o: $(HACKS_SRC)/xlockmore.h
+triangle.o: $(srcdir)/../../config.h
+triangle.o: $(HACKS_SRC)/fps.h
+triangle.o: $(HACKS_SRC)/recanim.h
+triangle.o: $(HACKS_SRC)/screenhackI.h
+triangle.o: $(UTILS_SRC)/colors.h
+triangle.o: $(UTILS_SRC)/erase.h
+triangle.o: $(UTILS_SRC)/font-retry.h
+triangle.o: $(UTILS_SRC)/grabscreen.h
+triangle.o: $(UTILS_SRC)/hsv.h
+triangle.o: $(UTILS_SRC)/resources.h
+triangle.o: $(UTILS_SRC)/usleep.h
+triangle.o: $(UTILS_SRC)/visual.h
+triangle.o: $(UTILS_SRC)/yarandom.h
+triangle.o: $(HACKS_SRC)/xlockmoreI.h
+triangle.o: $(HACKS_SRC)/xlockmore.h
+tube.o: $(srcdir)/../../config.h
+tube.o: $(HACKS_SRC)/fps.h
+tube.o: $(HACKS_SRC)/recanim.h
+tube.o: $(HACKS_SRC)/screenhackI.h
+tube.o: $(UTILS_SRC)/colors.h
+tube.o: $(UTILS_SRC)/erase.h
+tube.o: $(UTILS_SRC)/font-retry.h
+tube.o: $(UTILS_SRC)/grabscreen.h
+tube.o: $(UTILS_SRC)/hsv.h
+tube.o: $(UTILS_SRC)/resources.h
+tube.o: $(UTILS_SRC)/usleep.h
+tube.o: $(UTILS_SRC)/visual.h
+tube.o: $(UTILS_SRC)/yarandom.h
+tube.o: $(HACKS_SRC)/xlockmoreI.h
+tube.o: $(HACKS_SRC)/xlockmore.h
+turtle.o: $(srcdir)/../../config.h
+turtle.o: $(HACKS_SRC)/fps.h
+turtle.o: $(HACKS_SRC)/recanim.h
+turtle.o: $(HACKS_SRC)/screenhackI.h
+turtle.o: $(UTILS_SRC)/colors.h
+turtle.o: $(UTILS_SRC)/erase.h
+turtle.o: $(UTILS_SRC)/font-retry.h
+turtle.o: $(UTILS_SRC)/grabscreen.h
+turtle.o: $(UTILS_SRC)/hsv.h
+turtle.o: $(UTILS_SRC)/resources.h
+turtle.o: $(UTILS_SRC)/usleep.h
+turtle.o: $(UTILS_SRC)/visual.h
+turtle.o: $(UTILS_SRC)/yarandom.h
+turtle.o: $(HACKS_SRC)/xlockmoreI.h
+turtle.o: $(HACKS_SRC)/xlockmore.h
+vines.o: $(srcdir)/../../config.h
+vines.o: $(HACKS_SRC)/fps.h
+vines.o: $(HACKS_SRC)/recanim.h
+vines.o: $(HACKS_SRC)/screenhackI.h
+vines.o: $(UTILS_SRC)/colors.h
+vines.o: $(UTILS_SRC)/erase.h
+vines.o: $(UTILS_SRC)/font-retry.h
+vines.o: $(UTILS_SRC)/grabscreen.h
+vines.o: $(UTILS_SRC)/hsv.h
+vines.o: $(UTILS_SRC)/resources.h
+vines.o: $(UTILS_SRC)/usleep.h
+vines.o: $(UTILS_SRC)/visual.h
+vines.o: $(UTILS_SRC)/yarandom.h
+vines.o: $(HACKS_SRC)/xlockmoreI.h
+vines.o: $(HACKS_SRC)/xlockmore.h
+voters.o: $(srcdir)/../../config.h
+voters.o: $(HACKS_SRC)/fps.h
+voters.o: $(HACKS_SRC)/recanim.h
+voters.o: $(HACKS_SRC)/screenhackI.h
+voters.o: $(UTILS_SRC)/colors.h
+voters.o: $(UTILS_SRC)/erase.h
+voters.o: $(UTILS_SRC)/font-retry.h
+voters.o: $(UTILS_SRC)/grabscreen.h
+voters.o: $(UTILS_SRC)/hsv.h
+voters.o: $(UTILS_SRC)/resources.h
+voters.o: $(UTILS_SRC)/usleep.h
+voters.o: $(UTILS_SRC)/visual.h
+voters.o: $(UTILS_SRC)/yarandom.h
+voters.o: $(HACKS_SRC)/xlockmoreI.h
+voters.o: $(HACKS_SRC)/xlockmore.h
+wator.o: $(srcdir)/../../config.h
+wator.o: $(HACKS_SRC)/fps.h
+wator.o: $(HACKS_SRC)/recanim.h
+wator.o: $(HACKS_SRC)/screenhackI.h
+wator.o: $(UTILS_SRC)/colors.h
+wator.o: $(UTILS_SRC)/erase.h
+wator.o: $(UTILS_SRC)/font-retry.h
+wator.o: $(UTILS_SRC)/grabscreen.h
+wator.o: $(UTILS_SRC)/hsv.h
+wator.o: $(UTILS_SRC)/resources.h
+wator.o: $(UTILS_SRC)/usleep.h
+wator.o: $(UTILS_SRC)/visual.h
+wator.o: $(UTILS_SRC)/yarandom.h
+wator.o: $(HACKS_SRC)/xlockmoreI.h
+wator.o: $(HACKS_SRC)/xlockmore.h
+wire.o: $(srcdir)/../../config.h
+wire.o: $(HACKS_SRC)/fps.h
+wire.o: $(HACKS_SRC)/recanim.h
+wire.o: $(HACKS_SRC)/screenhackI.h
+wire.o: $(UTILS_SRC)/colors.h
+wire.o: $(UTILS_SRC)/erase.h
+wire.o: $(UTILS_SRC)/font-retry.h
+wire.o: $(UTILS_SRC)/grabscreen.h
+wire.o: $(UTILS_SRC)/hsv.h
+wire.o: $(UTILS_SRC)/resources.h
+wire.o: $(UTILS_SRC)/usleep.h
+wire.o: $(UTILS_SRC)/visual.h
+wire.o: $(UTILS_SRC)/yarandom.h
+wire.o: $(HACKS_SRC)/xlockmoreI.h
+wire.o: $(HACKS_SRC)/xlockmore.h
+world.o: $(srcdir)/../../config.h
+world.o: $(HACKS_SRC)/fps.h
+world.o: $(HACKS_SRC)/recanim.h
+world.o: $(HACKS_SRC)/screenhackI.h
+world.o: $(UTILS_SRC)/colors.h
+world.o: $(UTILS_SRC)/erase.h
+world.o: $(UTILS_SRC)/font-retry.h
+world.o: $(UTILS_SRC)/grabscreen.h
+world.o: $(UTILS_SRC)/hsv.h
+world.o: $(UTILS_SRC)/resources.h
+world.o: $(UTILS_SRC)/usleep.h
+world.o: $(UTILS_SRC)/visual.h
+world.o: $(UTILS_SRC)/yarandom.h
+world.o: $(HACKS_SRC)/xlockmoreI.h
+world.o: $(HACKS_SRC)/xlockmore.h
+worm.o: $(srcdir)/../../config.h
+worm.o: $(HACKS_SRC)/fps.h
+worm.o: $(HACKS_SRC)/recanim.h
+worm.o: $(HACKS_SRC)/screenhackI.h
+worm.o: $(UTILS_SRC)/colors.h
+worm.o: $(UTILS_SRC)/erase.h
+worm.o: $(UTILS_SRC)/font-retry.h
+worm.o: $(UTILS_SRC)/grabscreen.h
+worm.o: $(UTILS_SRC)/hsv.h
+worm.o: $(UTILS_SRC)/resources.h
+worm.o: $(UTILS_SRC)/usleep.h
+worm.o: $(UTILS_SRC)/visual.h
+worm.o: $(UTILS_SRC)/yarandom.h
+worm.o: $(HACKS_SRC)/xlockmoreI.h
+worm.o: $(HACKS_SRC)/xlockmore.h
+xcl.o: $(srcdir)/../../config.h
+xcl.o: $(HACKS_SRC)/fps.h
+xcl.o: $(HACKS_SRC)/recanim.h
+xcl.o: $(HACKS_SRC)/screenhackI.h
+xcl.o: $(UTILS_SRC)/colors.h
+xcl.o: $(UTILS_SRC)/erase.h
+xcl.o: $(UTILS_SRC)/font-retry.h
+xcl.o: $(UTILS_SRC)/grabscreen.h
+xcl.o: $(UTILS_SRC)/hsv.h
+xcl.o: $(UTILS_SRC)/resources.h
+xcl.o: $(UTILS_SRC)/usleep.h
+xcl.o: $(UTILS_SRC)/visual.h
+xcl.o: $(UTILS_SRC)/yarandom.h
+xcl.o: $(HACKS_SRC)/xlockmoreI.h
+xcl.o: $(HACKS_SRC)/xlockmore.h
+xjack.o: $(srcdir)/../../config.h
+xjack.o: $(HACKS_SRC)/fps.h
+xjack.o: $(HACKS_SRC)/recanim.h
+xjack.o: $(HACKS_SRC)/screenhackI.h
+#xjack.o: $(HACKS_SRC)/screenhack.h
+xjack.o: $(UTILS_SRC)/colors.h
+xjack.o: $(UTILS_SRC)/font-retry.h
+xjack.o: $(UTILS_SRC)/grabscreen.h
+xjack.o: $(UTILS_SRC)/hsv.h
+xjack.o: $(UTILS_SRC)/resources.h
+xjack.o: $(UTILS_SRC)/usleep.h
+xjack.o: $(UTILS_SRC)/visual.h
+xjack.o: $(UTILS_SRC)/yarandom.h
+xjack.o: $(HACKS_SRC)/xlockmoreI.h
+xjack.o: $(HACKS_SRC)/xlockmore.h
+
 abstractile.o: $(srcdir)/../../config.h
 abstractile.o: $(HACKS_SRC)/fps.h
 abstractile.o: $(HACKS_SRC)/recanim.h
@@ -1436,20 +3080,6 @@ analogtv.o: $(UTILS_SRC)/visual.h
 analogtv.o: $(UTILS_SRC)/xshm.h
 analogtv.o: $(UTILS_SRC)/yarandom.h
 analogtv.o: $(HACKS_SRC)/ximage-loader.h
-anemone.o: $(srcdir)/../../config.h
-anemone.o: $(HACKS_SRC)/fps.h
-anemone.o: $(HACKS_SRC)/recanim.h
-anemone.o: $(HACKS_SRC)/screenhackI.h
-anemone.o: $(HACKS_SRC)/screenhack.h
-anemone.o: $(UTILS_SRC)/colors.h
-anemone.o: $(UTILS_SRC)/font-retry.h
-anemone.o: $(UTILS_SRC)/grabscreen.h
-anemone.o: $(UTILS_SRC)/hsv.h
-anemone.o: $(UTILS_SRC)/resources.h
-anemone.o: $(UTILS_SRC)/usleep.h
-anemone.o: $(UTILS_SRC)/visual.h
-anemone.o: $(UTILS_SRC)/xdbe.h
-anemone.o: $(UTILS_SRC)/yarandom.h
 anemotaxis.o: $(srcdir)/../../config.h
 anemotaxis.o: $(HACKS_SRC)/fps.h
 anemotaxis.o: $(HACKS_SRC)/recanim.h
@@ -1752,20 +3382,6 @@ compass.o: $(UTILS_SRC)/usleep.h
 compass.o: $(UTILS_SRC)/visual.h
 compass.o: $(UTILS_SRC)/xdbe.h
 compass.o: $(UTILS_SRC)/yarandom.h
-coral.o: $(srcdir)/../../config.h
-coral.o: $(HACKS_SRC)/fps.h
-coral.o: $(HACKS_SRC)/recanim.h
-coral.o: $(HACKS_SRC)/screenhackI.h
-coral.o: $(HACKS_SRC)/screenhack.h
-coral.o: $(UTILS_SRC)/colors.h
-coral.o: $(UTILS_SRC)/erase.h
-coral.o: $(UTILS_SRC)/font-retry.h
-coral.o: $(UTILS_SRC)/grabscreen.h
-coral.o: $(UTILS_SRC)/hsv.h
-coral.o: $(UTILS_SRC)/resources.h
-coral.o: $(UTILS_SRC)/usleep.h
-coral.o: $(UTILS_SRC)/visual.h
-coral.o: $(UTILS_SRC)/yarandom.h
 critical.o: $(srcdir)/../../config.h
 critical.o: $(HACKS_SRC)/fps.h
 critical.o: $(HACKS_SRC)/recanim.h
@@ -1780,21 +3396,6 @@ critical.o: $(UTILS_SRC)/resources.h
 critical.o: $(UTILS_SRC)/usleep.h
 critical.o: $(UTILS_SRC)/visual.h
 critical.o: $(UTILS_SRC)/yarandom.h
-crystal.o: $(srcdir)/../../config.h
-crystal.o: $(HACKS_SRC)/fps.h
-crystal.o: $(HACKS_SRC)/recanim.h
-crystal.o: $(HACKS_SRC)/screenhackI.h
-crystal.o: $(UTILS_SRC)/colors.h
-crystal.o: $(UTILS_SRC)/erase.h
-crystal.o: $(UTILS_SRC)/font-retry.h
-crystal.o: $(UTILS_SRC)/grabscreen.h
-crystal.o: $(UTILS_SRC)/hsv.h
-crystal.o: $(UTILS_SRC)/resources.h
-crystal.o: $(UTILS_SRC)/usleep.h
-crystal.o: $(UTILS_SRC)/visual.h
-crystal.o: $(UTILS_SRC)/yarandom.h
-crystal.o: $(HACKS_SRC)/xlockmoreI.h
-crystal.o: $(HACKS_SRC)/xlockmore.h
 cwaves.o: $(srcdir)/../../config.h
 cwaves.o: $(HACKS_SRC)/fps.h
 cwaves.o: $(HACKS_SRC)/recanim.h
@@ -1835,67 +3436,8 @@ decayscreen.o: $(UTILS_SRC)/resources.h
 decayscreen.o: $(UTILS_SRC)/usleep.h
 decayscreen.o: $(UTILS_SRC)/visual.h
 decayscreen.o: $(UTILS_SRC)/yarandom.h
-deco.o: $(srcdir)/../../config.h
-deco.o: $(HACKS_SRC)/fps.h
-deco.o: $(HACKS_SRC)/recanim.h
-deco.o: $(HACKS_SRC)/screenhackI.h
-deco.o: $(HACKS_SRC)/screenhack.h
-deco.o: $(UTILS_SRC)/colors.h
-deco.o: $(UTILS_SRC)/font-retry.h
-deco.o: $(UTILS_SRC)/grabscreen.h
-deco.o: $(UTILS_SRC)/hsv.h
-deco.o: $(UTILS_SRC)/resources.h
-deco.o: $(UTILS_SRC)/usleep.h
-deco.o: $(UTILS_SRC)/visual.h
-deco.o: $(UTILS_SRC)/yarandom.h
 delaunay.o: $(srcdir)/../../config.h
 delaunay.o: $(HACKS_SRC)/delaunay.h
-deluxe.o: $(srcdir)/../../config.h
-deluxe.o: $(HACKS_SRC)/fps.h
-deluxe.o: $(HACKS_SRC)/recanim.h
-deluxe.o: $(HACKS_SRC)/screenhackI.h
-deluxe.o: $(HACKS_SRC)/screenhack.h
-deluxe.o: $(UTILS_SRC)/alpha.h
-deluxe.o: $(UTILS_SRC)/colors.h
-deluxe.o: $(UTILS_SRC)/font-retry.h
-deluxe.o: $(UTILS_SRC)/grabscreen.h
-deluxe.o: $(UTILS_SRC)/hsv.h
-deluxe.o: $(UTILS_SRC)/resources.h
-deluxe.o: $(UTILS_SRC)/usleep.h
-deluxe.o: $(UTILS_SRC)/visual.h
-deluxe.o: $(UTILS_SRC)/xdbe.h
-deluxe.o: $(UTILS_SRC)/yarandom.h
-demon.o: $(HACKS_SRC)/automata.h
-demon.o: $(srcdir)/../../config.h
-demon.o: $(HACKS_SRC)/fps.h
-demon.o: $(HACKS_SRC)/recanim.h
-demon.o: $(HACKS_SRC)/screenhackI.h
-demon.o: $(UTILS_SRC)/colors.h
-demon.o: $(UTILS_SRC)/erase.h
-demon.o: $(UTILS_SRC)/font-retry.h
-demon.o: $(UTILS_SRC)/grabscreen.h
-demon.o: $(UTILS_SRC)/hsv.h
-demon.o: $(UTILS_SRC)/resources.h
-demon.o: $(UTILS_SRC)/usleep.h
-demon.o: $(UTILS_SRC)/visual.h
-demon.o: $(UTILS_SRC)/yarandom.h
-demon.o: $(HACKS_SRC)/xlockmoreI.h
-demon.o: $(HACKS_SRC)/xlockmore.h
-discrete.o: $(srcdir)/../../config.h
-discrete.o: $(HACKS_SRC)/fps.h
-discrete.o: $(HACKS_SRC)/recanim.h
-discrete.o: $(HACKS_SRC)/screenhackI.h
-discrete.o: $(UTILS_SRC)/colors.h
-discrete.o: $(UTILS_SRC)/erase.h
-discrete.o: $(UTILS_SRC)/font-retry.h
-discrete.o: $(UTILS_SRC)/grabscreen.h
-discrete.o: $(UTILS_SRC)/hsv.h
-discrete.o: $(UTILS_SRC)/resources.h
-discrete.o: $(UTILS_SRC)/usleep.h
-discrete.o: $(UTILS_SRC)/visual.h
-discrete.o: $(UTILS_SRC)/yarandom.h
-discrete.o: $(HACKS_SRC)/xlockmoreI.h
-discrete.o: $(HACKS_SRC)/xlockmore.h
 distort.o: $(srcdir)/../../config.h
 distort.o: $(HACKS_SRC)/fps.h
 distort.o: $(HACKS_SRC)/recanim.h
@@ -1910,21 +3452,6 @@ distort.o: $(UTILS_SRC)/usleep.h
 distort.o: $(UTILS_SRC)/visual.h
 distort.o: $(UTILS_SRC)/xshm.h
 distort.o: $(UTILS_SRC)/yarandom.h
-drift.o: $(srcdir)/../../config.h
-drift.o: $(HACKS_SRC)/fps.h
-drift.o: $(HACKS_SRC)/recanim.h
-drift.o: $(HACKS_SRC)/screenhackI.h
-drift.o: $(UTILS_SRC)/colors.h
-drift.o: $(UTILS_SRC)/erase.h
-drift.o: $(UTILS_SRC)/font-retry.h
-drift.o: $(UTILS_SRC)/grabscreen.h
-drift.o: $(UTILS_SRC)/hsv.h
-drift.o: $(UTILS_SRC)/resources.h
-drift.o: $(UTILS_SRC)/usleep.h
-drift.o: $(UTILS_SRC)/visual.h
-drift.o: $(UTILS_SRC)/yarandom.h
-drift.o: $(HACKS_SRC)/xlockmoreI.h
-drift.o: $(HACKS_SRC)/xlockmore.h
 epicycle.o: $(srcdir)/../../config.h
 epicycle.o: $(HACKS_SRC)/fps.h
 epicycle.o: $(HACKS_SRC)/recanim.h
@@ -1952,127 +3479,6 @@ eruption.o: $(UTILS_SRC)/resources.h
 eruption.o: $(UTILS_SRC)/usleep.h
 eruption.o: $(UTILS_SRC)/visual.h
 eruption.o: $(UTILS_SRC)/yarandom.h
-euler2d.o: $(srcdir)/../../config.h
-euler2d.o: $(HACKS_SRC)/fps.h
-euler2d.o: $(HACKS_SRC)/recanim.h
-euler2d.o: $(HACKS_SRC)/screenhackI.h
-euler2d.o: $(UTILS_SRC)/colors.h
-euler2d.o: $(UTILS_SRC)/erase.h
-euler2d.o: $(UTILS_SRC)/font-retry.h
-euler2d.o: $(UTILS_SRC)/grabscreen.h
-euler2d.o: $(UTILS_SRC)/hsv.h
-euler2d.o: $(UTILS_SRC)/resources.h
-euler2d.o: $(UTILS_SRC)/usleep.h
-euler2d.o: $(UTILS_SRC)/visual.h
-euler2d.o: $(UTILS_SRC)/yarandom.h
-euler2d.o: $(HACKS_SRC)/xlockmoreI.h
-euler2d.o: $(HACKS_SRC)/xlockmore.h
-fadeplot.o: $(srcdir)/../../config.h
-fadeplot.o: $(HACKS_SRC)/fps.h
-fadeplot.o: $(HACKS_SRC)/recanim.h
-fadeplot.o: $(HACKS_SRC)/screenhackI.h
-fadeplot.o: $(UTILS_SRC)/colors.h
-fadeplot.o: $(UTILS_SRC)/erase.h
-fadeplot.o: $(UTILS_SRC)/font-retry.h
-fadeplot.o: $(UTILS_SRC)/grabscreen.h
-fadeplot.o: $(UTILS_SRC)/hsv.h
-fadeplot.o: $(UTILS_SRC)/resources.h
-fadeplot.o: $(UTILS_SRC)/usleep.h
-fadeplot.o: $(UTILS_SRC)/visual.h
-fadeplot.o: $(UTILS_SRC)/yarandom.h
-fadeplot.o: $(HACKS_SRC)/xlockmoreI.h
-fadeplot.o: $(HACKS_SRC)/xlockmore.h
-fiberlamp.o: $(srcdir)/../../config.h
-fiberlamp.o: $(HACKS_SRC)/fps.h
-fiberlamp.o: $(HACKS_SRC)/recanim.h
-fiberlamp.o: $(HACKS_SRC)/screenhackI.h
-fiberlamp.o: $(UTILS_SRC)/colors.h
-fiberlamp.o: $(UTILS_SRC)/erase.h
-fiberlamp.o: $(UTILS_SRC)/font-retry.h
-fiberlamp.o: $(UTILS_SRC)/grabscreen.h
-fiberlamp.o: $(UTILS_SRC)/hsv.h
-fiberlamp.o: $(UTILS_SRC)/resources.h
-fiberlamp.o: $(UTILS_SRC)/usleep.h
-fiberlamp.o: $(UTILS_SRC)/visual.h
-fiberlamp.o: $(UTILS_SRC)/yarandom.h
-fiberlamp.o: $(HACKS_SRC)/xlockmoreI.h
-fiberlamp.o: $(HACKS_SRC)/xlockmore.h
-filmleader.o: $(HACKS_SRC)/analogtv.h
-filmleader.o: $(srcdir)/../../config.h
-filmleader.o: $(HACKS_SRC)/fps.h
-filmleader.o: $(HACKS_SRC)/recanim.h
-filmleader.o: $(HACKS_SRC)/screenhackI.h
-filmleader.o: $(HACKS_SRC)/screenhack.h
-filmleader.o: $(UTILS_SRC)/aligned_malloc.h
-filmleader.o: $(UTILS_SRC)/colors.h
-filmleader.o: $(UTILS_SRC)/font-retry.h
-filmleader.o: $(UTILS_SRC)/grabscreen.h
-filmleader.o: $(UTILS_SRC)/hsv.h
-filmleader.o: $(UTILS_SRC)/resources.h
-filmleader.o: $(UTILS_SRC)/thread_util.h
-filmleader.o: $(UTILS_SRC)/usleep.h
-filmleader.o: $(UTILS_SRC)/visual.h
-filmleader.o: $(UTILS_SRC)/xft.h
-filmleader.o: $(UTILS_SRC)/xshm.h
-filmleader.o: $(UTILS_SRC)/yarandom.h
-fireworkx.o: $(srcdir)/../../config.h
-fireworkx.o: $(HACKS_SRC)/fps.h
-fireworkx.o: $(HACKS_SRC)/recanim.h
-fireworkx.o: $(HACKS_SRC)/screenhackI.h
-fireworkx.o: $(HACKS_SRC)/screenhack.h
-fireworkx.o: $(UTILS_SRC)/colors.h
-fireworkx.o: $(UTILS_SRC)/font-retry.h
-fireworkx.o: $(UTILS_SRC)/grabscreen.h
-fireworkx.o: $(UTILS_SRC)/hsv.h
-fireworkx.o: $(UTILS_SRC)/resources.h
-fireworkx.o: $(UTILS_SRC)/usleep.h
-fireworkx.o: $(UTILS_SRC)/visual.h
-fireworkx.o: $(UTILS_SRC)/yarandom.h
-flag.o: $(srcdir)/../../config.h
-flag.o: $(HACKS_SRC)/fps.h
-flag.o: images/gen/bob_png.h
-flag.o: $(HACKS_SRC)/recanim.h
-flag.o: $(HACKS_SRC)/screenhackI.h
-flag.o: $(UTILS_SRC)/colors.h
-flag.o: $(UTILS_SRC)/erase.h
-flag.o: $(UTILS_SRC)/font-retry.h
-flag.o: $(UTILS_SRC)/grabscreen.h
-flag.o: $(UTILS_SRC)/hsv.h
-flag.o: $(UTILS_SRC)/resources.h
-flag.o: $(UTILS_SRC)/usleep.h
-flag.o: $(UTILS_SRC)/visual.h
-flag.o: $(UTILS_SRC)/yarandom.h
-flag.o: $(HACKS_SRC)/ximage-loader.h
-flag.o: $(HACKS_SRC)/xlockmoreI.h
-flag.o: $(HACKS_SRC)/xlockmore.h
-flame.o: $(srcdir)/../../config.h
-flame.o: $(HACKS_SRC)/fps.h
-flame.o: $(HACKS_SRC)/recanim.h
-flame.o: $(HACKS_SRC)/screenhackI.h
-flame.o: $(HACKS_SRC)/screenhack.h
-flame.o: $(UTILS_SRC)/colors.h
-flame.o: $(UTILS_SRC)/font-retry.h
-flame.o: $(UTILS_SRC)/grabscreen.h
-flame.o: $(UTILS_SRC)/hsv.h
-flame.o: $(UTILS_SRC)/resources.h
-flame.o: $(UTILS_SRC)/usleep.h
-flame.o: $(UTILS_SRC)/visual.h
-flame.o: $(UTILS_SRC)/yarandom.h
-flow.o: $(srcdir)/../../config.h
-flow.o: $(HACKS_SRC)/fps.h
-flow.o: $(HACKS_SRC)/recanim.h
-flow.o: $(HACKS_SRC)/screenhackI.h
-flow.o: $(UTILS_SRC)/colors.h
-flow.o: $(UTILS_SRC)/erase.h
-flow.o: $(UTILS_SRC)/font-retry.h
-flow.o: $(UTILS_SRC)/grabscreen.h
-flow.o: $(UTILS_SRC)/hsv.h
-flow.o: $(UTILS_SRC)/resources.h
-flow.o: $(UTILS_SRC)/usleep.h
-flow.o: $(UTILS_SRC)/visual.h
-flow.o: $(UTILS_SRC)/yarandom.h
-flow.o: $(HACKS_SRC)/xlockmoreI.h
-flow.o: $(HACKS_SRC)/xlockmore.h
 fluidballs.o: $(srcdir)/../../config.h
 fluidballs.o: $(HACKS_SRC)/fps.h
 fluidballs.o: $(HACKS_SRC)/recanim.h
@@ -2104,34 +3510,6 @@ fontglide.o: $(UTILS_SRC)/visual.h
 fontglide.o: $(UTILS_SRC)/xdbe.h
 fontglide.o: $(UTILS_SRC)/xft.h
 fontglide.o: $(UTILS_SRC)/yarandom.h
-forest.o: $(srcdir)/../../config.h
-forest.o: $(HACKS_SRC)/fps.h
-forest.o: $(HACKS_SRC)/recanim.h
-forest.o: $(HACKS_SRC)/screenhackI.h
-forest.o: $(UTILS_SRC)/colors.h
-forest.o: $(UTILS_SRC)/erase.h
-forest.o: $(UTILS_SRC)/font-retry.h
-forest.o: $(UTILS_SRC)/grabscreen.h
-forest.o: $(UTILS_SRC)/hsv.h
-forest.o: $(UTILS_SRC)/resources.h
-forest.o: $(UTILS_SRC)/usleep.h
-forest.o: $(UTILS_SRC)/visual.h
-forest.o: $(UTILS_SRC)/yarandom.h
-forest.o: $(HACKS_SRC)/xlockmoreI.h
-forest.o: $(HACKS_SRC)/xlockmore.h
-fps.o: $(srcdir)/../../config.h
-fps.o: $(HACKS_SRC)/fpsI.h
-fps.o: $(HACKS_SRC)/fps.h
-fps.o: $(HACKS_SRC)/recanim.h
-fps.o: $(HACKS_SRC)/screenhackI.h
-fps.o: $(UTILS_SRC)/colors.h
-fps.o: $(UTILS_SRC)/font-retry.h
-fps.o: $(UTILS_SRC)/grabscreen.h
-fps.o: $(UTILS_SRC)/hsv.h
-fps.o: $(UTILS_SRC)/resources.h
-fps.o: $(UTILS_SRC)/usleep.h
-fps.o: $(UTILS_SRC)/visual.h
-fps.o: $(UTILS_SRC)/yarandom.h
 fuzzyflakes.o: $(srcdir)/../../config.h
 fuzzyflakes.o: $(HACKS_SRC)/fps.h
 fuzzyflakes.o: $(HACKS_SRC)/recanim.h
@@ -2145,21 +3523,37 @@ fuzzyflakes.o: $(UTILS_SRC)/resources.h
 fuzzyflakes.o: $(UTILS_SRC)/usleep.h
 fuzzyflakes.o: $(UTILS_SRC)/visual.h
 fuzzyflakes.o: $(UTILS_SRC)/yarandom.h
-galaxy.o: $(srcdir)/../../config.h
-galaxy.o: $(HACKS_SRC)/fps.h
-galaxy.o: $(HACKS_SRC)/recanim.h
-galaxy.o: $(HACKS_SRC)/screenhackI.h
-galaxy.o: $(UTILS_SRC)/colors.h
-galaxy.o: $(UTILS_SRC)/erase.h
-galaxy.o: $(UTILS_SRC)/font-retry.h
-galaxy.o: $(UTILS_SRC)/grabscreen.h
-galaxy.o: $(UTILS_SRC)/hsv.h
-galaxy.o: $(UTILS_SRC)/resources.h
-galaxy.o: $(UTILS_SRC)/usleep.h
-galaxy.o: $(UTILS_SRC)/visual.h
-galaxy.o: $(UTILS_SRC)/yarandom.h
-galaxy.o: $(HACKS_SRC)/xlockmoreI.h
-galaxy.o: $(HACKS_SRC)/xlockmore.h
+filmleader.o: $(HACKS_SRC)/analogtv.h
+filmleader.o: $(srcdir)/../../config.h
+filmleader.o: $(HACKS_SRC)/fps.h
+filmleader.o: $(HACKS_SRC)/recanim.h
+filmleader.o: $(HACKS_SRC)/screenhackI.h
+filmleader.o: $(HACKS_SRC)/screenhack.h
+filmleader.o: $(UTILS_SRC)/aligned_malloc.h
+filmleader.o: $(UTILS_SRC)/colors.h
+filmleader.o: $(UTILS_SRC)/font-retry.h
+filmleader.o: $(UTILS_SRC)/grabscreen.h
+filmleader.o: $(UTILS_SRC)/hsv.h
+filmleader.o: $(UTILS_SRC)/resources.h
+filmleader.o: $(UTILS_SRC)/thread_util.h
+filmleader.o: $(UTILS_SRC)/usleep.h
+filmleader.o: $(UTILS_SRC)/visual.h
+filmleader.o: $(UTILS_SRC)/xft.h
+filmleader.o: $(UTILS_SRC)/xshm.h
+filmleader.o: $(UTILS_SRC)/yarandom.h
+fireworkx.o: $(srcdir)/../../config.h
+fireworkx.o: $(HACKS_SRC)/fps.h
+fireworkx.o: $(HACKS_SRC)/recanim.h
+fireworkx.o: $(HACKS_SRC)/screenhackI.h
+fireworkx.o: $(HACKS_SRC)/screenhack.h
+fireworkx.o: $(UTILS_SRC)/colors.h
+fireworkx.o: $(UTILS_SRC)/font-retry.h
+fireworkx.o: $(UTILS_SRC)/grabscreen.h
+fireworkx.o: $(UTILS_SRC)/hsv.h
+fireworkx.o: $(UTILS_SRC)/resources.h
+fireworkx.o: $(UTILS_SRC)/usleep.h
+fireworkx.o: $(UTILS_SRC)/visual.h
+fireworkx.o: $(UTILS_SRC)/yarandom.h
 glitchpeg.o: $(srcdir)/../../config.h
 glitchpeg.o: $(HACKS_SRC)/fps.h
 glitchpeg.o: $(HACKS_SRC)/recanim.h
@@ -2174,36 +3568,6 @@ glitchpeg.o: $(UTILS_SRC)/usleep.h
 glitchpeg.o: $(UTILS_SRC)/visual.h
 glitchpeg.o: $(UTILS_SRC)/yarandom.h
 glitchpeg.o: $(HACKS_SRC)/ximage-loader.h
-goop.o: $(srcdir)/../../config.h
-goop.o: $(HACKS_SRC)/fps.h
-goop.o: $(HACKS_SRC)/recanim.h
-goop.o: $(HACKS_SRC)/screenhackI.h
-goop.o: $(HACKS_SRC)/screenhack.h
-goop.o: $(UTILS_SRC)/alpha.h
-goop.o: $(UTILS_SRC)/colors.h
-goop.o: $(UTILS_SRC)/font-retry.h
-goop.o: $(UTILS_SRC)/grabscreen.h
-goop.o: $(UTILS_SRC)/hsv.h
-goop.o: $(UTILS_SRC)/resources.h
-goop.o: $(UTILS_SRC)/spline.h
-goop.o: $(UTILS_SRC)/usleep.h
-goop.o: $(UTILS_SRC)/visual.h
-goop.o: $(UTILS_SRC)/yarandom.h
-grav.o: $(srcdir)/../../config.h
-grav.o: $(HACKS_SRC)/fps.h
-grav.o: $(HACKS_SRC)/recanim.h
-grav.o: $(HACKS_SRC)/screenhackI.h
-grav.o: $(UTILS_SRC)/colors.h
-grav.o: $(UTILS_SRC)/erase.h
-grav.o: $(UTILS_SRC)/font-retry.h
-grav.o: $(UTILS_SRC)/grabscreen.h
-grav.o: $(UTILS_SRC)/hsv.h
-grav.o: $(UTILS_SRC)/resources.h
-grav.o: $(UTILS_SRC)/usleep.h
-grav.o: $(UTILS_SRC)/visual.h
-grav.o: $(UTILS_SRC)/yarandom.h
-grav.o: $(HACKS_SRC)/xlockmoreI.h
-grav.o: $(HACKS_SRC)/xlockmore.h
 greynetic.o: $(srcdir)/../../config.h
 greynetic.o: $(HACKS_SRC)/fps.h
 greynetic.o: $(HACKS_SRC)/recanim.h
@@ -2243,33 +3607,6 @@ halo.o: $(UTILS_SRC)/resources.h
 halo.o: $(UTILS_SRC)/usleep.h
 halo.o: $(UTILS_SRC)/visual.h
 halo.o: $(UTILS_SRC)/yarandom.h
-helix.o: $(srcdir)/../../config.h
-helix.o: $(HACKS_SRC)/fps.h
-helix.o: $(HACKS_SRC)/recanim.h
-helix.o: $(HACKS_SRC)/screenhackI.h
-helix.o: $(HACKS_SRC)/screenhack.h
-helix.o: $(UTILS_SRC)/colors.h
-helix.o: $(UTILS_SRC)/erase.h
-helix.o: $(UTILS_SRC)/font-retry.h
-helix.o: $(UTILS_SRC)/grabscreen.h
-helix.o: $(UTILS_SRC)/hsv.h
-helix.o: $(UTILS_SRC)/resources.h
-helix.o: $(UTILS_SRC)/usleep.h
-helix.o: $(UTILS_SRC)/visual.h
-helix.o: $(UTILS_SRC)/yarandom.h
-hexadrop.o: $(srcdir)/../../config.h
-hexadrop.o: $(HACKS_SRC)/fps.h
-hexadrop.o: $(HACKS_SRC)/recanim.h
-hexadrop.o: $(HACKS_SRC)/screenhackI.h
-hexadrop.o: $(HACKS_SRC)/screenhack.h
-hexadrop.o: $(UTILS_SRC)/colors.h
-hexadrop.o: $(UTILS_SRC)/font-retry.h
-hexadrop.o: $(UTILS_SRC)/grabscreen.h
-hexadrop.o: $(UTILS_SRC)/hsv.h
-hexadrop.o: $(UTILS_SRC)/resources.h
-hexadrop.o: $(UTILS_SRC)/usleep.h
-hexadrop.o: $(UTILS_SRC)/visual.h
-hexadrop.o: $(UTILS_SRC)/yarandom.h
 hopalong.o: $(srcdir)/../../config.h
 hopalong.o: $(HACKS_SRC)/fps.h
 hopalong.o: $(HACKS_SRC)/recanim.h
@@ -2311,19 +3648,19 @@ hypercube.o: $(UTILS_SRC)/resources.h
 hypercube.o: $(UTILS_SRC)/usleep.h
 hypercube.o: $(UTILS_SRC)/visual.h
 hypercube.o: $(UTILS_SRC)/yarandom.h
-ifs.o: $(srcdir)/../../config.h
-ifs.o: $(HACKS_SRC)/fps.h
-ifs.o: $(HACKS_SRC)/recanim.h
-ifs.o: $(HACKS_SRC)/screenhackI.h
-ifs.o: $(HACKS_SRC)/screenhack.h
-ifs.o: $(UTILS_SRC)/colors.h
-ifs.o: $(UTILS_SRC)/font-retry.h
-ifs.o: $(UTILS_SRC)/grabscreen.h
-ifs.o: $(UTILS_SRC)/hsv.h
-ifs.o: $(UTILS_SRC)/resources.h
-ifs.o: $(UTILS_SRC)/usleep.h
-ifs.o: $(UTILS_SRC)/visual.h
-ifs.o: $(UTILS_SRC)/yarandom.h
+hexadrop.o: $(srcdir)/../../config.h
+hexadrop.o: $(HACKS_SRC)/fps.h
+hexadrop.o: $(HACKS_SRC)/recanim.h
+hexadrop.o: $(HACKS_SRC)/screenhackI.h
+hexadrop.o: $(HACKS_SRC)/screenhack.h
+hexadrop.o: $(UTILS_SRC)/colors.h
+hexadrop.o: $(UTILS_SRC)/font-retry.h
+hexadrop.o: $(UTILS_SRC)/grabscreen.h
+hexadrop.o: $(UTILS_SRC)/hsv.h
+hexadrop.o: $(UTILS_SRC)/resources.h
+hexadrop.o: $(UTILS_SRC)/usleep.h
+hexadrop.o: $(UTILS_SRC)/visual.h
+hexadrop.o: $(UTILS_SRC)/yarandom.h
 imsmap.o: $(srcdir)/../../config.h
 imsmap.o: $(HACKS_SRC)/fps.h
 imsmap.o: $(HACKS_SRC)/recanim.h
@@ -2380,36 +3717,6 @@ intermomentary.o: $(UTILS_SRC)/resources.h
 intermomentary.o: $(UTILS_SRC)/usleep.h
 intermomentary.o: $(UTILS_SRC)/visual.h
 intermomentary.o: $(UTILS_SRC)/yarandom.h
-juggle.o: $(srcdir)/../../config.h
-juggle.o: $(HACKS_SRC)/fps.h
-juggle.o: $(HACKS_SRC)/recanim.h
-juggle.o: $(HACKS_SRC)/screenhackI.h
-juggle.o: $(UTILS_SRC)/colors.h
-juggle.o: $(UTILS_SRC)/erase.h
-juggle.o: $(UTILS_SRC)/font-retry.h
-juggle.o: $(UTILS_SRC)/grabscreen.h
-juggle.o: $(UTILS_SRC)/hsv.h
-juggle.o: $(UTILS_SRC)/resources.h
-juggle.o: $(UTILS_SRC)/usleep.h
-juggle.o: $(UTILS_SRC)/visual.h
-juggle.o: $(UTILS_SRC)/yarandom.h
-juggle.o: $(HACKS_SRC)/xlockmoreI.h
-juggle.o: $(HACKS_SRC)/xlockmore.h
-julia.o: $(srcdir)/../../config.h
-julia.o: $(HACKS_SRC)/fps.h
-julia.o: $(HACKS_SRC)/recanim.h
-julia.o: $(HACKS_SRC)/screenhackI.h
-julia.o: $(UTILS_SRC)/colors.h
-julia.o: $(UTILS_SRC)/erase.h
-julia.o: $(UTILS_SRC)/font-retry.h
-julia.o: $(UTILS_SRC)/grabscreen.h
-julia.o: $(UTILS_SRC)/hsv.h
-julia.o: $(UTILS_SRC)/resources.h
-julia.o: $(UTILS_SRC)/usleep.h
-julia.o: $(UTILS_SRC)/visual.h
-julia.o: $(UTILS_SRC)/yarandom.h
-julia.o: $(HACKS_SRC)/xlockmoreI.h
-julia.o: $(HACKS_SRC)/xlockmore.h
 kaleidescope.o: $(srcdir)/../../config.h
 kaleidescope.o: $(HACKS_SRC)/fps.h
 kaleidescope.o: $(HACKS_SRC)/recanim.h
@@ -2424,35 +3731,6 @@ kaleidescope.o: $(UTILS_SRC)/spline.h
 kaleidescope.o: $(UTILS_SRC)/usleep.h
 kaleidescope.o: $(UTILS_SRC)/visual.h
 kaleidescope.o: $(UTILS_SRC)/yarandom.h
-kumppa.o: $(srcdir)/../../config.h
-kumppa.o: $(HACKS_SRC)/fps.h
-kumppa.o: $(HACKS_SRC)/recanim.h
-kumppa.o: $(HACKS_SRC)/screenhackI.h
-kumppa.o: $(HACKS_SRC)/screenhack.h
-kumppa.o: $(UTILS_SRC)/colors.h
-kumppa.o: $(UTILS_SRC)/font-retry.h
-kumppa.o: $(UTILS_SRC)/grabscreen.h
-kumppa.o: $(UTILS_SRC)/hsv.h
-kumppa.o: $(UTILS_SRC)/resources.h
-kumppa.o: $(UTILS_SRC)/usleep.h
-kumppa.o: $(UTILS_SRC)/visual.h
-kumppa.o: $(UTILS_SRC)/xdbe.h
-kumppa.o: $(UTILS_SRC)/yarandom.h
-laser.o: $(srcdir)/../../config.h
-laser.o: $(HACKS_SRC)/fps.h
-laser.o: $(HACKS_SRC)/recanim.h
-laser.o: $(HACKS_SRC)/screenhackI.h
-laser.o: $(UTILS_SRC)/colors.h
-laser.o: $(UTILS_SRC)/erase.h
-laser.o: $(UTILS_SRC)/font-retry.h
-laser.o: $(UTILS_SRC)/grabscreen.h
-laser.o: $(UTILS_SRC)/hsv.h
-laser.o: $(UTILS_SRC)/resources.h
-laser.o: $(UTILS_SRC)/usleep.h
-laser.o: $(UTILS_SRC)/visual.h
-laser.o: $(UTILS_SRC)/yarandom.h
-laser.o: $(HACKS_SRC)/xlockmoreI.h
-laser.o: $(HACKS_SRC)/xlockmore.h
 lcdscrub.o: $(srcdir)/../../config.h
 lcdscrub.o: $(HACKS_SRC)/fps.h
 lcdscrub.o: $(HACKS_SRC)/recanim.h
@@ -2466,51 +3744,6 @@ lcdscrub.o: $(UTILS_SRC)/resources.h
 lcdscrub.o: $(UTILS_SRC)/usleep.h
 lcdscrub.o: $(UTILS_SRC)/visual.h
 lcdscrub.o: $(UTILS_SRC)/yarandom.h
-lightning.o: $(srcdir)/../../config.h
-lightning.o: $(HACKS_SRC)/fps.h
-lightning.o: $(HACKS_SRC)/recanim.h
-lightning.o: $(HACKS_SRC)/screenhackI.h
-lightning.o: $(UTILS_SRC)/colors.h
-lightning.o: $(UTILS_SRC)/erase.h
-lightning.o: $(UTILS_SRC)/font-retry.h
-lightning.o: $(UTILS_SRC)/grabscreen.h
-lightning.o: $(UTILS_SRC)/hsv.h
-lightning.o: $(UTILS_SRC)/resources.h
-lightning.o: $(UTILS_SRC)/usleep.h
-lightning.o: $(UTILS_SRC)/visual.h
-lightning.o: $(UTILS_SRC)/yarandom.h
-lightning.o: $(HACKS_SRC)/xlockmoreI.h
-lightning.o: $(HACKS_SRC)/xlockmore.h
-lisa.o: $(srcdir)/../../config.h
-lisa.o: $(HACKS_SRC)/fps.h
-lisa.o: $(HACKS_SRC)/recanim.h
-lisa.o: $(HACKS_SRC)/screenhackI.h
-lisa.o: $(UTILS_SRC)/colors.h
-lisa.o: $(UTILS_SRC)/erase.h
-lisa.o: $(UTILS_SRC)/font-retry.h
-lisa.o: $(UTILS_SRC)/grabscreen.h
-lisa.o: $(UTILS_SRC)/hsv.h
-lisa.o: $(UTILS_SRC)/resources.h
-lisa.o: $(UTILS_SRC)/usleep.h
-lisa.o: $(UTILS_SRC)/visual.h
-lisa.o: $(UTILS_SRC)/yarandom.h
-lisa.o: $(HACKS_SRC)/xlockmoreI.h
-lisa.o: $(HACKS_SRC)/xlockmore.h
-lissie.o: $(srcdir)/../../config.h
-lissie.o: $(HACKS_SRC)/fps.h
-lissie.o: $(HACKS_SRC)/recanim.h
-lissie.o: $(HACKS_SRC)/screenhackI.h
-lissie.o: $(UTILS_SRC)/colors.h
-lissie.o: $(UTILS_SRC)/erase.h
-lissie.o: $(UTILS_SRC)/font-retry.h
-lissie.o: $(UTILS_SRC)/grabscreen.h
-lissie.o: $(UTILS_SRC)/hsv.h
-lissie.o: $(UTILS_SRC)/resources.h
-lissie.o: $(UTILS_SRC)/usleep.h
-lissie.o: $(UTILS_SRC)/visual.h
-lissie.o: $(UTILS_SRC)/yarandom.h
-lissie.o: $(HACKS_SRC)/xlockmoreI.h
-lissie.o: $(HACKS_SRC)/xlockmore.h
 lmorph.o: $(srcdir)/../../config.h
 lmorph.o: $(HACKS_SRC)/fps.h
 lmorph.o: $(HACKS_SRC)/recanim.h
@@ -2524,22 +3757,6 @@ lmorph.o: $(UTILS_SRC)/resources.h
 lmorph.o: $(UTILS_SRC)/usleep.h
 lmorph.o: $(UTILS_SRC)/visual.h
 lmorph.o: $(UTILS_SRC)/yarandom.h
-loop.o: $(HACKS_SRC)/automata.h
-loop.o: $(srcdir)/../../config.h
-loop.o: $(HACKS_SRC)/fps.h
-loop.o: $(HACKS_SRC)/recanim.h
-loop.o: $(HACKS_SRC)/screenhackI.h
-loop.o: $(UTILS_SRC)/colors.h
-loop.o: $(UTILS_SRC)/erase.h
-loop.o: $(UTILS_SRC)/font-retry.h
-loop.o: $(UTILS_SRC)/grabscreen.h
-loop.o: $(UTILS_SRC)/hsv.h
-loop.o: $(UTILS_SRC)/resources.h
-loop.o: $(UTILS_SRC)/usleep.h
-loop.o: $(UTILS_SRC)/visual.h
-loop.o: $(UTILS_SRC)/yarandom.h
-loop.o: $(HACKS_SRC)/xlockmoreI.h
-loop.o: $(HACKS_SRC)/xlockmore.h
 m6502.o: $(HACKS_SRC)/analogtv.h
 m6502.o: $(HACKS_SRC)/asm6502.h
 m6502.o: $(srcdir)/../../config.h
@@ -2559,23 +3776,6 @@ m6502.o: $(UTILS_SRC)/usleep.h
 m6502.o: $(UTILS_SRC)/visual.h
 m6502.o: $(UTILS_SRC)/xshm.h
 m6502.o: $(UTILS_SRC)/yarandom.h
-maze.o: $(srcdir)/../../config.h
-maze.o: $(HACKS_SRC)/fps.h
-maze.o: images/gen/logo-180_png.h
-maze.o: images/gen/logo-50_png.h
-maze.o: $(HACKS_SRC)/recanim.h
-maze.o: $(HACKS_SRC)/screenhackI.h
-maze.o: $(HACKS_SRC)/screenhack.h
-maze.o: $(UTILS_SRC)/colors.h
-maze.o: $(UTILS_SRC)/erase.h
-maze.o: $(UTILS_SRC)/font-retry.h
-maze.o: $(UTILS_SRC)/grabscreen.h
-maze.o: $(UTILS_SRC)/hsv.h
-maze.o: $(UTILS_SRC)/resources.h
-maze.o: $(UTILS_SRC)/usleep.h
-maze.o: $(UTILS_SRC)/visual.h
-maze.o: $(UTILS_SRC)/yarandom.h
-maze.o: $(HACKS_SRC)/ximage-loader.h
 memscroller.o: $(srcdir)/../../config.h
 memscroller.o: $(HACKS_SRC)/fps.h
 memscroller.o: $(HACKS_SRC)/recanim.h
@@ -2631,34 +3831,6 @@ moire.o: $(UTILS_SRC)/usleep.h
 moire.o: $(UTILS_SRC)/visual.h
 moire.o: $(UTILS_SRC)/xshm.h
 moire.o: $(UTILS_SRC)/yarandom.h
-mountain.o: $(srcdir)/../../config.h
-mountain.o: $(HACKS_SRC)/fps.h
-mountain.o: $(HACKS_SRC)/recanim.h
-mountain.o: $(HACKS_SRC)/screenhackI.h
-mountain.o: $(UTILS_SRC)/colors.h
-mountain.o: $(UTILS_SRC)/erase.h
-mountain.o: $(UTILS_SRC)/font-retry.h
-mountain.o: $(UTILS_SRC)/grabscreen.h
-mountain.o: $(UTILS_SRC)/hsv.h
-mountain.o: $(UTILS_SRC)/resources.h
-mountain.o: $(UTILS_SRC)/usleep.h
-mountain.o: $(UTILS_SRC)/visual.h
-mountain.o: $(UTILS_SRC)/yarandom.h
-mountain.o: $(HACKS_SRC)/xlockmoreI.h
-mountain.o: $(HACKS_SRC)/xlockmore.h
-munch.o: $(srcdir)/../../config.h
-munch.o: $(HACKS_SRC)/fps.h
-munch.o: $(HACKS_SRC)/recanim.h
-munch.o: $(HACKS_SRC)/screenhackI.h
-munch.o: $(HACKS_SRC)/screenhack.h
-munch.o: $(UTILS_SRC)/colors.h
-munch.o: $(UTILS_SRC)/font-retry.h
-munch.o: $(UTILS_SRC)/grabscreen.h
-munch.o: $(UTILS_SRC)/hsv.h
-munch.o: $(UTILS_SRC)/resources.h
-munch.o: $(UTILS_SRC)/usleep.h
-munch.o: $(UTILS_SRC)/visual.h
-munch.o: $(UTILS_SRC)/yarandom.h
 nerverot.o: $(srcdir)/../../config.h
 nerverot.o: $(HACKS_SRC)/fps.h
 nerverot.o: $(HACKS_SRC)/recanim.h
@@ -2696,6 +3868,19 @@ noseguy.o: $(UTILS_SRC)/visual.h
 noseguy.o: $(UTILS_SRC)/xft.h
 noseguy.o: $(UTILS_SRC)/yarandom.h
 noseguy.o: $(HACKS_SRC)/ximage-loader.h
+penetrate.o: $(srcdir)/../../config.h
+penetrate.o: $(HACKS_SRC)/fps.h
+penetrate.o: $(HACKS_SRC)/recanim.h
+penetrate.o: $(HACKS_SRC)/screenhackI.h
+penetrate.o: $(HACKS_SRC)/screenhack.h
+penetrate.o: $(UTILS_SRC)/colors.h
+penetrate.o: $(UTILS_SRC)/font-retry.h
+penetrate.o: $(UTILS_SRC)/grabscreen.h
+penetrate.o: $(UTILS_SRC)/hsv.h
+penetrate.o: $(UTILS_SRC)/resources.h
+penetrate.o: $(UTILS_SRC)/usleep.h
+penetrate.o: $(UTILS_SRC)/visual.h
+penetrate.o: $(UTILS_SRC)/yarandom.h
 pacman_ai.o: $(srcdir)/../../config.h
 pacman_ai.o: $(HACKS_SRC)/fps.h
 pacman_ai.o: $(HACKS_SRC)/pacman_ai.h
@@ -2731,26 +3916,6 @@ pacman_level.o: $(UTILS_SRC)/visual.h
 pacman_level.o: $(UTILS_SRC)/yarandom.h
 pacman_level.o: $(HACKS_SRC)/ximage-loader.h
 pacman_level.o: $(HACKS_SRC)/xlockmoreI.h
-pacman.o: $(srcdir)/../../config.h
-pacman.o: $(HACKS_SRC)/fps.h
-pacman.o: images/gen/pacman_png.h
-pacman.o: $(HACKS_SRC)/pacman_ai.h
-pacman.o: $(HACKS_SRC)/pacman.h
-pacman.o: $(HACKS_SRC)/pacman_level.h
-pacman.o: $(HACKS_SRC)/recanim.h
-pacman.o: $(HACKS_SRC)/screenhackI.h
-pacman.o: $(UTILS_SRC)/colors.h
-pacman.o: $(UTILS_SRC)/erase.h
-pacman.o: $(UTILS_SRC)/font-retry.h
-pacman.o: $(UTILS_SRC)/grabscreen.h
-pacman.o: $(UTILS_SRC)/hsv.h
-pacman.o: $(UTILS_SRC)/resources.h
-pacman.o: $(UTILS_SRC)/usleep.h
-pacman.o: $(UTILS_SRC)/visual.h
-pacman.o: $(UTILS_SRC)/yarandom.h
-pacman.o: $(HACKS_SRC)/ximage-loader.h
-pacman.o: $(HACKS_SRC)/xlockmoreI.h
-pacman.o: $(HACKS_SRC)/xlockmore.h
 pedal.o: $(srcdir)/../../config.h
 pedal.o: $(HACKS_SRC)/fps.h
 pedal.o: $(HACKS_SRC)/recanim.h
@@ -2765,48 +3930,6 @@ pedal.o: $(UTILS_SRC)/resources.h
 pedal.o: $(UTILS_SRC)/usleep.h
 pedal.o: $(UTILS_SRC)/visual.h
 pedal.o: $(UTILS_SRC)/yarandom.h
-penetrate.o: $(srcdir)/../../config.h
-penetrate.o: $(HACKS_SRC)/fps.h
-penetrate.o: $(HACKS_SRC)/recanim.h
-penetrate.o: $(HACKS_SRC)/screenhackI.h
-penetrate.o: $(HACKS_SRC)/screenhack.h
-penetrate.o: $(UTILS_SRC)/colors.h
-penetrate.o: $(UTILS_SRC)/font-retry.h
-penetrate.o: $(UTILS_SRC)/grabscreen.h
-penetrate.o: $(UTILS_SRC)/hsv.h
-penetrate.o: $(UTILS_SRC)/resources.h
-penetrate.o: $(UTILS_SRC)/usleep.h
-penetrate.o: $(UTILS_SRC)/visual.h
-penetrate.o: $(UTILS_SRC)/yarandom.h
-penrose.o: $(srcdir)/../../config.h
-penrose.o: $(HACKS_SRC)/fps.h
-penrose.o: $(HACKS_SRC)/recanim.h
-penrose.o: $(HACKS_SRC)/screenhackI.h
-penrose.o: $(UTILS_SRC)/colors.h
-penrose.o: $(UTILS_SRC)/erase.h
-penrose.o: $(UTILS_SRC)/font-retry.h
-penrose.o: $(UTILS_SRC)/grabscreen.h
-penrose.o: $(UTILS_SRC)/hsv.h
-penrose.o: $(UTILS_SRC)/resources.h
-penrose.o: $(UTILS_SRC)/usleep.h
-penrose.o: $(UTILS_SRC)/visual.h
-penrose.o: $(UTILS_SRC)/yarandom.h
-penrose.o: $(HACKS_SRC)/xlockmoreI.h
-penrose.o: $(HACKS_SRC)/xlockmore.h
-petri.o: $(srcdir)/../../config.h
-petri.o: $(HACKS_SRC)/fps.h
-petri.o: $(HACKS_SRC)/recanim.h
-petri.o: $(HACKS_SRC)/screenhackI.h
-petri.o: $(HACKS_SRC)/screenhack.h
-petri.o: $(UTILS_SRC)/colors.h
-petri.o: $(UTILS_SRC)/font-retry.h
-petri.o: $(UTILS_SRC)/grabscreen.h
-petri.o: $(UTILS_SRC)/hsv.h
-petri.o: $(UTILS_SRC)/resources.h
-petri.o: $(UTILS_SRC)/spline.h
-petri.o: $(UTILS_SRC)/usleep.h
-petri.o: $(UTILS_SRC)/visual.h
-petri.o: $(UTILS_SRC)/yarandom.h
 phosphor.o: $(srcdir)/../../config.h
 phosphor.o: $(HACKS_SRC)/fps.h
 phosphor.o: images/gen/6x10font_png.h
@@ -2838,21 +3961,6 @@ piecewise.o: $(UTILS_SRC)/usleep.h
 piecewise.o: $(UTILS_SRC)/visual.h
 piecewise.o: $(UTILS_SRC)/xdbe.h
 piecewise.o: $(UTILS_SRC)/yarandom.h
-polyominoes.o: $(srcdir)/../../config.h
-polyominoes.o: $(HACKS_SRC)/fps.h
-polyominoes.o: $(HACKS_SRC)/recanim.h
-polyominoes.o: $(HACKS_SRC)/screenhackI.h
-polyominoes.o: $(UTILS_SRC)/colors.h
-polyominoes.o: $(UTILS_SRC)/erase.h
-polyominoes.o: $(UTILS_SRC)/font-retry.h
-polyominoes.o: $(UTILS_SRC)/grabscreen.h
-polyominoes.o: $(UTILS_SRC)/hsv.h
-polyominoes.o: $(UTILS_SRC)/resources.h
-polyominoes.o: $(UTILS_SRC)/usleep.h
-polyominoes.o: $(UTILS_SRC)/visual.h
-polyominoes.o: $(UTILS_SRC)/yarandom.h
-polyominoes.o: $(HACKS_SRC)/xlockmoreI.h
-polyominoes.o: $(HACKS_SRC)/xlockmore.h
 pong.o: $(HACKS_SRC)/analogtv.h
 pong.o: $(srcdir)/../../config.h
 pong.o: $(HACKS_SRC)/fps.h
@@ -2884,33 +3992,6 @@ popsquares.o: $(UTILS_SRC)/usleep.h
 popsquares.o: $(UTILS_SRC)/visual.h
 popsquares.o: $(UTILS_SRC)/xdbe.h
 popsquares.o: $(UTILS_SRC)/yarandom.h
-pyro.o: $(srcdir)/../../config.h
-pyro.o: $(HACKS_SRC)/fps.h
-pyro.o: $(HACKS_SRC)/recanim.h
-pyro.o: $(HACKS_SRC)/screenhackI.h
-pyro.o: $(HACKS_SRC)/screenhack.h
-pyro.o: $(UTILS_SRC)/colors.h
-pyro.o: $(UTILS_SRC)/font-retry.h
-pyro.o: $(UTILS_SRC)/grabscreen.h
-pyro.o: $(UTILS_SRC)/hsv.h
-pyro.o: $(UTILS_SRC)/resources.h
-pyro.o: $(UTILS_SRC)/usleep.h
-pyro.o: $(UTILS_SRC)/visual.h
-pyro.o: $(UTILS_SRC)/yarandom.h
-qix.o: $(srcdir)/../../config.h
-qix.o: $(HACKS_SRC)/fps.h
-qix.o: $(HACKS_SRC)/recanim.h
-qix.o: $(HACKS_SRC)/screenhackI.h
-qix.o: $(HACKS_SRC)/screenhack.h
-qix.o: $(UTILS_SRC)/alpha.h
-qix.o: $(UTILS_SRC)/colors.h
-qix.o: $(UTILS_SRC)/font-retry.h
-qix.o: $(UTILS_SRC)/grabscreen.h
-qix.o: $(UTILS_SRC)/hsv.h
-qix.o: $(UTILS_SRC)/resources.h
-qix.o: $(UTILS_SRC)/usleep.h
-qix.o: $(UTILS_SRC)/visual.h
-qix.o: $(UTILS_SRC)/yarandom.h
 rd-bomb.o: $(srcdir)/../../config.h
 rd-bomb.o: $(HACKS_SRC)/fps.h
 rd-bomb.o: $(HACKS_SRC)/recanim.h
@@ -2978,21 +4059,6 @@ rorschach.o: $(UTILS_SRC)/resources.h
 rorschach.o: $(UTILS_SRC)/usleep.h
 rorschach.o: $(UTILS_SRC)/visual.h
 rorschach.o: $(UTILS_SRC)/yarandom.h
-rotor.o: $(srcdir)/../../config.h
-rotor.o: $(HACKS_SRC)/fps.h
-rotor.o: $(HACKS_SRC)/recanim.h
-rotor.o: $(HACKS_SRC)/screenhackI.h
-rotor.o: $(UTILS_SRC)/colors.h
-rotor.o: $(UTILS_SRC)/erase.h
-rotor.o: $(UTILS_SRC)/font-retry.h
-rotor.o: $(UTILS_SRC)/grabscreen.h
-rotor.o: $(UTILS_SRC)/hsv.h
-rotor.o: $(UTILS_SRC)/resources.h
-rotor.o: $(UTILS_SRC)/usleep.h
-rotor.o: $(UTILS_SRC)/visual.h
-rotor.o: $(UTILS_SRC)/yarandom.h
-rotor.o: $(HACKS_SRC)/xlockmoreI.h
-rotor.o: $(HACKS_SRC)/xlockmore.h
 rotzoomer.o: $(srcdir)/../../config.h
 rotzoomer.o: $(HACKS_SRC)/fps.h
 rotzoomer.o: $(HACKS_SRC)/recanim.h
@@ -3035,21 +4101,6 @@ shadebobs.o: $(UTILS_SRC)/resources.h
 shadebobs.o: $(UTILS_SRC)/usleep.h
 shadebobs.o: $(UTILS_SRC)/visual.h
 shadebobs.o: $(UTILS_SRC)/yarandom.h
-sierpinski.o: $(srcdir)/../../config.h
-sierpinski.o: $(HACKS_SRC)/fps.h
-sierpinski.o: $(HACKS_SRC)/recanim.h
-sierpinski.o: $(HACKS_SRC)/screenhackI.h
-sierpinski.o: $(UTILS_SRC)/colors.h
-sierpinski.o: $(UTILS_SRC)/erase.h
-sierpinski.o: $(UTILS_SRC)/font-retry.h
-sierpinski.o: $(UTILS_SRC)/grabscreen.h
-sierpinski.o: $(UTILS_SRC)/hsv.h
-sierpinski.o: $(UTILS_SRC)/resources.h
-sierpinski.o: $(UTILS_SRC)/usleep.h
-sierpinski.o: $(UTILS_SRC)/visual.h
-sierpinski.o: $(UTILS_SRC)/yarandom.h
-sierpinski.o: $(HACKS_SRC)/xlockmoreI.h
-sierpinski.o: $(HACKS_SRC)/xlockmore.h
 slidescreen.o: $(srcdir)/../../config.h
 slidescreen.o: $(HACKS_SRC)/fps.h
 slidescreen.o: $(HACKS_SRC)/recanim.h
@@ -3063,21 +4114,6 @@ slidescreen.o: $(UTILS_SRC)/resources.h
 slidescreen.o: $(UTILS_SRC)/usleep.h
 slidescreen.o: $(UTILS_SRC)/visual.h
 slidescreen.o: $(UTILS_SRC)/yarandom.h
-slip.o: $(srcdir)/../../config.h
-slip.o: $(HACKS_SRC)/fps.h
-slip.o: $(HACKS_SRC)/recanim.h
-slip.o: $(HACKS_SRC)/screenhackI.h
-slip.o: $(UTILS_SRC)/colors.h
-slip.o: $(UTILS_SRC)/erase.h
-slip.o: $(UTILS_SRC)/font-retry.h
-slip.o: $(UTILS_SRC)/grabscreen.h
-slip.o: $(UTILS_SRC)/hsv.h
-slip.o: $(UTILS_SRC)/resources.h
-slip.o: $(UTILS_SRC)/usleep.h
-slip.o: $(UTILS_SRC)/visual.h
-slip.o: $(UTILS_SRC)/yarandom.h
-slip.o: $(HACKS_SRC)/xlockmoreI.h
-slip.o: $(HACKS_SRC)/xlockmore.h
 speedmine.o: $(srcdir)/../../config.h
 speedmine.o: $(HACKS_SRC)/fps.h
 speedmine.o: $(HACKS_SRC)/recanim.h
@@ -3092,36 +4128,6 @@ speedmine.o: $(UTILS_SRC)/resources.h
 speedmine.o: $(UTILS_SRC)/usleep.h
 speedmine.o: $(UTILS_SRC)/visual.h
 speedmine.o: $(UTILS_SRC)/yarandom.h
-sphere.o: $(srcdir)/../../config.h
-sphere.o: $(HACKS_SRC)/fps.h
-sphere.o: $(HACKS_SRC)/recanim.h
-sphere.o: $(HACKS_SRC)/screenhackI.h
-sphere.o: $(UTILS_SRC)/colors.h
-sphere.o: $(UTILS_SRC)/erase.h
-sphere.o: $(UTILS_SRC)/font-retry.h
-sphere.o: $(UTILS_SRC)/grabscreen.h
-sphere.o: $(UTILS_SRC)/hsv.h
-sphere.o: $(UTILS_SRC)/resources.h
-sphere.o: $(UTILS_SRC)/usleep.h
-sphere.o: $(UTILS_SRC)/visual.h
-sphere.o: $(UTILS_SRC)/yarandom.h
-sphere.o: $(HACKS_SRC)/xlockmoreI.h
-sphere.o: $(HACKS_SRC)/xlockmore.h
-spiral.o: $(srcdir)/../../config.h
-spiral.o: $(HACKS_SRC)/fps.h
-spiral.o: $(HACKS_SRC)/recanim.h
-spiral.o: $(HACKS_SRC)/screenhackI.h
-spiral.o: $(UTILS_SRC)/colors.h
-spiral.o: $(UTILS_SRC)/erase.h
-spiral.o: $(UTILS_SRC)/font-retry.h
-spiral.o: $(UTILS_SRC)/grabscreen.h
-spiral.o: $(UTILS_SRC)/hsv.h
-spiral.o: $(UTILS_SRC)/resources.h
-spiral.o: $(UTILS_SRC)/usleep.h
-spiral.o: $(UTILS_SRC)/visual.h
-spiral.o: $(UTILS_SRC)/yarandom.h
-spiral.o: $(HACKS_SRC)/xlockmoreI.h
-spiral.o: $(HACKS_SRC)/xlockmore.h
 spotlight.o: $(srcdir)/../../config.h
 spotlight.o: $(HACKS_SRC)/fps.h
 spotlight.o: $(HACKS_SRC)/recanim.h
@@ -3149,39 +4155,6 @@ squiral.o: $(UTILS_SRC)/resources.h
 squiral.o: $(UTILS_SRC)/usleep.h
 squiral.o: $(UTILS_SRC)/visual.h
 squiral.o: $(UTILS_SRC)/yarandom.h
-starfish.o: $(srcdir)/../../config.h
-starfish.o: $(HACKS_SRC)/fps.h
-starfish.o: $(HACKS_SRC)/recanim.h
-starfish.o: $(HACKS_SRC)/screenhackI.h
-starfish.o: $(HACKS_SRC)/screenhack.h
-starfish.o: $(UTILS_SRC)/colors.h
-starfish.o: $(UTILS_SRC)/font-retry.h
-starfish.o: $(UTILS_SRC)/grabscreen.h
-starfish.o: $(UTILS_SRC)/hsv.h
-starfish.o: $(UTILS_SRC)/resources.h
-starfish.o: $(UTILS_SRC)/spline.h
-starfish.o: $(UTILS_SRC)/usleep.h
-starfish.o: $(UTILS_SRC)/visual.h
-starfish.o: $(UTILS_SRC)/yarandom.h
-strange.o: $(srcdir)/../../config.h
-strange.o: $(HACKS_SRC)/fps.h
-strange.o: $(HACKS_SRC)/recanim.h
-strange.o: $(HACKS_SRC)/screenhackI.h
-strange.o: $(UTILS_SRC)/aligned_malloc.h
-strange.o: $(UTILS_SRC)/colors.h
-strange.o: $(UTILS_SRC)/erase.h
-strange.o: $(UTILS_SRC)/font-retry.h
-strange.o: $(UTILS_SRC)/grabscreen.h
-strange.o: $(UTILS_SRC)/hsv.h
-strange.o: $(UTILS_SRC)/pow2.h
-strange.o: $(UTILS_SRC)/resources.h
-strange.o: $(UTILS_SRC)/thread_util.h
-strange.o: $(UTILS_SRC)/usleep.h
-strange.o: $(UTILS_SRC)/visual.h
-strange.o: $(UTILS_SRC)/xshm.h
-strange.o: $(UTILS_SRC)/yarandom.h
-strange.o: $(HACKS_SRC)/xlockmoreI.h
-strange.o: $(HACKS_SRC)/xlockmore.h
 substrate.o: $(srcdir)/../../config.h
 substrate.o: $(HACKS_SRC)/fps.h
 substrate.o: $(HACKS_SRC)/recanim.h
@@ -3195,35 +4168,6 @@ substrate.o: $(UTILS_SRC)/resources.h
 substrate.o: $(UTILS_SRC)/usleep.h
 substrate.o: $(UTILS_SRC)/visual.h
 substrate.o: $(UTILS_SRC)/yarandom.h
-swirl.o: $(srcdir)/../../config.h
-swirl.o: $(HACKS_SRC)/fps.h
-swirl.o: $(HACKS_SRC)/recanim.h
-swirl.o: $(HACKS_SRC)/screenhackI.h
-swirl.o: $(UTILS_SRC)/colors.h
-swirl.o: $(UTILS_SRC)/erase.h
-swirl.o: $(UTILS_SRC)/font-retry.h
-swirl.o: $(UTILS_SRC)/grabscreen.h
-swirl.o: $(UTILS_SRC)/hsv.h
-swirl.o: $(UTILS_SRC)/resources.h
-swirl.o: $(UTILS_SRC)/usleep.h
-swirl.o: $(UTILS_SRC)/visual.h
-swirl.o: $(UTILS_SRC)/xshm.h
-swirl.o: $(UTILS_SRC)/yarandom.h
-swirl.o: $(HACKS_SRC)/xlockmoreI.h
-swirl.o: $(HACKS_SRC)/xlockmore.h
-t3d.o: $(srcdir)/../../config.h
-t3d.o: $(HACKS_SRC)/fps.h
-t3d.o: $(HACKS_SRC)/recanim.h
-t3d.o: $(HACKS_SRC)/screenhackI.h
-t3d.o: $(HACKS_SRC)/screenhack.h
-t3d.o: $(UTILS_SRC)/colors.h
-t3d.o: $(UTILS_SRC)/font-retry.h
-t3d.o: $(UTILS_SRC)/grabscreen.h
-t3d.o: $(UTILS_SRC)/hsv.h
-t3d.o: $(UTILS_SRC)/resources.h
-t3d.o: $(UTILS_SRC)/usleep.h
-t3d.o: $(UTILS_SRC)/visual.h
-t3d.o: $(UTILS_SRC)/yarandom.h
 tessellimage.o: $(srcdir)/../../config.h
 tessellimage.o: $(HACKS_SRC)/delaunay.h
 tessellimage.o: $(HACKS_SRC)/fps.h
@@ -3256,36 +4200,6 @@ testx11.o: $(UTILS_SRC)/usleep.h
 testx11.o: $(UTILS_SRC)/visual.h
 testx11.o: $(UTILS_SRC)/yarandom.h
 testx11.o: $(HACKS_SRC)/ximage-loader.h
-thornbird.o: $(srcdir)/../../config.h
-thornbird.o: $(HACKS_SRC)/fps.h
-thornbird.o: $(HACKS_SRC)/recanim.h
-thornbird.o: $(HACKS_SRC)/screenhackI.h
-thornbird.o: $(UTILS_SRC)/colors.h
-thornbird.o: $(UTILS_SRC)/erase.h
-thornbird.o: $(UTILS_SRC)/font-retry.h
-thornbird.o: $(UTILS_SRC)/grabscreen.h
-thornbird.o: $(UTILS_SRC)/hsv.h
-thornbird.o: $(UTILS_SRC)/resources.h
-thornbird.o: $(UTILS_SRC)/usleep.h
-thornbird.o: $(UTILS_SRC)/visual.h
-thornbird.o: $(UTILS_SRC)/yarandom.h
-thornbird.o: $(HACKS_SRC)/xlockmoreI.h
-thornbird.o: $(HACKS_SRC)/xlockmore.h
-triangle.o: $(srcdir)/../../config.h
-triangle.o: $(HACKS_SRC)/fps.h
-triangle.o: $(HACKS_SRC)/recanim.h
-triangle.o: $(HACKS_SRC)/screenhackI.h
-triangle.o: $(UTILS_SRC)/colors.h
-triangle.o: $(UTILS_SRC)/erase.h
-triangle.o: $(UTILS_SRC)/font-retry.h
-triangle.o: $(UTILS_SRC)/grabscreen.h
-triangle.o: $(UTILS_SRC)/hsv.h
-triangle.o: $(UTILS_SRC)/resources.h
-triangle.o: $(UTILS_SRC)/usleep.h
-triangle.o: $(UTILS_SRC)/visual.h
-triangle.o: $(UTILS_SRC)/yarandom.h
-triangle.o: $(HACKS_SRC)/xlockmoreI.h
-triangle.o: $(HACKS_SRC)/xlockmore.h
 truchet.o: $(srcdir)/../../config.h
 truchet.o: $(HACKS_SRC)/fps.h
 truchet.o: $(HACKS_SRC)/recanim.h
@@ -3343,21 +4257,6 @@ vfeedback.o: $(UTILS_SRC)/usleep.h
 vfeedback.o: $(UTILS_SRC)/visual.h
 vfeedback.o: $(UTILS_SRC)/xshm.h
 vfeedback.o: $(UTILS_SRC)/yarandom.h
-vines.o: $(srcdir)/../../config.h
-vines.o: $(HACKS_SRC)/fps.h
-vines.o: $(HACKS_SRC)/recanim.h
-vines.o: $(HACKS_SRC)/screenhackI.h
-vines.o: $(UTILS_SRC)/colors.h
-vines.o: $(UTILS_SRC)/erase.h
-vines.o: $(UTILS_SRC)/font-retry.h
-vines.o: $(UTILS_SRC)/grabscreen.h
-vines.o: $(UTILS_SRC)/hsv.h
-vines.o: $(UTILS_SRC)/resources.h
-vines.o: $(UTILS_SRC)/usleep.h
-vines.o: $(UTILS_SRC)/visual.h
-vines.o: $(UTILS_SRC)/yarandom.h
-vines.o: $(HACKS_SRC)/xlockmoreI.h
-vines.o: $(HACKS_SRC)/xlockmore.h
 wander.o: $(srcdir)/../../config.h
 wander.o: $(HACKS_SRC)/fps.h
 wander.o: $(HACKS_SRC)/recanim.h
@@ -3427,21 +4326,6 @@ wormhole.o: $(UTILS_SRC)/resources.h
 wormhole.o: $(UTILS_SRC)/usleep.h
 wormhole.o: $(UTILS_SRC)/visual.h
 wormhole.o: $(UTILS_SRC)/yarandom.h
-worm.o: $(srcdir)/../../config.h
-worm.o: $(HACKS_SRC)/fps.h
-worm.o: $(HACKS_SRC)/recanim.h
-worm.o: $(HACKS_SRC)/screenhackI.h
-worm.o: $(UTILS_SRC)/colors.h
-worm.o: $(UTILS_SRC)/erase.h
-worm.o: $(UTILS_SRC)/font-retry.h
-worm.o: $(UTILS_SRC)/grabscreen.h
-worm.o: $(UTILS_SRC)/hsv.h
-worm.o: $(UTILS_SRC)/resources.h
-worm.o: $(UTILS_SRC)/usleep.h
-worm.o: $(UTILS_SRC)/visual.h
-worm.o: $(UTILS_SRC)/yarandom.h
-worm.o: $(HACKS_SRC)/xlockmoreI.h
-worm.o: $(HACKS_SRC)/xlockmore.h
 xanalogtv.o: $(HACKS_SRC)/analogtv.h
 xanalogtv.o: $(srcdir)/../../config.h
 xanalogtv.o: $(HACKS_SRC)/fps.h
@@ -3482,19 +4366,6 @@ xflame.o: $(UTILS_SRC)/yarandom.h
 xflame.o: $(HACKS_SRC)/ximage-loader.h
 ximage-loader.o: $(srcdir)/../../config.h
 ximage-loader.o: $(HACKS_SRC)/ximage-loader.h
-xjack.o: $(srcdir)/../../config.h
-xjack.o: $(HACKS_SRC)/fps.h
-xjack.o: $(HACKS_SRC)/recanim.h
-xjack.o: $(HACKS_SRC)/screenhackI.h
-xjack.o: $(HACKS_SRC)/screenhack.h
-xjack.o: $(UTILS_SRC)/colors.h
-xjack.o: $(UTILS_SRC)/font-retry.h
-xjack.o: $(UTILS_SRC)/grabscreen.h
-xjack.o: $(UTILS_SRC)/hsv.h
-xjack.o: $(UTILS_SRC)/resources.h
-xjack.o: $(UTILS_SRC)/usleep.h
-xjack.o: $(UTILS_SRC)/visual.h
-xjack.o: $(UTILS_SRC)/yarandom.h
 xlockmore.o: $(srcdir)/../../config.h
 xlockmore.o: $(HACKS_SRC)/fps.h
 xlockmore.o: $(HACKS_SRC)/recanim.h

@@ -32,15 +32,14 @@ static const char sccsid[] = "@(#)voters.c	5.24 2007/01/18 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_voters
-#define PROGCLASS "Voters"
-#define HACK_INIT init_voters
-#define HACK_DRAW draw_voters
-#define voters_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000 \n" \
- "*cycles: 327670 \n" \
- "*size: 0 \n" \
- "*ncolors: 64 \n" \
- "*neighbors: 0 \n"
+	"*cycles: 327670 \n" \
+	"*size: 0 \n" \
+	"*ncolors: 64 \n" \
+	"*neighbors: 0 \n" \
+
+# define reshape_voters 0
+# define voters_handle_event 0
 #define UNIFORM_COLORS
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -78,14 +77,14 @@ static OptionStruct desc[] =
 	{(char *) "-/+vertical", (char *) "change orientation for hexagons and triangles"}
 };
 
-ModeSpecOpt voters_opts =
+ENTRYPOINT ModeSpecOpt voters_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 
 #ifdef USE_MODULES
 ModStruct   voters_description =
 {"voters", "init_voters", "draw_voters", "release_voters",
- "refresh_voters", "init_voters", (char *) NULL, &voters_opts,
+ "refresh_voters", "init_voters", "free_voters", &voters_opts,
  1000, 0, 327670, 0, 64, 1.0, "",
  "Shows Dewdney's Voters", 0, NULL};
 
@@ -773,35 +772,12 @@ advanceColors(ModeInfo * mi, int col, int row)
 	}
 }
 
-void
-refresh_voters(ModeInfo * mi)
-{
-	int         col, row, colrow;
-	voterstruct *vp;
-
-	if (voters == NULL)
-		return;
-	vp = &voters[MI_SCREEN(mi)];
-	if (vp->first == NULL)
-		return;
-
-	if (vp->painted) {
-		MI_CLEARWINDOW(mi);
-		vp->painted = False;
-		for (row = 0; row < vp->nrows; row++)
-			for (col = 0; col < vp->ncols; col++) {
-				colrow = col + row * vp->ncols;
-				/* Draw all old, will get corrected soon if wrong... */
-				drawCell(mi, col, row,
-					 (unsigned long) (MI_NPIXELS(mi) * vp->arr[colrow] / BITMAPS),
-					 vp->arr[colrow], False);
-			}
-	}
-}
-
 static void
-free_voters(voterstruct *vp)
+free_voters_screen(voterstruct *vp)
 {
+	if (vp == NULL) {
+		return;
+	}
 	if (vp->first != NULL) {
 		flush_list(vp);
 		free(vp->first);
@@ -815,20 +791,24 @@ free_voters(voterstruct *vp)
 		free(vp->arr);
 		vp->arr = (char *) NULL;
 	}
+	vp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_voters(ModeInfo * mi)
+{
+	free_voters_screen(&voters[MI_SCREEN(mi)]);
+}
+
+
+ENTRYPOINT void
 init_voters(ModeInfo * mi)
 {
 	int         size = MI_SIZE(mi);
 	int         i, col, row, colrow;
 	voterstruct *vp;
 
-	if (voters == NULL) {
-		if ((voters = (voterstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (voterstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, voters);
 	vp = &voters[MI_SCREEN(mi)];
 
 	vp->generation = 0;
@@ -836,7 +816,7 @@ init_voters(ModeInfo * mi)
 		icon_width = donkey_width;
 		icon_height = donkey_height;
 		if (!init_list(vp)) {
-			free_voters(vp);
+			free_voters_screen(vp);
 			return;
 		}
 		for (i = 0; i < BITMAPS; i++) {
@@ -1001,7 +981,7 @@ init_voters(ModeInfo * mi)
 	if (vp->arr != NULL)
 		free(vp->arr);
 	if ((vp->arr = (char *) calloc(vp->npositions, sizeof (char))) == NULL) {
-		free_voters(vp);
+		free_voters_screen(vp);
 		return;
 	}
 
@@ -1033,7 +1013,33 @@ init_voters(ModeInfo * mi)
 		}
 }
 
-void
+ENTRYPOINT void
+refresh_voters(ModeInfo * mi)
+{
+	int         col, row, colrow;
+	voterstruct *vp;
+
+	if (voters == NULL)
+		return;
+	vp = &voters[MI_SCREEN(mi)];
+	if (vp->first == NULL)
+		return;
+
+	if (vp->painted) {
+		MI_CLEARWINDOW(mi);
+		vp->painted = False;
+		for (row = 0; row < vp->nrows; row++)
+			for (col = 0; col < vp->ncols; col++) {
+				colrow = col + row * vp->ncols;
+				/* Draw all old, will get corrected soon if wrong... */
+				drawCell(mi, col, row,
+					 (unsigned long) (MI_NPIXELS(mi) * vp->arr[colrow] / BITMAPS),
+					 vp->arr[colrow], False);
+			}
+	}
+}
+
+ENTRYPOINT void
 draw_voters(ModeInfo * mi)
 {
 	int         i, spineless_dude, neighbor_direction;
@@ -1084,7 +1090,7 @@ draw_voters(ModeInfo * mi)
 		if (MI_NPIXELS(mi) > 2) {
 			advanceColors(mi, spineless_col, spineless_row);
 			if (!addto_list(vp, info)) {
-				free_voters(vp);
+				free_voters_screen(vp);
 				return;
 			}
 		}
@@ -1102,14 +1108,14 @@ draw_voters(ModeInfo * mi)
 		}
 }
 
-void
+ENTRYPOINT void
 release_voters(ModeInfo * mi)
 {
 	if (voters != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_voters(&voters[screen]);
+			free_voters_screen(&voters[screen]);
 		free(voters);
 		voters = (voterstruct *) NULL;
 	}

@@ -3,7 +3,6 @@
 
 #if 0
 static const char sccsid[] = "@(#)bomb.c	5.00 2000/11/01 xlockmore";
-
 #endif
 
 /*-
@@ -41,34 +40,33 @@ static const char sccsid[] = "@(#)bomb.c	5.00 2000/11/01 xlockmore";
 
 
 #ifdef STANDALONE
-#define MODE_bomb
-#define USE_BOMB
-#define PROGCLASS "Bomb"
-#define HACK_INIT init_bomb
-#define HACK_DRAW draw_bomb
-#define bomb_opts xlockmore_opts
-#define DEFAULTS "*delay: 1000000 \n" \
- "*count: 10 \n" \
- "*cycles: 20 \n" \
- "*ncolors: 200 \n" \
- "*verbose: False \n"
-#define UNIFORM_COLORS
-#define BRIGHT_COLORS
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# define MODE_bomb
+# define USE_BOMB
+# define DEFAULTS	"*delay: 1000000 \n" \
+			"*count: 10 \n" \
+			"*cycles: 20 \n" \
+			"*ncolors: 200 \n" \
+			"*verbose: False \n" \
+
+# define reshape_bomb 0
+# define bomb_handle_event 0
+# define UNIFORM_COLORS
+# define BRIGHT_COLORS
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
-#endif /* STANDALONE */
+# include "xlock.h"		/* in xlockmore distribution */
 #include "iostuff.h"
+#endif /* STANDALONE */
 
 #ifdef MODE_bomb
 
-ModeSpecOpt bomb_opts =
+ENTRYPOINT ModeSpecOpt bomb_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 const ModStruct bomb_description =
 {"bomb", "init_bomb", "draw_bomb", "release_bomb",
- "refresh_bomb", "change_bomb", (char *) NULL, &bomb_opts,
+ "refresh_bomb", "change_bomb", "free_bomb", &bomb_opts,
  100000, 10, 20, 1, 64, 1.0, "",
  "Shows a bomb and will autologout after a time", 0, NULL};
 
@@ -135,8 +133,11 @@ static int getTextWidth(char *string)
 {
 	XRectangle ink, logical;
 
-       XmbTextExtents(mode_font, string, strlen(string), &ink, &logical);
-	return logical.width;
+	if (mode_font != None) {
+		XmbTextExtents(mode_font, string, strlen(string), &ink, &logical);
+		return logical.width;
+	}
+	return 8;
 }
 extern XFontSet getFontSet(Display * display);
 #define DrawString(d, p, gc, start, ascent, string, len) (void) XmbDrawString(\
@@ -148,18 +149,30 @@ static int getTextWidth(char *string)
 {
 	return XTextWidth(mode_font, string, strlen(string));
 }
+
 extern XFontStruct *getFont(Display * display);
+
 #define DrawString(d, p, gc, start, ascent, string, len) (void) XDrawString(\
 	d, p, gc, start, ascent, string, len)
 #endif
 
 static void
-free_bomb(Display *display, bombstruct *bp)
+free_bomb_screen(Display *display, bombstruct *bp)
 {
+	if (bp == NULL) {
+		return;
+	}
 	if (bp->gc != None) {
 		XFreeGC(display, bp->gc);
 		bp->gc = None;
 	}
+	bp = NULL;
+}
+
+ENTRYPOINT void
+free_bomb(ModeInfo * mi)
+{
+	free_bomb_screen(MI_DISPLAY(mi), &bombs[MI_SCREEN(mi)]);
 }
 
 static void
@@ -230,14 +243,14 @@ detonator(ModeInfo * mi, int draw)
 	}
 }
 
-void
+ENTRYPOINT void
 release_bomb(ModeInfo * mi)
 {
 	if (bombs != NULL) {
 		int screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-                        free_bomb(MI_DISPLAY(mi), &bombs[screen]);
+                        free_bomb_screen(MI_DISPLAY(mi), &bombs[screen]);
 		free(bombs);
 		bombs = (bombstruct *) NULL;
 	}
@@ -251,7 +264,7 @@ release_bomb(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 init_bomb(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
@@ -264,17 +277,13 @@ init_bomb(ModeInfo * mi)
 	XRectangle ink, log;
 #endif
 
-	if (bombs == NULL) {
-		if ((bombs = (bombstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (bombstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, bombs);
 	bp = &bombs[MI_SCREEN(mi)];
 
 	bp->width = MI_WIDTH(mi);
 	bp->height = MI_HEIGHT(mi);
 
-	free_bomb(display, bp);
+	free_bomb_screen(display, bp);
 	if (mode_font != None) {
 #ifdef USE_MB
 		XFreeFontSet(display, mode_font);
@@ -324,7 +333,7 @@ init_bomb(ModeInfo * mi)
 #endif
 			, &gcv)) == None) {
 			
-			free_bomb(display, bp);
+			free_bomb_screen(display, bp);
 			return;
 		}
 	}
@@ -433,7 +442,7 @@ explode(ModeInfo * mi)
 #endif
 }
 
-void
+ENTRYPOINT void
 draw_bomb(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
@@ -458,7 +467,7 @@ draw_bomb(ModeInfo * mi)
 		(void) sprintf(number, "%0*d", NDIGITS, countleft);
 #else
 		(void) sprintf(number, "%0*d:%02d", NDIGITS - 2,
-			countleft / 60, countleft % 60);
+			(countleft / 60) % 100, countleft % 60);
 #endif
 
 		/* Blank out the previous number .... */
@@ -501,7 +510,8 @@ draw_bomb(ModeInfo * mi)
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_bomb(ModeInfo * mi)
 {
 	bombstruct *bp;
@@ -518,7 +528,7 @@ refresh_bomb(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 change_bomb(ModeInfo * mi)
 {
 	bombstruct *bp;
@@ -540,6 +550,7 @@ change_bomb(ModeInfo * mi)
 	detonator(mi, 1);
 	bp->moveok = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Bomb", bomb)
 

@@ -35,14 +35,14 @@ static const char sccsid[] = "@(#)flame.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_flame
-#define PROGCLASS "Flame"
-#define HACK_INIT init_flame
-#define HACK_DRAW draw_flame
-#define flame_opts xlockmore_opts
 #define DEFAULTS "*delay: 750000 \n" \
- "*count: 20 \n" \
- "*cycles: 10000 \n" \
- "*ncolors: 200 \n"
+	"*count: 20 \n" \
+	"*cycles: 10000 \n" \
+	"*ncolors: 200 \n" \
+
+# define free_flame 0
+# define reshape_flame 0
+# define flame_handle_event 0
 #define UNIFORM_COLORS
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -53,7 +53,7 @@ static const char sccsid[] = "@(#)flame.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_flame
 
-ModeSpecOpt flame_opts =
+ENTRYPOINT ModeSpecOpt flame_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -257,18 +257,14 @@ recurse(ModeInfo * mi, flamestruct * fp,
 	return True;
 }
 
-void
+ENTRYPOINT void
 init_flame(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
 	GC          gc = MI_GC(mi);
 	flamestruct *fp;
 
-	if (flames == NULL) {
-		if ((flames = (flamestruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (flamestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, flames);
 	fp = &flames[MI_SCREEN(mi)];
 
 	fp->width = MI_WIDTH(mi);
@@ -290,7 +286,7 @@ init_flame(ModeInfo * mi)
 	fp->variation = NRAND(MAXKINDS);
 }
 
-void
+ENTRYPOINT void
 draw_flame(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -338,7 +334,7 @@ draw_flame(ModeInfo * mi)
 		    fp->pts, fp->num_points, CoordModeOrigin);
 }
 
-void
+ENTRYPOINT void
 release_flame(ModeInfo * mi)
 {
 	if (flames != NULL) {
@@ -347,11 +343,13 @@ release_flame(ModeInfo * mi)
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_flame(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Flame", flame)
 

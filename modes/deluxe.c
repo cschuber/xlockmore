@@ -3,7 +3,6 @@
 
 #if 0
 static const char sccsid[] = "@(#)deluxe.c	5.22 2006/03/07 xlockmore";
-
 #endif
 
 /* xscreensaver, Copyright (c) 1999, 2001, 2002 Jamie Zawinski <jwz AT jwz.org>
@@ -20,35 +19,34 @@ static const char sccsid[] = "@(#)deluxe.c	5.22 2006/03/07 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_deluxe
-#define PROGCLASS "Deluxe"
-#define HACK_INIT init_deluxe
-#define HACK_DRAW draw_deluxe
-#define deluxe_opts xlockmore_opts
-#define DEFAULTS "*delay: 10000 \n" \
- "*size: 4 \n" \
- "*ncolors: 8 \n" \
- "*fullrandom: True \n" \
- "*verbose: False \n" \
-  ".background:		black\n",
-  ".foreground:		white\n",
-  "*delay:		5000\n",
-  "*count:		5\n",
-  "*thickness:		50\n",
-  "*speed:		15\n",
-  "*ncolors:		20\n",
-  "*nlayers:		0\n",
-  "*transparent:	False\n",
-  "*doubleBuffer:	True\n",
+# define MODE_deluxe
+
+# define DEFAULTS	"*delay: 10000 \n" \
+			"*size: 4 \n" \
+			"*ncolors: 8 \n" \
+			"*fullrandom: True \n" \
+			"*verbose: False \n" \
+
+#if 0
+# define DEFAULTS	"*delay: 5000 \n" \
+			"*count: 5 \n", \
+			"*ncolors: 20 \n", \
+			"*nlayers: 0 \n", \
+			"*doubleBuffer: True\n"
+			".background: black\n", \
+			"foreground: white\n", \
+
 #ifdef HAVE_DOUBLE_BUFFER_EXTENSION
-  "*useDBE:		True\n",
-  "*useDBEClear:	True\n",
+			, "*useDBE: True\n", \
+
 #endif /* HAVE_DOUBLE_BUFFER_EXTENSION */
-  0
-#include "xlockmore.h"		/* in xscreensaver distribution */
+#endif
+# define reshape_deluxe 0
+# define deluxe_handle_event 0
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
-#include "color.h"
+# include "xlock.h"		/* in xlockmore distribution */
+# include "color.h"
 #endif /* STANDALONE */
 
 #ifdef MODE_deluxe
@@ -105,7 +103,7 @@ typedef struct {
    Bool dbuf;
 #ifdef HAVE_DOUBLE_BUFFER_EXTENSION
    Bool dbeclear_p;
-  XdbeBackBuffer backb;
+   XdbeBackBuffer backb;
 #endif
    XColor *colors;
    GC erase_gc;
@@ -124,7 +122,7 @@ static XrmOptionDescRec opts [] = {
   { "+transparent",	"deluxe.transparent",	 XrmoptionNoArg,  (caddr_t) "off" },
 #ifdef HAVE_DOUBLE_BUFFER_EXTENSION
   { "-useDBEClear",		"deluxe.useDBEClear", XrmoptionNoArg,  (caddr_t) "on" },
-  { "+useDBEClear",		"deluxe.useDBEClear", XrmoptionNoArg,  (caddr_t) "off" }
+  { "+useDBEClear",		"deluxe.useDBEClear", XrmoptionNoArg,  (caddr_t) "off" },
 #endif
   { "-mono",		"deluxe.mono", XrmoptionNoArg,  (caddr_t) "on" },
   { "+mono",		"deluxe.mono", XrmoptionNoArg,  (caddr_t) "off" },
@@ -160,19 +158,19 @@ static OptionStruct desc[] =
 	{(char *) "-planes num", (char *) "Number of planes"},
 	{(char *) "-/+transparent", (char *) "turn on/off transparancy"},
 #ifdef HAVE_DOUBLE_BUFFER_EXTENSION
-     {(char *) "-/+useDBEClear", (char *) "turn on/off useDBEClear"}
+	{(char *) "-/+useDBEClear", (char *) "turn on/off useDBEClear"},
 #endif
-     {(char *) "-/+mono", (char *) "turn on/off monochromatic mode"},
-     {(char *) "-/+db", (char *) "turn on/off double buffering"}
+	{(char *) "-/+mono", (char *) "turn on/off monochromatic mode"},
+	{(char *) "-/+db", (char *) "turn on/off double buffering"}
 };
 
-ModeSpecOpt deluxe_opts =
+ENTRYPOINT ModeSpecOpt deluxe_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   deluxe_description =
 {"deluxe", "init_deluxe", "draw_deluxe", "release_deluxe",
- "refresh_deluxe", "init_deluxe", (char *) NULL, &deluxe_opts,
+ "(char *) NULL", "init_deluxe", "free_deluxe", &deluxe_opts,
  5000, 5, 1, 1, 64, 1.0, "",
  "Shows pulsing sequence of stars, circles, and lines.", 0, NULL};
 
@@ -180,10 +178,13 @@ ModStruct   deluxe_description =
 
 
 static void
-free_deluxe(Display *dpy, deluxestruct *dlp)
+free_deluxe_screen(Display *dpy, deluxestruct *dlp)
 {
    int i;
-   
+
+   if (dlp == NULL) {
+     return;
+   }   
    for (i = 0; i < dlp->count; i++)
      if ( dlp->throbbers[i] )
        {
@@ -211,6 +212,13 @@ free_deluxe(Display *dpy, deluxestruct *dlp)
         XFreeGC (dpy, dlp->erase_gc);
    	dlp->erase_gc = None;
      }
+   dlp = NULL;
+}
+
+ENTRYPOINT void
+free_deluxe(ModeInfo * mi)
+{
+	free_deluxe_screen(MI_DISPLAY(mi), &deluxes[MI_SCREEN(mi)]);
 }
 
 /* http://mathworld.wolfram.com/Pentagram.html
@@ -404,7 +412,7 @@ throb (Display *dpy, Drawable window, struct throbber *t)
     }
 }
 
-void
+ENTRYPOINT void
 init_deluxe(ModeInfo * mi)
 {
   deluxestruct *dlp;
@@ -415,13 +423,8 @@ init_deluxe(ModeInfo * mi)
   int i;
 
    /* initialize */
-   if (deluxes == NULL) {
-      if ((deluxes = (deluxestruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (deluxestruct))) == NULL)
-	return;
-   }
+   MI_INIT(mi, deluxes);
    dlp = &deluxes[MI_SCREEN(mi)];
-   free_deluxe(dpy, dlp);
 
   dlp->count = MI_COUNT(mi);
   dlp->ncolors =  MI_NCOLORS(mi);
@@ -456,9 +459,10 @@ init_deluxe(ModeInfo * mi)
       if (dlp->nplanes <= 0)
         dlp->nplanes = NRAND(dlp->xgwa.depth-2) + 2;
 
-      allocate_alpha_colors (dlp->xgwa.screen, dlp->xgwa.visual, dlp->xgwa.colormap,
-                             &dlp->nplanes, True, &dlp->plane_masks,
-			     &dlp->base_pixel , mi );
+      allocate_alpha_colors (dlp->xgwa.screen, dlp->xgwa.visual,
+		dlp->xgwa.colormap,
+                &dlp->nplanes, True, &dlp->plane_masks,
+		&dlp->base_pixel , mi );
       if (dlp->nplanes <= 1)
 	{
 	  fprintf (stderr,
@@ -471,9 +475,17 @@ init_deluxe(ModeInfo * mi)
   else
     {
     COLOR:
-      make_random_colormap (mi , dlp->xgwa.colormap,
-                            dlp->colors, &dlp->ncolors, True, True, &writeable
-			    );
+      make_random_colormap (
+#ifdef STANDALONE
+		dlp->xgwa.screen, dlp->xgwa.visual,
+		dlp->xgwa.colormap, dlp->colors, &dlp->ncolors,
+		True, True, &writeable, True
+#else
+		mi,
+		dlp->xgwa.colormap, dlp->colors, &dlp->ncolors,
+		True, True, &writeable
+#endif
+		);
       if (dlp->ncolors < 2)
         goto MONO;
     }
@@ -518,7 +530,8 @@ init_deluxe(ModeInfo * mi)
 				dlp->xgwa.width, dlp->xgwa.height);
 }
 
-void draw_deluxe (ModeInfo * mi)
+ENTRYPOINT void
+draw_deluxe(ModeInfo * mi)
 {
    deluxestruct *dlp = &deluxes[MI_SCREEN(mi)];
    Display *dpy = MI_DISPLAY(mi);
@@ -562,24 +575,17 @@ void draw_deluxe (ModeInfo * mi)
       XSync (dpy, False);
 }
 
-void
+ENTRYPOINT void
 release_deluxe(ModeInfo * mi)
 {
    if (deluxes != NULL) {
       int screen;
 
       for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-	free_deluxe(MI_DISPLAY(mi), &deluxes[screen]);
+	free_deluxe_screen(MI_DISPLAY(mi), &deluxes[screen]);
       free(deluxes);
       deluxes = (deluxestruct *) NULL;
    }
-}
-
-void
-refresh_deluxe(ModeInfo * mi)
-{
-  if (deluxes == NULL)
-    return;
 }
 
 XSCREENSAVER_MODULE ("Deluxe", deluxe)

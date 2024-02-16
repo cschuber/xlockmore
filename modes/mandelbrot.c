@@ -55,14 +55,14 @@ static const char sccsid[] = "@(#)mandelbrot.c	5.09 2003/06/30 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_mandelbrot
-#define PROGCLASS "Mandelbrot"
-#define HACK_INIT init_mandelbrot
-#define HACK_DRAW draw_mandelbrot
 #define mandelbrot_opts xlockmore_opts
 #define DEFAULTS "*delay: 25000 \n" \
- "*count: -8 \n" \
- "*cycles: 20000 \n" \
- "*ncolors: 200 \n"
+	"*count: -8 \n" \
+	"*cycles: 20000 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_mandelbrot 0
+# define mandelbrot_handle_event 0
 #define SMOOTH_COLORS
 #define WRITABLE_COLORS
 #include "xlockmore.h"		/* from the xscreensaver distribution */
@@ -95,7 +95,7 @@ typedef enum {
 	LYAPUNOV,
 	ALPHA,
 	INDEX,
-	interior_size,
+	interior_size
 } interior_t;
 
 	/* incr also would be nice as a parameter.  It controls how fast
@@ -158,13 +158,13 @@ static OptionStruct desc[] =
   {(char *) "-/+cycle", (char *) "turn on/off colour cycling"}
 };
 
-ModeSpecOpt mandelbrot_opts =
+ENTRYPOINT ModeSpecOpt mandelbrot_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   mandelbrot_description =
 {"mandelbrot", "init_mandelbrot", "draw_mandelbrot", "release_mandelbrot",
- (char *) NULL, "init_mandelbrot", (char *) NULL, &mandelbrot_opts,
+ (char *) NULL, "init_mandelbrot", "free_mandelbrot", &mandelbrot_opts,
  25000, -8, 20000, 1, 64, 1.0, "",
  "Shows mandelbrot sets", 0, NULL};
 
@@ -309,8 +309,7 @@ typedef struct {
 	int         reptop;
 	Bool        dem, pow, sin, cycle_p, mono_p, no_colors;
 	Bool        binary;
-    interior_t  interior;
-	ModeInfo   *mi;
+	interior_t  interior;
 } mandelstruct;
 
 static mandelstruct *mandels = (mandelstruct *) NULL;
@@ -499,10 +498,13 @@ Select(/* input variables first */
 
 
 static void
-free_mandelbrot(Display *display, mandelstruct *mp)
+free_mandelbrot_screen(ModeInfo *mi, mandelstruct *mp)
 {
-	ModeInfo *mi = mp->mi;
+	Display *display = MI_DISPLAY(mi);
 
+	if (mp == NULL) {
+		return;
+	}
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
 		MI_WHITE_PIXEL(mi) = mp->whitepixel;
 		MI_BLACK_PIXEL(mi) = mp->blackpixel;
@@ -512,8 +514,13 @@ free_mandelbrot(Display *display, mandelstruct *mp)
 #endif
 		if (mp->colors != NULL) {
 			if (mp->ncolors && !mp->no_colors)
-				free_colors(display, mp->cmap, mp->colors,
-					mp->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					MI_SCREENPTR(mi),
+#else
+					display,
+#endif
+					mp->cmap, mp->colors, mp->ncolors);
 			free(mp->colors);
 			mp->colors = (XColor *) NULL;
 		}
@@ -526,6 +533,13 @@ free_mandelbrot(Display *display, mandelstruct *mp)
 		XFreeGC(display, mp->gc);
 		mp->gc = None;
 	}
+	mp = NULL;
+}
+
+ENTRYPOINT void
+free_mandelbrot(ModeInfo * mi)
+{
+	free_mandelbrot_screen(mi, &mandels[MI_SCREEN(mi)]);
 }
 
 #ifndef STANDALONE
@@ -533,20 +547,15 @@ extern char *background;
 extern char *foreground;
 #endif
 
-void
+ENTRYPOINT void
 init_mandelbrot(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
 	Window      window = MI_WINDOW(mi);
 	mandelstruct *mp;
 
-	if (mandels == NULL) {
-		if ((mandels = (mandelstruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (mandelstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, mandels);
 	mp = &mandels[MI_SCREEN(mi)];
-	mp->mi = mi;
 
 	mp->screen_width = MI_WIDTH(mi);
 	mp->screen_height = MI_HEIGHT(mi);
@@ -608,7 +617,7 @@ init_mandelbrot(ModeInfo * mi)
 			mp->whitepixel = MI_WHITE_PIXEL(mi);
 			if ((mp->cmap = XCreateColormap(display, window,
 					MI_VISUAL(mi), AllocNone)) == None) {
-				free_mandelbrot(display, mp);
+				free_mandelbrot_screen(mi, mp);
 				return;
 			}
 			XSetWindowColormap(display, window, mp->cmap);
@@ -631,7 +640,7 @@ init_mandelbrot(ModeInfo * mi)
 		}
 		if ((mp->gc = XCreateGC(display, MI_WINDOW(mi),
 			     (unsigned long) 0, (XGCValues *) NULL)) == None) {
-			free_mandelbrot(display, mp);
+			free_mandelbrot_screen(mi, mp);
 			return;
 		}
 	}
@@ -640,9 +649,18 @@ init_mandelbrot(ModeInfo * mi)
   /* Set up colour map */
   mp->direction = (LRAND() & 1) ? 1 : -1;
   if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
+#ifdef STANDALONE
+	Screen *screen = MI_SCREENPTR(mi);
+#endif
     if (mp->colors != NULL) {
       if (mp->ncolors && !mp->no_colors)
-        free_colors(display, mp->cmap, mp->colors, mp->ncolors);
+        free_colors(
+#ifdef STANDALONE
+		screen,
+#else
+		display,
+#endif
+		mp->cmap, mp->colors, mp->ncolors);
       free(mp->colors);
       mp->colors = (XColor *) NULL;
     }
@@ -659,10 +677,16 @@ init_mandelbrot(ModeInfo * mi)
     else
       if ((mp->colors = (XColor *) malloc(sizeof (*mp->colors) *
           (mp->ncolors + 1))) == NULL) {
-        free_mandelbrot(display, mp);
+        free_mandelbrot_screen(mi, mp);
         return;
       }
-    mp->cycle_p = has_writable_cells(mi);
+    mp->cycle_p = has_writable_cells(
+#ifdef STANDALONE
+	MI_SCREENPTR(mi), MI_VISUAL(mi)
+#else
+	mi
+#endif
+	);
     if (mp->cycle_p) {
       if (MI_IS_FULLRANDOM(mi)) {
         if (!NRAND(8))
@@ -674,33 +698,45 @@ init_mandelbrot(ModeInfo * mi)
       }
     }
     if (!mp->mono_p) {
+#ifdef STANDALONE
+	Screen *screen = MI_SCREENPTR(mi);
+#endif
       if (!(LRAND() % 10))
         make_random_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		mp->cmap, mp->colors, &mp->ncolors,
+		True, True, &mp->cycle_p, True
 #else
-            mi,
+		mi,
+		mp->cmap, mp->colors, &mp->ncolors,
+		True, True, &mp->cycle_p
 #endif
-              mp->cmap, mp->colors, &mp->ncolors,
-              True, True, &mp->cycle_p);
+		);
       else if (!(LRAND() % 2))
         make_uniform_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		mp->cmap, mp->colors, &mp->ncolors,
+		True, &mp->cycle_p, True
 #else
-            mi,
+		mi,
+		mp->cmap, mp->colors, &mp->ncolors,
+		True, &mp->cycle_p
 #endif
-                  mp->cmap, mp->colors, &mp->ncolors,
-                  True, &mp->cycle_p);
+		);
       else
         make_smooth_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		mp->cmap, mp->colors, &mp->ncolors,
+		True, &mp->cycle_p, True
 #else
-            mi,
+		mi,
+		mp->cmap, mp->colors, &mp->ncolors,
+		True, &mp->cycle_p
 #endif
-                 mp->cmap, mp->colors, &mp->ncolors,
-                 True, &mp->cycle_p);
+		);
     }
     XInstallColormap(display, mp->cmap);
     if (mp->ncolors < 2) {
@@ -726,7 +762,7 @@ init_mandelbrot(ModeInfo * mi)
 		&mp->ul,&mp->lr);
 }
 
-void
+ENTRYPOINT void
 draw_mandelbrot(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -761,8 +797,13 @@ draw_mandelbrot(ModeInfo * mi)
 
   /* Rotate colours */
   if (mp->cycle_p) {
-    rotate_colors(display, mp->cmap, mp->colors, mp->ncolors,
-      mp->direction);
+    rotate_colors(
+#ifdef STANDALONE
+	MI_SCREENPTR(mi),
+#else
+	display,
+#endif
+	mp->cmap, mp->colors, mp->ncolors, mp->direction);
     if (!(LRAND() % 1000))
       mp->direction = -mp->direction;
   }
@@ -827,14 +868,14 @@ draw_mandelbrot(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_mandelbrot(ModeInfo * mi)
 {
 	if (mandels != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_mandelbrot(MI_DISPLAY(mi), &mandels[screen]);
+			free_mandelbrot_screen(mi, &mandels[screen]);
 		free(mandels);
 		mandels = (mandelstruct *) NULL;
 	}

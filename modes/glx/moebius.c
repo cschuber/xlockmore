@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* moebius --- Moebius Strip II, an Escher-like GL scene with ants. */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)moebius.c	5.01 2001/03/01 xlockmore";
-
 #endif
 
 /*-
@@ -84,15 +83,13 @@ static const char sccsid[] = "@(#)moebius.c	5.01 2001/03/01 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_moebius
-# define PROGCLASS			"Moebius"
-# define HACK_INIT			init_moebius
-# define HACK_DRAW			draw_moebius
-# define HACK_RESHAPE			reshape_moebius
-# define moebius_opts			xlockmore_opts
 # define DEFAULTS			"*cycles:	1       \n"	\
 					"*delay:	30000   \n"	\
 					"*showFps:      False   \n"	\
 					"*wireframe:	False	\n"
+
+# define free_moebius 0
+# define moebius_handle_event 0
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 #else /* !STANDALONE */
 # include "xlock.h"		/* from the xlockmore distribution */
@@ -129,7 +126,7 @@ static OptionStruct desc[] =
 	{(char *) "-/+noants", (char *) "turn on/off walking ants"}
 };
 
-ModeSpecOpt moebius_opts =
+ENTRYPOINT ModeSpecOpt moebius_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -552,7 +549,7 @@ draw_moebius_strip(ModeInfo * mi)
 #undef MoebiusDivisions
 #undef MoebiusTransversals
 
-static void
+ENTRYPOINT void
 reshape_moebius(ModeInfo * mi, int width, int height)
 {
 	moebiusstruct *mp = &moebius[MI_SCREEN(mi)];
@@ -692,7 +689,7 @@ rotate(GLfloat *pos, GLfloat *v, GLfloat *dv, GLfloat max_v, Bool verbose)
     }
 }
 
-void
+ENTRYPOINT void
 release_moebius(ModeInfo * mi)
 {
 	if (moebius != NULL) {
@@ -702,16 +699,12 @@ release_moebius(ModeInfo * mi)
 	FreeAllGL(mi);
 }
 
-void
+ENTRYPOINT void
 init_moebius(ModeInfo * mi)
 {
 	moebiusstruct *mp;
 
-	if (moebius == NULL) {
-		if ((moebius = (moebiusstruct *) calloc(MI_NUM_SCREENS(mi),
-					    sizeof (moebiusstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, moebius);
 	mp = &moebius[MI_SCREEN(mi)];
 	mp->step = NRAND(90);
 	mp->ant_position = NRAND(90);
@@ -743,7 +736,7 @@ init_moebius(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_moebius(ModeInfo * mi)
 {
 	moebiusstruct *mp;
@@ -806,7 +799,8 @@ draw_moebius(ModeInfo * mi)
 	mp->step += 0.025;
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 change_moebius(ModeInfo * mi)
 {
 	moebiusstruct *mp = &moebius[MI_SCREEN(mi)];
@@ -821,5 +815,8 @@ change_moebius(ModeInfo * mi)
 #endif
 	pinit();
 }
-
 #endif
+
+XSCREENSAVER_MODULE ("Moebius", moebius)
+
+#endif /* MODE_moebius */

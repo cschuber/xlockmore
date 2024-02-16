@@ -34,14 +34,13 @@ static const char sccsid[] = "@(#)discrete.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_discrete
-#define PROGCLASS "Discrete"
-#define HACK_INIT init_discrete
-#define HACK_DRAW draw_discrete
-#define discrete_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000 \n" \
- "*count: 4096 \n" \
- "*cycles: 2500 \n" \
- "*ncolors: 100 \n"
+	"*count: 4096 \n" \
+	"*cycles: 2500 \n" \
+	"*ncolors: 100 \n" \
+
+# define reshape_discrete 0
+# define discrete_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -50,13 +49,13 @@ static const char sccsid[] = "@(#)discrete.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_discrete
 
-ModeSpecOpt discrete_opts =
+ENTRYPOINT ModeSpecOpt discrete_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   discrete_description =
 {"discrete", "init_discrete", "draw_discrete", "release_discrete",
- "refresh_discrete", "init_discrete", (char *) NULL, &discrete_opts,
+ "refresh_discrete", "init_discrete", "free_discrete", &discrete_opts,
  1000, 4096, 2500, 1, 64, 1.0, "",
  "Shows various discrete maps", 0, NULL};
 
@@ -103,18 +102,32 @@ typedef struct {
 
 static discretestruct *discretes = (discretestruct *) NULL;
 
-void
+static void
+free_discrete_screen(discretestruct *hp)
+{
+	if (hp == NULL) {
+		return;
+	}
+	if (hp->pointBuffer != NULL) {
+		free(hp->pointBuffer);
+		/* hp->pointBuffer = NULL; */
+	}
+	hp = NULL;
+}
+
+ENTRYPOINT void
+free_discrete(ModeInfo * mi)
+{
+        free_discrete_screen(&discretes[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_discrete(ModeInfo * mi)
 {
 	double      range;
 	discretestruct *hp;
 
-	if (discretes == NULL) {
-		if ((discretes =
-		     (discretestruct *) calloc(MI_NUM_SCREENS(mi),
-					   sizeof (discretestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, discretes);
 	hp = &discretes[MI_SCREEN(mi)];
 
 	hp->maxx = MI_WIDTH(mi);
@@ -251,7 +264,7 @@ init_discrete(ModeInfo * mi)
 }
 
 
-void
+ENTRYPOINT void
 draw_discrete(ModeInfo * mi)
 {
 	Display    *dsp = MI_DISPLAY(mi);
@@ -395,30 +408,27 @@ draw_discrete(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_discrete(ModeInfo * mi)
 {
 	if (discretes != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			discretestruct *hp = &discretes[screen];
-
-			if (hp->pointBuffer != NULL) {
-				free(hp->pointBuffer);
-				/* hp->pointBuffer = NULL; */
-			}
+			free_discrete_screen(&discretes[screen]);
 		}
 		free(discretes);
 		discretes = (discretestruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_discrete(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Discrete", discrete)
 

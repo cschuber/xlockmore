@@ -35,18 +35,17 @@ static const char sccsid[] = "@(#)flag.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_flag
-#define PROGCLASS "Flag"
-#define HACK_INIT init_flag
-#define HACK_DRAW draw_flag
-#define flag_opts xlockmore_opts
 #define DEFAULTS "*delay: 50000 \n" \
- "*cycles: 1000 \n" \
- "*size: -7 \n" \
- "*ncolors: 200 \n" \
- "*bitmap: \n" \
- "*font: \n" \
- "*text: \n" \
- "*fullrandom: True \n"
+	"*cycles: 1000 \n" \
+	"*size: -7 \n" \
+	"*ncolors: 200 \n" \
+	"*bitmap: \n" \
+	"*font: fixed \n" \
+	"*text: \n" \
+	"*fullrandom: True \n" \
+
+# define reshape_flag 0
+# define flag_handle_event 0
 #define BRIGHT_COLORS
 #define UNIFORM_COLORS
 #define DEF_FONT "-*-helvetica-bold-r-*-240-*"
@@ -58,7 +57,7 @@ static const char sccsid[] = "@(#)flag.c	5.00 2000/11/01 xlockmore";
 #include "color.h"
 #endif /* STANDALONE */
 
-#ifdef JWZ
+#ifdef STANDALONE
 
 #ifdef HAVE_XPM
 #include <X11/xpm.h>
@@ -75,7 +74,10 @@ static const char sccsid[] = "@(#)flag.c	5.00 2000/11/01 xlockmore";
 #endif /* VMS */
 #endif /* HAVE_XMU */
 
+#ifdef JWZ
 #include "images/bob.xbm"
+#else
+#endif
 #include <string.h>
 #include <X11/Xutil.h>
 #else
@@ -102,13 +104,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+invert", (char *) "turn on/off inverting of flag"}
 };
 
-ModeSpecOpt flag_opts =
+ENTRYPOINT ModeSpecOpt flag_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   flag_description =
 {"flag", "init_flag", "draw_flag", "release_flag",
- "refresh_flag", "init_flag", (char *) NULL, &flag_opts,
+ "refresh_flag", "init_flag", "free_flag", &flag_opts,
  50000, 1, 1000, -7, 64, 1.0, "",
  "Shows a waving flag image", 0, NULL};
 
@@ -119,7 +121,9 @@ ModStruct   flag_description =
 #define FLAG_HEIGHT    image_height
 #define FLAG_BITS    image_bits
 
+#ifndef STANDALONE
 #include "flag.xbm"
+#endif
 
 #ifdef HAVE_XPM
 #define FLAG_NAME  image_name
@@ -266,6 +270,10 @@ affiche(ModeInfo * mi)
 
 extern char *message;
 
+#ifdef STANDALONE
+char * message = NULL;
+#endif
+
 static Bool
 getText(ModeInfo * mi, XImage ** image)
 {
@@ -400,9 +408,9 @@ getText(ModeInfo * mi, XImage ** image)
 static Bool
 init_stuff(ModeInfo * mi)
 {
-	Display    *display = MI_DISPLAY(mi);
-	Window      window = MI_WINDOW(mi);
 	flagstruct *fp = &flags[MI_SCREEN(mi)];
+#ifndef STANDALONE
+	Display    *display = MI_DISPLAY(mi);
 
 	if (!fp->logo) {
 		getImage(mi, &fp->logo, FLAG_WIDTH, FLAG_HEIGHT, FLAG_BITS,
@@ -413,8 +421,9 @@ init_stuff(ModeInfo * mi)
 		if (!fp->logo)
 			return False;
 	}
-#ifndef STANDALONE
 	if (fp->cmap != None) {
+		Window      window = MI_WINDOW(mi);
+
 		setColormap(display, window, fp->cmap, MI_IS_INWINDOW(mi));
 		if (fp->backGC == None) {
 			XGCValues   xgcv;
@@ -448,8 +457,11 @@ free_stuff(Display * display, flagstruct * fp)
 }
 
 static void
-free_flag(Display * display, flagstruct * fp)
+free_flag_screen(Display * display, flagstruct * fp)
 {
+	if (fp == NULL) {
+		return;
+	}
 	if (fp->cache != None) {
 		XFreePixmap(display, fp->cache);
 		fp->cache = None;
@@ -462,20 +474,29 @@ free_flag(Display * display, flagstruct * fp)
 		fp->image = None;
 	}
 	free_stuff(display, fp);
+#ifndef STANDALONE
 	if (fp->logo != None) {
 		destroyImage(&fp->logo, &fp->graphics_format);
 		fp->logo = None;
 	}
+#endif
+	fp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_flag(ModeInfo * mi)
+{
+	free_flag_screen(MI_DISPLAY(mi), &flags[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 release_flag(ModeInfo * mi)
 {
 	if (flags != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_flag(MI_DISPLAY(mi), &flags[screen]);
+			free_flag_screen(MI_DISPLAY(mi), &flags[screen]);
 		free(flags);
 		flags = (flagstruct *) NULL;
 	}
@@ -485,18 +506,14 @@ release_flag(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 init_flag(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
 	int         size = MI_SIZE(mi);
 	flagstruct *fp;
 
-	if (flags == NULL) {
-		if ((flags = (flagstruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (flagstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, flags);
 	fp = &flags[MI_SCREEN(mi)];
 
 	if (messagefont == None) {
@@ -507,7 +524,7 @@ init_flag(ModeInfo * mi)
 	}
 
 	if (!init_stuff(mi)) {
-		free_flag(display, fp);
+		free_flag_screen(display, fp);
 		return;
 	}
 
@@ -521,6 +538,7 @@ init_flag(ModeInfo * mi)
 			(void) XDestroyImage(fp->image);
 		fp->image = None;
 	}
+#ifndef STANDALONE
 	if (MI_IS_FULLRANDOM(mi) ||
 	    (MI_BITMAP(mi) && *(MI_BITMAP(mi)) && message && *message) ||
 	((!(MI_BITMAP(mi)) || !*(MI_BITMAP(mi))) && (!message || !*message)))
@@ -528,10 +546,11 @@ init_flag(ModeInfo * mi)
 	else if (MI_BITMAP(mi) && *(MI_BITMAP(mi)))
 		fp->choice = IMAGE_FLAG;
 	else
+#endif
 		fp->choice = MESSAGE_FLAG;
 	if (fp->choice == MESSAGE_FLAG) {
 		if (!getText(mi, &fp->image)) {
-			free_flag(display, fp);
+			free_flag_screen(display, fp);
 			return;
 		}
 	} else {
@@ -546,7 +565,7 @@ init_flag(ModeInfo * mi)
 					 0, fp->logo->data,
 					 (fp->graphics_format == IS_RASTERFILE && (fp->logo->width & 1)) ?
 					 fp->logo->width + 1 : fp->logo->width, fp->logo->height, 8, 0)) == None) {
-			free_flag(display, fp);
+			free_flag_screen(display, fp);
 			return;
 		}
 		if (fp->graphics_format < IS_XPM) {
@@ -572,7 +591,7 @@ init_flag(ModeInfo * mi)
 	}
 	if ((fp->cache = XCreatePixmap(display, MI_WINDOW(mi),
 					MAXW(fp), MAXH(fp), MI_DEPTH(mi))) == None) {
-		free_flag(display, fp);
+		free_flag_screen(display, fp);
 		return;
 	}
 	XSetForeground(display, fp->backGC, fp->black);
@@ -600,7 +619,7 @@ init_flag(ModeInfo * mi)
 	MI_CLEARWINDOWCOLORMAP(mi, fp->backGC, fp->black);
 }
 
-void
+ENTRYPOINT void
 draw_flag(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -641,7 +660,8 @@ draw_flag(ModeInfo * mi)
 		init_flag(mi);
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_flag(ModeInfo * mi)
 {
 	flagstruct *fp;
@@ -652,12 +672,13 @@ refresh_flag(ModeInfo * mi)
 
 #ifdef HAVE_XPM
 	/* This is needed when another program changes the colormap. */
-	free_flag(MI_DISPLAY(mi), fp);
+	free_flag_screen(MI_DISPLAY(mi), fp);
 	init_flag(mi);
 #endif
 	if (fp->backGC != None)
 		MI_CLEARWINDOWCOLORMAP(mi, fp->backGC, fp->black);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Flag", flag)
 

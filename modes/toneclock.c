@@ -46,17 +46,16 @@ static const char sccsid[] = "@(#)toneclock.c	5.00 2004/09/16 xlockmore";
 #endif
 #ifdef STANDALONE
 #define MODE_toneclock
-#define PROGCLASS "toneclock"
-#define HACK_INIT init_toneclock
-#define HACK_DRAW draw_toneclock
-#define toneclock_opts xlockmore_opts
 #define DEFAULTS "*delay: 60000 \n" \
- "*count: -20 \n" \
- "*cycles: 200 \n" \
- "*size: -1000 \n" \
- "*ncolors: 64 \n" \
- "*fullrandom: True \n" \
- "*verbose: False \n"
+	"*count: -20 \n" \
+	"*cycles: 200 \n" \
+	"*size: -1000 \n" \
+	"*ncolors: 64 \n" \
+	"*fullrandom: True \n" \
+	"*verbose: False \n" \
+
+# define reshape_toneclock 0
+# define toneclock_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -106,13 +105,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+pulsating", (char *) "turn on/off pulsating clock"}
 };
 
-ModeSpecOpt toneclock_opts =
+ENTRYPOINT ModeSpecOpt toneclock_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   toneclock_description =
 {"toneclock", "init_toneclock", "draw_toneclock", "release_toneclock",
- "refresh_toneclock", "init_toneclock", (char *) NULL, &toneclock_opts,
+ "refresh_toneclock", "init_toneclock", "free_toneclock", &toneclock_opts,
  60000, -20, 200, -1000, 64, 1.0, "",
  "Shows Peter Schat's toneclock", 0, NULL};
 
@@ -129,7 +128,6 @@ typedef struct {
 } toneclockhour;
 
 typedef struct {
-	ModeInfo   *mi;
 	Pixmap      dbuf;
 	GC          dbuf_gc;
 	GC          gc;
@@ -244,10 +242,13 @@ free_hour(toneclockstruct *tclock)
 }
 
 static void
-free_toneclock(Display *display, toneclockstruct *tclock)
+free_toneclock_screen(ModeInfo *mi, toneclockstruct *tclock)
 {
-	ModeInfo *mi = tclock->mi;
-   
+	Display    *display = MI_DISPLAY(mi);
+
+	if (tclock == NULL) {
+		return;
+	}   
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
 		MI_WHITE_PIXEL(mi) = tclock->whitepixel;
 		MI_BLACK_PIXEL(mi) = tclock->blackpixel;
@@ -256,8 +257,17 @@ free_toneclock(Display *display, toneclockstruct *tclock)
 		MI_BG_PIXEL(mi) = tclock->bg;
 #endif
 		if (tclock->colors != NULL) {
+#ifdef STANDALONE
+			Screen *screen = MI_SCREENPTR(mi);
+#endif
 			if (tclock->ncolors && !tclock->no_colors)
-				free_colors(display, tclock->cmap, tclock->colors, tclock->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					screen,
+#else
+					display,
+#endif
+					tclock->cmap, tclock->colors, tclock->ncolors);
 			free(tclock->colors);
 			tclock->colors = (XColor *) NULL;
 		}
@@ -281,6 +291,13 @@ free_toneclock(Display *display, toneclockstruct *tclock)
 		tclock->dbuf_gc = None;
 	}
 #endif
+	tclock = NULL;
+}
+
+ENTRYPOINT void
+free_toneclock(ModeInfo * mi)
+{
+        free_toneclock_screen(mi, &toneclocks[MI_SCREEN(mi)]);
 }
 
 #ifndef STANDALONE
@@ -288,7 +305,7 @@ extern char *background;
 extern char *foreground;
 #endif
 
-void
+ENTRYPOINT void
 init_toneclock(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -297,13 +314,8 @@ init_toneclock(ModeInfo * mi)
 	toneclockstruct *tclock;
 
 /* initialize */
-	if (toneclocks == NULL) {
-		if ((toneclocks = (toneclockstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (toneclockstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, toneclocks);
 	tclock = &toneclocks[MI_SCREEN(mi)];
-	tclock->mi = mi;
 
 	if (tclock->gc == None) {
 		if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
@@ -317,7 +329,7 @@ init_toneclock(ModeInfo * mi)
 			tclock->whitepixel = MI_WHITE_PIXEL(mi);
 			if ((tclock->cmap = XCreateColormap(display, window,
 					MI_VISUAL(mi), AllocNone)) == None) {
-				free_toneclock(display, tclock);
+				free_toneclock_screen(mi, tclock);
 				return;
 			}
 			XSetWindowColormap(display, window, tclock->cmap);
@@ -340,7 +352,7 @@ init_toneclock(ModeInfo * mi)
 		}
 		if ((tclock->gc = XCreateGC(display, MI_WINDOW(mi),
 			     (unsigned long) 0, (XGCValues *) NULL)) == None) {
-			free_toneclock(display, tclock);
+			free_toneclock_screen(mi, tclock);
 			return;
 		}
 	}
@@ -385,14 +397,23 @@ init_toneclock(ModeInfo * mi)
           istart = 0;
 	if ((tclock->hour = (toneclockhour *) calloc(tclock->num_hour,
 			sizeof (toneclockhour))) == NULL) {
-		free_toneclock(display, tclock);
+		free_toneclock_screen(mi, tclock);
 		return;
 	}
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
+#ifdef STANDALONE
+		Screen *screen = MI_SCREENPTR(mi);
+#endif
 /* Set up colour map */
 		if (tclock->colors != NULL) {
 			if (tclock->ncolors && !tclock->no_colors)
-				free_colors(display, tclock->cmap, tclock->colors, tclock->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					screen,
+#else
+					display,
+#endif
+					tclock->cmap, tclock->colors, tclock->ncolors);
 			free(tclock->colors);
 			tclock->colors = (XColor *) NULL;
 		}
@@ -409,10 +430,16 @@ init_toneclock(ModeInfo * mi)
 		else
 			if ((tclock->colors = (XColor *) malloc(sizeof (*tclock->colors) *
 					(tclock->ncolors + 1))) == NULL) {
-				free_toneclock(display, tclock);
+				free_toneclock_screen(mi, tclock);
 				return;
 			}
-		tclock->cycle_p = has_writable_cells(mi);
+		tclock->cycle_p = has_writable_cells(
+#ifdef STANDALONE
+			screen, MI_VISUAL(mi)
+#else
+			mi
+#endif
+			);
 		if (tclock->cycle_p) {
 			if (MI_IS_FULLRANDOM(mi)) {
 				if (!NRAND(8))
@@ -427,30 +454,39 @@ init_toneclock(ModeInfo * mi)
 			if (!(LRAND() % 10))
 				make_random_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					tclock->cmap, tclock->colors, &tclock->ncolors,
+					True, True, &tclock->cycle_p, True
 #else
-            mi,
+					mi,
+					tclock->cmap, tclock->colors, &tclock->ncolors,
+					True, True, &tclock->cycle_p
 #endif
-						tclock->cmap, tclock->colors, &tclock->ncolors,
-						True, True, &tclock->cycle_p);
+					);
 			else if (!(LRAND() % 2))
 				make_uniform_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					tclock->cmap, tclock->colors, &tclock->ncolors,
+					True, &tclock->cycle_p, True
 #else
-            mi,
+					mi,
+					tclock->cmap, tclock->colors, &tclock->ncolors,
+					True, &tclock->cycle_p
 #endif
-                  tclock->cmap, tclock->colors, &tclock->ncolors,
-						      True, &tclock->cycle_p);
+					);
 			else
 				make_smooth_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					tclock->cmap, tclock->colors, &tclock->ncolors,
+					True, &tclock->cycle_p, True
 #else
-            mi,
+					mi,
+					tclock->cmap, tclock->colors, &tclock->ncolors,
+					True, &tclock->cycle_p
 #endif
-                 tclock->cmap, tclock->colors, &tclock->ncolors,
-						     True, &tclock->cycle_p);
+					);
 		}
 		XInstallColormap(display, tclock->cmap);
 		if (tclock->ncolors < 2) {
@@ -666,7 +702,7 @@ init_toneclock(ModeInfo * mi)
 	XSetFunction(display, tclock->gc, GXcopy);
 }
 
-void
+ENTRYPOINT void
 draw_toneclock(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -681,7 +717,7 @@ draw_toneclock(ModeInfo * mi)
 		return;
 
 	if (tclock->no_colors) {
-		free_toneclock(display, tclock);
+		free_toneclock_screen(mi, tclock);
 		init_toneclock(mi);
 		return;
 	}
@@ -695,8 +731,13 @@ draw_toneclock(ModeInfo * mi)
 	MI_IS_DRAWN(mi) = True;
 /* Rotate colours */
 	if (tclock->cycle_p) {
-		rotate_colors(display, tclock->cmap, tclock->colors, tclock->ncolors,
-			      tclock->direction);
+		rotate_colors(
+#ifdef STANDALONE
+			MI_SCREENPTR(mi),
+#else
+			display,
+#endif
+			tclock->cmap, tclock->colors, tclock->ncolors, tclock->direction);
 		if (!(LRAND() % 1000))
 			tclock->direction = -tclock->direction;
 	}
@@ -764,7 +805,21 @@ draw_toneclock(ModeInfo * mi)
 	XSetFunction(display, tclock->gc, GXcopy);
 }
 
-void
+ENTRYPOINT void
+release_toneclock(ModeInfo * mi)
+{
+	if (toneclocks != NULL) {
+		int         screen;
+
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_toneclock_screen(mi, &toneclocks[screen]);
+		free(toneclocks);
+		toneclocks = (toneclockstruct *) NULL;
+	}
+}
+
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_toneclock(ModeInfo * mi)
 {
 	toneclockstruct *tclock;
@@ -806,19 +861,7 @@ refresh_toneclock(ModeInfo * mi)
 	}
 #endif
 }
-
-void
-release_toneclock(ModeInfo * mi)
-{
-	if (toneclocks != NULL) {
-		int         screen;
-
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_toneclock(MI_DISPLAY(mi), &toneclocks[screen]);
-		free(toneclocks);
-		toneclocks = (toneclockstruct *) NULL;
-	}
-}
+#endif
 
 XSCREENSAVER_MODULE ("Toneclock", toneclock)
 

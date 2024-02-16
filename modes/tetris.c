@@ -66,18 +66,16 @@ static const char sccsid[] = "@(#)tetris.c	5.01 2000/12/19 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_tetris
-#define PROGCLASS "Tetris"
-#define HACK_INIT init_tetris
-#define HACK_DRAW draw_tetris
-#define tetris_opts xlockmore_opts
 #define DEFAULTS "*delay: 600000 \n" \
- "*count: -500 \n" \
- "*cycles: 200 \n" \
- "*size: 0 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n" \
- "*trackmouse: False \n" \
- "*verbose: False \n"
+	"*count: -500 \n" \
+	"*cycles: 200 \n" \
+	"*size: 0 \n" \
+	"*ncolors: 200 \n" \
+	"*fullrandom: True \n" \
+	"*verbose: False \n" \
+
+# define reshape_tetris 0
+# define tetris_handle_event 0
 #include "xlockmore.h"    /* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"    /* in xlockmore distribution */
@@ -137,13 +135,13 @@ static OptionStruct desc[] =
   {(char *) "-/+well", (char *) "turn on/off the welltris mode"}
 };
 
-ModeSpecOpt tetris_opts =
+ENTRYPOINT ModeSpecOpt tetris_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   tetris_description =
 {"tetris", "init_tetris", "draw_tetris", "release_tetris",
- "refresh_tetris", "change_tetris", (char *) NULL, &tetris_opts,
+ "refresh_tetris", "change_tetris", "free_tetris", &tetris_opts,
  600000, -40, 200, -100, 64, 1.0, "",
  "Shows an autoplaying tetris game", 0, NULL};
 
@@ -237,8 +235,6 @@ typedef struct {
   fieldstruct wall[WELL_DEPTH+WELL_WIDTH][WELL_PERIMETER];
   fieldstruct base[WELL_WIDTH][WELL_WIDTH];
   Pixmap graypix;
-
-  ModeInfo *mi;
 } trisstruct;
 
 #define ARR(i,j) (((i)<0||(i)>=tp->curPolyomino.size||\
@@ -1601,10 +1597,13 @@ free_images(trisstruct *tp)
 }
 
 static void
-free_tetris(Display *display, trisstruct *tp)
+free_tetris_screen(ModeInfo *mi, trisstruct *tp)
 {
-  ModeInfo *mi = tp->mi;
+  Display *display = MI_DISPLAY(mi);
 
+  if (tp == NULL) {
+    return;
+  }
   if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
     MI_WHITE_PIXEL(mi) = tp->whitepixel;
     MI_BLACK_PIXEL(mi) = tp->blackpixel;
@@ -1613,8 +1612,17 @@ free_tetris(Display *display, trisstruct *tp)
     MI_BG_PIXEL(mi) = tp->bg;
 #endif
     if (tp->colors != NULL) {
+#ifdef STANDALONE
+	Screen *screen = MI_SCREENPTR(mi);
+#endif
       if (tp->ncolors && !tp->no_colors)
-        free_colors(display, tp->cmap, tp->colors, tp->ncolors);
+	free_colors(
+#ifdef STANDALONE
+		screen,
+#else
+		display,
+#endif
+		tp->cmap, tp->colors, tp->ncolors);
       free(tp->colors);
       tp->colors = (XColor *) NULL;
     }
@@ -1636,6 +1644,13 @@ free_tetris(Display *display, trisstruct *tp)
      tp->field = (fieldstruct *) NULL;
   }
   free_images(tp);
+  tp = NULL;
+}
+
+ENTRYPOINT void
+free_tetris(ModeInfo * mi)
+{
+	free_tetris_screen(mi, &triss[MI_SCREEN(mi)]);
 }
 
 static int
@@ -1771,7 +1786,7 @@ checkLines(ModeInfo *mi)
     int       i, j, y;
 
     if ((lSet = (int *) calloc(tp->nrows, sizeof (int))) == NULL) {
-        free_tetris(display, tp);
+        free_tetris_screen(mi, tp);
         return -1; /* error */
     }
     for (j = 0; j < tp->nrows; j++) {
@@ -2081,7 +2096,8 @@ create_images(ModeInfo *mi, trisstruct *tp)
   return True;
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_tetris(ModeInfo * mi)
 {
   trisstruct *tp;
@@ -2129,7 +2145,21 @@ refresh_tetris(ModeInfo * mi)
   drawPolyomino(mi);
 }
 
-void
+ENTRYPOINT void
+change_tetris(ModeInfo * mi) {
+  trisstruct *tp;
+
+  if (triss == NULL)
+    return;
+  tp = &triss[MI_SCREEN(mi)];
+  if (!tp->well && tp->field == NULL)
+    return;
+
+  tryMove(mi, ROTATE);
+}
+#endif
+
+ENTRYPOINT void
 release_tetris(ModeInfo * mi) {
   int bonustype, number;
 
@@ -2137,7 +2167,7 @@ release_tetris(ModeInfo * mi) {
     int   screen;
 
     for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-       free_tetris(MI_DISPLAY(mi), &triss[screen]);
+       free_tetris_screen(mi, &triss[screen]);
     free(triss);
     triss = (trisstruct *) NULL;
     for (bonustype = 0; bonustype < 2; bonustype++) {
@@ -2157,25 +2187,12 @@ release_tetris(ModeInfo * mi) {
   }
 }
 
-void
-change_tetris(ModeInfo * mi) {
-  trisstruct *tp;
-
-  if (triss == NULL)
-    return;
-  tp = &triss[MI_SCREEN(mi)];
-  if (!tp->well && tp->field == NULL)
-    return;
-
-  tryMove(mi, ROTATE);
-}
-
 #ifndef STANDALONE
 extern char *background;
 extern char *foreground;
 #endif
 
-void
+ENTRYPOINT void
 init_tetris(ModeInfo * mi) {
   Display *   display = MI_DISPLAY(mi);
   Window      window = MI_WINDOW(mi);
@@ -2184,9 +2201,7 @@ init_tetris(ModeInfo * mi) {
   trisstruct *tp;
 
   if (triss == NULL) {
-    if ((triss = (trisstruct *) calloc(MI_NUM_SCREENS(mi),
-               sizeof (trisstruct))) == NULL)
-      return;
+    MI_INIT(mi, triss);
     for (bonustype = 0; bonustype < 2; bonustype++) {
       if (((polytris[bonustype].mode.start = (int *) malloc(start_ominoes[bonustype] *
             sizeof(int))) == NULL) ||
@@ -2205,7 +2220,6 @@ init_tetris(ModeInfo * mi) {
 #endif
   }
    tp = &triss[MI_SCREEN(mi)];
-  tp->mi = mi;
 
   if (MI_IS_FULLRANDOM(mi)) {
     tp->bonus = (Bool) (LRAND() & 1);
@@ -2229,7 +2243,7 @@ init_tetris(ModeInfo * mi) {
       tp->whitepixel = MI_WHITE_PIXEL(mi);
       if ((tp->cmap = XCreateColormap(display, window,
           MI_VISUAL(mi), AllocNone)) == None) {
-        free_tetris(display, tp);
+        free_tetris_screen(mi, tp);
         return;
       }
       XSetWindowColormap(display, window, tp->cmap);
@@ -2252,7 +2266,7 @@ init_tetris(ModeInfo * mi) {
     }
     if ((tp->gc = XCreateGC(display, MI_WINDOW(mi),
         (unsigned long) 0, (XGCValues *) NULL)) == None) {
-      free_tetris(display, tp);
+      free_tetris_screen(mi, tp);
       return;
     }
 #if 0
@@ -2307,7 +2321,7 @@ init_tetris(ModeInfo * mi) {
   if (tp->well) {
     if ((tp->graypix = XCreateBitmapFromData(display, window,
          (char *) gray1_bits, gray1_width, gray1_height)) == None) {
-      free_tetris(display, tp);
+      free_tetris_screen(mi, tp);
       return;
     }
     tp->ncols = MAX_SIDES * WELL_WIDTH;
@@ -2338,7 +2352,7 @@ init_tetris(ModeInfo * mi) {
       free(tp->field);
     if ((tp->field = (fieldstruct *) malloc(tp->ncols * tp->nrows *
         sizeof (fieldstruct))) == NULL) {
-      free_tetris(display, tp);
+      free_tetris_screen(mi, tp);
       return;
     }
     for (i = 0; i < tp->ncols * tp->nrows; i++) {
@@ -2353,9 +2367,18 @@ init_tetris(ModeInfo * mi) {
   /* Set up colour map */
   tp->direction = (LRAND() & 1) ? 1 : -1;
   if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
+#ifdef STANDALONE
+	Screen *screen = MI_SCREENPTR(mi);
+#endif
     if (tp->colors != NULL) {
       if (tp->ncolors && !tp->no_colors)
-        free_colors(display, tp->cmap, tp->colors, tp->ncolors);
+	free_colors(
+#ifdef STANDALONE
+		screen,
+#else
+		display,
+#endif
+		tp->cmap, tp->colors, tp->ncolors);
       free(tp->colors);
       tp->colors = (XColor *) NULL;
     }
@@ -2372,10 +2395,16 @@ init_tetris(ModeInfo * mi) {
     else
       if ((tp->colors = (XColor *) malloc(sizeof (*tp->colors) *
           (tp->ncolors + 1))) == NULL) {
-        free_tetris(display, tp);
+        free_tetris_screen(mi, tp);
         return;
       }
-    tp->cycle_p = has_writable_cells(mi);
+    tp->cycle_p = has_writable_cells(
+#ifdef STANDALONE
+	screen, MI_VISUAL(mi)
+#else
+	mi
+#endif
+	);
     if (tp->cycle_p) {
       if (MI_IS_FULLRANDOM(mi)) {
         if (!NRAND(8))
@@ -2389,31 +2418,40 @@ init_tetris(ModeInfo * mi) {
     if (!tp->mono_p) {
       if (!(LRAND() % 10))
         make_random_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		tp->cmap, tp->colors, &tp->ncolors,
+		True, True, &tp->cycle_p, True
 #else
-            mi,
+		mi,
+		tp->cmap, tp->colors, &tp->ncolors,
+		True, True, &tp->cycle_p
 #endif
-              tp->cmap, tp->colors, &tp->ncolors,
-              True, True, &tp->cycle_p);
+		);
       else if (!(LRAND() % 2))
         make_uniform_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		tp->cmap, tp->colors, &tp->ncolors,
+		True, &tp->cycle_p, True
 #else
-            mi,
+		mi,
+		tp->cmap, tp->colors, &tp->ncolors,
+		True, &tp->cycle_p
 #endif
-                  tp->cmap, tp->colors, &tp->ncolors,
-                  True, &tp->cycle_p);
+		);
       else
         make_smooth_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		tp->cmap, tp->colors, &tp->ncolors,
+		True, &tp->cycle_p, True
 #else
-            mi,
+		mi,
+		tp->cmap, tp->colors, &tp->ncolors,
+		True, &tp->cycle_p
 #endif
-                 tp->cmap, tp->colors, &tp->ncolors,
-                 True, &tp->cycle_p);
+		);
     }
     XInstallColormap(display, tp->cmap);
     if (tp->ncolors < 2) {
@@ -2545,10 +2583,9 @@ moveOne(ModeInfo *mi, move_t move)
   }
 }
 
-void
+ENTRYPOINT void
 draw_tetris(ModeInfo * mi)
 {
-  Display *   display = MI_DISPLAY(mi);
   trisstruct *tp;
 
   if (triss == NULL)
@@ -2566,8 +2603,13 @@ draw_tetris(ModeInfo * mi)
 
   /* Rotate colours */
   if (tp->cycle_p) {
-    rotate_colors(display, tp->cmap, tp->colors, tp->ncolors,
-      tp->direction);
+    rotate_colors(
+#ifdef STANDALONE
+		MI_SCREENPTR(mi),
+#else
+		MI_DISPLAY(mi),
+#endif
+		tp->cmap, tp->colors, tp->ncolors, tp->direction);
     if (!(LRAND() % 1000))
       tp->direction = -tp->direction;
   }

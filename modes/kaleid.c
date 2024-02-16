@@ -65,24 +65,15 @@ static const char sccsid[] = "@(#)kaleid.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_kaleid
-#define PROGCLASS "Kaleid"
-#define HACK_INIT init_kaleid
-#define HACK_DRAW draw_kaleid
-#define kaleid_opts xlockmore_opts
 #define DEFAULTS "*delay: 80000 \n" \
- "*count: 4 \n" \
- "*cycles: 40 \n" \
- "*size: -9 \n" \
- "*ncolors: 200 \n" \
- "*disconnected: True \n" \
- "*serial: False \n" \
- "*alternate: False \n" \
- "*spiral: False \n" \
- "*spots: False \n" \
- "*linear: False \n" \
- "*quad: False \n" \
- "*oct: False \n"
-"*fullrandom: False \n"
+	"*count: 4 \n" \
+	"*cycles: 40 \n" \
+	"*size: -9 \n" \
+	"*ncolors: 200 \n" \
+	"*fullrandom: False \n" \
+
+# define reshape_kaleid 0
+# define kaleid_handle_event 0
 #define UNIFORM_COLORS
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -156,14 +147,14 @@ static OptionStruct desc[] =
 	{(char *) "-/+linear", (char *) "select Cartesian/Polar coordinate display mode"}
 };
 
-ModeSpecOpt kaleid_opts =
+ENTRYPOINT ModeSpecOpt kaleid_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   kaleid_description =
 {
 	"kaleid", "init_kaleid", "draw_kaleid", "release_kaleid",
-	"refresh_kaleid", "init_kaleid", (char *) NULL, &kaleid_opts,
+	"refresh_kaleid", "init_kaleid", "free_kaleid", &kaleid_opts,
 	80000, 4, 40, -9, 64, 0.6, "",
 	"Shows Brewster's Kaleidoscope", 0, NULL
 };
@@ -1072,22 +1063,33 @@ random_position(kaleidstruct * kp, int i)
 	}
 }
 
+static void
+free_kaleid_screen(kaleidstruct *kp)
+{
+	if (kp == NULL) {
+		return;
+	}
+	if (kp->pen != NULL)
+		free(kp->pen);
+	kp = NULL;
+}
+
+ENTRYPOINT void
+free_kaleid(ModeInfo * mi)
+{
+	free_kaleid_screen(&kaleids[MI_SCREEN(mi)]);
+}
 
 /*-
  *
  */
-void
+ENTRYPOINT void
 init_kaleid(ModeInfo * mi)
 {
 	int         i;
 	kaleidstruct *kp;
 
-
-	if (kaleids == NULL) {
-		if ((kaleids = (kaleidstruct *) calloc(MI_NUM_SCREENS(mi),
-			       sizeof (kaleidstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, kaleids);
 	kp = &kaleids[MI_SCREEN(mi)];
 
 	kp->PenCount = MI_COUNT(mi);
@@ -1289,7 +1291,7 @@ change_pen(ModeInfo * mi, kaleidstruct * kp, int i)
 /*-
  *
  */
-void
+ENTRYPOINT void
 draw_kaleid(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -1381,31 +1383,30 @@ draw_kaleid(ModeInfo * mi)
 /*-
  *
  */
-void
+ENTRYPOINT void
 release_kaleid(ModeInfo * mi)
 {
 	if (kaleids != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			kaleidstruct *kp = &kaleids[screen];
-
-			if (kp->pen != NULL)
-				free(kp->pen);
+			free_kaleid_screen(&kaleids[screen]);
 		}
 		free(kaleids);
 		kaleids = (kaleidstruct *) NULL;
 	}
 }
 
+#ifndef STANDALONE
 /*-
  *
  */
-void
+ENTRYPOINT void
 refresh_kaleid(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Kaleid", kaleid)
 

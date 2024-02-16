@@ -49,14 +49,13 @@ static const char sccsid[] = "@(#)t3d.c	5.0 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_t3d
-#define PROGCLASS "t3d"
-#define HACK_INIT init_t3d
-#define HACK_DRAW draw_t3d
-#define t3d_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*cycles: 60000 \n" \
- "*ncolors: 200 \n" \
- "*mouse: False \n"
+	"*cycles: 60000 \n" \
+	"*ncolors: 200 \n" \
+	"*mouse: False \n" \
+
+# define reshape_t3d 0
+# define t3d_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 
@@ -145,14 +144,14 @@ static OptionStruct desc[] =
         {(char *) "-/+trackmouse", (char *) "turn on/off the tracking of the mouse"}
 };
 
-ModeSpecOpt t3d_opts =
+ENTRYPOINT ModeSpecOpt t3d_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 
 #ifdef USE_MODULES
 ModStruct   t3d_description =
 {"t3d", "init_t3d", "draw_t3d", "release_t3d",
- "refresh_t3d", "init_t3d", (char *) NULL, &t3d_opts,
+ "refresh_t3d", "init_t3d", "free_t3d", &t3d_opts,
  250000, 1000, 60000 , 1, 64, 1.0, "",
  "Flying Balls Clock Demo", 0, NULL};
 
@@ -187,7 +186,6 @@ typedef struct {
    struct tm  *zeit;
    kugeldat kugeln[100];
    int         color_offset;
-   ModeInfo   *mi;
 } t3dstruct;
 
 static t3dstruct *t3ds = (t3dstruct *) NULL;
@@ -591,12 +589,13 @@ t3d_init_3d( ModeInfo* mi )
 
 }
 
-
 static void
-free_t3d(Display *display, t3dstruct *t3dp)
+free_t3d_screen(ModeInfo *mi, t3dstruct *t3dp)
 {
-	ModeInfo *mi = t3dp->mi;
-
+	Display *display = MI_DISPLAY(mi);
+	if (t3dp == NULL) {
+		return;
+	}
 	if (t3dp->cursor != None) {
 		XFreeCursor(display, t3dp->cursor);
 		t3dp->cursor = None;
@@ -610,7 +609,13 @@ free_t3d(Display *display, t3dstruct *t3dp)
 #endif
 		if (t3dp->colors != NULL) {
 			if (t3dp->ncolors && !t3dp->no_colors)
-				free_colors(display, t3dp->cmap, t3dp->colors, t3dp->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					MI_SCREENPTR(mi),
+#else
+					display,
+#endif
+					t3dp->cmap, t3dp->colors, t3dp->ncolors);
 			free(t3dp->colors);
 			t3dp->colors = (XColor *) NULL;
 		}
@@ -649,6 +654,13 @@ free_t3d(Display *display, t3dstruct *t3dp)
 		free(t3dp->zeit);
 		t3dp->zeit = (struct tm *) NULL;
 	}
+	t3dp = NULL;
+}
+
+ENTRYPOINT void
+free_t3d(ModeInfo * mi)
+{
+	free_t3d_screen(mi, &t3ds[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -683,20 +695,20 @@ t3d_initialize( ModeInfo* mi )
      }
    xgcv.foreground = MI_WHITE_PIXEL(mi);
    if ((t3dp->gc = XCreateGC (display, window, GCForeground, &xgcv)) == None) {
-	free_t3d(display, t3dp);
+	free_t3d_screen(mi, t3dp);
 	return False;
    }
 #ifdef FASTDRAW
    xgcv.function = GXor;
    if ((t3dp->orgc = XCreateGC (display, window, GCFunction | GCForeground,
 		&xgcv)) == None) {
-	free_t3d(display, t3dp);
+	free_t3d_screen(mi, t3dp);
 	return False;
    }
    xgcv.function = GXandInverted;
    if ((t3dp->andgc = XCreateGC (display, window, GCFunction | GCForeground,
 		&xgcv)) == None) {
-	free_t3d(display, t3dp);
+	free_t3d_screen(mi, t3dp);
 	return False;
    }
 #endif
@@ -719,7 +731,7 @@ t3d_initialize( ModeInfo* mi )
 		fastcw, t3dp->fastch+1, t3dp->depth)) == None) ||
        ((t3dp->fastmask    = XCreatePixmap (display, window,
 		fastcw, t3dp->fastch+1, t3dp->depth)) == None)) {
-	free_t3d(display, t3dp);
+	free_t3d_screen(mi, t3dp);
 	return False;
    }
 #endif
@@ -750,20 +762,15 @@ extern char *background;
 extern char *foreground;
 #endif
 
-void
+ENTRYPOINT void
 init_t3d(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
 	Window      window = MI_WINDOW(mi);
 	t3dstruct *t3dp;
 
-	if (t3ds == NULL) {
-		if ((t3ds = (t3dstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (t3dstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, t3ds);
 	t3dp = &t3ds[MI_SCREEN(mi)];
-	t3dp->mi = mi;
 
 	if (trackmouse && !t3dp->cursor) {	/* Create an invisible cursor */
 		Pixmap      bit;
@@ -776,13 +783,13 @@ init_t3d(ModeInfo * mi)
 		if ((bit = XCreatePixmapFromBitmapData(display, window,
 				(char *) "\000", 1, 1, MI_BLACK_PIXEL(mi),
 				MI_BLACK_PIXEL(mi), 1)) == None) {
-			free_t3d(display, t3dp);
+			free_t3d_screen(mi, t3dp);
 			return;
 		}
 		if ((t3dp->cursor = XCreatePixmapCursor(display, bit, bit,
 				&black, &black, 0, 0)) == None) {
 			XFreePixmap(display, bit);
-			free_t3d(display, t3dp);
+			free_t3d_screen(mi, t3dp);
 			return;
 		}
 		XFreePixmap(display, bit);
@@ -798,7 +805,7 @@ init_t3d(ModeInfo * mi)
 	}
 	if ((t3dp->buffer = XCreatePixmap (display, window,
 			t3dp->width, t3dp->height, t3dp->depth)) == None) {
-		free_t3d(display, t3dp);
+		free_t3d_screen(mi, t3dp);
 		return;
   	}
 
@@ -819,7 +826,7 @@ init_t3d(ModeInfo * mi)
 	     t3dp->whitepixel = MI_WHITE_PIXEL(mi);
 	     if ((t3dp->cmap = XCreateColormap(display, window, MI_VISUAL(mi),
 			AllocNone)) == None) {
-		free_t3d(display, t3dp);
+		free_t3d_screen(mi, t3dp);
 		return;
 	     }
 	     XSetWindowColormap(display, window, t3dp->cmap);
@@ -849,10 +856,19 @@ init_t3d(ModeInfo * mi)
    t3dp->vturn = 0.0;
 
    if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
+#ifdef STANDALONE
+		Screen *screen = MI_SCREENPTR(mi);
+#endif
 /* Set up colour map */
 		if (t3dp->colors != NULL) {
 			if (t3dp->ncolors && !t3dp->no_colors)
-				free_colors(display, t3dp->cmap, t3dp->colors, t3dp->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					screen,
+#else
+					display,
+#endif
+					t3dp->cmap, t3dp->colors, t3dp->ncolors);
 			free(t3dp->colors);
 			t3dp->colors = (XColor *) NULL;
 		}
@@ -869,10 +885,16 @@ init_t3d(ModeInfo * mi)
 		else
 			if ((t3dp->colors = (XColor *) malloc(sizeof (*t3dp->colors) *
 					(t3dp->ncolors + 1))) == NULL) {
-				free_t3d(display, t3dp);
+				free_t3d_screen(mi, t3dp);
 				return;
 			}
-		t3dp->cycle_p = has_writable_cells(mi);
+		t3dp->cycle_p = has_writable_cells(
+#ifdef STANDALONE
+			screen, MI_VISUAL(mi)
+#else
+			mi
+#endif
+			);
 		if (t3dp->cycle_p) {
 			if (MI_IS_FULLRANDOM(mi)) {
 				if (!NRAND(8))
@@ -887,30 +909,39 @@ init_t3d(ModeInfo * mi)
 			if (!(LRAND() % 10))
 				make_random_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					t3dp->cmap, t3dp->colors, &t3dp->ncolors,
+					True, True, &t3dp->cycle_p, True
 #else
-            mi,
+					mi,
+					t3dp->cmap, t3dp->colors, &t3dp->ncolors,
+					True, True, &t3dp->cycle_p
 #endif
-						t3dp->cmap, t3dp->colors, &t3dp->ncolors,
-						True, True, &t3dp->cycle_p);
+					);
 			else if (!(LRAND() % 2))
 				make_uniform_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					t3dp->cmap, t3dp->colors, &t3dp->ncolors,
+					True, &t3dp->cycle_p, True
 #else
-            mi,
+					mi,
+					t3dp->cmap, t3dp->colors, &t3dp->ncolors,
+					True, &t3dp->cycle_p
 #endif
-                  t3dp->cmap, t3dp->colors, &t3dp->ncolors,
-						      True, &t3dp->cycle_p);
+					);
 			else
 				make_smooth_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					t3dp->cmap, t3dp->colors, &t3dp->ncolors,
+					True, &t3dp->cycle_p, True
 #else
-            mi,
+					mi,
+					t3dp->cmap, t3dp->colors, &t3dp->ncolors,
+					True, &t3dp->cycle_p
 #endif
-                 t3dp->cmap, t3dp->colors, &t3dp->ncolors,
-						     True, &t3dp->cycle_p);
+					);
 		}
 		XInstallColormap(display, t3dp->cmap);
 		if (t3dp->ncolors < 2) {
@@ -930,7 +961,7 @@ init_t3d(ModeInfo * mi)
 
    if (t3dp->zeit == NULL)
      if ((t3dp->zeit = (struct tm *) malloc(sizeof(struct tm))) == NULL) {
-	free_t3d(display, t3dp);
+	free_t3d_screen(mi, t3dp);
 	return;
      }
 
@@ -948,20 +979,20 @@ init_t3d(ModeInfo * mi)
    MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 release_t3d(ModeInfo * mi)
 {
 	if (t3ds != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_t3d(MI_DISPLAY(mi), &t3ds[screen]);
+			free_t3d_screen(mi, &t3ds[screen]);
 		free(t3ds);
 		t3ds = (t3dstruct *) NULL;
 	}
 }
 
-void
+ENTRYPOINT void
 draw_t3d(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -977,7 +1008,7 @@ draw_t3d(ModeInfo * mi)
 		return;
 
 	if (t3dp->no_colors) {
-		free_t3d(display, t3dp);
+		free_t3d_screen(mi, t3dp);
 		init_t3d(mi);
 		return;
 	}
@@ -987,8 +1018,13 @@ draw_t3d(ModeInfo * mi)
 /* Rotate colours */
    if (t3dp->cycle_p)
      {
-	rotate_colors(display, t3dp->cmap, t3dp->colors, t3dp->ncolors,
-		      t3dp->direction);
+	rotate_colors(
+#ifdef STANDALONE
+		MI_SCREENPTR(mi),
+#else
+		display,
+#endif
+		t3dp->cmap, t3dp->colors, t3dp->ncolors, t3dp->direction);
 	if (!(LRAND() % 1000))
 	  t3dp->direction = -t3dp->direction;
      }
@@ -1120,11 +1156,13 @@ draw_t3d(ModeInfo * mi)
 	t3dp->a[2]=t3dp->a[2]+t3dp->speed*t3dp->v[2];
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_t3d(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("T3d", t3d)
 

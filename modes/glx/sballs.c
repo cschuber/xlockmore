@@ -1,6 +1,6 @@
 /* sballs --- balls spinning like crazy in GL */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)sballs.c	5.02 2001/03/10 xlockmore";
 #endif
 
@@ -41,13 +41,8 @@ static const char sccsid[] = "@(#)sballs.c	5.02 2001/03/10 xlockmore";
  */
 
 #ifdef STANDALONE	/* xscreensaver mode */
-#define MODE_sballs
-#define PROGCLASS 	"Sballs"
-#define HACK_INIT 	init_sballs
-#define HACK_DRAW 	draw_sballs
-#define HACK_RESHAPE 	reshape_sballs
-#define sballs_opts 	xlockmore_opts
-#define DEFAULTS 	"*delay: 	40000 \n" \
+# define MODE_sballs
+# define DEFAULTS 	"*delay: 	40000 \n" \
  			"*size: 	    0 \n" \
 			"*cycles:	   10 \n" \
  			"*object: 	    0 \n" \
@@ -56,10 +51,12 @@ static const char sccsid[] = "@(#)sballs.c	5.02 2001/03/10 xlockmore";
  			"*wireframe:  	False \n" \
  			"*texture:  	True  \n"
 
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+# define free_sballs 0
+# define sballs_handle_event 0
+# include "xlockmore.h"		/* from the xscreensaver distribution */
 #else				/* !STANDALONE */
-#include "xlock.h"		/* from the xlockmore distribution */
-#include "visgl.h"
+# include "xlock.h"		/* from the xlockmore distribution */
+# include "visgl.h"
 #endif				/* !STANDALONE */
 
 #ifdef MODE_sballs
@@ -117,7 +114,7 @@ static OptionStruct desc[] = {
     {(char *) "-object num", (char *) "number of the 3D object (0 means random)"},
 };
 
-ModeSpecOpt sballs_opts =
+ENTRYPOINT ModeSpecOpt sballs_opts =
  { sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc };
 
 #ifdef USE_MODULES
@@ -546,11 +543,8 @@ static void drawSphere(ModeInfo * mi,int sphere_num)
  *-----------------------------------------------------------------------------
  */
 
-#ifndef STANDALONE
-static void Reshape(ModeInfo * mi)
-#else
-void reshape_sballs(ModeInfo * mi, int width, int height)
-#endif
+ENTRYPOINT void
+reshape_sballs(ModeInfo * mi, int width, int height)
 {
 
     sballsstruct *sb = &sballs[MI_SCREEN(mi)];
@@ -699,7 +693,11 @@ static void Init(ModeInfo * mi)
 
     if (MI_IS_DEBUG(mi)) {
 	(void) fprintf(stderr,
+#ifdef STANDALONE
+		       "%s:\n\tobject=%s\n\tspheres=%d\n\tspeed=%ld\n\ttexture=%s\n",
+#else
 		       "%s:\n\tobject=%s\n\tspheres=%d\n\tspeed=%d\n\ttexture=%s\n",
+#endif
 		       MI_NAME(mi),
 		       polygons[object].shortname,
 		       spheres,
@@ -730,24 +728,16 @@ static void Init(ModeInfo * mi)
  *-----------------------------------------------------------------------------
  */
 
-void init_sballs(ModeInfo * mi)
+ENTRYPOINT void
+init_sballs(ModeInfo * mi)
 {
     sballsstruct *sb;
 
-    if (sballs == NULL) {
-	if ((sballs = (sballsstruct *) calloc(MI_NUM_SCREENS(mi),
-					  sizeof(sballsstruct))) == NULL)
-	    return;
-    }
+    MI_INIT(mi, sballs);
     sb = &sballs[MI_SCREEN(mi)];
 
     if ((sb->glx_context = init_GL(mi)) != NULL) {
-
-#ifndef STANDALONE
-	Reshape(mi); /* xlock mode */
-#else
         reshape_sballs(mi,MI_WIDTH(mi),MI_HEIGHT(mi)); /* xscreensaver mode */
-#endif
 	glDrawBuffer(GL_BACK);
 	Init(mi);
 
@@ -761,7 +751,8 @@ void init_sballs(ModeInfo * mi)
  *    Called by the mainline code periodically to update the display.
  *-----------------------------------------------------------------------------
  */
-void draw_sballs(ModeInfo * mi)
+ENTRYPOINT void
+draw_sballs(ModeInfo * mi)
 {
     Display *display = MI_DISPLAY(mi);
     Window window = MI_WINDOW(mi);
@@ -780,11 +771,7 @@ void draw_sballs(ModeInfo * mi)
     glXMakeCurrent(display, window, *(sb->glx_context));
 #endif
     Draw(mi);
-#ifndef STANDALONE
-    Reshape(mi); /* xlock mode */
-#else
     reshape_sballs(mi,MI_WIDTH(mi),MI_HEIGHT(mi)); /* xscreensaver mode */
-#endif
 
     glFinish();
     glXSwapBuffers(display, window);
@@ -799,7 +786,8 @@ void draw_sballs(ModeInfo * mi)
  *-----------------------------------------------------------------------------
  */
 
-void release_sballs(ModeInfo * mi)
+ENTRYPOINT void
+release_sballs(ModeInfo * mi)
 {
     int screen;
 
@@ -823,7 +811,9 @@ void release_sballs(ModeInfo * mi)
     FreeAllGL(mi);
 }
 
-void change_sballs(ModeInfo * mi)
+#ifndef STANDALONE
+ENTRYPOINT void
+change_sballs(ModeInfo * mi)
 {
     sballsstruct *sb;
 
@@ -864,4 +854,8 @@ void change_sballs(ModeInfo * mi)
     glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(sb->glx_context));
 #endif
 }
+#endif
+
+XSCREENSAVER_MODULE ("Sballs", sballs)
+
 #endif /* MODE_sballs */

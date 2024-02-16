@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* Sierpinski3D --- 3D sierpinski gasket */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)sierpinski3D.c	00.01 99/11/04 xlockmore";
-
 #endif
 
 /*-
@@ -36,11 +35,6 @@ static const char sccsid[] = "@(#)sierpinski3D.c	00.01 99/11/04 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_sierpinski3d
-# define PROGCLASS					"Sierpinski3D"
-# define HACK_INIT					init_gasket
-# define HACK_DRAW					draw_gasket
-# define HACK_RESHAPE				refesh_gasket
-# define gasket_opts				xlockmore_opts
 # define DEFAULTS					"*count:		1       \n"			\
 									"*cycles:		9999    \n"			\
 									"*delay:		15000   \n"			\
@@ -48,6 +42,9 @@ static const char sccsid[] = "@(#)sierpinski3D.c	00.01 99/11/04 xlockmore";
 									"*speed:		150     \n"			\
 									"*showFPS:      False   \n"			\
 									"*wireframe:	False	\n"
+
+#define free_gasket 0
+#define gasket_handle_event 0
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
 # include "xlock.h"			/* from the xlockmore distribution */
@@ -86,7 +83,8 @@ static OptionStruct desc[] = {
   {(char *) "-intensity", (char *) "intensity"}
 };
 
-ModeSpecOpt gasket_opts = {countof(opts), opts, countof(vars), vars, desc};
+ENTRYPOINT ModeSpecOpt gasket_opts =
+{countof(opts), opts, countof(vars), vars, desc};
 
 #ifdef USE_MODULES
 ModStruct sierpinski3d_description =
@@ -447,7 +445,7 @@ draw(ModeInfo *mi)
 
 
 /* new window size or exposure */
-void
+ENTRYPOINT void
 reshape_gasket(ModeInfo *mi, int width, int height)
 {
   GLfloat h = (GLfloat) height / (GLfloat) width;
@@ -558,18 +556,13 @@ rotate(GLfloat *pos, GLfloat *v, GLfloat *dv, GLfloat max_v, Bool verbose)
 }
 
 
-void
+ENTRYPOINT void
 init_gasket(ModeInfo *mi)
 {
   int           screen = MI_SCREEN(mi);
   gasketstruct *gp;
 
-  if (gasket == NULL)
-  {
-    if ((gasket = (gasketstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (gasketstruct))) == NULL)
-	return;
-  }
+  MI_INIT(mi, gasket);
   gp = &gasket[screen];
 
   gp->window = MI_WINDOW(mi);
@@ -611,7 +604,7 @@ init_gasket(ModeInfo *mi)
   }
 }
 
-void
+ENTRYPOINT void
 draw_gasket(ModeInfo * mi)
 {
   gasketstruct *gp = &gasket[MI_SCREEN(mi)];
@@ -648,7 +641,7 @@ draw_gasket(ModeInfo * mi)
   glXSwapBuffers(display, window);
 }
 
-void
+ENTRYPOINT void
 release_gasket(ModeInfo * mi)
 {
   if (gasket != NULL)
@@ -681,7 +674,6 @@ release_gasket(ModeInfo * mi)
   FreeAllGL(mi);
 }
 
+XSCREENSAVER_MODULE ("Sierpinski3d", sierpinski3d)
 
-/*********************************************************/
-
-#endif
+#endif /* MODE_sierpinski3d */

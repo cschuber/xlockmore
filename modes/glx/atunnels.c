@@ -1,7 +1,7 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* atunnels --- OpenGL Advanced Tunnel Screensaver */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)atunnels.c	5.13 2004/07/19 xlockmore";
 #endif
 
@@ -43,11 +43,7 @@ static const char sccsid[] = "@(#)atunnels.c	5.13 2004/07/19 xlockmore";
 #endif
 
 #ifdef STANDALONE		/* xscreensaver mode */
-# define PROGCLASS		"Atunnels"
-# define HACK_INIT		init_atunnels
-# define HACK_DRAW		draw_atunnels
-# define HACK_RESHAPE		reshape_atunnels
-# define atunnels_opts		xlockmore_opts
+# define MODE_atunnels
 #define	DEFAULTS                "*delay:	10000	\n" \
 				"*showFPS:     	False	\n" \
                                 "*light:	True	\n" \
@@ -63,8 +59,7 @@ static const char sccsid[] = "@(#)atunnels.c	5.13 2004/07/19 xlockmore";
 # include "visgl.h"
 #endif /* !STANDALONE */
 
-#ifdef USE_GL /* whole file */
-
+#ifdef MODE_atunnels
 #include "tunnel_draw.h"
 
 #ifdef HAVE_XPM
@@ -121,7 +116,8 @@ static OptionStruct desc[] =
   {(char *)"-/+ texture", (char *)"whether to apply a texture (slower)"},
 };
 
-ModeSpecOpt atunnels_opts = {countof(opts), opts, countof(vars), vars, desc};
+ENTRYPOINT ModeSpecOpt atunnels_opts =
+{countof(opts), opts, countof(vars), vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   atunnels_description =
@@ -253,7 +249,7 @@ static Bool Init(ModeInfo * mi)
 
 
 /* Standard reshape function */
-void
+ENTRYPOINT void
 reshape_atunnels(ModeInfo *mi, int width, int height)
 {
 	float a;
@@ -267,7 +263,8 @@ reshape_atunnels(ModeInfo *mi, int width, int height)
 }
 
 /* draw the screensaver once */
-void draw_atunnels(ModeInfo * mi)
+ENTRYPOINT void
+draw_atunnels(ModeInfo * mi)
 {
   	atunnelsstruct *gp;
   	Display    *display = MI_DISPLAY(mi);
@@ -296,23 +293,15 @@ void draw_atunnels(ModeInfo * mi)
 
 }
 
-void
-refresh_atunnels(ModeInfo * mi)
-{
-}
-
-
 /* xscreensaver initialization routine */
-void init_atunnels(ModeInfo * mi)
+ENTRYPOINT void
+init_atunnels(ModeInfo * mi)
 {
   int screen = MI_SCREEN(mi);
   int size = MI_SIZE(mi);
   atunnelsstruct *gp;
 
-  if (Atunnels == NULL) {
-	if ((Atunnels = (atunnelsstruct *) calloc(MI_NUM_SCREENS(mi), sizeof (atunnelsstruct))) == NULL)
-	  return;
-  }
+  MI_INIT(mi, Atunnels);
   gp = &Atunnels[screen];
 
   /* Viewport is specified size if size >= MINSIZE && size < screensize */
@@ -338,7 +327,8 @@ void init_atunnels(ModeInfo * mi)
 }
 
 /* all sorts of nice cleanup code should go here! */
-void release_atunnels(ModeInfo * mi)
+ENTRYPOINT void
+release_atunnels(ModeInfo * mi)
 {
   if (Atunnels != NULL) {
 #if 0
@@ -353,9 +343,10 @@ void release_atunnels(ModeInfo * mi)
   }
   FreeAllGL(mi);
 }
-#endif
 
-void change_atunnels(ModeInfo * mi)
+#ifndef STANDALONE
+ENTRYPOINT void
+change_atunnels(ModeInfo * mi)
 {
   	atunnelsstruct *gp;
 
@@ -371,4 +362,8 @@ void change_atunnels(ModeInfo * mi)
 #endif
 	(void) Init(mi);
 }
+#endif
 
+XSCREENSAVER_MODULE ("Atunnels", atunnels)
+
+#endif /* MODE_atunnels */

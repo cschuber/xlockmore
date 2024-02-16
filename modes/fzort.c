@@ -9,17 +9,17 @@
  * 27-Nov-2005: speed ups.
  * 21-Nov-2005: initial version
  */
+
 #ifdef STANDALONE
-#define MODE_fzort
-#define PROGCLASS "Fzort"
-#define HACK_INIT init_fzort
-#define HACK_DRAW draw_fzort
-#define fzort_opts xlockmode_opts
-#define DEFAULTS "*delay: 0 \n"
-#define UNIFORM_COLORS
-#include "xlockmore.h" /* xscreensaver distribution */
+# define MODE_fzort
+# define DEFAULTS "*delay: 0 \n" \
+
+# define reshape_fzort 0
+# define fzort_handle_event 0
+# define UNIFORM_COLORS
+# include "xlockmore.h" /* xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h" /* xlockmore distribution */
+# include "xlock.h" /* xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_fzort
@@ -28,13 +28,13 @@
 #include <sys/time.h>
 #include "xshm.h"
 
-ModeSpecOpt fzort_opts =
+ENTRYPOINT ModeSpecOpt fzort_opts =
 {0, (XrmOptionDescRec *)NULL, 0, (argtype *)NULL, (OptionStruct *)NULL };
 
 #ifdef USE_MODULES
 ModStruct fzort_description =
 { "fzort", "init_fzort", "draw_fzort", "release_fzort",
-  "refresh_fzort", "init_fzort", (char *)NULL, &fzort_opts,
+  "refresh_fzort", "init_fzort", "free_fzort", &fzort_opts,
   10000, 1, 1, 1, 64, 1.0, "",
   "Shows a metallic-looking fzort.", 0, NULL };
 #endif
@@ -1167,6 +1167,7 @@ init_texture(int *palette, int depth)
  *	x i m a g e
  */
 
+#if 0
 static int caught_x_error;
 
 static int
@@ -1176,6 +1177,7 @@ x_error_handler(Display *display, XErrorEvent *error)
 
 	return 0;
 }
+#endif
 
 static int
 make_image(ModeInfo *mi, struct fzort_ctx *fz)
@@ -1220,8 +1222,11 @@ free_image(ModeInfo *mi, struct fzort_ctx *fz)
  */
 
 static void
-release_fzort_ctx(ModeInfo *mi, fzort_ctx *fz)
+free_fzort_screen(ModeInfo *mi, fzort_ctx *fz)
 {
+	if (fz == NULL) {
+		return;
+	}
 	if (fz->initialized) {
 		free(fz->pvtx);
 		free(fz->order_in);
@@ -1231,6 +1236,13 @@ release_fzort_ctx(ModeInfo *mi, fzort_ctx *fz)
 		free_image(mi, fz);
 		fz->initialized = False;
 	}
+	fz = NULL;
+}
+
+ENTRYPOINT void
+free_fzort(ModeInfo * mi)
+{
+	free_fzort_screen(mi, &fzorts[MI_SCREEN(mi)]);
 }
 
 static void
@@ -1274,7 +1286,7 @@ init_fzort_ctx(ModeInfo *mi, fzort_ctx *fz)
 	struct timeval tv;
 
 	if (fz->initialized) {
-		release_fzort_ctx(mi, fz);
+		free_fzort_screen(mi, fz);
 	}
 
 	/* 0. create image for double-buffering */
@@ -1409,23 +1421,17 @@ render(fzort_ctx *fz, long ticks)
  *   P u b l i c   i n t e r f a c e
  */
 
-void
+ENTRYPOINT void
 init_fzort(ModeInfo *mi)
 {
 	fzort_ctx *fz;
 
-	if (fzorts == NULL) {
-		if ((fzorts = (fzort_ctx *) calloc(MI_NUM_SCREENS(mi),
-		  sizeof (fzort_ctx))) == NULL)
-			return;
-	}
-
+	MI_INIT(mi, fzorts);
 	fz = &fzorts[MI_SCREEN(mi)];
-
 	init_fzort_ctx(mi, fz);
 }
 
-void
+ENTRYPOINT void
 draw_fzort(ModeInfo *mi)
 {
 	fzort_ctx *fz;
@@ -1501,19 +1507,22 @@ draw_fzort(ModeInfo *mi)
 	  fz->image,
 	  src_x_min, src_y_min, x0 + src_x_min, y0 + src_y_min,
 	  src_x_max - src_x_min + 1, src_y_max - src_y_min + 1,
-	  &fz->shm_info, 1);
-
+	  &fz->shm_info
+#ifndef STANDALONE
+	  , True
+#endif
+	  );
 	fz->prev_box = fz->cur_box;
 }
 
-void
+ENTRYPOINT void
 release_fzort(ModeInfo *mi)
 {
 	int i;
 
 	if (fzorts != NULL) {
 		for (i = 0; i < MI_NUM_SCREENS(mi); i++) {
-			release_fzort_ctx(mi, &fzorts[i]);
+			free_fzort_screen(mi, &fzorts[i]);
 		}
 	}
 
@@ -1522,11 +1531,13 @@ release_fzort(ModeInfo *mi)
 	fzorts = (fzort_ctx *) NULL;
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_fzort(ModeInfo *mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Fzort", fzort)
 

@@ -50,15 +50,14 @@ static const char sccsid[] = "@(#)spline.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_spline
-#define PROGCLASS "Spline"
-#define HACK_INIT init_spline
-#define HACK_DRAW draw_spline
-#define spline_opts xlockmore_opts
 #define DEFAULTS "*delay: 30000 \n" \
- "*count: -6 \n" \
- "*cycles: 2048 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n"
+	"*count: -6 \n" \
+	"*cycles: 2048 \n" \
+	"*ncolors: 200 \n" \
+	"*fullrandom: True \n" \
+
+# define reshape_spline 0
+# define spline_handle_event 0
 #define UNIFORM_COLORS
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -89,13 +88,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+erase", (char *) "turn on/off the following erase of splines"}
 };
 
-ModeSpecOpt spline_opts =
+ENTRYPOINT ModeSpecOpt spline_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   spline_description =
 {"spline", "init_spline", "draw_spline", "release_spline",
- "refresh_spline", "init_spline", (char *) NULL, &spline_opts,
+ "refresh_spline", "init_spline", "free_spline_dup", &spline_opts,
  30000, -6, 2048, 1, 64, 0.3, "",
  "Shows colorful moving splines", 0, NULL};
 
@@ -135,9 +134,11 @@ static void XDrawSpline(Display * display, Drawable d, GC gc,
 			int x0, int y0, int x1, int y1, int x2, int y2);
 
 static void
-free_spline(splinestruct *sp)
+free_spline_screen(splinestruct *sp)
 {
-
+	if (sp == NULL) {
+		return;
+	}
 	if (sp->pt != NULL) {
 		free(sp->pt);
 		sp->pt = (splinepointstruct *) NULL;
@@ -151,19 +152,31 @@ free_spline(splinestruct *sp)
 		free(sp->splineq);
 		sp->splineq = (XPoint **) NULL;
 	}
+	sp = NULL;
 }
 
-void
+/* FIXME */
+#ifdef STANDALONE
+ENTRYPOINT void
+free_spline(ModeInfo * mi)
+{
+	free_spline_screen(&splines[MI_SCREEN(mi)]);
+}
+#else
+ENTRYPOINT void
+free_spline_dup(ModeInfo * mi)
+{
+	free_spline_screen(&splines[MI_SCREEN(mi)]);
+}
+#endif
+
+ENTRYPOINT void
 init_spline(ModeInfo * mi)
 {
 	int         i;
 	splinestruct *sp;
 
-	if (splines == NULL) {
-		if ((splines = (splinestruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (splinestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, splines);
 	sp = &splines[MI_SCREEN(mi)];
 
 	sp->width = MI_WIDTH(mi);
@@ -193,7 +206,7 @@ init_spline(ModeInfo * mi)
 	if (sp->pt == NULL)
 		if ((sp->pt = (splinepointstruct *) malloc(sp->points *
 				sizeof (splinepointstruct))) == NULL) {
-			free_spline(sp);
+			free_spline_screen(sp);
 			return;
 		}
 
@@ -205,14 +218,14 @@ init_spline(ModeInfo * mi)
 		if (sp->splineq == NULL)
 			if ((sp->splineq = (XPoint **) calloc(sp->nsplines,
 					sizeof (XPoint *))) == NULL) {
-				free_spline(sp);
+				free_spline_screen(sp);
 				return;
 			}
 		for (i = 0; i < sp->nsplines; ++i)
 			if (sp->splineq[i] == NULL)
 				if ((sp->splineq[i] = (XPoint *) calloc(sp->points,
 						sizeof (XPoint))) == NULL) {
-					free_spline(sp);
+					free_spline_screen(sp);
 					return;
 				}
 	} else {
@@ -237,7 +250,7 @@ init_spline(ModeInfo * mi)
 		sp->color = NRAND(MI_NPIXELS(mi));
 }
 
-void
+ENTRYPOINT void
 draw_spline(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -425,20 +438,21 @@ XDrawSpline(Display * display, Drawable d, GC gc, int x0, int y0, int x1, int y1
 		XDrawLine(display, d, gc, xb, yb, x2, y2);
 }
 
-void
+ENTRYPOINT void
 release_spline(ModeInfo * mi)
 {
 	if (splines != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_spline(&splines[screen]);
+			free_spline_screen(&splines[screen]);
 		free(splines);
 		splines = (splinestruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_spline(ModeInfo * mi)
 {
 	splinestruct *sp;
@@ -454,6 +468,7 @@ refresh_spline(ModeInfo * mi)
 		MI_CLEARWINDOW(mi);
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Spline", spline)
 

@@ -28,11 +28,11 @@ static const char sccsid[] = "@(#)ball.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_ball
-# define DEFAULTS "*delay: 10000 \n" \
-	"*count: 10 \n" \
-	"*cycles: 20 \n" \
-	"*size: -100 \n" \
-	"*ncolors: 200 \n" \
+# define DEFAULTS	"*delay: 10000 \n" \
+			"*count: 10 \n" \
+			"*cycles: 20 \n" \
+			"*size: -100 \n" \
+			"*ncolors: 200 \n" \
 
 # define reshape_ball 0
 # define ball_handle_event 0
@@ -309,11 +309,8 @@ free_ball_screen(Display *display, ballstruct *bp)
 ENTRYPOINT void
 free_ball(ModeInfo * mi)
 {
-	Display *display = MI_DISPLAY(mi);
-	ballstruct *bp = &balls[MI_SCREEN(mi)];
-	free_ball_screen(display, bp);
+	free_ball_screen(MI_DISPLAY(mi), &balls[MI_SCREEN(mi)]);
 }
-
 
 ENTRYPOINT void
 init_ball(ModeInfo * mi)

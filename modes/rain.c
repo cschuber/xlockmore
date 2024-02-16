@@ -27,12 +27,11 @@ static const char sccsid[] = "@(#)rain.c  1.00 2007/05/22 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_rain
-#define PROGCLASS "Rain"
-#define HACK_INIT init_rain
-#define HACK_DRAW draw_rain
-#define rain_opts xlockmore_opts
 #define DEFAULTS "*delay: 35000 \n" \
-                 "*ncolors: 64 \n"
+	"*ncolors: 64 \n" \
+
+# define reshape_rain 0
+# define rain_handle_event 0
 #define SMOOTH_COLORS
 #if 0
 #define UNIFORM_COLORS    /* To get blue water uncomment, but ... */
@@ -44,14 +43,14 @@ static const char sccsid[] = "@(#)rain.c  1.00 2007/05/22 xlockmore";
 
 #ifdef MODE_rain
 
-ModeSpecOpt rain_opts =
+ENTRYPOINT ModeSpecOpt rain_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct rain_description =
 {
   "rain", "init_rain", "draw_rain", "release_rain",
-  "refresh_rain", "init_rain", (char *) NULL, &rain_opts,
+  "refresh_rain", "init_rain", "free_rain", &rain_opts,
   35000, 1, 1, 1, 64, 0.3, "",
   "It's raining", 0, NULL
 };
@@ -114,8 +113,12 @@ static void DrawLine(ModeInfo * mi, XRectangle rect, unsigned long color)
   XDrawLine(display, window, gc, rect.x, rect.height, rect.width, rect.y);
 }
 
-void free_rain(rainstruct *rp)
+static void
+free_rain_screen(rainstruct *rp)
 {
+  if (rp == NULL) {
+    return;
+  }
   if (rp->drops != NULL)
   {
     dropstruct *drop, *dropNext;
@@ -129,6 +132,13 @@ void free_rain(rainstruct *rp)
     }
     rp->drops = NULL;
   }
+  rp = NULL;
+}
+
+ENTRYPOINT void
+free_rain(ModeInfo * mi)
+{
+  free_rain_screen(&rain[MI_SCREEN(mi)]);
 }
 
 /*
@@ -194,18 +204,15 @@ static void InitDrop(ModeInfo * mi, rainstruct *rp, dropstruct *drop)
  * Initialise the mode
  */
 
-void init_rain(ModeInfo * mi)
+ENTRYPOINT void
+init_rain(ModeInfo * mi)
 {
   rainstruct *rp;
   int i, nr_drops, max_drops;
   dropstruct *drop;
 
   /* Allocate the memory */
-  if (rain == NULL) {
-    if ((rain = (rainstruct *) calloc(MI_NUM_SCREENS(mi),
-    sizeof (rainstruct))) == NULL)
-      return;
-  }
+  MI_INIT(mi, rain);
   rp = &rain[MI_SCREEN(mi)];
   MI_CLEARWINDOW(mi);
 
@@ -220,7 +227,7 @@ void init_rain(ModeInfo * mi)
   nr_drops = MIN(nr_drops, max_drops);
 
   /* Initialise these drops */
-  free_rain(rp);
+  free_rain_screen(rp);
   for (i = 0; i < nr_drops; i++)
   {
     /* Allocate the memory for the drop */
@@ -243,7 +250,8 @@ void init_rain(ModeInfo * mi)
  * Draw the drops
  */
 
-void draw_rain(ModeInfo * mi)
+ENTRYPOINT void
+draw_rain(ModeInfo * mi)
 {
   dropstruct *drop;
   rainstruct *rp;
@@ -310,27 +318,31 @@ void draw_rain(ModeInfo * mi)
  * Clean up the mess
  */
 
-void release_rain(ModeInfo * mi)
+ENTRYPOINT void
+release_rain(ModeInfo * mi)
 {
   if (rain != NULL)
   {
     int screen;
 
     for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-      free_rain(&rain[screen]);
+      free_rain_screen(&rain[screen]);
     free(rain);
     rain = (rainstruct *) NULL;
   }
 }
 
+#ifndef STANDALONE
 /*
  *
  */
 
-void refresh_rain(ModeInfo * mi)
+ENTRYPOINT void
+refresh_rain(ModeInfo * mi)
 {
   MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Rain", rain)
 

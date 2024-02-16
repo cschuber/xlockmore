@@ -42,14 +42,13 @@ static const char sccsid[] = "@(#)coral.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_coral
-#define PROGCLASS "Coral"
-#define HACK_INIT init_coral
-#define HACK_DRAW draw_coral
-#define coral_opts xlockmore_opts
 #define DEFAULTS "*delay: 60000 \n" \
- "*batchcount: -3 \n" \
- "*size: 35 \n" \
- "*ncolors: 200 \n"
+	"*batchcount: -3 \n" \
+	"*size: 35 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_coral 0
+# define coral_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -57,7 +56,7 @@ static const char sccsid[] = "@(#)coral.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_coral
 
-ModeSpecOpt coral_opts =
+ENTRYPOINT ModeSpecOpt coral_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -121,9 +120,11 @@ rand_2(void)
 }
 
 static void
-free_coral(coralstruct *cp)
+free_coral_screen(coralstruct *cp)
 {
-
+	if (cp == NULL) {
+		return;
+	}
 	if (cp->reef != NULL) {
 		free(cp->reef);
 		cp->reef = (unsigned int *) NULL;
@@ -136,9 +137,16 @@ free_coral(coralstruct *cp)
 		free(cp->pointbuf);
 		cp->pointbuf = (XPoint *) NULL;
 	}
+	cp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_coral(ModeInfo * mi)
+{
+        free_coral_screen(&reefs[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_coral(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -146,16 +154,10 @@ init_coral(ModeInfo * mi)
 	GC          gc = MI_GC(mi);
 	coralstruct *cp;
 	int         size = MI_SIZE(mi);
-
 	int         i;
 
-	if (reefs == NULL) {
-		if ((reefs = (coralstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (coralstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, reefs);
 	cp = &reefs[MI_SCREEN(mi)];
-
 
 	cp->width = MAX(MI_WIDTH(mi), 4);
 	cp->height = MAX(MI_HEIGHT(mi), 4);
@@ -165,7 +167,7 @@ init_coral(ModeInfo * mi)
 		free(cp->reef);
 	if ((cp->reef = (unsigned int *) calloc((cp->widthb + 1) * cp->height,
 			sizeof (unsigned int))) == NULL) {
-		free_coral(cp);
+		free_coral_screen(cp);
 		return;
 	}
 
@@ -181,7 +183,7 @@ init_coral(ModeInfo * mi)
 		free(cp->walkers);
 	if ((cp->walkers = (XPoint *) calloc(cp->nwalkers,
 			sizeof (XPoint))) == NULL) {
-		free_coral(cp);
+		free_coral_screen(cp);
 		return;
 	}
 
@@ -228,13 +230,13 @@ init_coral(ModeInfo * mi)
 	}
 	if ((cp->pointbuf = (XPoint *) calloc((MAXPOINTS + 2),
 			sizeof (XPoint))) == NULL) {
-		free_coral(cp);
+		free_coral_screen(cp);
 		return;
 	}
 }
 
 
-void
+ENTRYPOINT void
 draw_coral(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -327,14 +329,14 @@ draw_coral(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_coral(ModeInfo * mi)
 {
 	if (reefs != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_coral(&reefs[screen]);
+			free_coral_screen(&reefs[screen]);
 		free(reefs);
 		reefs = (coralstruct *) NULL;
 	}

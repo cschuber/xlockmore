@@ -133,11 +133,6 @@
 
 #ifdef STANDALONE
 #define MODE_juggler3d
-#define PROGCLASS       "Juggler3D"
-#define HACK_INIT       init_juggler3d
-#define HACK_DRAW       draw_juggler3d
-#define HACK_RESHAPE    reshape_juggler3d
-#define juggler3d_opts     xlockmore_opts
 # define DEFAULTS	"*delay:	10000	\n" \
 			"*count:	200	\n" \
 			"*cycles:	1000	\n" \
@@ -164,7 +159,7 @@
 #define MI_COLOR_blue    (NRAND(50000)+15536)
 #endif /* !STANDALONE */
 
-#ifdef MODE_juggler3d
+#ifdef MODE_juggler3d /* whole file */
 
 #undef countof
 #define countof(x) (sizeof((x))/sizeof((*x)))
@@ -176,7 +171,6 @@
 #include "glxfonts.h"
 #include <ctype.h>
 
-#ifdef USE_GL /* whole file */
 #include <GL/glu.h>
 
 #define DEF_PATTERN "random" /* All patterns */
@@ -2691,8 +2685,7 @@ init_juggler3d (ModeInfo * mi)
   int wire = MI_IS_WIREFRAME(mi);
 
   if (!juggles) {
-    juggles = (jugglestruct *)
-      calloc (MI_NUM_SCREENS(mi), sizeof (jugglestruct));
+    MI_INIT(mi, juggles);
 #ifdef STANDALONE
     if (!juggles) {
       fprintf(stderr, "%s: out of memory\n", progname);
@@ -3125,9 +3118,8 @@ draw_juggler3d (ModeInfo *mi)
   glXSwapBuffers(dpy, window);
 }
 
-#if STANDALONE
+#ifdef STANDALONE
 XSCREENSAVER_MODULE_2 ("Juggler3D", juggler3d, juggle)
 #endif
 
-#endif /* USE_GL */
 #endif /* MODE_juggler3d */

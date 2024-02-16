@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* gears --- 3D gear wheels */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)gears.c	5.03 2001/11/28 xlockmore";
-
 #endif
 
 /*-
@@ -44,18 +43,14 @@ static const char sccsid[] = "@(#)gears.c	5.03 2001/11/28 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_gears
-# define PROGCLASS					"Gears"
-# define HACK_INIT					init_gears
-# define HACK_DRAW					draw_gears
-# define HACK_RESHAPE					reshape_gears
-# define gears_opts					xlockmore_opts
 # define DEFAULTS			"*count:		1       \n"	\
 					"*cycles:		2       \n"	\
 					"*delay:		50000   \n"	\
 					"*size:			0 	\n"	\
-					"*planetary:		False   \n"	\
 					"*showFps:      	False   \n"	\
 					"*wireframe:		False	\n"
+
+#define gears_handle_event 0
 # include "xlockmore.h"				/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
 # include "xlock.h"				/* from the xlockmore distribution */
@@ -91,12 +86,13 @@ static OptionStruct desc[] = {
   {(char *) "-planetsize num", (char *) "size of screen for \"Planetary\" gear system"}
 };
 
-ModeSpecOpt gears_opts = {countof(opts), opts, countof(vars), vars, desc};
+ENTRYPOINT ModeSpecOpt gears_opts =
+{countof(opts), opts, countof(vars), vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   gears_description =
 {"gears", "init_gears", "draw_gears", "release_gears",
- "draw_gears", "init_gears", (char *) NULL, &gears_opts,
+ "draw_gears", "init_gears", "free_gears", &gears_opts,
  50000, 1, 2, 0, 64, 1.0, "",
  "Shows GL's gears", 0, NULL};
 
@@ -640,7 +636,7 @@ draw(ModeInfo * mi)
 
 
 /* new window size or exposure */
-static void
+ENTRYPOINT void
 reshape_gears(ModeInfo *mi, int width, int height)
 {
 	gearsstruct *gp = &gears[MI_SCREEN(mi)];
@@ -678,8 +674,11 @@ reshape_gears(ModeInfo *mi, int width, int height)
 }
 
 static void
-free_gears(Display *display, gearsstruct *gp)
+free_gears_screen(Display *display, gearsstruct *gp)
 {
+	if (gp == NULL) {
+		return;
+	}
 	if (gp->glx_context) {
 		/* Display lists MUST be freed while their glXContext is current. */
 #ifdef WIN32
@@ -717,6 +716,12 @@ free_gears(Display *display, gearsstruct *gp)
 		gp->glx_context = (GLXContext *) NULL;
 #endif
 	}
+	gp = NULL;
+}
+
+ENTRYPOINT void
+free_gears(ModeInfo *mi) {
+	free_gears_screen(MI_DISPLAY(mi), &gears[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -763,12 +768,12 @@ pinit(ModeInfo * mi)
     if (! gp->planetary) {
 
       if ((gp->gear1 = glGenLists(1)) == 0) {
-          free_gears(MI_DISPLAY(mi), gp);
+          free_gears_screen(MI_DISPLAY(mi), gp);
           return False;
       }
       glNewList(gp->gear1, GL_COMPILE);
       if (glGetError() != GL_NO_ERROR) {
-          free_gears(MI_DISPLAY(mi), gp);
+          free_gears_screen(MI_DISPLAY(mi), gp);
           return False;
       }
       if (wire) {
@@ -787,12 +792,12 @@ pinit(ModeInfo * mi)
       glEndList();
 
       if ((gp->gear2 = glGenLists(1)) == 0) {
-          free_gears(MI_DISPLAY(mi), gp);
+          free_gears_screen(MI_DISPLAY(mi), gp);
           return False;
       }
       glNewList(gp->gear2, GL_COMPILE);
       if (glGetError() != GL_NO_ERROR) {
-          free_gears(MI_DISPLAY(mi), gp);
+          free_gears_screen(MI_DISPLAY(mi), gp);
           return False;
       }
       if (wire) {
@@ -810,12 +815,12 @@ pinit(ModeInfo * mi)
       glEndList();
 
       if ((gp->gear3 = glGenLists(1)) == 0) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       glNewList(gp->gear3, GL_COMPILE);
       if (glGetError() != GL_NO_ERROR) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       if (wire) {
@@ -837,12 +842,12 @@ pinit(ModeInfo * mi)
     } else { /* planetary */
 
       if ((gp->gear1 = glGenLists(1)) == 0) {
-          free_gears(MI_DISPLAY(mi), gp);
+          free_gears_screen(MI_DISPLAY(mi), gp);
           return False;
       }
       glNewList(gp->gear1, GL_COMPILE);
       if (glGetError() != GL_NO_ERROR) {
-          free_gears(MI_DISPLAY(mi), gp);
+          free_gears_screen(MI_DISPLAY(mi), gp);
           return False;
       }
       if (wire) {
@@ -860,12 +865,12 @@ pinit(ModeInfo * mi)
       glEndList();
 
       if ((gp->gear2 = glGenLists(1)) == 0) {
-          free_gears(MI_DISPLAY(mi), gp);
+          free_gears_screen(MI_DISPLAY(mi), gp);
           return False;
       }
       glNewList(gp->gear2, GL_COMPILE);
       if (glGetError() != GL_NO_ERROR) {
-          free_gears(MI_DISPLAY(mi), gp);
+          free_gears_screen(MI_DISPLAY(mi), gp);
           return False;
       }
       if (wire) {
@@ -883,12 +888,12 @@ pinit(ModeInfo * mi)
       glEndList();
 
       if ((gp->gear3 = glGenLists(1)) == 0) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       glNewList(gp->gear3, GL_COMPILE);
       if (glGetError() != GL_NO_ERROR) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       if (wire) {
@@ -909,12 +914,12 @@ pinit(ModeInfo * mi)
 
 
       if ((gp->gear_inner = glGenLists(1)) == 0) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       glNewList(gp->gear_inner, GL_COMPILE);
       if (glGetError() != GL_NO_ERROR) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       if (wire) {
@@ -935,12 +940,12 @@ pinit(ModeInfo * mi)
 
 
       if ((gp->gear_outer = glGenLists(1)) == 0) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       glNewList(gp->gear_outer, GL_COMPILE);
       if (glGetError() != GL_NO_ERROR) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       if (wire) {
@@ -983,12 +988,12 @@ pinit(ModeInfo * mi)
 		glEnable(GL_NORMALIZE);
 
       if ((gp->armature = glGenLists(1)) == 0) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       glNewList(gp->armature, GL_COMPILE);
       if (glGetError() != GL_NO_ERROR) {
-           free_gears(MI_DISPLAY(mi), gp);
+           free_gears_screen(MI_DISPLAY(mi), gp);
            return False;
       }
       if (wire) {
@@ -1138,18 +1143,14 @@ rotate(GLfloat *pos, GLfloat *v, GLfloat *dv, GLfloat max_v, Bool verbose)
 }
 
 
-void
+ENTRYPOINT void
 init_gears(ModeInfo * mi)
 {
 	/*Colormap    cmap; */
 	/* Boolean     rgba, doublebuffer, cmap_installed; */
 	gearsstruct *gp;
 
-	if (gears == NULL) {
-		if ((gears = (gearsstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (gearsstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, gears);
 	gp = &gears[MI_SCREEN(mi)];
 
 	gp->window = MI_WINDOW(mi);
@@ -1189,7 +1190,7 @@ init_gears(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_gears(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -1225,21 +1226,20 @@ draw_gears(ModeInfo * mi)
 	glXSwapBuffers(display, window);
 }
 
-void
+ENTRYPOINT void
 release_gears(ModeInfo * mi)
 {
 	if (gears != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_gears(MI_DISPLAY(mi), &gears[screen]);
+			free_gears_screen(MI_DISPLAY(mi), &gears[screen]);
 		free(gears);
 		gears = (gearsstruct *) NULL;
 	}
 	FreeAllGL(mi);
 }
 
+XSCREENSAVER_MODULE ("Gears", gears)
 
-/*********************************************************/
-
-#endif
+#endif /* MODE_gears */

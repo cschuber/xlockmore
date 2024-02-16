@@ -34,170 +34,6 @@
  *
  */
 
-/*-
- * Declare external interface routines for supported screen savers.
- */
-
-/* -------------------------------------------------------------------- */
-
-#ifdef STANDALONE
-
-/* xscreensaver compatibility layer for xlockmore modules. */
-
-/*-
- * xscreensaver, Copyright (c) 1997, 1998 Jamie Zawinski <jwz AT jwz.org>
- *
- * Permission to use, copy, modify, distribute, and sell this software and its
- * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that
- * copyright notice and this permission notice appear in supporting
- * documentation.  No representations are made about the suitability of this
- * software for any purpose.  It is provided "as is" without express or
- * implied warranty.
- *
- * The definitions in this file make it possible to compile an xlockmore
- * module into a standalone program, and thus use it with xscreensaver.
- * By Jamie Zawinski <jwz AT jwz.org> on 10-May-97; based on the ideas
- * in the older xlock.h by Charles Hannum <mycroft@ai.mit.edu>.  (I had
- * to redo it, since xlockmore has diverged so far from xlock...)
- */
-
-/*-
- * Accessor macros for the ModeInfo structure
- */
-
-#define MI_DISPLAY(MI)		((MI)->dpy)
-#define MI_WINDOW(MI)		((MI)->window)
-#define MI_NUM_SCREENS(MI)	(1)	/* Only manage one screen at a time; */
-#define MI_SCREEN(MI)		(0)	/*  this might be fragile... */
-#define MI_NPIXELS(MI)		((MI)->npixels)
-#define MI_PIXEL(MI,N)		((MI)->pixels[(N)])
-#define MI_VISUAL(MI)		((MI)->xgwa.visual)
-#define MI_GC(MI)		((MI)->gc)
-#define MI_PAUSE(MI)		((MI)->pause)
-#define MI_LEFT_COLOR(MI)	((MI)->threed_left_color)
-#define MI_RIGHT_COLOR(MI)	((MI)->threed_right_color)
-#define MI_BOTH_COLOR(MI)	((MI)->threed_both_color)
-#define MI_NONE_COLOR(MI)	((MI)->threed_none_color)
-#define MI_DELTA3D(MI)		((MI)->threed_delta)
-#define MI_CYCLES(MI)		((MI)->cycles)
-#define MI_BATCHCOUNT(MI)	((MI)->count)
-#define MI_SIZE(MI)		((MI)->size)
-#define MI_BITMAP(MI)		((MI)->bitmap)
-#define MI_WHITE_PIXEL(MI)	((MI)->white)
-#define MI_BLACK_PIXEL(MI)	((MI)->black)
-#define MI_WIDTH(MI)	((MI)->xgwa.width)
-#define MI_HEIGHT(MI)	((MI)->xgwa.height)
-#define MI_DEPTH(MI)	((MI)->xgwa.depth)
-#define MI_COLORMAP(MI)	((MI)->xgwa.colormap)
-#define MI_IS_FULLRANDOM(MI)((MI)->fullrandom)
-#define MI_IS_DEBUG(MI)   ((MI)->verbose)
-#define MI_IS_VERBOSE(MI)   ((MI)->verbose)
-#define MI_IS_INSTALL(MI)   (True)
-#define MI_IS_MONO(MI)	(mono_p)
-#define MI_IS_INROOT(MI)	((MI)->root_p)
-#define MI_IS_INWINDOW(MI)	(!(MI)->root_p)
-#define MI_IS_ICONIC(MI)	(False)
-#define MI_IS_WIREFRAME(MI)	((MI)->wireframe_p)
-#define MI_IS_FPS(MI)	((MI)->fps_p)
-#define MI_IS_USE3D(MI)	((MI)->threed)
-#define MI_COUNT(MI)	((MI)->count)
-#define MI_NCOLORS(MI)    ((MI)->ncolors)
-#define MI_IS_DRAWN(MI)((MI)->is_drawn)
-
-
-#define MI_CLEARWINDOWCOLORMAP(mi, gc, pixel) \
-{ \
- XSetForeground(MI_DISPLAY(mi), gc, pixel); \
- XFillRectangle(MI_DISPLAY(mi), MI_WINDOW(mi), gc, \
-   0, 0, (unsigned int) MI_WIDTH(mi), (unsigned int) MI_HEIGHT(mi)); \
-}
-#define MI_CLEARWINDOWCOLORMAPFAST(mi, gc, pixel) \
- MI_CLEARWINDOWCOLORMAP(mi, gc, pixel)
-#define MI_CLEARWINDOWCOLOR(mi, pixel) \
- MI_CLEARWINDOWCOLORMAP(mi, MI_GC(mi), pixel)
-
-/* #define MI_CLEARWINDOW(mi) XClearWindow(MI_DISPLAY(mi), MI_WINDOW(mi)) */
-#define MI_CLEARWINDOW(mi) MI_CLEARWINDOWCOLOR(mi, MI_BLACK_PIXEL(mi))
-
-#include "screenhack.h"
-
-#ifdef __cplusplus
-  extern "C" {
-#endif
-typedef struct ModeInfo {
-	Display    *dpy;
-	Window      window;
-	Bool        root_p;
-	int         npixels;
-	unsigned long *pixels;
-	XColor     *colors;
-	int         polygon_count;
-	Bool        writable_p;
-	unsigned long white;
-	unsigned long black;
-	XWindowAttributes xgwa;
-	GC          gc;
-	long        pause;
-	Bool        fullrandom;
-	Bool        verbose;
-	int         count;
-	int         cycles;
-	int         size;
-	int         ncolors;
-	Bool        threed;
-	long        threed_left_color;
-	long        threed_right_color;
-	long        threed_both_color;
-	long        threed_none_color;
-	long        threed_delta;
-	Bool        wireframe_p;
-	char       *bitmap;
-	Bool        is_drawn;
-        Bool        fps_p;
-} ModeInfo;
-
-typedef enum {
-	t_String, t_Float, t_Int, t_Bool
-} xlockmore_type;
-
-typedef struct {
-	void       *var;
-	char       *name;
-	char       *classname;
-	char       *def;
-	xlockmore_type type;
-} argtype;
-
-typedef struct {
-	char       *opt;
-	char       *desc;
-} OptionStruct;
-
-typedef struct {
-	int         numopts;
-	XrmOptionDescRec *opts;
-	int         numvarsdesc;
-	argtype    *vars;
-	OptionStruct *desc;
-} ModeSpecOpt;
-
-extern void xlockmore_screenhack(Display * dpy, Window window,
-				 Bool want_writable_colors,
-				 Bool want_uniform_colors,
-				 Bool want_smooth_colors,
-				 Bool want_bright_colors,
-				 void        (*hack_init) (ModeInfo *),
-				 void        (*hack_draw) (ModeInfo *),
-				 void        (*hack_free) (ModeInfo *));
-#ifdef USE_GL
-extern Visual *get_gl_visual(Screen * screen, char *name, char *class);
-#endif
-#ifdef __cplusplus
-  }
-#endif
-
-#else /* STANDALONE */
 #ifdef __cplusplus
   extern "C" {
 #endif
@@ -214,6 +50,7 @@ typedef struct LockStruct_s {
 	ModeHook   *release_hook;	/* func to shutdown a mode */
 	ModeHook   *refresh_hook;	/* tells mode to repaint */
 	ModeHook   *change_hook;	/* user wants mode to change */
+	/*ModeHook   *unused_hook;*/	/* future */
 	ModeHook   *free_hook;	/* free a single screen */
 	ModeSpecOpt *msopt;	/* this mode's def resources */
 	int         def_delay;	/* default delay for mode */
@@ -275,6 +112,7 @@ typedef struct {
 	XWindowChanges fullsizeconfigure;
 	mboxInfo    mb;
 	Pixmap	    root_pixmap;
+	double      recursion_depth;
 } ScreenInfo;
 
 typedef struct {
@@ -404,6 +242,7 @@ typedef struct ModeInfo_s {
 #define MI_RIGHT_COLOR(mi)	((mi)->screeninfo->right_pixel)
 #define MI_LEFT_COLOR(mi)	((mi)->screeninfo->left_pixel)
 #define MI_ROOT_PIXMAP(mi)	((mi)->screeninfo->root_pixmap)
+#define MI_RECURSION_DEPTH(MI)	((mi)->screeninfo->recursion_depth)
 
 #define MI_DELAY(mi)		((mi)->runinfo.delay)
 #define MI_COUNT(mi)		((mi)->runinfo.count)
@@ -482,6 +321,7 @@ extern HookProc call_callback_hook;
 extern HookProc call_release_hook;
 extern HookProc call_refresh_hook;
 extern HookProc call_change_hook;
+/*extern HookProc call_unused_hook;*/
 
 extern void set_default_mode(LockStruct *);
 extern void release_last_mode(ModeInfo *);
@@ -792,7 +632,6 @@ extern ModeSpecOpt apollonian_opts;
 extern ModeHook init_atlantis;
 extern ModeHook draw_atlantis;
 extern ModeHook release_atlantis;
-extern ModeHook refresh_atlantis;
 extern ModeHook change_atlantis;
 extern ModeSpecOpt atlantis_opts;
 #endif
@@ -801,7 +640,6 @@ extern ModeSpecOpt atlantis_opts;
 extern ModeHook init_atunnels;
 extern ModeHook draw_atunnels;
 extern ModeHook release_atunnels;
-extern ModeHook refresh_atunnels;
 extern ModeHook change_atunnels;
 extern ModeSpecOpt atunnels_opts;
 #endif
@@ -876,7 +714,7 @@ extern ModeSpecOpt braid_opts;
 extern ModeHook init_bubble;
 extern ModeHook draw_bubble;
 extern ModeHook release_bubble;
-extern ModeHook refresh_bubble;
+extern ModeHook free_bubble;
 extern ModeSpecOpt bubble_opts;
 #endif
 
@@ -884,7 +722,6 @@ extern ModeSpecOpt bubble_opts;
 extern ModeHook init_bubble3d;
 extern ModeHook draw_bubble3d;
 extern ModeHook release_bubble3d;
-extern ModeHook change_bubble3d;
 extern ModeSpecOpt bubble3d_opts;
 #endif
 
@@ -972,7 +809,6 @@ extern ModeSpecOpt deco_opts;
 extern ModeHook init_deluxe;
 extern ModeHook draw_deluxe;
 extern ModeHook release_deluxe;
-extern ModeHook refresh_deluxe;
 extern ModeSpecOpt deluxe_opts;
 #endif
 
@@ -1253,6 +1089,7 @@ extern ModeHook init_laser;
 extern ModeHook draw_laser;
 extern ModeHook release_laser;
 extern ModeHook refresh_laser;
+extern ModeHook free_laser;
 extern ModeSpecOpt laser_opts;
 #endif
 
@@ -1262,6 +1099,7 @@ extern ModeHook draw_life;
 extern ModeHook release_life;
 extern ModeHook refresh_life;
 extern ModeHook change_life;
+extern ModeHook free_life;
 extern ModeSpecOpt life_opts;
 #endif
 
@@ -1270,6 +1108,7 @@ extern ModeHook init_life1d;
 extern ModeHook draw_life1d;
 extern ModeHook release_life1d;
 extern ModeHook refresh_life1d;
+extern ModeHook free_life1d;
 extern ModeSpecOpt life1d_opts;
 #endif
 
@@ -1279,6 +1118,7 @@ extern ModeHook draw_life3d;
 extern ModeHook release_life3d;
 extern ModeHook refresh_life3d;
 extern ModeHook change_life3d;
+extern ModeHook free_life3d;
 extern ModeSpecOpt life3d_opts;
 #endif
 
@@ -1286,7 +1126,6 @@ extern ModeSpecOpt life3d_opts;
 extern ModeHook init_lightning;
 extern ModeHook draw_lightning;
 extern ModeHook release_lightning;
-extern ModeHook refresh_lightning;
 extern ModeSpecOpt lightning_opts;
 #endif
 
@@ -1607,7 +1446,6 @@ extern ModeSpecOpt solitaire_opts;
 extern ModeHook init_space;
 extern ModeHook draw_space;
 extern ModeHook release_space;
-extern ModeHook refresh_space;
 extern ModeSpecOpt space_opts;
 #endif
 
@@ -1639,7 +1477,6 @@ extern ModeSpecOpt spline_opts;
 extern ModeHook init_sproingies;
 extern ModeHook draw_sproingies;
 extern ModeHook release_sproingies;
-extern ModeHook refresh_sproingies;
 extern ModeSpecOpt sproingies_opts;
 #endif
 
@@ -1678,7 +1515,6 @@ extern ModeSpecOpt strange_opts;
 extern ModeHook init_superquadrics;
 extern ModeHook draw_superquadrics;
 extern ModeHook release_superquadrics;
-extern ModeHook refresh_superquadrics;
 extern ModeSpecOpt superquadrics_opts;
 #endif
 
@@ -1845,16 +1681,12 @@ extern ModeSpecOpt xjack_opts;
 #endif
 
 extern ModeHook init_blank;
-extern ModeHook draw_blank;
-extern ModeHook release_blank;
-extern ModeHook refresh_blank;
 extern ModeSpecOpt blank_opts;
 
 #ifdef MODE_run
 extern ModeHook init_run;
-extern ModeHook draw_run;
 extern ModeHook release_run;
-extern ModeHook refresh_run;
+extern ModeHook free_run;
 extern ModeSpecOpt run_opts;
 #endif
 
@@ -1902,6 +1734,4 @@ extern void mi_init (ModeInfo *, size_t, void **);
 
 #define XSCREENSAVER_MODULE(CLASS,PREFIX)
 
-#endif /* STANDALONE */
-/* -------------------------------------------------------------------- */
 #endif /* __XLOCK_MODE_H__ */

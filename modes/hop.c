@@ -52,22 +52,20 @@ static const char sccsid[] = "@(#)hop.c	5.00 2000/11/01 xlockmore";
 
 
 #ifdef STANDALONE
-#define MODE_hop
-#define PROGCLASS "Hop"
-#define HACK_INIT init_hop
-#define HACK_DRAW draw_hop
-#define hop_opts xlockmore_opts
-#define DEFAULTS "*delay: 10000 \n" \
- "*count: 1000 \n" \
- "*cycles: 2500 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n" \
- "*verbose: False \n"
-#define SMOOTH_COLORS
-#include "xlockmore.h"		/* in xscreensaver distribution */
-#else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# define MODE_hop
+# define DEFAULTS	"*delay: 10000 \n" \
+			"*count: 1000 \n" \
+			"*cycles: 2500 \n" \
+			"*ncolors: 200 \n" \
+			"*fullrandom: True \n" \
+			"*verbose: False \n" \
 
+# define reshape_hop 0
+# define hop_handle_event 0
+# define SMOOTH_COLORS
+# include "xlockmore.h"		/* in xscreensaver distribution */
+#else /* STANDALONE */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_hop
@@ -150,13 +148,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+sine", (char *) "turn on/off sine format"}
 };
 
-ModeSpecOpt hop_opts =
+ENTRYPOINT ModeSpecOpt hop_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   hop_description =
 {"hop", "init_hop", "draw_hop", "release_hop",
- "refresh_hop", "init_hop", (char *) NULL, &hop_opts,
+ "refresh_hop", "init_hop", "free_hop", &hop_opts,
  10000, 1000, 2500, 1, 64, 1.0, "",
  "Shows real plane iterated fractals", 0, NULL};
 
@@ -193,7 +191,24 @@ typedef struct {
 
 static hopstruct *hops = (hopstruct *) NULL;
 
-void
+static void
+free_hop_screen(hopstruct *hp)
+{
+	if (hp == NULL) {
+		return;
+	}
+	if (hp->pointBuffer != NULL)
+		free(hp->pointBuffer);
+	hp = NULL;
+}
+
+ENTRYPOINT void
+free_hop(ModeInfo * mi)
+{
+	free_hop_screen(&hops[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_hop(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -201,11 +216,7 @@ init_hop(ModeInfo * mi)
 	double      range;
 	hopstruct  *hp;
 
-	if (hops == NULL) {
-		if ((hops = (hopstruct *) calloc(MI_NUM_SCREENS(mi),
-						 sizeof (hopstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, hops);
 	hp = &hops[MI_SCREEN(mi)];
 
 	hp->centerx = MI_WIDTH(mi) / 2;
@@ -396,7 +407,7 @@ init_hop(ModeInfo * mi)
 }
 
 
-void
+ENTRYPOINT void
 draw_hop(ModeInfo * mi)
 {
 	double      oldj, oldi;
@@ -538,28 +549,27 @@ draw_hop(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_hop(ModeInfo * mi)
 {
 	if (hops != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			hopstruct  *hp = &hops[screen];
-
-			if (hp->pointBuffer != NULL)
-				free(hp->pointBuffer);
+			free_hop_screen(&hops[screen]);
 		}
 		free(hops);
 		hops = (hopstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_hop(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Hop", hop)
 

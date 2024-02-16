@@ -32,15 +32,15 @@ static const char sccsid[] = "@(#)daisy.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_daisy
-#define PROGCLASS "Daisy"
-#define HACK_INIT init_daisy
-#define HACK_DRAW draw_daisy
-#define daisy_opts xlockmore_opts
 #define DEFAULTS "*delay: 100000 \n" \
- "*count: 300 \n" \
- "*cycles: 350 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n"
+	"*count: 300 \n" \
+	"*cycles: 350 \n" \
+	"*ncolors: 200 \n" \
+	"*fullrandom: True \n" \
+
+# define free_daisy 0
+# define reshape_daisy 0
+# define daisy_handle_event 0
 #define BRIGHT_COLORS
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -69,7 +69,7 @@ static OptionStruct desc[] =
 	{(char *) "-/+garden", (char *) "turn on/off garden"}
 };
 
-ModeSpecOpt daisy_opts =
+ENTRYPOINT ModeSpecOpt daisy_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -247,17 +247,12 @@ drawdaisy(ModeInfo * mi)
 	drawcenter(mi, stem_stop, height / 7, colour);
 }
 
-
-void
+ENTRYPOINT void
 init_daisy(ModeInfo * mi)
 {
 	daisystruct *dp;
-
-	if (daisies == NULL) {
-		if ((daisies = (daisystruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (daisystruct))) == NULL)
-			return;
-	}
+	
+	MI_INIT(mi, daisies);
 	dp = &daisies[MI_SCREEN(mi)];
 
 	dp->width = MI_WIDTH(mi);
@@ -278,7 +273,7 @@ init_daisy(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_daisy(ModeInfo * mi)
 {
 	daisystruct *dp;
@@ -295,7 +290,7 @@ draw_daisy(ModeInfo * mi)
 		init_daisy(mi);
 }
 
-void
+ENTRYPOINT void
 release_daisy(ModeInfo * mi)
 {
 	if (daisies != NULL) {
@@ -304,7 +299,8 @@ release_daisy(ModeInfo * mi)
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_daisy(ModeInfo * mi)
 {
 	daisystruct *dp;
@@ -319,6 +315,7 @@ refresh_daisy(ModeInfo * mi)
 		init_daisy(mi);
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Daisy", daisy)
 

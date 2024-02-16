@@ -36,14 +36,13 @@ static const char sccsid[] = "@(#)spiral.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_spiral
-#define PROGCLASS "Spiral"
-#define HACK_INIT init_spiral
-#define HACK_DRAW draw_spiral
-#define spiral_opts xlockmore_opts
 #define DEFAULTS "*delay: 5000 \n" \
- "*count: -40 \n" \
- "*cycles: 350 \n" \
- "*ncolors: 64 \n"
+	"*count: -40 \n" \
+	"*cycles: 350 \n" \
+	"*ncolors: 64 \n" \
+
+# define reshape_spiral 0
+# define spiral_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* from the xscreensaver distribution */
 #else /* !STANDALONE */
@@ -52,13 +51,13 @@ static const char sccsid[] = "@(#)spiral.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_spiral
 
-ModeSpecOpt spiral_opts =
+ENTRYPOINT ModeSpecOpt spiral_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   spiral_description =
 {"spiral", "init_spiral", "draw_spiral", "release_spiral",
- "refresh_spiral", "init_spiral", (char *) NULL, &spiral_opts,
+ "refresh_spiral", "init_spiral", "free_spiral", &spiral_opts,
  5000, -40, 350, 1, 64, 1.0, "",
  "Shows a helical locus of points", 0, NULL};
 
@@ -121,18 +120,29 @@ draw_dots(ModeInfo * mi, int in)
 			   TFX(sp, x), TFY(sp, y));
 	}
 }
+static void
+free_spiral_screen(spiralstruct *sp) {
+	if (sp == NULL) {
+		return;
+	}		
+	if (sp->traildots)
+		free(sp->traildots);
+	sp = NULL;
+}
+ 
+ENTRYPOINT void
+free_spiral(ModeInfo * mi)
+{
+	free_spiral_screen(&spirals[MI_SCREEN(mi)]);
+}
 
-void
+ENTRYPOINT void
 init_spiral(ModeInfo * mi)
 {
 	spiralstruct *sp;
 	int         i;
 
-	if (spirals == NULL) {
-		if ((spirals = (spiralstruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (spiralstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, spirals);
 	sp = &spirals[MI_SCREEN(mi)];
 
 	sp->width = MI_WIDTH(mi);
@@ -194,7 +204,7 @@ init_spiral(ModeInfo * mi)
 		sp->dots = MINDOTS;
 }
 
-void
+ENTRYPOINT void
 draw_spiral(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -299,24 +309,23 @@ draw_spiral(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_spiral(ModeInfo * mi)
 {
 	if (spirals != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			spiralstruct *sp = &spirals[screen];
+			free_spiral_screen(&spirals[screen]);
 
-			if (sp->traildots)
-				free(sp->traildots);
 		}
 		free(spirals);
 		spirals = (spiralstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_spiral(ModeInfo * mi)
 {
 	spiralstruct *sp;
@@ -329,6 +338,7 @@ refresh_spiral(ModeInfo * mi)
 	sp->redrawing = 1;
 	sp->redrawpos = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Spiral", spiral)
 

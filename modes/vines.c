@@ -46,15 +46,15 @@ static const char sccsid[] = "@(#)vines.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_vines
-#define PROGCLASS "Vines"
-#define HACK_INIT init_vines
-#define HACK_DRAW draw_vines
-#define vines_opts xlockmore_opts
 #define DEFAULTS "*delay: 200000 \n" \
- "*count: 0 \n" \
- "*ncolors: 64 \n" \
- "*eraseSpeed: 400 \n" \
- "*eraseMode: -1 \n"
+	"*count: 0 \n" \
+	"*ncolors: 64 \n" \
+	"*eraseSpeed: 400 \n" \
+	"*eraseMode: -1 \n" \
+
+# define free_vines 0
+# define reshape_vines 0
+# define vines_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -62,7 +62,7 @@ static const char sccsid[] = "@(#)vines.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_vines
 
-ModeSpecOpt vines_opts =
+ENTRYPOINT ModeSpecOpt vines_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -91,23 +91,12 @@ typedef struct {
 
 static vinestruct *vines = (vinestruct *) NULL;
 
-void
-refresh_vines(ModeInfo * mi)
-{
-	MI_CLEARWINDOW(mi);
-}				/* refresh_vines */
-
-void
+ENTRYPOINT void
 init_vines(ModeInfo * mi)
 {
 	vinestruct *fp;
 
-	if (vines == NULL) {
-		if ((vines = (vinestruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (vinestruct))) == NULL) {
-			return;
-		}
-	}
+	MI_INIT(mi, vines);
 	fp = &vines[MI_SCREEN(mi)];
 
 	fp->i = 0;
@@ -117,7 +106,7 @@ init_vines(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }				/* init_vines */
 
-void
+ENTRYPOINT void
 draw_vines(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -175,7 +164,7 @@ draw_vines(ModeInfo * mi)
 	}
 }				/* draw_vines */
 
-void
+ENTRYPOINT void
 release_vines(ModeInfo * mi)
 {
 	if (vines != NULL) {
@@ -183,6 +172,14 @@ release_vines(ModeInfo * mi)
 		vines = (vinestruct *) NULL;
 	}
 }				/* release_vines */
+
+#ifndef STANDALONE
+ENTRYPOINT void
+refresh_vines(ModeInfo * mi)
+{
+	MI_CLEARWINDOW(mi);
+}				/* refresh_vines */
+#endif
 
 XSCREENSAVER_MODULE ("Vines", vines)
 

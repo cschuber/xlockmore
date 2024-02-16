@@ -35,11 +35,12 @@ static const char sccsid[] = "@(#)random.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define PROGCLASS "Random"
-#define HACK_INIT init_random
-#define HACK_DRAW draw_random
-#define random_opts xlockmore_opts
-#define DEFAULTS "*verbose: False \n"
+#define MODE_random
+#define DEFAULTS "*verbose: False \n" \
+
+# define free_random 0
+# define reshape_random 0
+# define random_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -83,7 +84,7 @@ static OptionStruct desc[] =
 	{(char *) "-/+fullrandom", (char *) "turn on/off full random choice of mode-options"}
 };
 
-ModeSpecOpt random_opts =
+ENTRYPOINT ModeSpecOpt random_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -1003,12 +1004,13 @@ setMode(ModeInfo * mi, int newmode)
 #endif
 }
 
-void
+ENTRYPOINT void
 init_random(ModeInfo * mi)
 {
 	randomstruct *rp;
 	int         i;
 
+	/* NO MI_INIT here*/
 	if (randoms == NULL) {
 		if ((randoms = (randomstruct *) calloc(MI_NUM_SCREENS(mi),
 					     sizeof (randomstruct))) == NULL)
@@ -1041,7 +1043,7 @@ init_random(ModeInfo * mi)
 	call_init_hook(&LockProcs[currentmode], mi);
 }
 
-void
+ENTRYPOINT void
 draw_random(ModeInfo * mi)
 {
 	int         scrn = MI_SCREEN(mi);
@@ -1082,7 +1084,16 @@ draw_random(ModeInfo * mi)
 	call_callback_hook(&LockProcs[currentmode], mi);
 }
 
-void
+ENTRYPOINT void
+release_random(ModeInfo * mi)
+{
+	if (previousmode >= 0 && previousmode != currentmode)
+		call_release_hook(&LockProcs[previousmode], mi);
+	previousmode = currentmode;
+}
+
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_random(ModeInfo * mi)
 {
 	if (currentmode < 0)
@@ -1090,7 +1101,7 @@ refresh_random(ModeInfo * mi)
 	call_refresh_hook(&LockProcs[currentmode], mi);
 }
 
-void
+ENTRYPOINT void
 change_random(ModeInfo * mi)
 {
 	if (currentmode < 0)
@@ -1099,13 +1110,6 @@ change_random(ModeInfo * mi)
 		change_now = True;	/* force a change on next draw callback */
 	draw_random(mi);
 }
-
-void
-release_random(ModeInfo * mi)
-{
-	if (previousmode >= 0 && previousmode != currentmode)
-		call_release_hook(&LockProcs[previousmode], mi);
-	previousmode = currentmode;
-}
+#endif
 
 XSCREENSAVER_MODULE ("Random", random)

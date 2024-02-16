@@ -33,13 +33,12 @@ static const char sccsid[] = "@(#)world.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_world
-#define PROGCLASS "World"
-#define HACK_INIT init_world
-#define HACK_DRAW draw_world
-#define world_opts xlockmore_opts
 #define DEFAULTS "*delay: 100000 \n" \
- "*count: -16 \n" \
- "*ncolors: 200 \n"
+	"*count: -16 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_world 0
+# define world_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -47,13 +46,13 @@ static const char sccsid[] = "@(#)world.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_world
 
-ModeSpecOpt world_opts =
+ENTRYPOINT ModeSpecOpt world_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   world_description =
 {"world", "init_world", "draw_world", "release_world",
- "refresh_world", "init_world", (char *) NULL, &world_opts,
+ "refresh_world", "init_world", "free_world", &world_opts,
  100000, -16, 1, 1, 64, 0.3, "",
  "Shows spinning Earths", 0, NULL};
 
@@ -151,17 +150,30 @@ typedef struct {
 
 static worldstruct *worlds = (worldstruct *) NULL;
 
-void
+static void
+free_world_screen(worldstruct * wp)
+{
+	if (wp == NULL) {
+		return;
+	}
+	if (wp->planets != NULL)
+		free(wp->planets);
+	wp = NULL;
+}
+
+ENTRYPOINT void
+free_world(ModeInfo * mi)
+{
+	free_world_screen(&worlds[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_world(ModeInfo * mi)
 {
 	int         i;
 	worldstruct *wp;
 
-	if (worlds == NULL) {
-		if ((worlds = (worldstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (worldstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, worlds);
 	wp = &worlds[MI_SCREEN(mi)];
 	wp->frame_num = NUM_EARTHS * NUM_REV;
 	for (i = 0; i < NUM_EARTHS; i++)
@@ -200,7 +212,7 @@ init_world(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_world(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -273,25 +285,26 @@ draw_world(ModeInfo * mi)
 	wp->frame_num++;
 }
 
-void
+ENTRYPOINT void
 release_world(ModeInfo * mi)
 {
 	if (worlds != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			if (worlds[screen].planets != NULL)
-				free(worlds[screen].planets);
+			free_world_screen(&worlds[screen]);
 		free(worlds);
 		worlds = (worldstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_world(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("World", world)
 

@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* superquadrics --- 3D mathematical shapes */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)superquadrics.c	5.01 2001/03/01 xlockmore";
-
 #endif
 
 /*-
@@ -75,15 +74,15 @@ static const char sccsid[] = "@(#)superquadrics.c	5.01 2001/03/01 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_superquadrics
-# define PROGCLASS				"Superquadrics"
-# define HACK_INIT				init_superquadrics
-# define HACK_DRAW				draw_superquadrics
-# define superquadrics_opts			xlockmore_opts
 # define DEFAULTS	"*delay:	40000   \n"	\
 			"*count:	25      \n"	\
 			"*cycles:	40      \n"	\
 			"*showfps:      False   \n"	\
 			"*wireframe:	False	\n"
+
+#define free_superquadrics 0
+#define reshape_superquadrics 0
+#define superquadrics_handle_event 0
 # include "xlockmore.h"			/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
 # include "xlock.h"			/* from the xlockmore distribution */
@@ -116,13 +115,13 @@ static OptionStruct desc[] =
 	{(char *) "-spinspeed num", (char *) "speed of rotation, in degrees per frame"}
 };
 
-ModeSpecOpt superquadrics_opts =
+ENTRYPOINT ModeSpecOpt superquadrics_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   superquadrics_description =
 {"superquadrics", "init_superquadrics", "draw_superquadrics", "release_superquadrics",
- "refresh_superquadrics", "init_superquadrics", (char *) NULL, &superquadrics_opts,
+ (char *) NULL, "init_superquadrics", (char *) NULL, &superquadrics_opts,
  40000, 25, 40, 1, 4, 1.0, "",
  "Shows 3D mathematical shapes", 0, NULL};
 
@@ -709,7 +708,7 @@ InitSuperquadrics(int wfmode, int snorm, int res, int count, float speed, superq
 
 /* End of superquadrics main functions */
 
-void
+ENTRYPOINT void
 init_superquadrics(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -718,11 +717,7 @@ init_superquadrics(ModeInfo * mi)
 
 	superquadricsstruct *sp;
 
-	if (superquadrics == NULL) {
-		if ((superquadrics = (superquadricsstruct *) calloc(MI_NUM_SCREENS(mi),
-				      sizeof (superquadricsstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, superquadrics);
 	sp = &superquadrics[screen];
 	sp->mono = (MI_IS_MONO(mi) ? 1 : 0);
 
@@ -740,7 +735,7 @@ init_superquadrics(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_superquadrics(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -766,13 +761,7 @@ draw_superquadrics(ModeInfo * mi)
 	glXSwapBuffers(display, window);
 }
 
-void
-refresh_superquadrics(ModeInfo * mi)
-{
-	/* Nothing happens here */
-}
-
-void
+ENTRYPOINT void
 release_superquadrics(ModeInfo * mi)
 {
 	if (superquadrics != NULL) {
@@ -782,7 +771,8 @@ release_superquadrics(ModeInfo * mi)
 	FreeAllGL(mi);
 }
 
+XSCREENSAVER_MODULE ("Superquadrics", superquadrics)
 
-#endif
+#endif /* MODE_superquadrics */
 
 /* End of superquadrics.c */

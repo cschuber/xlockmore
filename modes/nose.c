@@ -51,33 +51,32 @@ static const char sccsid[] = "@(#)nose.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_nose
-#define PROGCLASS "Nose"
-#define HACK_INIT init_nose
-#define HACK_DRAW draw_nose
-#define nose_opts xlockmore_opts
 #define DEFAULTS "*delay: 100000 \n" \
- "*ncolors: 64 \n" \
- "*font: \n" \
- "*text: \n" \
- "*filename: \n" \
- "*fortunefile: \n" \
- "*program: \n"
+	"*ncolors: 64 \n" \
+	"*font: fixed\n" \
+	"*text: \n" \
+	"*filename: \n" \
+	"*fortunefile: \n" \
+	"*program: \n" \
+
+# define reshape_nose 0
+# define nose_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
-#endif /* STANDALONE */
 #include "iostuff.h"
+#endif /* STANDALONE */
 
 #ifdef MODE_nose
 
-ModeSpecOpt nose_opts =
+ENTRYPOINT ModeSpecOpt nose_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   nose_description =
 {"nose", "init_nose", "draw_nose", "release_nose",
- "refresh_nose", "init_nose", (char *) NULL, &nose_opts,
+ "refresh_nose", "init_nose", "free_nose", &nose_opts,
  100000, 1, 1, 1, 64, 1.0, "",
  "Shows a man with a big nose runs around spewing out messages", 0, NULL};
 
@@ -188,7 +187,7 @@ XSetStipple(d,g,p); XSetTSOrigin(d,g,x,y);\
 XFillRectangle(d,np,g,x,y,w,h)
 
 static void
-free_nose(Display *display, nosestruct *np)
+free_nose_screen(Display *display, nosestruct *np)
 {
 	int         pix;
 
@@ -210,6 +209,12 @@ free_nose(Display *display, nosestruct *np)
 	   		np->noseGC[pix] = None;
 		}
 	}
+}
+
+ENTRYPOINT void
+free_nose(ModeInfo * mi)
+{
+        free_nose_screen(MI_DISPLAY(mi), &noses[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -778,7 +783,7 @@ move(ModeInfo * mi)
 	np->state = MOVE;
 }
 
-void
+ENTRYPOINT void
 init_nose(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -787,11 +792,7 @@ init_nose(ModeInfo * mi)
 	XGCValues   gcv;
 	nosestruct *np;
 
-	if (noses == NULL) {
-		if ((noses = (nosestruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (nosestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, noses);
 	np = &noses[MI_SCREEN(mi)];
 
 	np->width = MI_WIDTH(mi) + 2;
@@ -816,7 +817,7 @@ init_nose(ModeInfo * mi)
 	}
 	if (np->noseGC[0] == None)
 		if (!pickClothes(mi)) {
-			free_nose(display, np);
+			free_nose_screen(display, np);
 			return;
 		}
 	np->words = getWords(MI_SCREEN(mi), MI_NUM_SCREENS(mi));
@@ -833,7 +834,7 @@ init_nose(ModeInfo * mi)
 #endif
 				 GCForeground | GCBackground | GCGraphicsExposures,
 				 &gcv)) == None) {
-			free_nose(display, np);
+			free_nose_screen(display, np);
 			return;
 		}
 		gcv.foreground = MI_BLACK_PIXEL(mi);
@@ -844,7 +845,7 @@ init_nose(ModeInfo * mi)
 #endif
 				 GCForeground | GCBackground | GCGraphicsExposures,
 				 &gcv)) == None) {
-			free_nose(display, np);
+			free_nose_screen(display, np);
 			return;
 		}
 	}
@@ -867,7 +868,7 @@ init_nose(ModeInfo * mi)
 	XFlush(display);
 }
 
-void
+ENTRYPOINT void
 draw_nose(ModeInfo * mi)
 {
 	nosestruct *np;
@@ -893,14 +894,14 @@ draw_nose(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_nose(ModeInfo * mi)
 {
 	if (noses != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_nose(MI_DISPLAY(mi), &noses[screen]);
+			free_nose_screen(MI_DISPLAY(mi), &noses[screen]);
 		free(noses);
 		noses = (nosestruct *) NULL;
 	}
@@ -914,11 +915,13 @@ release_nose(ModeInfo * mi)
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_nose(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Nose", nose)
 

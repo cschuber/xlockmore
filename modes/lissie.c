@@ -33,15 +33,14 @@ static const char sccsid[] = "@(#)lissie.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_lissie
-#define PROGCLASS "Lissie"
-#define HACK_INIT init_lissie
-#define HACK_DRAW draw_lissie
-#define lissie_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*count: 1 \n" \
- "*cycles: 20000 \n" \
- "*size: -200 \n" \
- "*ncolors: 200 \n"
+	"*count: 1 \n" \
+	"*cycles: 20000 \n" \
+	"*size: -200 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_lissie 0
+# define lissie_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -50,13 +49,13 @@ static const char sccsid[] = "@(#)lissie.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_lissie
 
-ModeSpecOpt lissie_opts =
+ENTRYPOINT ModeSpecOpt lissie_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   lissie_description =
 {"lissie", "init_lissie", "draw_lissie", "release_lissie",
- "refresh_lissie", "init_lissie", (char *) NULL, &lissie_opts,
+ "refresh_lissie", "init_lissie", "free_lissie", &lissie_opts,
  10000, 1, 2000, -200, 64, 0.6, "",
  "Shows lissajous worms", 0, NULL};
 
@@ -107,6 +106,25 @@ typedef struct {
 } lissstruct;
 
 static lissstruct *lisses = (lissstruct *) NULL;
+
+
+static void
+free_lissie_screen(lissstruct *lp)
+{
+	if (lp == NULL) {
+		return;
+	}
+	if (lp->lissie != NULL) {
+		free(lp->lissie);
+	}
+	lp = NULL;
+}
+
+ENTRYPOINT void
+free_lissie(ModeInfo * mi)
+{
+	free_lissie_screen(&lisses[MI_SCREEN(mi)]);
+}
 
 
 static void
@@ -216,17 +234,13 @@ initlissie(ModeInfo * mi, lissiestruct * lissie)
 	drawlissie(mi, lissie);
 }
 
-void
+ENTRYPOINT void
 init_lissie(ModeInfo * mi)
 {
 	lissstruct *lp;
 	unsigned char ball;
 
-	if (lisses == NULL) {
-		if ((lisses = (lissstruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (lissstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, lisses);
 	lp = &lisses[MI_SCREEN(mi)];
 
 	lp->width = MI_WIDTH(mi);
@@ -257,7 +271,7 @@ init_lissie(ModeInfo * mi)
 
 }
 
-void
+ENTRYPOINT void
 draw_lissie(ModeInfo * mi)
 {
 	register unsigned char ball;
@@ -280,7 +294,7 @@ draw_lissie(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_lissie(ModeInfo * mi)
 {
 	if (lisses != NULL) {
@@ -288,18 +302,15 @@ release_lissie(ModeInfo * mi)
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
 			lissstruct *lp = &lisses[screen];
-
-			if (lp->lissie != NULL) {
-				free(lp->lissie);
-				/* lp->lissie = NULL; */
-			}
+			free_lissie_screen(lp);
 		}
 		free(lisses);
 		lisses = (lissstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_lissie(ModeInfo * mi)
 {
 	int         i;
@@ -319,6 +330,7 @@ refresh_lissie(ModeInfo * mi)
 		}
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Lissie", lissie)
 

@@ -35,14 +35,13 @@ static const char sccsid[] = "@(#)polyominoes.c 5.01 2000/12/18 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_polyominoes
-#define PROGCLASS "Polyominoes"
-#define HACK_INIT init_polyominoes
-#define HACK_DRAW draw_polyominoes
-#define polyominoes_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000 \n" \
-"*count: 1024 \n" \
-"*cycles: 3000 \n" \
-"*ncolors: 200 \n"
+	"*count: 1024 \n" \
+	"*cycles: 3000 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_polyominoes 0
+# define polyominoes_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -74,14 +73,13 @@ static OptionStruct desc[] =
   {(char *) "-/+plain", (char *) "turn on/off plain pieces"}
 };
 
-ModeSpecOpt polyominoes_opts =
-{sizeof opts / sizeof opts[0], opts,
- sizeof vars / sizeof vars[0], vars, desc};
+ENTRYPOINT ModeSpecOpt polyominoes_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   polyominoes_description = {
   "polyominoes", "init_polyominoes", "draw_polyominoes", "release_polyominoes",
-  "refresh_polyominoes", "init_polyominoes", (char *) NULL, &polyominoes_opts,
+  "refresh_polyominoes", "init_polyominoes", "free_polyominoes", &polyominoes_opts,
   6000, 1, 8192, 1, 64, 1.0, "",
   "Shows attempts to place polyominoes into a rectangle", 0, NULL
 };
@@ -1059,9 +1057,13 @@ static void free_bitmaps(polyominoesstruct *sp) {
 
 #define deallocate(p,t) if ((p)!=NULL) {free(p); p=(t*)NULL;}
 
-static void free_polyominoes(polyominoesstruct *sp) {
+static void
+free_polyominoes_screen(polyominoesstruct *sp) {
   int n;
 
+  if (sp == NULL) {
+    return;
+  }
   for (n=0;n<sp->nr_polyominoes;n++) {
     deallocate(sp->polyomino[n].point, point_type);
   }
@@ -1075,10 +1077,17 @@ static void free_polyominoes(polyominoesstruct *sp) {
   deallocate(sp->changed_array, int);
 
   free_bitmaps(sp);
+  sp = NULL;
+}
+
+ENTRYPOINT void
+free_polyominoes(ModeInfo *mi)
+{
+  free_polyominoes_screen(&polyominoeses[MI_SCREEN(mi)]);
 }
 
 #define set_allocate(p,type,size) p = (type *) malloc(size);		\
-  if ((p)==NULL) {free_polyominoes(sp);return 0;}
+  if ((p)==NULL) {free_polyominoes_screen(sp);return 0;}
 
 #define copy_polyomino(dst,src,new_rand)				\
   (dst).len=(src).len;							\
@@ -2058,24 +2067,19 @@ int set_elevenomino_puzzle2(polyominoesstruct *sp) {
 The main functions.
 **************************************************/
 
-#define allocate(p,type,size) p = (type *) malloc(size); if ((p)==NULL) {free_polyominoes(sp); return;}
+#define allocate(p,type,size) p = (type *) malloc(size); if ((p)==NULL) {free_polyominoes_screen(sp); return;}
 
-void
+ENTRYPOINT void
 init_polyominoes(ModeInfo * mi) {
   polyominoesstruct *sp;
   int i,x,y, start;
   int box1, box2;
   int *perm;
 
-  if (polyominoeses == NULL) {
-    if ((polyominoeses
-         = (polyominoesstruct *) calloc(MI_NUM_SCREENS(mi),sizeof (polyominoesstruct)))
-        == NULL)
-      return;
-  }
+  MI_INIT(mi, polyominoeses);
   sp = &polyominoeses[MI_SCREEN(mi)];
 
-  free_polyominoes(sp);
+  free_polyominoes_screen(sp);
 
   sp->rot180 = 0;
   sp->counter = 0;
@@ -2220,7 +2224,7 @@ init_polyominoes(ModeInfo * mi) {
 
 }
 
-void
+ENTRYPOINT void
 draw_polyominoes(ModeInfo * mi) {
   polyominoesstruct *sp;
   int poly_no,point_no,transform_index,done,another_attachment_try;
@@ -2318,22 +2322,24 @@ draw_polyominoes(ModeInfo * mi) {
     sp->wait = 0;
 }
 
-void
+ENTRYPOINT void
 release_polyominoes(ModeInfo * mi) {
   int screen;
 
   if (polyominoeses != NULL) {
     for (screen=0;screen<MI_NUM_SCREENS(mi); screen++)
-      free_polyominoes(&polyominoeses[screen]);
+      free_polyominoes_screen(&polyominoeses[screen]);
     free(polyominoeses);
     polyominoeses = (polyominoesstruct *) NULL;
   }
 }
 
+#ifndef STANDALONE
 void
 refresh_polyominoes(ModeInfo * mi) {
   MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Polyominoes", polyominoes)
 

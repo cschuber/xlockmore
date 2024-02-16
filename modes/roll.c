@@ -30,14 +30,13 @@ static const char sccsid[] = "@(#)roll.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_roll
-#define PROGCLASS "Roll"
-#define HACK_INIT init_roll
-#define HACK_DRAW draw_roll
-#define roll_opts xlockmore_opts
 #define DEFAULTS "*delay: 100000 \n" \
- "*count: 25 \n" \
- "*size: -64 \n" \
- "*ncolors: 200 \n"
+	"*count: 25 \n" \
+	"*size: -64 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_roll 0
+# define roll_handle_event 0
 #define BRIGHT_COLORS
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -47,13 +46,13 @@ static const char sccsid[] = "@(#)roll.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_roll
 
-ModeSpecOpt roll_opts =
+ENTRYPOINT ModeSpecOpt roll_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   roll_description =
 {"roll", "init_roll", "draw_roll", "release_roll",
- "refresh_roll", "init_roll", (char *) NULL, &roll_opts,
+ "refresh_roll", "init_roll", "free_roll", &roll_opts,
  100000, 25, 1, -64, 64, 0.6, "",
  "Shows a rolling ball", 0, NULL};
 
@@ -144,8 +143,11 @@ project(rollstruct * rp)
 }
 
 static void
-free_roll(rollstruct *rp)
+free_roll_screen(rollstruct *rp)
 {
+	if (rp == NULL) {
+		return;
+	}
 	if (rp->pts != NULL) {
 		free(rp->pts);
 		rp->pts = (ptsstruct *) NULL;
@@ -154,9 +156,16 @@ free_roll(rollstruct *rp)
 		free(rp->p);
 		rp->p = (XPoint *) NULL;
 	}
+	rp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_roll(ModeInfo * mi)
+{
+	free_roll_screen(&rolls[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_roll(ModeInfo * mi)
 {
 	int         i;
@@ -164,11 +173,7 @@ init_roll(ModeInfo * mi)
 	double      ang;
 	rollstruct *rp;
 
-	if (rolls == NULL) {
-		if ((rolls = (rollstruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (rollstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, rolls);
 	rp = &rolls[MI_SCREEN(mi)];
 
 	ang = (double) NRAND(75) + 7.5;
@@ -212,7 +217,7 @@ init_roll(ModeInfo * mi)
 	if (rp->pts == NULL)
 		if ((rp->pts = (ptsstruct *) malloc(rp->maxpts *
 				sizeof (ptsstruct))) ==NULL) {
-			free_roll(rp);
+			free_roll_screen(rp);
 			return;
 		}
 	if (rp->p != NULL) {
@@ -226,7 +231,7 @@ init_roll(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_roll(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -265,7 +270,7 @@ draw_roll(ModeInfo * mi)
 			free(rp->p);
 		if ((rp->p = (XPoint *) malloc(rp->maxpts *
 				sizeof (XPoint))) == NULL) {
-			free_roll(rp);
+			free_roll_screen(rp);
 			return;
 		}
 	}
@@ -312,24 +317,26 @@ draw_roll(ModeInfo * mi)
 	rp->sphere.y += rp->direction.y;
 }
 
-void
+ENTRYPOINT void
 release_roll(ModeInfo * mi)
 {
 	if (rolls != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_roll(&rolls[screen]);
+			free_roll_screen(&rolls[screen]);
 		free(rolls);
 		rolls = (rollstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_roll(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Roll", roll)
 

@@ -1,7 +1,7 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* molecule --- 3D molecules */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)molecule.c	5.01 2001/04/12 xlockmore";
 #endif
 
@@ -61,14 +61,8 @@ static const char sccsid[] = "@(#)molecule.c	5.01 2001/04/12 xlockmore";
 
 
 #ifdef STANDALONE
-#define MODE_molecule
-#define PROGCLASS	"Molecule"
-#define HACK_INIT	init_molecule
-#define HACK_DRAW	draw_molecule
-#define HACK_RESHAPE	reshape_molecule
-#define molecule_opts	xlockmore_opts
-
-#define DEFAULTS	"*delay:	10000         \n" \
+# define MODE_molecule
+# define DEFAULTS	"*delay:	10000         \n" \
 			"*timeout:    " DEF_TIMEOUT  "\n" \
 			"*showFPS:      False         \n" \
 			"*wireframe:    False         \n" \
@@ -84,10 +78,12 @@ static const char sccsid[] = "@(#)molecule.c	5.01 2001/04/12 xlockmore";
 			"*noLabelThreshold:    30     \n" \
 			"*wireframeThreshold:  150    \n" \
 
-#include "xlockmore.h"
-#include "colors.h"
+# define free_molecule 0
+# define molecule_handle_event 0
+# include "xlockmore.h"
+# include "colors.h"
 #else  /* !STANDALONE */
-# include "xlock.h"					/* from the xlockmore distribution */
+# include "xlock.h"				/* from the xlockmore distribution */
 # include "visgl.h"
 #endif /* !STANDALONE */
 #include "sphere.h"
@@ -267,7 +263,8 @@ static OptionStruct desc[] = {
   {(char *) "-/+bbox", (char *) "turn on/off bbox"},
 };
 
-ModeSpecOpt molecule_opts = {countof(opts), opts, countof(vars), vars, desc};
+ENTRYPOINT ModeSpecOpt molecule_opts =
+{countof(opts), opts, countof(vars), vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   molecule_description =
@@ -1227,7 +1224,7 @@ load_molecules (ModeInfo *mi)
 
 /* Window management, etc
  */
-void
+ENTRYPOINT void
 reshape_molecule (ModeInfo *mi, int width, int height)
 {
   GLfloat h = (GLfloat) height / (GLfloat) width;
@@ -1355,7 +1352,58 @@ startup_blurb (ModeInfo *mi)
   firstcall = False;
 }
 
-void
+ENTRYPOINT void
+release_molecule(ModeInfo * mi)
+{
+  if (mcs != NULL) {
+	int         screen;
+
+	for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
+	  molecule_configuration *mc = &mcs[screen];
+
+#if 0
+	int         i;
+
+	  for (i = 0; i < mc->nmolecules; i++) {
+	    molecule *m = &mc->molecules[i];
+
+	    if (m->atoms) {
+		free(m->atoms);
+		m->atoms = (molecule_atom *) NULL;
+	    }
+	    if (m->bonds) {
+		free(m->bonds);
+		m->bonds = (molecule_bond *) NULL;
+	    }
+	    if (m->label) {
+		free(m->label);
+		m->label = (char *) NULL;
+	    }
+	  }
+	  if (mc->molecules) {
+		free(mc->molecules);
+		mc->molecules = (molecule *) NULL;
+	  }
+#endif
+
+	  if (mc->glx_context) {
+		/* Display lists MUST be freed while their glXContext is current. */
+#ifdef WIN32
+		wglMakeCurrent(hdc, mc->glx_context);
+#else
+		glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(mc->glx_context));
+#endif
+		/* Free font stuff */
+		free_fonts (mi);
+	  }
+	}
+	free(mcs);
+	mcs = (molecule_configuration *) NULL;
+  }
+  FreeAllGL(mi);
+}
+
+ENTRYPOINT void
 init_molecule (ModeInfo *mi)
 {
   molecule_configuration *mc;
@@ -1364,14 +1412,7 @@ init_molecule (ModeInfo *mi)
 #ifndef STANDALONE
   timeout = MI_CYCLES(mi);
 #endif
-  if (!mcs) {
-    mcs = (molecule_configuration *)
-      calloc (MI_NUM_SCREENS(mi), sizeof (molecule_configuration));
-    if (!mcs) {
-       return;
-    }
-  }
-
+  MI_INIT(mi, mcs);
   mc = &mcs[MI_SCREEN(mi)];
   if (mc->glx_context) {
 	/* Free font stuff */
@@ -1447,7 +1488,7 @@ init_molecule (ModeInfo *mi)
 }
 
 
-void
+ENTRYPOINT void
 draw_molecule (ModeInfo *mi)
 {
 /*  static time_t last = 0; */
@@ -1564,55 +1605,6 @@ draw_molecule (ModeInfo *mi)
   glXSwapBuffers(dpy, window);
 }
 
-void
-release_molecule(ModeInfo * mi)
-{
-  if (mcs != NULL) {
-	int         screen;
+XSCREENSAVER_MODULE ("Molecule", molecule)
 
-	for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-	  molecule_configuration *mc = &mcs[screen];
-
-#if 0
-	int         i;
-
-	  for (i = 0; i < mc->nmolecules; i++) {
-	    molecule *m = &mc->molecules[i];
-
-	    if (m->atoms) {
-		free(m->atoms);
-		m->atoms = (molecule_atom *) NULL;
-	    }
-	    if (m->bonds) {
-		free(m->bonds);
-		m->bonds = (molecule_bond *) NULL;
-	    }
-	    if (m->label) {
-		free(m->label);
-		m->label = (char *) NULL;
-	    }
-	  }
-	  if (mc->molecules) {
-		free(mc->molecules);
-		mc->molecules = (molecule *) NULL;
-	  }
-#endif
-
-	  if (mc->glx_context) {
-		/* Display lists MUST be freed while their glXContext is current. */
-#ifdef WIN32
-		wglMakeCurrent(hdc, mc->glx_context);
-#else
-		glXMakeCurrent(MI_DISPLAY(mi), MI_WINDOW(mi), *(mc->glx_context));
-#endif
-		/* Free font stuff */
-		free_fonts (mi);
-	  }
-	}
-	free(mcs);
-	mcs = (molecule_configuration *) NULL;
-  }
-  FreeAllGL(mi);
-}
-
-#endif /* USE_GL */
+#endif /* MODE_molecule */

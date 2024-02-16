@@ -35,15 +35,14 @@ static const char sccsid[] = "@(#)clock.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_clock
-#define PROGCLASS "Clock"
-#define HACK_INIT init_clock
-#define HACK_DRAW draw_clock
-#define clock_opts xlockmore_opts
 #define DEFAULTS "*delay: 100000 \n" \
- "*count: -16 \n" \
- "*cycles: 200 \n" \
- "*size: -200 \n" \
- "*ncolors: 200 \n"
+	"*count: -16 \n" \
+	"*cycles: 200 \n" \
+	"*size: -200 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_clock 0
+# define clock_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -52,13 +51,13 @@ static const char sccsid[] = "@(#)clock.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_clock
 
-ModeSpecOpt clock_opts =
+ENTRYPOINT ModeSpecOpt clock_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   clock_description =
 {"clock", "init_clock", "draw_clock", "release_clock",
- "refresh_clock", "init_clock", (char *) NULL, &clock_opts,
+ "refresh_clock", "init_clock", "free_clock", &clock_opts,
  100000, -16, 200, -200, 64, 1.0, "",
  "Shows Packard's clock", 0, NULL};
 
@@ -345,17 +344,31 @@ update_clock(ModeInfo * mi, int clck)
 		 SecondsToAngle(&cp->oclocks[clck]), 1);
 }
 
-void
+ENTRYPOINT void
+free_clock_screen(clockstruct *cp) {
+	if (cp == NULL) {
+		return;
+	}
+	if (cp->oclocks != NULL) {
+		free(cp->oclocks);
+		/* cp->oclocks = (oclock *) NULL; */
+	}
+	cp = NULL;
+}
+
+ENTRYPOINT void
+free_clock(ModeInfo * mi)
+{
+	free_clock_screen(&clocks[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_clock(ModeInfo * mi)
 {
 	clockstruct *cp;
 	int         clck;
 
-	if (clocks == NULL) {
-		if ((clocks = (clockstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (clockstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, clocks);
 	cp = &clocks[MI_SCREEN(mi)];
 
 
@@ -408,7 +421,7 @@ init_clock(ModeInfo * mi)
 			break;
 }
 
-void
+ENTRYPOINT void
 draw_clock(ModeInfo * mi)
 {
 	int         clck;
@@ -442,26 +455,22 @@ draw_clock(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_clock(ModeInfo * mi)
 {
 	if (clocks != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			clockstruct *cp = &clocks[screen];
-
-			if (cp->oclocks != NULL) {
-				free(cp->oclocks);
-				/* cp->oclocks = (oclock *) NULL; */
-			}
+			free_clock_screen(&clocks[screen]);
 		}
 		free(clocks);
 		clocks = (clockstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_clock(ModeInfo * mi)
 {
 	clockstruct *cp;
@@ -473,6 +482,7 @@ refresh_clock(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 	cp->redrawing = 1;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Clock", clock)
 

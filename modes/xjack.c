@@ -31,32 +31,31 @@ static const char sccsid[] = "@(#)xjack.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_xjack
-#define PROGCLASS "XJack"
-#define HACK_INIT init_xjack
-#define HACK_DRAW draw_xjack
-#define xjack_opts xlockmore_opts
 #define DEFAULTS "*delay: 50000 \n" \
- "*font: \n" \
- "*text: \n" \
- "*fullrandom: True \n"
+	"*font: fixed \n" \
+	"*text: \n" \
+	"*fullrandom: True \n" \
+
+# define reshape_xjack 0
+# define xjack_handle_event 0
 #define DEF_FONT "-*-courier-medium-r-*-*-*-240-*-*-m-*-*-*",
 #define DEF_TEXT "All work and no play makes Jack a dull boy.  ";
 #include "xlockmore.h"  /* in xscreensaver distribution */
 
 #else /* STANDALONE */
 #include "xlock.h"     /* in xlockmore distribution */
-#endif
 #include "iostuff.h"
+#endif
 
 #ifdef MODE_xjack
 
-ModeSpecOpt xjack_opts =
+ENTRYPOINT ModeSpecOpt xjack_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct xjack_description =
 {"xjack", "init_xjack", "draw_xjack", "release_xjack",
- "init_xjack", "init_xjack", (char *) NULL, &xjack_opts,
+ "init_xjack", "init_xjack", "free_xjack", &xjack_opts,
  50000, 1, 1, 1, 64, 1.0, "",
  "Shows Jack having one of those days", 0, NULL};
 
@@ -114,18 +113,32 @@ static const char *source_message;
 
 extern char *message;
 
-void
+static void
+free_xjack_screen(Display *display, jackstruct *jp)
+{
+	if (jp == NULL) {
+		return;
+	}
+	if (jp->gc)
+		XFreeGC(display, jp->gc);
+	jp = NULL;
+}
+
+ENTRYPOINT void
+free_xjack(ModeInfo * mi)
+{
+	free_xjack_screen(MI_DISPLAY(mi), &jacks[MI_SCREEN(mi)]);
+}
+
+
+ENTRYPOINT void
 release_xjack(ModeInfo * mi)
 {
 	if (jacks != NULL) {
 		int				 screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			jackstruct *jp = &jacks[screen];
-			Display		*display = MI_DISPLAY(mi);
-
-			if (jp->gc)
-				XFreeGC(display, jp->gc);
+			free_xjack_screen(MI_DISPLAY(mi), &jacks[screen]);
 		}
 		free(jacks);
 		jacks = (jackstruct *) NULL;
@@ -136,18 +149,14 @@ release_xjack(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 init_xjack(ModeInfo * mi)
 {
 	Display		*display = MI_DISPLAY(mi);
 	jackstruct *jp;
 	XGCValues gcv;
 
-	if (jacks == NULL) {
-		if ((jacks = (jackstruct *) calloc(MI_NUM_SCREENS(mi),
-			 sizeof (jackstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, jacks);
 	jp = &jacks[MI_SCREEN(mi)];
 	if (mode_font == None)
 		if ((mode_font = getFont(display)) == None) {
@@ -196,15 +205,19 @@ init_xjack(ModeInfo * mi)
 	jp->mode = 0;
 	jp->stage = 0;
 	jp->busyloop = 0;
+#ifdef STANDALONE
+	source_message = source;
+#else
 	if (!message || !*message)
 		source_message = source;
 	else
 		source_message = message;
+#endif
 	jp->s = source_message;
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_xjack(ModeInfo * mi)
 {
 	Display		*display = MI_DISPLAY(mi);

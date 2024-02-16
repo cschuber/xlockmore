@@ -43,14 +43,13 @@ static const char sccsid[] = "@(#)euler2d.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_euler2d
-#define PROGCLASS "Euler2d"
-#define HACK_INIT init_euler2d
-#define HACK_DRAW draw_euler2d
-#define euler2d_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000 \n" \
-"*count: 1024 \n" \
-"*cycles: 3000 \n" \
-"*ncolors: 200 \n"
+	"*count: 1024 \n" \
+	"*cycles: 3000 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_euler2d 0
+# define euler2d_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -87,14 +86,13 @@ static OptionStruct desc[] =
   {(char *) "-eulerpower power", (char *) "power of interaction law for points for Euler2d"},
 };
 
-ModeSpecOpt euler2d_opts =
-{sizeof opts / sizeof opts[0], opts,
- sizeof vars / sizeof vars[0], vars, desc};
+ENTRYPOINT ModeSpecOpt euler2d_opts =
+{sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   euler2d_description = {
 	"euler2d", "init_euler2d", "draw_euler2d", "release_euler2d",
-	"refresh_euler2d", "init_euler2d", (char *) NULL, &euler2d_opts,
+	"refresh_euler2d", "init_euler2d", "free_euler2d", &euler2d_opts,
 	1000, 1024, 3000, 1, 64, 1.0, "",
 	"Simulates 2D incompressible invisid fluid.", 0, NULL
 };
@@ -484,11 +482,14 @@ ode_solve(euler2dstruct *sp)
 
 #define deallocate(p,t) if (p!=NULL) {free(p); p=(t*)NULL; }
 #define allocate(p,t,s) if ((p=(t*)malloc(sizeof(t)*s))==NULL)\
-{free_euler2d(sp);return;}
+{free_euler2d_screen(sp);return;}
 
 static void
-free_euler2d(euler2dstruct *sp)
+free_euler2d_screen(euler2dstruct *sp)
 {
+	if (sp == NULL) {
+		return;
+	}
 	deallocate(sp->csegs, XSegment);
 	deallocate(sp->old_segs, XSegment);
 	deallocate(sp->nold_segs, int);
@@ -505,9 +506,16 @@ free_euler2d(euler2dstruct *sp)
 	deallocate(sp->x_is_zero, short);
 	deallocate(sp->p, double);
 	deallocate(sp->mod_dp2, double);
+	sp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_euler2d(ModeInfo * mi)
+{
+        free_euler2d_screen(&euler2ds[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_euler2d(ModeInfo * mi)
 {
 #define nr_rotates 18 /* how many rotations to try to fill as much of screen as possible - must be even number */
@@ -524,11 +532,7 @@ init_euler2d(ModeInfo * mi)
 	delta_t = 0.001;
         if (power>1.0) delta_t *= pow(0.1,(double) power-1);
 
-	if (euler2ds == NULL) {
-		if ((euler2ds = (euler2dstruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (euler2dstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, euler2ds);
 	sp = &euler2ds[MI_SCREEN(mi)];
 
 	sp->boundary_color = NRAND(MI_NPIXELS(mi));
@@ -552,7 +556,7 @@ init_euler2d(ModeInfo * mi)
 	/* Clear the background. */
 	MI_CLEARWINDOW(mi);
 
-	free_euler2d(sp);
+	free_euler2d_screen(sp);
 
 	/* Allocate memory. */
 
@@ -748,7 +752,7 @@ init_euler2d(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_euler2d(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -857,24 +861,26 @@ draw_euler2d(ModeInfo * mi)
 
 }
 
-void
+ENTRYPOINT void
 release_euler2d(ModeInfo * mi)
 {
 	if (euler2ds != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_euler2d(&euler2ds[screen]);
+			free_euler2d_screen(&euler2ds[screen]);
 		free(euler2ds);
 		euler2ds = (euler2dstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_euler2d(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Euler2d", euler2d)
 

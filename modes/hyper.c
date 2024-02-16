@@ -61,25 +61,23 @@ static const char sccsid[] = "@(#)hyper.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_hyper
-#define PROGCLASS "Hyper"
-#define HACK_INIT init_hyper
-#define HACK_DRAW draw_hyper
-#define HACK_CHANGE change_hyper
-#define hyper_opts xlockmore_opts
 #define DEFAULTS "*delay: 100000 \n" \
- "*count: -6 \n" \
- "*cycles: 300 \n" \
- "*ncolors: 200 \n" \
- "*use3d: False \n" \
- "*delta3d: 1.5 \n" \
- "*right3d: red \n" \
- "*left3d: blue \n" \
- "*both3d: magenta \n" \
- "*none3d: black \n" \
- "*spinDelay:	2 \n" \
- "*showAxes:	false \n" \
- "*randomStart:	false \n" \
- "*debug:	false \n"
+	"*count: -6 \n" \
+	"*cycles: 300 \n" \
+	"*ncolors: 200 \n" \
+	"*use3d: False \n" \
+	"*delta3d: 1.5 \n" \
+	"*right3d: red \n" \
+	"*left3d: blue \n" \
+	"*both3d: magenta \n" \
+	"*none3d: black \n" \
+	"*spinDelay: 2 \n" \
+	"*showAxes: false \n" \
+	"*randomStart:false \n" \
+	"*debug: false \n" \
+
+# define reshape_hyper 0
+# define hyper_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -119,13 +117,13 @@ static OptionStruct desc[] =
 	{(char *) "-spindelay num", (char *) "delay in seconds before chaning spin speed"},
 };
 
-ModeSpecOpt hyper_opts =
+ENTRYPOINT ModeSpecOpt hyper_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   hyper_description =
 {"hyper", "init_hyper", "draw_hyper", "release_hyper",
- "refresh_hyper", "change_hyper", (char *) NULL, &hyper_opts,
+ "refresh_hyper", "change_hyper", "free_hyper", &hyper_opts,
  100000, -6, 300, 1, 64, 1.0, "",
  "Shows spinning n-dimensional hypercubes", 0, NULL};
 
@@ -222,9 +220,9 @@ typedef struct hyper {
 static hyperstruct *hypers = (hyperstruct *) NULL;
 
 #define allocarray(P,T,N) if((P=(T*)malloc((N)*sizeof(T)))==NULL) \
- {free_hyper(display,hp);return False;}
+ {free_hyper_screen(display,hp);return False;}
 #define callocarray(P,T,N) if((P=(T*)calloc(N,sizeof(T)))==NULL) \
- {free_hyper(display,hp);return False;}
+ {free_hyper_screen(display,hp);return False;}
 
 /*
  * Matrix handling & 3d transformation routines
@@ -345,7 +343,7 @@ figure_num_planes(int d)
 }
 
 static void
-free_hyperstuff(hyperstruct * hp)
+free_hyper_stuff(hyperstruct * hp)
 {
 	if (hp->axis_points) {
 		free(hp->axis_points);
@@ -422,8 +420,11 @@ free_hyperstuff(hyperstruct * hp)
 }
 
 static void
-free_hyper(Display *display, hyperstruct *hp)
+free_hyper_screen(Display *display, hyperstruct *hp)
 {
+	if (hp == NULL) {
+		return;
+	}
 	if (hp->gc != None) {
 		XFreeGC(display, hp->gc);
 		hp->gc = None;
@@ -432,7 +433,14 @@ free_hyper(Display *display, hyperstruct *hp)
 		XFreeFont(display, hp->font);
 		hp->font = None;
 	}
-	free_hyperstuff(hp);
+	free_hyper_stuff(hp);
+	hp = NULL;
+}
+
+ENTRYPOINT void
+free_hyper(ModeInfo * mi)
+{
+	free_hyper_screen(MI_DISPLAY(mi), &hypers[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -604,7 +612,7 @@ init_x_stuff(ModeInfo * mi)
 	if (hp->spinDelay < 0)
 		hp->spinDelay = 0;
 
-	free_hyperstuff(hp);
+	free_hyper_stuff(hp);
 	hp->num_d = MI_COUNT(mi);
 	if (hp->num_d < -MAX_D)
 		hp->num_d = -MAX_D;
@@ -1139,7 +1147,7 @@ translate_points(ModeInfo * mi, int set)
 	return True;
 }
 
-void
+ENTRYPOINT void
 refresh_hyper(ModeInfo * mi)
 {
 	hyperstruct *hp = &hypers[MI_SCREEN(mi)];
@@ -1153,27 +1161,23 @@ refresh_hyper(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 init_hyper(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
 	int         i;
 	hyperstruct *hp;
 
-	if (hypers == NULL) {
-		if ((hypers = (hyperstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (hyperstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, hypers);
 	hp = &hypers[MI_SCREEN(mi)];
 
 	if (!init_x_stuff(mi)) {
-		free_hyper(display, hp);
+		free_hyper_screen(display, hp);
 		return;
 	}
 
 	if (!figure_points(mi)) {
-		free_hyper(display, hp);
+		free_hyper_screen(display, hp);
 		return;
 	}
 
@@ -1190,11 +1194,11 @@ init_hyper(ModeInfo * mi)
 
 	hp->this_set = 0;
 	if (!translate_points(mi, !hp->this_set)) {
-		free_hyper(display, hp);
+		free_hyper_screen(display, hp);
 		return;
 	}
 	if (!translate_points(mi, hp->this_set)) {
-		free_hyper(display, hp);
+		free_hyper_screen(display, hp);
 		return;
 	}
 	refresh_hyper(mi);
@@ -1203,7 +1207,7 @@ init_hyper(ModeInfo * mi)
 }
 
 
-void
+ENTRYPOINT void
 draw_hyper(ModeInfo * mi)
 {
 	hyperstruct *hp;
@@ -1220,14 +1224,29 @@ draw_hyper(ModeInfo * mi)
 	/* Set up next place */
 	move_hyper(mi);
 	if (!translate_points(mi, hp->this_set)) {
-		free_hyper(MI_DISPLAY(mi), hp);
+		free_hyper_screen(MI_DISPLAY(mi), hp);
 		return;
 	}
 	if (!hp->stationary)
 		hp->this_set = !hp->this_set;
 }
 
-void
+ENTRYPOINT void
+release_hyper(ModeInfo * mi)
+{
+	if (hypers != NULL) {
+		int         screen;
+
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_hyper_screen(MI_DISPLAY(mi), &hypers[screen]);
+		free(hypers);
+		hypers = (hyperstruct *) NULL;
+	}
+}
+
+
+#ifndef STANDALONE
+ENTRYPOINT void
 change_hyper(ModeInfo * mi)
 {
 	hyperstruct *hp = &hypers[MI_SCREEN(mi)];
@@ -1235,19 +1254,7 @@ change_hyper(ModeInfo * mi)
 	/* make it change */
 	hp->spinDelay = 0;
 }
-
-void
-release_hyper(ModeInfo * mi)
-{
-	if (hypers != NULL) {
-		int         screen;
-
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_hyper(MI_DISPLAY(mi), &hypers[screen]);
-		free(hypers);
-		hypers = (hyperstruct *) NULL;
-	}
-}
+#endif
 
 XSCREENSAVER_MODULE ("Hyper", hyper)
 

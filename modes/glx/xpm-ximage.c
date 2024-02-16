@@ -1,8 +1,7 @@
 /* xpm-ximage.c --- converts XPM data to an XImage for use with OpenGL.*/
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)xpm-ximage.c       5.0 00/11/14 xlockmore";
-
 #endif
 /*
  * xscreensaver, Copyright (c) 1998 Jamie Zawinski <jwz AT jwz.org>

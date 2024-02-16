@@ -66,14 +66,14 @@ static const char sccsid[] = "@(#)apollonian.c	5.02 2001/07/01 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_apollonian
-# define DEFAULTS "*delay: 1000000 \n" \
-	"*count: 64 \n" \
-	"*cycles: 20 \n" \
-	"*ncolors: 64 \n" \
-	"*font:    fixed" "\n" \
-	"*fpsTop: true     \n" \
-	"*fpsSolid: true   \n" \
-	"*ignoreRotation: true" \
+# define DEFAULTS	"*delay: 1000000 \n" \
+			"*count: 64 \n" \
+			"*cycles: 20 \n" \
+			"*ncolors: 64 \n" \
+			"*font:    fixed" "\n" \
+			"*fpsTop: true     \n" \
+			"*fpsSolid: true   \n" \
+			"*ignoreRotation: true" \
 
 # define reshape_apollonian 0
 # define apollonian_handle_event 0
@@ -623,9 +623,7 @@ f(ModeInfo *mi, circle c1, circle c2, circle c3, circle c4, int depth)
 	int e = (int) ((cp->c1.e >= 0.0) ? 1.0 : -cp->c1.e);
         circle c;
 
-#if STANDALONE
-	if (depth > mi->recursion_depth) mi->recursion_depth = depth;
-#endif
+	if (depth > MI_RECURSION_DEPTH(mi)) MI_RECURSION_DEPTH(mi) = depth;
 
         c.e = 2*(c1.e+c2.e+c3.e) - c4.e;
         c.s = 2*(c1.s+c2.s+c3.s) - c4.s;
@@ -672,13 +670,10 @@ free_apollonian_screen(
 ENTRYPOINT void
 free_apollonian(ModeInfo * mi)
 {
-#ifdef DOFONT
-	Display *display = MI_DISPLAY(mi);
-#endif
 	apollonianstruct *ap = &apollonians[MI_SCREEN(mi)];
 	free_apollonian_screen(
 #ifdef DOFONT
-		display,
+		MI_DISPLAY(mi),
 #endif
 		ap);
 }
@@ -795,9 +790,7 @@ init_apollonian(ModeInfo * mi)
 	randomize_c(i, &(cp->c3));
 	randomize_c(i, &(cp->c4));
 #endif
-#ifdef STANDALONE
-	mi->recursion_depth = -1;
-#endif
+	MI_RECURSION_DEPTH(mi) = -1;
 }
 
 ENTRYPOINT void

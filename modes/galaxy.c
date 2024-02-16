@@ -44,15 +44,14 @@ static const char sccsid[] = "@(#)galaxy.c	5.01 2001/01/02 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_galaxy
-#define PROGCLASS "Galaxy"
-#define HACK_INIT init_galaxy
-#define HACK_DRAW draw_galaxy
-#define galaxy_opts xlockmore_opts
 #define DEFAULTS "*delay: 100 \n" \
- "*count: -5 \n" \
- "*cycles: 250 \n" \
- "*size: -3 \n" \
- "*ncolors: 64 \n"
+	"*count: -5 \n" \
+	"*cycles: 250 \n" \
+	"*size: -3 \n" \
+	"*ncolors: 64 \n" \
+
+# define reshape_galaxy 0
+# define galaxy_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -88,13 +87,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+tracks", (char *) "turn on/off star tracks"}
 };
 
-ModeSpecOpt galaxy_opts =
+ENTRYPOINT ModeSpecOpt galaxy_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   galaxy_description =
 {"galaxy", "init_galaxy", "draw_galaxy", "release_galaxy",
- "refresh_galaxy", "init_galaxy", (char *) NULL, &galaxy_opts,
+ "refresh_galaxy", "init_galaxy", "free_galaxy", &galaxy_opts,
  100, -5, 250, -3, 64, 1.0, "",
  "Shows crashing spiral galaxies", 0, NULL};
 
@@ -200,13 +199,23 @@ free_galaxies(unistruct * gp)
 }
 
 static void
-free_galaxy(Display *display, unistruct * gp)
+free_galaxy_screen(Display *display, unistruct * gp)
 {
+	if (gp == NULL) {
+		return;
+	}
 	free_galaxies(gp);
 	if (gp->pixmap != None) {
 		XFreePixmap(display, gp->pixmap);
 		gp->pixmap = None;
 	}
+	gp = NULL;
+}
+
+ENTRYPOINT void
+free_galaxy(ModeInfo * mi)
+{
+	free_galaxy_screen(MI_DISPLAY(mi), &universes[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -230,7 +239,7 @@ startover(ModeInfo * mi)
 	if (gp->galaxies == NULL)
 		if ((gp->galaxies = (Galaxy *) calloc(gp->ngalaxies,
 				sizeof (Galaxy))) == NULL) {
-			free_galaxy(MI_DISPLAY(mi), gp);
+			free_galaxy_screen(MI_DISPLAY(mi), gp);
 			return False;
 	}
 	for (i = 0; i < gp->ngalaxies; ++i) {
@@ -253,7 +262,7 @@ startover(ModeInfo * mi)
 		gt->nstars = (NRAND(MAX_STARS / 2)) + MAX_STARS / 2;
 		if ((gt->stars = (Star *) malloc(gt->nstars *
 				sizeof (Star))) == NULL) {
-			free_galaxy(MI_DISPLAY(mi), gp);
+			free_galaxy_screen(MI_DISPLAY(mi), gp);
 			return False;
 		}
 		w1 = 2.0 * M_PI * FLOATRAND;
@@ -346,17 +355,13 @@ startover(ModeInfo * mi)
 	return True;
 }
 
-void
+ENTRYPOINT void
 init_galaxy(ModeInfo * mi)
 {
 	Display *display = MI_DISPLAY(mi);
 	unistruct  *gp;
 
-	if (universes == NULL) {
-		if ((universes = (unistruct *) calloc(MI_NUM_SCREENS(mi),
-						sizeof (unistruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, universes);
 	gp = &universes[MI_SCREEN(mi)];
 
 	gp->f_hititerations = MI_CYCLES(mi);
@@ -399,7 +404,7 @@ init_galaxy(ModeInfo * mi)
 
 }
 
-void
+ENTRYPOINT void
 draw_galaxy(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -571,24 +576,26 @@ draw_galaxy(ModeInfo * mi)
 		(void) startover(mi);
 }
 
-void
+ENTRYPOINT void
 release_galaxy(ModeInfo * mi)
 {
 	if (universes != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_galaxy(MI_DISPLAY(mi), &universes[screen]);
+			free_galaxy_screen(MI_DISPLAY(mi), &universes[screen]);
 		free(universes);
 		universes = (unistruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_galaxy(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Galaxy", galaxy)
 

@@ -1,6 +1,6 @@
 /* biof --- 3D Bioform */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)biof.c	5.15 2005/02/15 xlockmore";
 #endif
 
@@ -50,18 +50,15 @@ static const char sccsid[] = "@(#)biof.c	5.15 2005/02/15 xlockmore";
 
 #ifdef STANDALONE
 # define MODE_biof
-# define PROGCLASS      "BioF"
-# define HACK_INIT      init_biof
-# define HACK_DRAW      draw_biof
-# define HACK_RESHAPE   reshape_biof
-# define biof_opts  xlockmore_opts
 # define DEFAULTS       "*delay:       25000 \n" \
                          "*count:          4 \n" \
                          "*showFPS:    False \n" \
                          "*cycles:       100 \n" \
                          "*size:        6000 \n" \
-                         "*preset:         5 \n" 
 
+/*                         "*preset:         5 \n" */
+#define free_biof 0
+#define biof_handle_event 0
 # include "xlockmore.h"         /* from the xscreensaver distribution */
 # include <stdio.h>
 # include <stdlib.h>
@@ -72,7 +69,7 @@ static const char sccsid[] = "@(#)biof.c	5.15 2005/02/15 xlockmore";
 #endif /* !STANDALONE */
 
 #ifdef MODE_biof
-// BioF screen saver
+/* BioF screen saver */
 
 #include <stdlib.h>
 #include <GL/gl.h>
@@ -84,9 +81,9 @@ static const char sccsid[] = "@(#)biof.c	5.15 2005/02/15 xlockmore";
 #define POINTS 4
 #define LIGHTMAP 5
 
-//#define COLOR	0.9, 0.75, 0.5
-//#define COLOR_RAND(i)	((float) (NRAND(i)) / 100.0)
-// Try to keep the same 'weight' on the components:
+/*#define COLOR	0.9, 0.75, 0.5 */
+/*#define COLOR_RAND(i)	((float) (NRAND(i)) / 100.0) */
+/*  Try to keep the same 'weight' on the components: */
 #define COLOR_RAND(i)	((float) ( (2*i - 100) + NRAND(100 - i) ) / 100.0)
 static float C_RED;
 static float C_GREEN;
@@ -133,15 +130,15 @@ static OptionStruct desc[] =
         {(char *) "+/-offangle",        (char *) "whether to use OffAngle"},
 };
 
-ModeSpecOpt biof_opts =
+ENTRYPOINT ModeSpecOpt biof_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
-ModStruct   cage_description =
-{"cage", "init_biof", "draw_biof", "release_biof",
+ModStruct   biof_description =
+{"biof", "init_biof", "draw_biof", "release_biof",
  "draw_biof", "init_biof", (char *) NULL, &cage_opts,
  10000, 800, 1, 0, 1.0, "",
- "Shows the Impossible Cage, an Escher-like GL scene", 0, NULL};
+ "Shows BioF", 0, NULL};
 
 #endif
 
@@ -215,7 +212,7 @@ static void Horn (ModeInfo * mi, int ribs, double bend, double stack, double twi
 				gluQuadricDrawStyle (bp->shapes, GLU_LINE);
 				gluQuadricNormals (bp->shapes, GLU_NONE);
 			}
-			//gluSphere(bp->shapes, power(grow,i/ribs), 5, 5);
+			/*gluSphere(bp->shapes, power(grow,i/ribs), 5, 5);*/
 			gluSphere (bp->shapes, exp (i / ribs * log (grow)), 6, 4);
 
 			break;
@@ -233,7 +230,8 @@ static void Horn (ModeInfo * mi, int ribs, double bend, double stack, double twi
 	}
 }
 
-void reshape_biof (ModeInfo * mi, int width, int height)
+ENTRYPOINT void
+reshape_biof (ModeInfo * mi, int width, int height)
 {
 	biofstruct *bp = &biof[MI_SCREEN(mi)];
 
@@ -243,11 +241,12 @@ void reshape_biof (ModeInfo * mi, int width, int height)
 	gluPerspective (30, (GLdouble) width / (GLdouble) height, 100, 300);
 }
 
-void init_biof (ModeInfo * mi)
+ENTRYPOINT void
+init_biof (ModeInfo * mi)
 {
 	float glfLightPosition[4] = { 100.0, 100.0, 100.0, 0.0 };
 	float glfFog[4] = { 0.0, 0.0, 0.3, 1.0 };
-	//float DiffuseLightColor[4] = { 1, 0.8, 0.4, 1.0 };
+	/*float DiffuseLightColor[4] = { 1, 0.8, 0.4, 1.0 };*/
 	float DiffuseLightColor[4] = { 1.0, 1.0, 1.0, 1.0 };
 	int i, j;
 	double x, y, r, d;
@@ -255,11 +254,7 @@ void init_biof (ModeInfo * mi)
 	int        screen = MI_SCREEN(mi);
         biofstruct *bp;
 
-        if (biof == NULL) {
-                if ((biof = (biofstruct *) calloc(MI_NUM_SCREENS(mi),
-                                           sizeof (biofstruct))) == NULL)
-                        return;
-        }
+	MI_INIT(mi, biof);
         bp = &biof[screen];
 	bp->wire = MI_IS_WIREFRAME(mi);
 	C_RED   = COLOR_RAND(90);
@@ -365,7 +360,8 @@ void init_biof (ModeInfo * mi)
 
 }
 
-void release_biof (ModeInfo * mi)
+ENTRYPOINT void
+release_biof (ModeInfo * mi)
 {
 	int         screen;
 
@@ -381,7 +377,8 @@ void release_biof (ModeInfo * mi)
         FreeAllGL(mi);
 }
 
-void draw_biof (ModeInfo * mi)
+ENTRYPOINT void
+draw_biof (ModeInfo * mi)
 {
 #ifndef WIN32
 	struct timeval now;
@@ -627,4 +624,7 @@ static void handle_opts (ModeInfo * mi)
 		}
 	}
 }
-#endif
+
+XSCREENSAVER_MODULE ("Biof", biof)
+
+#endif /* MODE_biof */

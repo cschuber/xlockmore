@@ -3,7 +3,6 @@
 
 #if 0
 static const char sccsid[] = "@(#)slip.c	5.00 2000/11/01 xlockmore";
-
 #endif
 
 /*-
@@ -27,23 +26,23 @@ static const char sccsid[] = "@(#)slip.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_slip
-#define PROGCLASS "Slip"
-#define HACK_INIT init_slip
-#define HACK_DRAW draw_slip
-#define slip_opts xlockmore_opts
-#define DEFAULTS "*delay: 50000 \n" \
- "*count: 35 \n" \
- "*cycles: 50 \n" \
- "*ncolors: 200 \n"
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# define MODE_slip
+# define DEFAULTS "*delay: 50000 \n" \
+	"*count: 35 \n" \
+	"*cycles: 50 \n" \
+	"*ncolors: 200 \n" \
+	"*fpsSolid:     true \n" \
+	"*ignoreRotation: True \n" \
+
+# define free_slip 0
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_slip
 
-ModeSpecOpt slip_opts =
+ENTRYPOINT ModeSpecOpt slip_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -65,6 +64,7 @@ typedef struct {
 	short       lasthalf;
 	int         stage;
 	unsigned long r;
+	Bool        image_loading_p;
 } slipstruct;
 static slipstruct *slips = (slipstruct *) NULL;
 
@@ -101,39 +101,43 @@ erandom(slipstruct *sp, int mv)
 		return -(res & mv);
 }
 
+#ifdef STANDALONE
 static void
+image_loaded_cb(Screen *screen, Window w, Drawable d,
+		const char *name, XRectangle *geom,
+		void *closure)
+{
+	ModeInfo *mi = (ModeInfo *) closure;
+	slipstruct *sp = &slips[MI_SCREEN(mi)];
+	Display *dpy = DisplayOfScreen (screen);
+	XCopyArea (dpy, d, w, mi->gc, 0, 0,
+		sp->width, sp->height, 0, 0);
+	XFreePixmap (dpy, d);
+	sp->image_loading_p = False;
+}
+#endif /* STANDALONE */
+
+static Bool
 prepare_screen(ModeInfo * mi, slipstruct * sp)
 {
-
 	Display    *display = MI_DISPLAY(mi);
 	GC          gc = MI_GC(mi);
 	int         i, n, w = sp->width / 20;
 	int         not_solid = halfrandom(sp, 10);
 
-#ifdef STANDALONE		/* jwz -- sometimes hack the desktop image! */
-	if (halfrandom(sp, 2) == 0) {
-#if 0
-		Pixmap      p =
-#endif
-		grab_screen_image(DefaultScreenOfDisplay(display),
-				  MI_WINDOW(mi));
-
-#if 0
-		if (p)
-			XFreePixmap(display, p);
-		return;
-#endif
-	}
-#endif
-
 	sp->backwards = (int) (LRAND() & 1);	/* jwz: go the other way sometimes */
 
-	if (sp->first_time || !halfrandom(sp, 10)) {
-		MI_CLEARWINDOW(mi);
+	if (sp->first_time) {
+		XClearWindow (display, MI_WINDOW(mi));
 		n = 300;
+	} else if (!sp->image_loading_p && !halfrandom(sp, 10)) {
+		sp->first_time = 1;
+		sp->nblits_remaining = 0;
+		MI_CLEARWINDOW(mi);
+		return False;
 	} else {
 		if (halfrandom(sp, 5))
-			return;
+			return True;
 		if (halfrandom(sp, 5))
 			n = 100;
 		else
@@ -164,6 +168,21 @@ prepare_screen(ModeInfo * mi, slipstruct * sp)
 			       ww, ww);
 	}
 	sp->first_time = 0;
+#ifdef STANDALONE                         /* jwz -- sometimes hack the desktop image! */
+	if (!sp->image_loading_p &&
+			(1||halfrandom(sp, 2) == 0)) {
+	/* Load it into a pixmap so that the "Loading" message and checkerboard
+	   don't show up on the window -- we keep running while the image is
+	   in progress... */
+		Pixmap p = XCreatePixmap (MI_DISPLAY(mi), MI_WINDOW(mi),
+			sp->width, sp->height, mi->xgwa.depth);
+		sp->image_loading_p = True;
+		load_image_async (ScreenOfDisplay (MI_DISPLAY(mi), 0/*####MI_SCREEN(mi)*/),
+			MI_WINDOW(mi), p, image_loaded_cb, mi);
+	}
+#endif
+
+        return True;
 }
 
 static int
@@ -177,32 +196,36 @@ quantize(double d)
 	return i;
 }
 
-void
+ENTRYPOINT void
+reshape_slip(ModeInfo * mi, int w, int h)
+{
+	slipstruct *sp = &slips[MI_SCREEN(mi)];
+	sp->width = w;
+	sp->height = h;
+	sp->blit_width = sp->width / 25;
+	sp->blit_height = sp->height / 25;
+
+	sp->mode = 0;
+	sp->nblits_remaining = 0;
+}
+
+ENTRYPOINT void
 init_slip(ModeInfo * mi)
 {
 	slipstruct *sp;
 
-	if (slips == NULL) {
-		if ((slips = (slipstruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (slipstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, slips);
 	sp = &slips[MI_SCREEN(mi)];
 
-	sp->width = MI_WIDTH(mi);
-	sp->height = MI_HEIGHT(mi);
-
-	sp->blit_width = sp->width / 25;
-	sp->blit_height = sp->height / 25;
-	sp->nblits_remaining = 0;
-	sp->mode = 0;
 	sp->first_time = 1;
 
 	/* no "NoExpose" events from XCopyArea wanted */
 	XSetGraphicsExposures(MI_DISPLAY(mi), MI_GC(mi), False);
+
+	reshape_slip (mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 }
 
-void
+ENTRYPOINT void
 draw_slip(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -217,18 +240,17 @@ draw_slip(ModeInfo * mi)
 
 	timer = MI_COUNT(mi) * MI_CYCLES(mi);
 
-	MI_IS_DRAWN(mi) = True;
-
 	while (timer--) {
 		int         xi = halfrandom(sp, MAX(sp->width - sp->blit_width, 1));
 		int         yi = halfrandom(sp, MAX(sp->height - sp->blit_height, 1));
 		double      x, y, dx = 0, dy = 0, t, s1, s2;
 
 		if (0 == sp->nblits_remaining--) {
-			static int  lut[] =
-			{0, 0, 0, 1, 1, 1, 2};
+			static const int lut[] = {0, 0, 0, 1, 1, 1, 2};
 
-			prepare_screen(mi, sp);
+			if (!prepare_screen(mi, sp))
+				break;
+			MI_IS_DRAWN(mi) = True;
 			sp->nblits_remaining = MI_COUNT(mi) *
 				(2000 + halfrandom(sp, 1000) + halfrandom(sp, 1000));
 			if (sp->mode == 2)
@@ -329,7 +351,7 @@ X Error of failed request:  BadDrawable (invalid Pixmap or Window parameter)
 	}
 }
 
-void
+ENTRYPOINT void
 release_slip(ModeInfo * mi)
 {
 	if (slips != NULL) {
@@ -337,6 +359,20 @@ release_slip(ModeInfo * mi)
 		slips = (slipstruct *) NULL;
 	}
 }
+
+#ifdef STANDALONE
+ENTRYPOINT Bool
+slip_handle_event (ModeInfo *mi, XEvent *event)
+{
+	slipstruct *sp = &slips[MI_SCREEN(mi)];
+	if (screenhack_event_helper(MI_DISPLAY(mi), MI_WINDOW(mi), event)) {
+		sp->first_time = 1;
+		sp->nblits_remaining = 0;
+		return True;
+	}
+	return False;
+}
+#endif
 
 XSCREENSAVER_MODULE ("Slip", slip)
 

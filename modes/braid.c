@@ -32,26 +32,25 @@ static const char sccsid[] = "@(#)braid.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_braid
-#define DEFAULTS "*delay: 1000 \n" \
-	"*count: 15 \n" \
-	"*cycles: 100 \n" \
-	"*size: -7 \n" \
-	"*ncolors: 64 \n"
+# define MODE_braid
+# define DEFAULTS	 "*delay: 1000 \n" \
+			"*count: 15 \n" \
+			"*cycles: 100 \n" \
+			"*size: -7 \n" \
+			"*ncolors: 64 \n"
 
 # define reshape_braid 0
 # define free_braid 0
 # define braid_handle_event 0
-#define UNIFORM_COLORS
-#include "xlockmore.h"
+# define UNIFORM_COLORS
+# include "xlockmore.h"
 #else /* STANDALONE */
-#include "xlock.h"
-
+# include "xlock.h"
 #endif /* STANDALONE */
 
 #ifdef MODE_braid
 
-ModeSpecOpt braid_opts =
+ENTRYPOINT ModeSpecOpt braid_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES

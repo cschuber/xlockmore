@@ -28,32 +28,31 @@ static const char sccsid[] = "@(#)mountain.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_mountain
-#define PROGCLASS "Mountain"
-#define HACK_INIT init_mountain
-#define HACK_DRAW draw_mountain
-#define mountain_opts xlockmore_opts
-#define DEFAULTS "*delay: 1000 \n" \
- "*count: 30 \n" \
- "*cycles: 4000 \n" \
- "*ncolors: 64 \n" \
- "*wireframe: False \n" \
- "*fullrandom: False \n"
-#define SMOOTH_COLORS
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# define MODE_mountain
+# define DEFAULTS "*delay: 1000 \n" \
+	"*count: 30 \n" \
+	"*cycles: 4000 \n" \
+	"*ncolors: 64 \n" \
+	"*wireframe: False \n" \
+	"*fullrandom: False \n" \
+
+# define reshape_mountain 0
+# define mountain_handle_event 0
+# define SMOOTH_COLORS
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_mountain
 
-ModeSpecOpt mountain_opts =
+ENTRYPOINT ModeSpecOpt mountain_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   mountain_description =
 {"mountain", "init_mountain", "draw_mountain", "release_mountain",
- "refresh_mountain", "init_mountain", (char *) NULL, &mountain_opts,
+ "refresh_mountain", "init_mountain", "free_mountain", &mountain_opts,
  1000, 30, 4000, 1, 64, 1.0, "",
  "Shows Papo's mountain range", 0, NULL};
 
@@ -166,18 +165,31 @@ drawamountain(ModeInfo * mi)
 		mp->stage++;
 }
 
-void
+static void
+free_mountain_screen(Display * display, mountainstruct * mp)
+{
+	if (mp == NULL) {
+		return;
+	}
+	if (mp->stippledGC != None)
+		XFreeGC(display, mp->stippledGC);
+	mp = NULL;
+}
+
+ENTRYPOINT void
+free_mountain(ModeInfo * mi)
+{
+	free_mountain_screen(MI_DISPLAY(mi), &mountains[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_mountain(ModeInfo * mi)
 {
 	int         i, j, x, y;
 	XGCValues   gcv;
 	mountainstruct *mp;
 
-	if (mountains == NULL) {
-		if ((mountains = (mountainstruct *) calloc(MI_NUM_SCREENS(mi),
-					   sizeof (mountainstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, mountains);
 	mp = &mountains[MI_SCREEN(mi)];
 
 	mp->width = MI_WIDTH(mi);
@@ -231,7 +243,7 @@ init_mountain(ModeInfo * mi)
 		mp->offset = 0;
 }
 
-void
+ENTRYPOINT void
 draw_mountain(ModeInfo * mi)
 {
 	mountainstruct *mp;
@@ -258,24 +270,21 @@ draw_mountain(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_mountain(ModeInfo * mi)
 {
 	if (mountains != NULL) {
 		int         screen;
 
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			mountainstruct *mp = &mountains[screen];
-
-			if (mp->stippledGC)
-				XFreeGC(MI_DISPLAY(mi), mp->stippledGC);
-		}
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_mountain_screen(MI_DISPLAY(mi), &mountains[screen]);
 		free(mountains);
 		mountains = (mountainstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_mountain(ModeInfo * mi)
 {
 	mountainstruct *mp;
@@ -288,6 +297,7 @@ refresh_mountain(ModeInfo * mi)
 	mp->x = 0;
 	mp->y = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Mountain", mountain)
 

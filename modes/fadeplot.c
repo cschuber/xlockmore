@@ -31,14 +31,13 @@ static const char sccsid[] = "@(#)fadeplot.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_fadeplot
-#define PROGCLASS "Fadeplot"
-#define HACK_INIT init_fadeplot
-#define HACK_DRAW draw_fadeplot
-#define fadeplot_opts xlockmore_opts
 #define DEFAULTS "*delay: 30000 \n" \
- "*count: 10 \n" \
- "*cycles: 1500 \n" \
- "*ncolors: 64 \n"
+	"*count: 10 \n" \
+	"*cycles: 1500 \n" \
+	"*ncolors: 64 \n" \
+
+# define reshape_fadeplot 0
+# define fadeplot_handle_event 0
 #define BRIGHT_COLORS
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -49,13 +48,13 @@ static const char sccsid[] = "@(#)fadeplot.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_fadeplot
 
-ModeSpecOpt fadeplot_opts =
+ENTRYPOINT ModeSpecOpt fadeplot_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   fadeplot_description =
 {"fadeplot", "init_fadeplot", "draw_fadeplot", "release_fadeplot",
- "refresh_fadeplot", "init_fadeplot", (char *) NULL, &fadeplot_opts,
+ "refresh_fadeplot", "init_fadeplot", "free_fadeplot", &fadeplot_opts,
  30000, 10, 1500, 1, 64, 0.6, "",
  "Shows a fading plot of sine squared", 0, NULL};
 
@@ -77,8 +76,11 @@ typedef struct {
 static fadeplotstruct *fadeplots = (fadeplotstruct *) NULL;
 
 static void
-free_fadeplot(fadeplotstruct *fp)
+free_fadeplot_screen(fadeplotstruct *fp)
 {
+	if (fp == NULL) {
+		return;
+	}
 	if (fp->pts != NULL) {
 		free(fp->pts);
 		fp->pts = (XPoint *) NULL;
@@ -87,6 +89,13 @@ free_fadeplot(fadeplotstruct *fp)
 		free(fp->stab);
 		fp->stab = (int *) NULL;
 	}
+	fp = NULL;
+}
+
+ENTRYPOINT void
+free_fadeplot(ModeInfo * mi)
+{
+	free_fadeplot_screen(&fadeplots[MI_SCREEN(mi)]);
 }
 
 static Bool
@@ -98,7 +107,7 @@ initSintab(ModeInfo * mi)
 
 	fp->angles = NRAND(950) + 250;
 	if ((fp->stab = (int *) malloc(fp->angles * sizeof (int))) == NULL) {
-		free_fadeplot(fp);
+		free_fadeplot_screen(fp);
 		return False;
 	}
 	for (i = 0; i < fp->angles; i++) {
@@ -108,16 +117,12 @@ initSintab(ModeInfo * mi)
 	return True;
 }
 
-void
+ENTRYPOINT void
 init_fadeplot(ModeInfo * mi)
 {
 	fadeplotstruct *fp;
 
-	if (fadeplots == NULL) {
-		if ((fadeplots = (fadeplotstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (fadeplotstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, fadeplots);
 	fp = &fadeplots[MI_SCREEN(mi)];
 
 	fp->width = MI_WIDTH(mi);
@@ -145,7 +150,7 @@ init_fadeplot(ModeInfo * mi)
 	if (fp->pts == NULL) {
 		if ((fp->pts = (XPoint *) calloc(
 				fp->maxpts, sizeof (XPoint))) == NULL) {
-			free_fadeplot(fp);
+			free_fadeplot_screen(fp);
 			return;
 		}
 	}
@@ -159,7 +164,7 @@ init_fadeplot(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_fadeplot(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -215,24 +220,27 @@ draw_fadeplot(ModeInfo * mi)
 		MI_CLEARWINDOWCOLORMAPFAST(mi, MI_GC(mi), MI_BLACK_PIXEL(mi));
 	}
 }
-void
-refresh_fadeplot(ModeInfo * mi)
-{
-	MI_CLEARWINDOW(mi);
-}
 
-void
+ENTRYPOINT void
 release_fadeplot(ModeInfo * mi)
 {
 	if (fadeplots != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_fadeplot(&fadeplots[screen]);
+			free_fadeplot_screen(&fadeplots[screen]);
 		free(fadeplots);
 		fadeplots = (fadeplotstruct *) NULL;
 	}
 }
+
+#ifndef STANDALONE
+ENTRYPOINT void
+refresh_fadeplot(ModeInfo * mi)
+{
+	MI_CLEARWINDOW(mi);
+}
+#endif
 
 XSCREENSAVER_MODULE ("Fadeplot", fadeplot)
 

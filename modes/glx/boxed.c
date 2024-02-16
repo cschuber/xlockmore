@@ -41,11 +41,11 @@ static const char sccsid[] = "@(#)boxed.c	0.9 01/09/26 xlockmore";
 */
 
 #ifdef STANDALONE
+# define MODE_boxed
 # define DEFAULTS	"*delay:     15000   \n" \
 			"*showFPS:   False   \n" \
 			"*wireframe: False   \n"
 
-#define release_boxed 0
 # define boxed_handle_event xlockmore_no_events
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
@@ -53,7 +53,7 @@ static const char sccsid[] = "@(#)boxed.c	0.9 01/09/26 xlockmore";
 # include "visgl.h"
 #endif /* !STANDALONE */
 
-#ifdef USE_GL
+#ifdef MODE_boxed
 
 #include <GL/glu.h>
 
@@ -95,13 +95,14 @@ static argtype vars[] = {
     {&cfg_momentum, "momentum", "Explosion Momentum", DEF_MOMENTUM, t_Float},
 };
 
-ENTRYPOINT ModeSpecOpt boxed_opts = {countof(opts), opts, countof(vars), vars, NULL};
+ENTRYPOINT ModeSpecOpt boxed_opts =
+{countof(opts), opts, countof(vars), vars, NULL};
 
 #ifdef USE_MODULES
 
 ModStruct   boxed_description = { 
      "boxed", "init_boxed", "draw_boxed", "release_boxed",
-     "draw_boxed", "init_boxed", (char *) NULL, &boxed_opts,
+     "draw_boxed", "init_boxed", "free_boxed", &boxed_opts,
      1000, 1, 2, 1, 64, 1.0, "",
      "Shows GL's boxed balls", 0, NULL};
 
@@ -1382,10 +1383,12 @@ draw_boxed(ModeInfo * mi)
 
 
 static void
-free_boxed(boxedstruct *gp) {
+free_boxed_screen(boxedstruct *gp) {
     int i;
 
-
+    if (gp == NULL) {
+	return;
+    }
     if (glIsList(gp->listobjects))
         glDeleteLists(gp->listobjects, 3);
     for (i=0;i<gp->bman.num_balls;i++) {
@@ -1405,6 +1408,13 @@ free_boxed(boxedstruct *gp) {
         free (gp->tex1);
         gp->tex1 = NULL;
     }
+    gp = NULL;
+}
+
+ENTRYPOINT void
+free_boxed(ModeInfo * mi)
+{
+     free_boxed_screen(&boxed[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void
@@ -1416,7 +1426,7 @@ release_boxed(ModeInfo * mi)
 
         for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
              boxedstruct *gp = &boxed[screen];
-             free_boxed(gp);
+             free_boxed_screen(gp);
         }
         free(boxed);
         boxed = (boxedstruct *) NULL;
@@ -1424,8 +1434,6 @@ release_boxed(ModeInfo * mi)
     FreeAllGL(mi);
 }
 
-#ifdef STANDALONE
 XSCREENSAVER_MODULE ("Boxed", boxed)
-#endif
 
-#endif
+#endif /* MODE_boxed */

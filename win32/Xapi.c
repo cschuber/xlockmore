@@ -1,7 +1,7 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* Xapi --- mapped X API calls */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)Xapi.c	4.07 98/04/16 xlockmore";
 
 #endif

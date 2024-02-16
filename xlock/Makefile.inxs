@@ -54,6 +54,9 @@ HACKS_SRC	= $(XS)/hacks
 HACKS_BIN	= ../../hacks
 UTILS_SRC	= $(XS)/utils
 UTILS_BIN	= ../../utils
+XLOCK_SRC       = $(XS)/xlockmore/xlock
+XLOCK_BIN       = ../xlock
+
 
 INCLUDES	= -I$(srcdir) -I$(srcdir)/../.. -I$(UTILS_SRC) -I$(HACKS_SRC) -I../.. @INCLUDES@
 
@@ -70,16 +73,16 @@ UTIL_OBJS	= $(UTILS_BIN)/alpha.o $(UTILS_BIN)/colors.o \
 		  $(UTILS_BIN)/xroger.o $(UTILS_BIN)/yarandom.o \
 		  $(UTILS_BIN)/erase.o $(UTILS_BIN)/sgivideo.o
 
-SRCS		= automata.c iostuff.c spline.c xbm.c
+SRCS		= automata.c iostuff.c spline.c xbm.c color.c
 
-OBJS		= automata.o iostuff.o spline.o xbm.o
+OBJS		= automata.o iostuff.o spline.o xbm.o color.o
 
 EXES		=
 
 HACK_OBJS_1	= $(UTILS_BIN)/resources.o $(UTILS_BIN)/visual.o \
 		  $(UTILS_BIN)/usleep.o $(UTILS_BIN)/yarandom.o @XMU_OBJS@
 HACK_OBJS	= screenhack.o $(HACK_OBJS_1)
-XLOCK_OBJS	= screenhack-xlock.o $(XLOCK_OBJS)/xlockmore.o $(COLOR_OBJS) $(HACK_OBJS_1)
+XLOCK_OBJS	= screenhack-xlock.o $(HACKS_BIN)/xlockmore.o $(COLOR_OBJS) $(HACK_OBJS_1)
 COLOR_OBJS	= $(UTILS_BIN)/hsv.o $(UTILS_BIN)/colors.o
 GRAB_OBJS_1	= $(UTILS_BIN)/grabscreen.o $(SGI_VIDEO_OBJS)
 GRAB_OBJS	= $(GRAB_OBJS_1) $(COLOR_OBJS)

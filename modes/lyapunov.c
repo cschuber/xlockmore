@@ -37,14 +37,13 @@ static const char sccsid[] = "@(#)lyapunov.c	5.09 2003/06/30 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_lyapunov
-#define PROGCLASS "Lyapunov"
-#define HACK_INIT init_lyapunov
-#define HACK_DRAW draw_lyapunov
-#define lyapunov_opts xlockmore_opts
 #define DEFAULTS "*delay: 25000 \n" \
- "*count: 600 \n" \
- "*cycles: 20000 \n" \
- "*ncolors: 200 \n"
+	"*count: 600 \n" \
+	"*cycles: 20000 \n" \
+	"*ncolors: 200 \n" \
+
+# define reshape_lyapunov 0
+# define lyapunov_handle_event 0
 #define SMOOTH_COLORS
 #define WRITABLE_COLORS
 #include "xlockmore.h"		/* from the xscreensaver distribution */
@@ -83,13 +82,13 @@ static OptionStruct desc[] =
   {(char *) "-/+cycle", (char *) "turn on/off colour cycling"}
 };
 
-ModeSpecOpt lyapunov_opts =
+ENTRYPOINT ModeSpecOpt lyapunov_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   lyapunov_description =
 {"lyapunov", "init_lyapunov", "draw_lyapunov", "release_lyapunov",
- (char *) NULL, "init_lyapunov", (char *) NULL, &lyapunov_opts,
+ (char *) NULL, "init_lyapunov", "free_lyapunov", &lyapunov_opts,
  25000, 600, 20000, 1, 64, 1.0, "",
  "Shows lyapunov space", 0, NULL};
 
@@ -117,7 +116,6 @@ typedef struct {
 	float       reptop;
 	unsigned long periodic_forcing;
 	int firstone;
-	ModeInfo   *mi;
 	unsigned long seq;
 	int          na, nb, hbit;
 	int          iter_local;
@@ -185,10 +183,13 @@ reps(lyapstruct * lp, unsigned long periodic_forcing, int firstone, int iter, do
 }
 
 static void
-free_lyapunov(Display *display, lyapstruct *lp)
+free_lyapunov_screen(ModeInfo *mi, lyapstruct *lp)
 {
-	ModeInfo *mi = lp->mi;
+	Display *display = MI_DISPLAY(mi);
 
+	if (lp == NULL) {
+		return;
+	}
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
 		MI_WHITE_PIXEL(mi) = lp->whitepixel;
 		MI_BLACK_PIXEL(mi) = lp->blackpixel;
@@ -197,9 +198,17 @@ free_lyapunov(Display *display, lyapstruct *lp)
 		MI_BG_PIXEL(mi) = lp->bg;
 #endif
 		if (lp->colors != NULL) {
+#ifdef STANDALONE
+			Screen *screen = MI_SCREENPTR(mi);
+#endif
 			if (lp->ncolors && !lp->no_colors)
-				free_colors(display, lp->cmap, lp->colors,
-					lp->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					screen,
+#else
+					display,
+#endif
+					lp->cmap, lp->colors, lp->ncolors);
 			free(lp->colors);
 			lp->colors = (XColor *) NULL;
 		}
@@ -212,6 +221,13 @@ free_lyapunov(Display *display, lyapstruct *lp)
 		XFreeGC(display, lp->gc);
 		lp->gc = None;
 	}
+	lp = NULL;
+}
+
+ENTRYPOINT void
+free_lyapunov(ModeInfo * mi)
+{
+	free_lyapunov_screen(mi, &lyaps[MI_SCREEN(mi)]);
 }
 
 #ifndef STANDALONE
@@ -219,7 +235,7 @@ extern char *background;
 extern char *foreground;
 #endif
 
-void
+ENTRYPOINT void
 init_lyapunov(ModeInfo * mi)
 {
 	Window      window = MI_WINDOW(mi);
@@ -228,13 +244,8 @@ init_lyapunov(ModeInfo * mi)
 	unsigned long power2;
 	lyapstruct *lp;
 
-	if (lyaps == NULL) {
-		if ((lyaps = (lyapstruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (lyapstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, lyaps);
 	lp = &lyaps[MI_SCREEN(mi)];
-	lp->mi = mi;
 
 #ifdef DEBUG
 	debug = MI_IS_DEBUG(mi);
@@ -292,7 +303,7 @@ init_lyapunov(ModeInfo * mi)
 			lp->whitepixel = MI_WHITE_PIXEL(mi);
 			if ((lp->cmap = XCreateColormap(display, window,
 					MI_VISUAL(mi), AllocNone)) == None) {
-				free_lyapunov(display, lp);
+				free_lyapunov_screen(mi, lp);
 				return;
 			}
 			XSetWindowColormap(display, window, lp->cmap);
@@ -315,7 +326,7 @@ init_lyapunov(ModeInfo * mi)
 		}
 		if ((lp->gc = XCreateGC(display, MI_WINDOW(mi),
 			     (unsigned long) 0, (XGCValues *) NULL)) == None) {
-			free_lyapunov(display, lp);
+			free_lyapunov_screen(mi, lp);
 			return;
 		}
 	}
@@ -325,8 +336,17 @@ init_lyapunov(ModeInfo * mi)
   lp->direction = (LRAND() & 1) ? 1 : -1;
   if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
     if (lp->colors != NULL) {
+#ifdef STANDALONE
+      Screen *screen = MI_SCREENPTR(mi);
+#endif
       if (lp->ncolors && !lp->no_colors)
-        free_colors(display, lp->cmap, lp->colors, lp->ncolors);
+	free_colors(
+#ifdef STANDALONE
+		screen,
+#else
+		display,
+#endif
+		lp->cmap, lp->colors, lp->ncolors);
       free(lp->colors);
       lp->colors = (XColor *) NULL;
     }
@@ -343,10 +363,14 @@ init_lyapunov(ModeInfo * mi)
     else
       if ((lp->colors = (XColor *) malloc(sizeof (*lp->colors) *
           (lp->ncolors + 1))) == NULL) {
-        free_lyapunov(display, lp);
+        free_lyapunov_screen(mi, lp);
         return;
       }
+#ifdef STANDALONE
+    lp->cycle_p = has_writable_cells(MI_SCREENPTR(mi), MI_VISUAL(mi));
+#else
     lp->cycle_p = has_writable_cells(mi);
+#endif
     if (lp->cycle_p) {
       if (MI_IS_FULLRANDOM(mi)) {
         if (!NRAND(8))
@@ -358,33 +382,46 @@ init_lyapunov(ModeInfo * mi)
       }
     }
     if (!lp->mono_p) {
+#ifdef STANDALONE
+      Screen *screen = MI_SCREENPTR(mi);
+#endif
+
       if (!(LRAND() % 10))
         make_random_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		lp->cmap, lp->colors, &lp->ncolors,
+		True, True, &lp->cycle_p, True
 #else
-            mi,
+		mi,
+		lp->cmap, lp->colors, &lp->ncolors,
+		True, True, &lp->cycle_p
 #endif
-              lp->cmap, lp->colors, &lp->ncolors,
-              True, True, &lp->cycle_p);
+		);
       else if (!(LRAND() % 2))
         make_uniform_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		lp->cmap, lp->colors, &lp->ncolors,
+		True, &lp->cycle_p, True
 #else
-            mi,
+		mi,
+		lp->cmap, lp->colors, &lp->ncolors,
+		True, &lp->cycle_p
 #endif
-                  lp->cmap, lp->colors, &lp->ncolors,
-                  True, &lp->cycle_p);
+		);
       else
         make_smooth_colormap(
-#if STANDALONE
-            display, MI_WINDOW(mi),
+#ifdef STANDALONE
+		screen, MI_VISUAL(mi),
+		lp->cmap, lp->colors, &lp->ncolors,
+		True, &lp->cycle_p, True
 #else
-            mi,
+		mi,
+		lp->cmap, lp->colors, &lp->ncolors,
+		True, &lp->cycle_p
 #endif
-                 lp->cmap, lp->colors, &lp->ncolors,
-                 True, &lp->cycle_p);
+		);
     }
     XInstallColormap(display, lp->cmap);
     if (lp->ncolors < 2) {
@@ -409,7 +446,7 @@ init_lyapunov(ModeInfo * mi)
 	lp->iter_local = -1;
 }
 
-void
+ENTRYPOINT void
 draw_lyapunov(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -444,8 +481,14 @@ draw_lyapunov(ModeInfo * mi)
 
   /* Rotate colours */
   if (lp->cycle_p) {
-    rotate_colors(display, lp->cmap, lp->colors, lp->ncolors,
-      lp->direction);
+    rotate_colors(
+#ifdef STANDALONE
+	MI_SCREENPTR(mi),
+#else
+	display,
+#endif
+	lp->cmap, lp->colors, lp->ncolors,
+	lp->direction);
     if (!(LRAND() % 1000))
       lp->direction = -lp->direction;
   }
@@ -498,14 +541,14 @@ draw_lyapunov(ModeInfo * mi)
 		lp->column++;
 }
 
-void
+ENTRYPOINT void
 release_lyapunov(ModeInfo * mi)
 {
 	if (lyaps != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_lyapunov(MI_DISPLAY(mi), &lyaps[screen]);
+			free_lyapunov_screen(mi, &lyaps[screen]);
 		free(lyaps);
 		lyaps = (lyapstruct *) NULL;
 	}

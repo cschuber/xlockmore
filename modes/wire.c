@@ -88,16 +88,15 @@ static const char sccsid[] = "@(#)wire.c	5.24 2007/01/18 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_wire
-#define PROGCLASS "Wire"
-#define HACK_INIT init_wire
-#define HACK_DRAW draw_wire
-#define wire_opts xlockmore_opts
 #define DEFAULTS "*delay: 500000 \n" \
- "*count: 1000 \n" \
- "*cycles: 150 \n" \
- "*size: -8 \n" \
- "*ncolors: 64 \n" \
- "*neighbors: 0 \n"
+	"*count: 1000 \n" \
+	"*cycles: 150 \n" \
+	"*size: -8 \n" \
+	"*ncolors: 64 \n" \
+	"*neighbors: 0 \n" \
+
+# define reshape_wire 0
+# define wire_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -134,13 +133,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+vertical", (char *) "change orientation for hexagons and triangles"}
 };
 
-ModeSpecOpt wire_opts =
+ENTRYPOINT ModeSpecOpt wire_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   wire_description =
 {"wire", "init_wire", "draw_wire", "release_wire",
- "refresh_wire", "init_wire", (char *) NULL, &wire_opts,
+ "refresh_wire", "init_wire", "free_wire", &wire_opts,
  500000, 1000, 150, -8, 64, 1.0, "",
  "Shows a random circuit with 2 electrons", 0, NULL};
 
@@ -149,7 +148,7 @@ ModStruct   wire_description =
 #define WIREBITS(n,w,h)\
   if ((wp->pixmaps[wp->init_bits]=\
   XCreatePixmapFromBitmapData(display,window,(char *)n,w,h,1,0,1))==None){\
-  free_wire(display,wp); return;} else {wp->init_bits++;}
+  free_wire_screen(display,wp); return;} else {wp->init_bits++;}
 
 #define COLORS 4
 #define MINWIRES 32
@@ -932,10 +931,13 @@ free_list(circuitstruct * wp)
 }
 
 static void
-free_wire(Display *display, circuitstruct *wp)
+free_wire_screen(Display *display, circuitstruct *wp)
 {
 	int         shade;
 
+	if (wp == NULL) {
+		return;
+	}
 	for (shade = 0; shade < wp->init_bits; shade++)
 		XFreePixmap(display, wp->pixmaps[shade]);
 	wp->init_bits = 0;
@@ -952,22 +954,17 @@ free_wire(Display *display, circuitstruct *wp)
 		wp->newcells = (unsigned char *) NULL;
 	}
 	free_list(wp);
+	wp = NULL;
 }
 
-void
-release_wire(ModeInfo * mi)
+ENTRYPOINT void
+free_wire(ModeInfo * mi)
 {
-	if (circuits != NULL) {
-		int         screen;
-
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_wire(MI_DISPLAY(mi), &circuits[screen]);
-		free(circuits);
-		circuits = (circuitstruct *) NULL;
-	}
+	free_wire_screen(MI_DISPLAY(mi), &circuits[MI_SCREEN(mi)]);
 }
 
-void
+
+ENTRYPOINT void
 init_wire(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -976,11 +973,7 @@ init_wire(ModeInfo * mi)
 	circuitstruct *wp;
 	XGCValues   gcv;
 
-	if (circuits == NULL) {
-		if ((circuits = (circuitstruct *) calloc(MI_NUM_SCREENS(mi),
-					    sizeof (circuitstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, circuits);
 	wp = &circuits[MI_SCREEN(mi)];
 
 	wp->redrawing = 0;
@@ -990,7 +983,7 @@ init_wire(ModeInfo * mi)
 			gcv.fill_style = FillOpaqueStippled;
 			if ((wp->stippledGC = XCreateGC(display, window, GCFillStyle,
 					&gcv)) == None) {
-				free_wire(display, wp);
+				free_wire_screen(display, wp);
 				return;
 			}
 		}
@@ -1171,7 +1164,7 @@ init_wire(ModeInfo * mi)
 	}
 	if ((wp->oldcells = (unsigned char *) calloc(wp->bncols * wp->bnrows,
 			sizeof (unsigned char))) == NULL) {
-		free_wire(display, wp);
+		free_wire_screen(display, wp);
 		return;
 	}
 
@@ -1181,7 +1174,7 @@ init_wire(ModeInfo * mi)
 	}
 	if ((wp->newcells = (unsigned char *) calloc(wp->bncols * wp->bnrows,
 			sizeof (unsigned char))) == NULL) {
-		free_wire(display, wp);
+		free_wire_screen(display, wp);
 		return;
 	}
 
@@ -1197,7 +1190,7 @@ init_wire(ModeInfo * mi)
 	create_path(wp, n);
 }
 
-void
+ENTRYPOINT void
 draw_wire(ModeInfo * mi)
 {
 	int         offset, i, j, found = 0;
@@ -1222,7 +1215,7 @@ draw_wire(ModeInfo * mi)
 				found = 1;
 				*z = *znew;
 				if (!addtolist(mi, i - 2, j - 2, *znew - 1)) {
-					free_wire(MI_DISPLAY(mi), wp);
+					free_wire_screen(MI_DISPLAY(mi), wp);
 					return;
 				}
 			}
@@ -1230,7 +1223,7 @@ draw_wire(ModeInfo * mi)
 	}
 	for (i = 0; i < COLORS - 1; i++)
 		if (!draw_state(mi, i)) {
-			free_wire(MI_DISPLAY(mi), wp);
+			free_wire_screen(MI_DISPLAY(mi), wp);
 			return;
 		}
 	if (++wp->generation > MI_CYCLES(mi) || !found) {
@@ -1253,6 +1246,20 @@ draw_wire(ModeInfo * mi)
 	}
 }
 
+ENTRYPOINT void
+release_wire(ModeInfo * mi)
+{
+	if (circuits != NULL) {
+		int         screen;
+
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_wire_screen(MI_DISPLAY(mi), &circuits[screen]);
+		free(circuits);
+		circuits = (circuitstruct *) NULL;
+	}
+}
+
+#ifndef STANDALONE
 void
 refresh_wire(ModeInfo * mi)
 {
@@ -1266,6 +1273,7 @@ refresh_wire(ModeInfo * mi)
 	wp->redrawing = 1;
 	wp->redrawpos = 2 * wp->ncols + 2;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Wire", wire)
 

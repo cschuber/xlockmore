@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* cage --- the Impossible Cage, an Escher like scene. */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)cage.c	5.01 2001/03/01 xlockmore";
-
 #endif
 
 /*-
@@ -81,19 +80,20 @@ static const char sccsid[] = "@(#)cage.c	5.01 2001/03/01 xlockmore";
 #endif
 
 #ifdef STANDALONE
-#define MODE_cage
-#define PROGCLASS "Cage"
-#define HACK_INIT init_cage
-#define HACK_DRAW draw_cage
-#define cage_opts xlockmore_opts
-#define DEFAULTS "*delay: 80000 \n" \
- "*showFps  : False \n" \
- "*wireframe: False \n"
-#include "xlockmore.h"		/* from the xscreensaver distribution */
-#else /* !STANDALONE */
-#include "xlock.h"		/* from the xlockmore distribution */
-#include "visgl.h"
+# define MODE_cage
+# define DEFAULTS	"*delay: 80000 \n" \
+			"*showFps  : False \n" \
+			"*wireframe: False \n" \
+			"*suppressRotationAnimation: True\n" \
 
+# define free_cage 0
+# define cage_handle_event xlockmore_no_events
+# include "xlockmore.h"		/* from the xscreensaver distribution */
+/* TODO for JWZ: move this to better place */
+#define MI_POLYGONCOUNT(MI)    ((MI)->polygon_count)
+#else /* !STANDALONE */
+# include "xlock.h"		/* from the xlockmore distribution */
+# include "visgl.h"
 #endif /* !STANDALONE */
 
 #ifdef MODE_cage
@@ -101,7 +101,7 @@ static const char sccsid[] = "@(#)cage.c	5.01 2001/03/01 xlockmore";
 #include <GL/glu.h>
 #include "e_textures.h"
 
-ModeSpecOpt cage_opts =
+ENTRYPOINT ModeSpecOpt cage_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -137,25 +137,16 @@ typedef struct {
 	GLfloat     step;
 } cagestruct;
 
-static float front_shininess[] =
-{60.0};
-static float front_specular[] =
-{0.7, 0.7, 0.7, 1.0};
-static float ambient[] =
-{0.0, 0.0, 0.0, 1.0};
-static float diffuse[] =
-{1.0, 1.0, 1.0, 1.0};
-static float position0[] =
-{1.0, 1.0, 1.0, 0.0};
-static float position1[] =
-{-1.0, -1.0, 1.0, 0.0};
-static float lmodel_ambient[] =
-{0.5, 0.5, 0.5, 1.0};
-static float lmodel_twoside[] =
-{GL_TRUE};
+static const float front_shininess[] = {60.0};
+static const float front_specular[] = {0.7, 0.7, 0.7, 1.0};
+static const float ambient[] = {0.0, 0.0, 0.0, 1.0};
+static const float diffuse[] = {1.0, 1.0, 1.0, 1.0};
+static const float position0[] = {1.0, 1.0, 1.0, 0.0};
+static const float position1[] = {-1.0, -1.0, 1.0, 0.0};
+static const float lmodel_ambient[] = {0.5, 0.5, 0.5, 1.0};
+static const float lmodel_twoside[] = {GL_TRUE};
 
-static float MaterialWhite[] =
-{0.7, 0.7, 0.7, 1.0};
+static const float MaterialWhite[] = {0.7, 0.7, 0.7, 1.0};
 
 static cagestruct *cage = (cagestruct *) NULL;
 
@@ -164,9 +155,9 @@ static cagestruct *cage = (cagestruct *) NULL;
 #define PlankThickness  0.15
 
 static Bool
-draw_woodplank()
+draw_woodplank(ModeInfo *mi, cagestruct * cp, int wire)
 {
-	glBegin(GL_QUADS);
+	glBegin(wire ? GL_LINES : GL_QUADS);
 	glNormal3f(0, 0, 1);
 	glTexCoord2f(0, 0);
 	glVertex3f(-PlankWidth, -PlankHeight, PlankThickness);
@@ -176,6 +167,7 @@ draw_woodplank()
 	glVertex3f(PlankWidth, PlankHeight, PlankThickness);
 	glTexCoord2f(0, 1);
 	glVertex3f(-PlankWidth, PlankHeight, PlankThickness);
+	MI_POLYGONCOUNT(mi)++;
 	glNormal3f(0, 0, -1);
 	glTexCoord2f(0, 0);
 	glVertex3f(-PlankWidth, PlankHeight, -PlankThickness);
@@ -185,6 +177,7 @@ draw_woodplank()
 	glVertex3f(PlankWidth, -PlankHeight, -PlankThickness);
 	glTexCoord2f(0, 1);
 	glVertex3f(-PlankWidth, -PlankHeight, -PlankThickness);
+	MI_POLYGONCOUNT(mi)++;
 	glNormal3f(0, 1, 0);
 	glTexCoord2f(0, 0);
 	glVertex3f(-PlankWidth, PlankHeight, PlankThickness);
@@ -194,6 +187,7 @@ draw_woodplank()
 	glVertex3f(PlankWidth, PlankHeight, -PlankThickness);
 	glTexCoord2f(0, 1);
 	glVertex3f(-PlankWidth, PlankHeight, -PlankThickness);
+	MI_POLYGONCOUNT(mi)++;
 	glNormal3f(0, -1, 0);
 	glTexCoord2f(0, 0);
 	glVertex3f(-PlankWidth, -PlankHeight, -PlankThickness);
@@ -203,6 +197,7 @@ draw_woodplank()
 	glVertex3f(PlankWidth, -PlankHeight, PlankThickness);
 	glTexCoord2f(0, 1);
 	glVertex3f(-PlankWidth, -PlankHeight, PlankThickness);
+	MI_POLYGONCOUNT(mi)++;
 	glNormal3f(1, 0, 0);
 	glTexCoord2f(0, 0);
 	glVertex3f(PlankWidth, -PlankHeight, PlankThickness);
@@ -212,6 +207,7 @@ draw_woodplank()
 	glVertex3f(PlankWidth, PlankHeight, -PlankThickness);
 	glTexCoord2f(0, 1);
 	glVertex3f(PlankWidth, PlankHeight, PlankThickness);
+	MI_POLYGONCOUNT(mi)++;
 	glNormal3f(-1, 0, 0);
 	glTexCoord2f(0, 0);
 	glVertex3f(-PlankWidth, PlankHeight, PlankThickness);
@@ -221,86 +217,87 @@ draw_woodplank()
 	glVertex3f(-PlankWidth, -PlankHeight, -PlankThickness);
 	glTexCoord2f(0, 1);
 	glVertex3f(-PlankWidth, -PlankHeight, PlankThickness);
+	MI_POLYGONCOUNT(mi)++;
 	glEnd();
 
 	return True;
 }
 
 static Bool
-draw_impossiblecage()
+draw_impossiblecage(ModeInfo *mi, cagestruct * cp, int wire)
 {
 	glPushMatrix();
 	glRotatef(90, 0, 1, 0);
 	glTranslatef(0.0, PlankHeight - PlankWidth, -PlankThickness - PlankWidth);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glRotatef(90, 0, 0, 1);
 	glTranslatef(0.0, PlankHeight - PlankWidth, PlankWidth - PlankThickness);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glRotatef(90, 0, 1, 0);
 	glTranslatef(0.0, PlankWidth - PlankHeight, -PlankThickness - PlankWidth);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(0.0, PlankWidth - PlankHeight, 3 * PlankThickness - PlankWidth);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glRotatef(90, 0, 0, 1);
 	glTranslatef(0.0, PlankWidth - PlankHeight, PlankWidth - PlankThickness);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(0.0, PlankWidth - PlankHeight, PlankWidth - 3 * PlankThickness);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(0.0, PlankHeight - PlankWidth, 3 * PlankThickness - PlankWidth);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glRotatef(90, 0, 0, 1);
 	glTranslatef(0.0, PlankHeight - PlankWidth, PlankThickness - PlankWidth);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(0.0, PlankHeight - PlankWidth, PlankWidth - 3 * PlankThickness);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glRotatef(90, 0, 1, 0);
 	glTranslatef(0.0, PlankHeight - PlankWidth, PlankWidth + PlankThickness);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glRotatef(90, 0, 0, 1);
 	glTranslatef(0.0, PlankWidth - PlankHeight, PlankThickness - PlankWidth);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	glPushMatrix();
 	glRotatef(90, 0, 1, 0);
 	glTranslatef(0.0, PlankWidth - PlankHeight, PlankWidth + PlankThickness);
-	if (!draw_woodplank())
+	if (!draw_woodplank(mi, cp, wire))
 		return False;
 	glPopMatrix();
 	return True;
 }
 
-static void
+ENTRYPOINT void
 reshape_cage(ModeInfo * mi, int width, int height)
 {
 	cagestruct *cp = &cage[MI_SCREEN(mi)];
@@ -359,7 +356,7 @@ pinit(ModeInfo *mi)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, front_specular);
 }
 
-void
+ENTRYPOINT void
 release_cage(ModeInfo * mi)
 {
 	if (cage != NULL) {
@@ -380,16 +377,12 @@ release_cage(ModeInfo * mi)
 	FreeAllGL(mi);
 }
 
-void
+ENTRYPOINT void
 init_cage(ModeInfo * mi)
 {
 	cagestruct *cp;
 
-	if (cage == NULL) {
-		if ((cage = (cagestruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (cagestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, cage);
 	cp = &cage[MI_SCREEN(mi)];
 
 	cp->step = NRAND(90);
@@ -403,7 +396,7 @@ init_cage(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_cage(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -416,6 +409,7 @@ draw_cage(ModeInfo * mi)
 	if (!cp->glx_context)
 		return;
 	MI_IS_DRAWN(mi) = True;
+	MI_POLYGONCOUNT(mi) = 0;
 #ifdef WIN32
 	wglMakeCurrent(hdc, cp->glx_context);
 #else
@@ -437,7 +431,7 @@ draw_cage(ModeInfo * mi)
 	glRotatef(cp->step * 100, 0, 0, 1);
 	glRotatef(25 + cos(cp->step * 5) * 6, 1, 0, 0);
 	glRotatef(204.5 - sin(cp->step * 5) * 8, 0, 1, 0);
-	if (!draw_impossiblecage()) {
+	if (!draw_impossiblecage(mi, cp, MI_IS_WIREFRAME(mi))) {
 		release_cage(mi);
 		return;
 	}
@@ -451,7 +445,8 @@ draw_cage(ModeInfo * mi)
 	cp->step += 0.025;
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 change_cage(ModeInfo * mi)
 {
 	cagestruct *cp = &cage[MI_SCREEN(mi)];
@@ -466,5 +461,9 @@ change_cage(ModeInfo * mi)
 #endif
 	pinit(mi);
 }
+#endif
+
+XSCREENSAVER_MODULE ("Cage", cage)
+
 
 #endif

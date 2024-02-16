@@ -1,7 +1,7 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* fire --- 3D fire or rain landscape */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)fire.c	5.02 2001/09/26 xlockmore";
 #endif
 
@@ -75,28 +75,18 @@ static const char sccsid[] = "@(#)fire.c	5.02 2001/09/26 xlockmore";
 
 
 #ifdef STANDALONE	/* xscreensaver mode */
-#define MODE_fire
-#define PROGCLASS 	"Fire"
-#define HACK_INIT 	init_fire
-#define HACK_DRAW 	draw_fire
-#define HACK_RESHAPE 	reshape_fire
-#define fire_opts 	xlockmore_opts
-#define DEFAULTS "*delay:     10000 \n" \
+# define MODE_fire
+# define DEFAULTS	"*delay:     10000 \n" \
 		"*count: 	800 \n" \
 		"*size:           0 \n" \
-		"*trees:          5 \n" \
 		"*showFPS:    False \n" \
-		"*trackmouse: False \n" \
-		"*wander:      True \n" \
 		"*wireframe:  False \n"	\
-		"*fog:        False \n"	\
-		"*shadows:     True \n"	\
-		"*texture:     True \n"
 
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+# define fire_handle_event 0
+# include "xlockmore.h"		/* from the xscreensaver distribution */
 #else				/* !STANDALONE */
-#include "xlock.h"		/* from the xlockmore distribution */
-#include "visgl.h"
+# include "xlock.h"		/* from the xlockmore distribution */
+# include "visgl.h"
 #endif				/* !STANDALONE */
 
 #ifdef MODE_fire
@@ -209,13 +199,13 @@ static OptionStruct desc[] = {
     {(char *) "-trees num", (char *) "number of trees (0 disables)"},
 };
 
-ModeSpecOpt fire_opts =
+ENTRYPOINT ModeSpecOpt fire_opts =
  { sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc };
 
 #ifdef USE_MODULES
 ModStruct fire_description =
     { "fire", "init_fire", "draw_fire", "release_fire",
-    "draw_fire", "change_fire", (char *) NULL, &fire_opts,
+    "draw_fire", "change_fire", "free_fire", &fire_opts,
     10000, 800, 1, 0, 64, 1.0, "",
     "Shows a 3D fire-like image", 0, NULL
 };
@@ -670,7 +660,8 @@ static Bool inittree(ModeInfo * mi)
  *-----------------------------------------------------------------------------
  */
 
-void reshape_fire(ModeInfo * mi, int width, int height)
+ENTRYPOINT void
+reshape_fire(ModeInfo * mi, int width, int height)
 {
 
     firestruct *fs = &fire[MI_SCREEN(mi)];
@@ -926,8 +917,11 @@ static Bool Init(ModeInfo * mi)
 
 
 static void
-free_fire(firestruct *fs)
+free_fire_screen(firestruct *fs)
 {
+	if (fs == NULL) {
+		return;
+	}
 	if (mode_font != None && fs->fontbase != None) {
 		glDeleteLists(fs->fontbase, mode_font->max_char_or_byte2 -
 			mode_font->min_char_or_byte2 + 1);
@@ -956,6 +950,7 @@ free_fire(firestruct *fs)
 		XDestroyImage(fs->gtexture);
 		fs->gtexture = None;
 	}
+	fs = NULL;
 }
 
 /*
@@ -964,18 +959,19 @@ free_fire(firestruct *fs)
  *-----------------------------------------------------------------------------
  */
 
-void
+ENTRYPOINT void
+free_fire(ModeInfo * mi)
+{
+	free_fire_screen(&fire[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_fire(ModeInfo * mi)
 {
     firestruct *fs;
 
     /* allocate the main fire table if needed */
-    if (fire == NULL) {
-	if ((fire = (firestruct *) calloc(MI_NUM_SCREENS(mi),
-					  sizeof(firestruct))) == NULL)
-	    return;
-    }
-
+    MI_INIT(mi, fire);
     /* initialise the per screen fire structure */
     fs = &fire[MI_SCREEN(mi)];
     fs->np = MI_COUNT(mi);
@@ -984,14 +980,14 @@ init_fire(ModeInfo * mi)
     /* initialise fire particles if any */
     if ((fs->np)&&(fs->p == NULL)) {
 	if ((fs->p = (part *) calloc(fs->np, sizeof(part))) == NULL) {
-	    free_fire(fs);
+	    free_fire_screen(fs);
 	    return;
 	}
     }
     else if (fs->r == NULL) {
         /* initialise rain particles if no fire particles */
 	if ((fs->r = (rain *) calloc(NUMPART, sizeof(part))) == NULL) {
-	    free_fire(fs);
+	    free_fire_screen(fs);
 	    return;
 	}
     }
@@ -1011,7 +1007,7 @@ init_fire(ModeInfo * mi)
 	reshape_fire(mi,MI_WIDTH(mi),MI_HEIGHT(mi));
 	glDrawBuffer(GL_BACK);
 	if (!Init(mi)) {
-		free_fire(fs);
+		free_fire_screen(fs);
 		return;
 	}
     } else {
@@ -1024,7 +1020,8 @@ init_fire(ModeInfo * mi)
  *    Called by the mainline code periodically to update the display.
  *-----------------------------------------------------------------------------
  */
-void draw_fire(ModeInfo * mi)
+ENTRYPOINT void
+draw_fire(ModeInfo * mi)
 {
     firestruct *fs = &fire[MI_SCREEN(mi)];
 
@@ -1055,12 +1052,13 @@ void draw_fire(ModeInfo * mi)
  *-----------------------------------------------------------------------------
  */
 
-void release_fire(ModeInfo * mi)
+ENTRYPOINT void
+release_fire(ModeInfo * mi)
 {
     if (fire != NULL) {
     int screen;
 	for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-		free_fire(&fire[screen]);
+		free_fire_screen(&fire[screen]);
 	free(fire);
 	fire = (firestruct *) NULL;
     }
@@ -1073,7 +1071,9 @@ void release_fire(ModeInfo * mi)
     FreeAllGL(mi);
 }
 
-void change_fire(ModeInfo * mi)
+#ifndef STANDALONE
+ENTRYPOINT void
+change_fire(ModeInfo * mi)
 {
     firestruct *fs = &fire[MI_SCREEN(mi)];
 
@@ -1109,4 +1109,8 @@ void change_fire(ModeInfo * mi)
 		       fs->eject_r, fs->ridtri);
     }
 }
+#endif
+
+XSCREENSAVER_MODULE ("Fire", fire)
+
 #endif /* MODE_fire */

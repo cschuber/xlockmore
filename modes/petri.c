@@ -73,22 +73,21 @@ static const char sccsid[] = "@(#)petri.c	5.04 2002/07/19 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_petri
-#define PROGCLASS "Petri"
-#define HACK_INIT init_petri
-#define HACK_DRAW draw_petri
-#define petri_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*size: 4 \n" \
- "*ncolors: 8 \n" \
- "*fullrandom: True \n" \
- "*verbose: False \n"
+	"*size: 4 \n" \
+	"*ncolors: 8 \n" \
+	"*fullrandom: True \n" \
+	"*verbose: False \n" \
+
+# define reshape_petri 0
+# define petri_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #include "color.h"
 #define DO_STIPPLE
-#include "automata.h"
 #endif /* STANDALONE */
+#include "automata.h"
 
 #ifdef MODE_petri
 
@@ -180,13 +179,13 @@ static OptionStruct desc[] =
    {(char *) "-minorchan float", (char *) "The chance on a minor cell birth"}
 };
 
-ModeSpecOpt petri_opts =
+ENTRYPOINT ModeSpecOpt petri_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   petri_description =
 {"petri", "init_petri", "draw_petri", "release_petri",
- "refresh_petri", "init_petri", (char *) NULL, &petri_opts,
+ "refresh_petri", "init_petri", "free_petri", &petri_opts,
  10000, 1, 1, 4, 8, 1.0, "",
  "Shows a mold simulation in a petri dish", 0, NULL};
 
@@ -209,7 +208,7 @@ typedef struct cell_s
 #define PETRIBITS(n,w,h)\
   if ((sp->pixmaps[sp->init_bits]=\
   XCreatePixmapFromBitmapData(display,window,(char *)n,w,h,1,0,1))==None){\
-  free_petri(display,sp); return False;} else {sp->init_bits++;}
+  free_petri_screen(display,sp); return False;} else {sp->init_bits++;}
 
 #define cell_x(c) (((c) - sp->arr) % sp->arr_width)
 #define cell_y(c) (((c) - sp->arr) / sp->arr_width)
@@ -258,10 +257,13 @@ static int random_life_value (petristruct *sp)
 }
 
 static void
-free_petri(Display *display, petristruct *sp)
+free_petri_screen(Display *display, petristruct *sp)
 {
     int n, shade;
 
+    if (sp == NULL) {
+        return;
+    }
     if (sp->coloredGCs != NULL) {
 	for (n = 0; n < sp->count*2; n++)
 		if (sp->coloredGCs[n] != None)
@@ -289,6 +291,13 @@ free_petri(Display *display, petristruct *sp)
 		free(sp->tail);
 		sp->tail = (cell *) NULL;
     }
+    sp = NULL;
+}
+
+ENTRYPOINT void
+free_petri(ModeInfo * mi)
+{
+  free_petri_screen(MI_DISPLAY(mi), &petries[MI_SCREEN(mi)]);
 }
 
 static int setup_random_colormap (ModeInfo * mi)
@@ -298,12 +307,15 @@ static int setup_random_colormap (ModeInfo * mi)
    int ncolors = sp->count - 1;
    int n;
    XColor *colors = (XColor *) NULL;
+#ifdef STANDALONE
+  Screen *screen = MI_SCREENPTR(mi);
+#endif
    Display    *display = MI_DISPLAY(mi);
    Window      window = MI_WINDOW(mi);
 
     colors = (XColor *) calloc (sizeof(*colors), sp->count*2);
     if (colors == NULL) {
-	free_petri(display, sp);
+	free_petri_screen(display, sp);
         return False;
     }
     colors[0].pixel = MI_BLACK_PIXEL(mi);
@@ -313,12 +325,15 @@ static int setup_random_colormap (ModeInfo * mi)
     } else
         make_random_colormap (
 #ifdef STANDALONE
-			  display , window ,
+            screen, MI_VISUAL(mi),
+            sp->cmap, colors + 1, &ncolors,
+            True, True, 0, True
 #else
-			  mi ,
+            mi,
+            sp->cmap, colors + 1, &ncolors,
+            True, True, 0
 #endif
-			  sp->cmap ,
-			  colors+1, &ncolors, True, True, 0);
+            );
     if (ncolors < 1) {
 	sp->mono = True;
     }
@@ -337,7 +352,7 @@ static int setup_random_colormap (ModeInfo * mi)
 	    gcv.fill_style = FillOpaqueStippled;
 	    if ((sp->stippledGC = XCreateGC(display, window, GCFillStyle,
 		   &gcv)) == None) {
-		free_petri(display, sp);
+		free_petri_screen(display, sp);
 		return False;
 	    }
 	}
@@ -414,7 +429,7 @@ static int setup_original_colormap (ModeInfo * mi)
 	    gcv.fill_style = FillOpaqueStippled;
 	    if ((sp->stippledGC = XCreateGC(display, window, GCFillStyle,
 		   &gcv)) == None) {
-		free_petri(display, sp);
+		free_petri_screen(display, sp);
 		return False;
 	    }
 	}
@@ -429,7 +444,7 @@ static int setup_original_colormap (ModeInfo * mi)
 
     colors = (XColor *) calloc (sizeof(*colors), sp->count*2);
     if (colors == NULL) {
-	free_petri(display, sp);
+	free_petri_screen(display, sp);
         return False;
     }
     colors[0].pixel = MI_BLACK_PIXEL(mi);
@@ -516,7 +531,7 @@ static int setup_display (ModeInfo * mi)
           {
             (void) fprintf (stderr,
 		     "petri: invalid memThrottle \"%s\" (try \"10M\")\n", s);
-            free_petri(display, sp);
+            free_petri_screen(display, sp);
 	    return False;
           }
 
@@ -545,7 +560,7 @@ static int setup_display (ModeInfo * mi)
 
     sp->coloredGCs = (GC *) calloc (sizeof(GC), sp->count * 2);
     if (sp->coloredGCs == NULL) {
-	free_petri(display, sp);
+	free_petri_screen(display, sp);
         return False;
     }
 
@@ -810,7 +825,7 @@ static int setup_arr (ModeInfo * mi)
       {
         (void) fprintf (stderr, "petri: out of memory allocating %dx%d grid\n",
                  sp->arr_width, sp->arr_height);
-	free_petri(display, sp);
+	free_petri_screen(display, sp);
         return False;
       }
 
@@ -835,7 +850,7 @@ static int setup_arr (ModeInfo * mi)
       {
         (void) fprintf (stderr, "petri: out of memory allocating %dx%d grid\n",
                  sp->arr_width, sp->arr_height);
-	free_petri(display, sp);
+	free_petri_screen(display, sp);
         return False;
     }
     }
@@ -847,7 +862,7 @@ static int setup_arr (ModeInfo * mi)
       {
         (void) fprintf (stderr, "petri: out of memory allocating %dx%d grid\n",
                  sp->arr_width, sp->arr_height);
-	free_petri(display, sp);
+	free_petri_screen(display, sp);
         return False;
     }
     }
@@ -951,7 +966,8 @@ static int randblip (ModeInfo * mi , int doit)
     return True;
 }
 
-void draw_petri (ModeInfo * mi)
+ENTRYPOINT void
+draw_petri (ModeInfo * mi)
 {
    petristruct *sp = &petries[MI_SCREEN(mi)];
     cell *a;
@@ -1032,7 +1048,7 @@ void draw_petri (ModeInfo * mi)
     }
 }
 
-void
+ENTRYPOINT void
 init_petri(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -1054,13 +1070,9 @@ init_petri(ModeInfo * mi)
      }
 
 /* initialize */
-	if (petries == NULL) {
-		if ((petries = (petristruct *) calloc(MI_NUM_SCREENS(mi),
-					   sizeof (petristruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, petries);
 	sp = &petries[MI_SCREEN(mi)];
-	free_petri(display, sp);
+	free_petri_screen(display, sp);
         sp->redrawing = 0;
         if (!setup_display(mi))
 	   return;
@@ -1070,20 +1082,21 @@ init_petri(ModeInfo * mi)
     (void) randblip (mi , 1);
 }
 
-void
+ENTRYPOINT void
 release_petri(ModeInfo * mi)
 {
    if (petries != NULL) {
       int screen;
 
       for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-	free_petri(MI_DISPLAY(mi), &petries[screen]);
+	free_petri_screen(MI_DISPLAY(mi), &petries[screen]);
       free(petries);
       petries = (petristruct *) NULL;
    }
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_petri(ModeInfo * mi)
 {
   petristruct *sp;
@@ -1095,6 +1108,7 @@ refresh_petri(ModeInfo * mi)
   sp->redrawing = 1;
   sp->redrawpos = 0;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Petri", petri)
 

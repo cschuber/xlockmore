@@ -40,21 +40,20 @@ static const char sccsid[] = "@(#)worm.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_worm
-#define PROGCLASS "Worm"
-#define HACK_INIT init_worm
-#define HACK_DRAW draw_worm
-#define worm_opts xlockmore_opts
 #define DEFAULTS "*delay: 17000 \n" \
- "*count: -20 \n" \
- "*cycles: 10 \n" \
- "*size: -3 \n" \
- "*ncolors: 200 \n" \
- "*use3d: False \n" \
- "*delta3d: 1.5 \n" \
- "*right3d: red \n" \
- "*left3d: blue \n" \
- "*both3d: magenta \n" \
- "*none3d: black \n"
+	"*count: -20 \n" \
+	"*cycles: 10 \n" \
+	"*size: -3 \n" \
+	"*ncolors: 200 \n" \
+	"*use3d: False \n" \
+	"*delta3d: 1.5 \n" \
+	"*right3d: red \n" \
+	"*left3d: blue \n" \
+	"*both3d: magenta \n" \
+	"*none3d: black \n" \
+
+# define reshape_worm 0
+# define worm_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -63,13 +62,13 @@ static const char sccsid[] = "@(#)worm.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_worm
 
-ModeSpecOpt worm_opts =
+ENTRYPOINT ModeSpecOpt worm_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   worm_description =
 {"worm", "init_worm", "draw_worm", "release_worm",
- "refresh_worm", "init_worm", (char *) NULL, &worm_opts,
+ "refresh_worm", "init_worm", "free_worm", &worm_opts,
  17000, -20, 10, -3, 64, 1.0, "",
  "Shows wiggly worms", 0, NULL};
 
@@ -255,10 +254,13 @@ worm_doit(ModeInfo * mi, int which, unsigned long color)
 }
 
 static void
-free_worm(wormstruct * wp)
+free_worm_screen(wormstruct * wp)
 {
 	int         wn;
 
+	if (wp == NULL) {
+		return;
+	}
 	if (wp->worm) {
 		for (wn = 0; wn < wp->nw; wn++) {
 			if (wp->worm[wn].circ)
@@ -277,27 +279,30 @@ free_worm(wormstruct * wp)
 		free(wp->size);
 		wp->size = (int *) NULL;
 	}
+	wp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_worm(ModeInfo * mi)
+{
+        free_worm_screen(&worms[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_worm(ModeInfo * mi)
 {
 	wormstruct *wp;
 	int         size = MI_SIZE(mi);
 	int         i, j;
 
-	if (worms == NULL) {
-		if ((worms = (wormstruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (wormstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, worms);
 	wp = &worms[MI_SCREEN(mi)];
 	if (MI_NPIXELS(mi) <= 2 || MI_IS_USE3D(mi))
 		wp->nc = 2;
 	else
 		wp->nc = MI_NPIXELS(mi);
 
-	free_worm(wp);
+	free_worm_screen(wp);
 	wp->nw = MI_COUNT(mi);
 	if (wp->nw < -MINWORMS)
 		wp->nw = NRAND(-wp->nw - MINWORMS + 1) + MINWORMS;
@@ -306,14 +311,14 @@ init_worm(ModeInfo * mi)
 	if (!wp->worm)
 		if ((wp->worm = (wormstuff *) malloc(wp->nw *
 				sizeof (wormstuff))) == NULL) {
-			free_worm(wp);
+			free_worm_screen(wp);
 			return;
 		}
 
 	if (!wp->size)
 		if ((wp->size = (int *) malloc(MI_NPIXELS(mi) *
 				sizeof (int))) == NULL) {
-			free_worm(wp);
+			free_worm_screen(wp);
 			return;
 		}
 
@@ -321,7 +326,7 @@ init_worm(ModeInfo * mi)
 	if (!wp->rects)
 		if ((wp->rects = (XRectangle *) malloc(wp->maxsize * MI_NPIXELS(mi) *
 				sizeof (XRectangle))) == NULL) {
-			free_worm(wp);
+			free_worm_screen(wp);
 			return;
 		}
 
@@ -363,7 +368,7 @@ init_worm(ModeInfo * mi)
 				sizeof (XPoint))) == NULL) ||
 		    ((wp->worm[i].diffcirc = (int *) malloc(wp->wormlength *
 				sizeof (int))) == NULL)) {
-			free_worm(wp);
+			free_worm_screen(wp);
 			return;
 		}
 
@@ -389,7 +394,7 @@ init_worm(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_worm(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -437,20 +442,21 @@ draw_worm(ModeInfo * mi)
 		wp->chromo = 0;
 }
 
-void
+ENTRYPOINT void
 release_worm(ModeInfo * mi)
 {
 	if (worms != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_worm(&worms[screen]);
+			free_worm_screen(&worms[screen]);
 		free(worms);
 		worms = (wormstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_worm(ModeInfo * mi)
 {
 	if (MI_IS_INSTALL(mi) && MI_IS_USE3D(mi)) {
@@ -471,6 +477,7 @@ refresh_worm(ModeInfo * mi)
 		}
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Worm", worm)
 

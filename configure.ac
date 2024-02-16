@@ -5013,6 +5013,8 @@ if test "$modules" = yes; then
 case ${canonical} in
     *-*-linux* )
       MODULEFLAGS="-rdynamic"
+      CFLAGS="$CFLAGS -fPIC"
+      CXXFLAGS="$CXXFLAGS -fPIC"
       ;;
     *)
       MODULEFLAGS=""

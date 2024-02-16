@@ -7,7 +7,7 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
 #endif
 
 /*-
- * Copyright (c) 2002 by Edwin de Jong <mauddib@gmx.net>.
+ * Copyright (c) 2002 by Edwin de Jong <mauddib AT gmx.net>.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted,
@@ -40,25 +40,23 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
 */
 
 #ifdef STANDALONE
-#	define MODE_pacman
-#	define PROGCLASS "Pacman"
-#	define HACK_INIT init_pacman
-#	define HACK_DRAW draw_pacman
-#	define pacman_opts xlockmore_opts
-#	define DEFAULTS "*delay: 10000 \n" \
- 			"*count: 10 \n" \
- 			"*size: 0 \n" \
- 			"*ncolors: 6 \n" \
- 			"*bitmap: \n" \
-			"*trackmouse: False \n"
-#	define UNIFORM_COLORS
-#	define BRIGHT_COLORS
-#	include "xlockmore.h"		/* in xscreensaver distribution */
+# define MODE_pacman
+# define DEFAULTS	"*delay: 10000 \n" \
+		 	"*size: 0 \n" \
+		 	"*ncolors: 6 \n" \
+			"*fpsTop: true   \n" \
+			"*fpsSolid: true \n" \
+
+# define reshape_pacman 0
+# define pacman_handle_event 0
+# define UNIFORM_COLORS
+# define BRIGHT_COLORS
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#	include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
+# include "iostuff.h"
 #endif /* STANDALONE */
 
-#include "iostuff.h"
 #include <stdlib.h>
 #include <math.h>
 
@@ -69,13 +67,8 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
 #include "pacman_level.h"
 
 #ifdef DISABLE_INTERACTIVE
-ModeSpecOpt pacman_opts = {
-	0,
-	(XrmOptionDescRec *) NULL,
-	0,
-	(argtype *) NULL,
-	(OptionStruct *) NULL
-};
+ENTRYPOINT ModeSpecOpt pacman_opts =
+{0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 #else
 static XrmOptionDescRec opts[] =
 {
@@ -97,7 +90,7 @@ static OptionStruct desc[] =
 		"mouse"}
 };
 
-ModeSpecOpt pacman_opts =
+ENTRYPOINT ModeSpecOpt pacman_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 #endif
 
@@ -109,14 +102,14 @@ ModStruct   pacman_description = {
 	"release_pacman",	/* *release_name; */
  	"refresh_pacman", 	/* *refresh_name; */
 	"change_pacman", 	/* *change_name; */
-	(char *) NULL, 		/* *unused_name; */
+	"free_pacman", 		/* *unused_name; */
 	&pacman_opts,		/* *msopts */
  	10000, 4, 1, 0, 64, 1.0, "", "Shows Pacman(tm)", 0, NULL
 };
 
 #endif
 static void
-free_pacman(Display *display, pacmangamestruct *pp)
+free_pacman_screen(Display *display, pacmangamestruct *pp)
 {
 	int         dir, mouth;
 
@@ -139,6 +132,12 @@ free_pacman(Display *display, pacmangamestruct *pp)
 					pp->pacmanPixmap[dir][mouth]);
 				pp->pacmanPixmap[dir][mouth] = None;
 			}
+}
+
+ENTRYPOINT void
+free_pacman(ModeInfo * mi)
+{
+	free_pacman_screen(MI_DISPLAY(mi), &pacmangames[MI_SCREEN(mi)]);
 }
 
 /* Checks for death of any ghosts/pacman and updates.  It also makes a new
@@ -277,8 +276,10 @@ drawlevelblock(ModeInfo * mi, pacmangamestruct *pp,
 	Window      window = MI_WINDOW(mi);
 	int dx = 0, dy = 0;
 
-	if (pp->xs % 2 == 1) dx = -1;
-	if (pp->ys % 2 == 1) dy = -1;
+	if (pp->xs % 2 == 1)
+		dx = -1;
+	if (pp->ys % 2 == 1)
+		dy = -1;
 
 	XSetFillStyle(display, pp->stippledGC, FillSolid);
 	XSetLineAttributes(display, pp->stippledGC, pp->wallwidth,
@@ -286,111 +287,111 @@ drawlevelblock(ModeInfo * mi, pacmangamestruct *pp,
 
 	if (pp->xs < 2 || pp->ys < 2) {
 		switch(pp->level[y*LEVWIDTH + x]) {
-			case ' ':
-			case '=':
-				break;
-			case '.':
-				setdotcolor(mi);
-				(void)XDrawPoint(display, window,
-						 pp->stippledGC,
-						 x * pp->xs + pp->xb,
-						 y * pp->ys + pp->yb);
-				break;
-			default:
-				setwallcolor(mi);
-				(void)XDrawPoint(display, window,
-						 pp->stippledGC,
-						 x * pp->xs + pp->xb,
-						 y * pp->ys + pp->yb);
+		case ' ':
+		case '=':
+			break;
+		case '.':
+			setdotcolor(mi);
+			(void)XDrawPoint(display, window,
+					 pp->stippledGC,
+					 x * pp->xs + pp->xb,
+					 y * pp->ys + pp->yb);
+			break;
+		default:
+			setwallcolor(mi);
+			(void)XDrawPoint(display, window,
+					 pp->stippledGC,
+					 x * pp->xs + pp->xb,
+					 y * pp->ys + pp->yb);
 		}
 
 		return;
 	}
 
 	switch (pp->level[y*LEVWIDTH + x]) {
-		case ' ':
-		case '=':
-			break;
+	case ' ':
+	case '=':
+		break;
 
-		case '.':
-			setdotcolor(mi);
-			if (pp->xs < 8 || pp->ys < 8) {
-				(void)XDrawPoint(display, window,
-						 pp->stippledGC,
-						 x * pp->xs + pp->xb +
-						 pp->xs/2,
-						 y * pp->ys + pp->yb +
-						 pp->ys/2);
-				break;
-			}
-
-			(void)XDrawArc(display, window, pp->stippledGC,
-				(pp->xs * x) +
-					(pp->xs / 2) -
-					(pp->xs > 32 ? (pp->xs / 16) : 1) +
-					pp->xb,
-				(pp->ys * y) +
-					(pp->ys / 2) -
-					(pp->ys > 32 ? (pp->ys / 16) : 1) +
-					pp->yb,
-				(pp->xs > 32 ? (pp->xs / 32) : 1),
-				(pp->ys > 32 ? (pp->ys / 32) : 1),
-				0, 23040);
+	case '.':
+		setdotcolor(mi);
+		if (pp->xs < 8 || pp->ys < 8) {
+			(void)XDrawPoint(display, window,
+					 pp->stippledGC,
+					 x * pp->xs + pp->xb +
+					 pp->xs/2,
+					 y * pp->ys + pp->yb +
+					 pp->ys/2);
 			break;
+		}
 
-		case '-':
-			setwallcolor(mi);
-			(void)XDrawLine(display, window, pp->stippledGC,
-				(pp->xs * x) + pp->xb,
-				(pp->ys * y) + (pp->ys / 2) + pp->yb,
-				(pp->xs * (x + 1)) + pp->xb,
-				(pp->ys * y) + (pp->ys / 2) + pp->yb);
-			break;
+		(void)XDrawArc(display, window, pp->stippledGC,
+			(pp->xs * x) +
+				(pp->xs / 2) -
+				(pp->xs > 32 ? (pp->xs / 16) : 1) +
+				pp->xb,
+			(pp->ys * y) +
+				(pp->ys / 2) -
+				(pp->ys > 32 ? (pp->ys / 16) : 1) +
+				pp->yb,
+			(pp->xs > 32 ? (pp->xs / 32) : 1),
+			(pp->ys > 32 ? (pp->ys / 32) : 1),
+			0, 23040);
+		break;
 
-		case '|':
-			setwallcolor(mi);
-			(void)XDrawLine(display, window, pp->stippledGC,
-				(pp->xs * x) + (pp->xs / 2) + pp->xb,
-				(pp->ys * y) + pp->yb,
-				(pp->xs * x) + (pp->xs / 2) + pp->xb,
-				(pp->ys * (y + 1)) + pp->yb);
-			break;
+	case '-':
+		setwallcolor(mi);
+		(void)XDrawLine(display, window, pp->stippledGC,
+			(pp->xs * x) + pp->xb,
+			(pp->ys * y) + (pp->ys / 2) + pp->yb,
+			(pp->xs * (x + 1)) + pp->xb,
+			(pp->ys * y) + (pp->ys / 2) + pp->yb);
+		break;
 
-		case '_':
-			setwallcolor(mi);
-			(void)XDrawArc(display, window, pp->stippledGC,
-				(pp->xs * x) - (pp->ys / 2) + pp->xb + dx,
-				(pp->ys * y) + (pp->ys / 2) + pp->yb,
-				pp->xs, pp->ys,
-				0*64, 90*64);
-			break;
+	case '|':
+		setwallcolor(mi);
+		(void)XDrawLine(display, window, pp->stippledGC,
+			(pp->xs * x) + (pp->xs / 2) + pp->xb,
+			(pp->ys * y) + pp->yb,
+			(pp->xs * x) + (pp->xs / 2) + pp->xb,
+			(pp->ys * (y + 1)) + pp->yb);
+		break;
 
-		case ',':
-			setwallcolor(mi);
-			(void)XDrawArc(display, window, pp->stippledGC,
-				(pp->xs * x) + (pp->ys / 2) + pp->xb,
-				(pp->ys * y) + (pp->ys / 2) + pp->yb,
-				pp->xs, pp->ys,
-				90*64, 90*64);
-			break;
+	case '_':
+		setwallcolor(mi);
+		(void)XDrawArc(display, window, pp->stippledGC,
+			(pp->xs * x) - (pp->ys / 2) + pp->xb + dx,
+			(pp->ys * y) + (pp->ys / 2) + pp->yb,
+			pp->xs, pp->ys,
+			0*64, 90*64);
+		break;
 
-		case '`':
-			setwallcolor(mi);
-			(void)XDrawArc(display, window, pp->stippledGC,
-				(pp->xs * x) + (pp->ys / 2) + pp->xb,
-				(pp->ys * y) - (pp->ys / 2) + pp->yb + dy,
-				pp->xs, pp->ys,
-				180*64, 90*64);
-			break;
+	case ',':
+		setwallcolor(mi);
+		(void)XDrawArc(display, window, pp->stippledGC,
+			(pp->xs * x) + (pp->ys / 2) + pp->xb,
+			(pp->ys * y) + (pp->ys / 2) + pp->yb,
+			pp->xs, pp->ys,
+			90*64, 90*64);
+		break;
 
-		case '\'':
-			setwallcolor(mi);
-			(void)XDrawArc(display, window, pp->stippledGC,
-				(pp->xs * x) - (pp->ys / 2) + pp->xb + dx,
-				(pp->ys * y) - (pp->ys / 2) + pp->yb + dy,
-				pp->xs, pp->ys,
-				270*64, 90*64);
-			break;
+	case '`':
+		setwallcolor(mi);
+		(void)XDrawArc(display, window, pp->stippledGC,
+			(pp->xs * x) + (pp->ys / 2) + pp->xb,
+			(pp->ys * y) - (pp->ys / 2) + pp->yb + dy,
+			pp->xs, pp->ys,
+			180*64, 90*64);
+		break;
+
+	case '\'':
+		setwallcolor(mi);
+		(void)XDrawArc(display, window, pp->stippledGC,
+			(pp->xs * x) - (pp->ys / 2) + pp->xb + dx,
+			(pp->ys * y) - (pp->ys / 2) + pp->yb + dy,
+			pp->xs, pp->ys,
+			270*64, 90*64);
+		break;
 
 	}
 }
@@ -576,7 +577,7 @@ pacman_tick(ModeInfo * mi)
 }
 
 /* Hook function, sets state to initial position. */
-void
+ENTRYPOINT void
 init_pacman(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -588,12 +589,7 @@ init_pacman(ModeInfo * mi)
 	GC          fg_gc, bg_gc;
 	XPoint	    points[9];
 
-	if (pacmangames == NULL) {
-		if ((pacmangames = (pacmangamestruct *)
-					calloc((size_t)MI_NUM_SCREENS(mi),
-					 sizeof (pacmangamestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, pacmangames);
 	pp = &pacmangames[MI_SCREEN(mi)];
 
 	pp->width = (unsigned short)MI_WIDTH(mi);
@@ -601,7 +597,7 @@ init_pacman(ModeInfo * mi)
 	if (pp->ghostPixmap != None) {
 		XFreePixmap(display, pp->ghostPixmap);
 		pp->ghostPixmap = None;
-		pp->graphics_format = IS_NONE;
+		pp->graphics_format = 0 /*IS_NONE */ ;
 	}
 
 	if (size == 0 ||
@@ -625,7 +621,8 @@ init_pacman(ModeInfo * mi)
 	}
 
 	pp->wallwidth = (unsigned int)(pp->xs + pp->ys) >> 4;
-	if (pp->wallwidth < 1) pp->wallwidth = 1;
+	if (pp->wallwidth < 1)
+		pp->wallwidth = 1;
 	pp->incx = (pp->xs >> 3) + 1;
 	pp->incy = (pp->ys >> 3) + 1;
 	pp->ncols = (unsigned short)MAX(LEVWIDTH, 2);
@@ -639,7 +636,7 @@ init_pacman(ModeInfo * mi)
 
 	if ((pp->ghostPixmap = XCreatePixmap(display, window,
 		pp->spritexs, pp->spriteys, 1)) == None) {
-		free_pacman(display, pp);
+		free_pacman_screen(display, pp);
 		return;
 	}
 
@@ -647,7 +644,7 @@ init_pacman(ModeInfo * mi)
 	gcv.background = 1;
 	if ((bg_gc = XCreateGC(display, pp->ghostPixmap,
 			GCForeground | GCBackground, &gcv)) == None) {
-		free_pacman(display, pp);
+		free_pacman_screen(display, pp);
 		return;
 	}
 
@@ -656,7 +653,7 @@ init_pacman(ModeInfo * mi)
 	if ((fg_gc = XCreateGC(display, pp->ghostPixmap,
 			GCForeground | GCBackground, &gcv)) == None) {
 		XFreeGC(display, bg_gc);
-		free_pacman(display, pp);
+		free_pacman_screen(display, pp);
 		return;
 	}
 
@@ -687,7 +684,7 @@ init_pacman(ModeInfo * mi)
 		gcv.background = MI_BLACK_PIXEL(mi);
 		if ((pp->stippledGC = XCreateGC(display, window,
 				GCForeground | GCBackground, &gcv)) == None) {
-			free_pacman(display, pp);
+			free_pacman_screen(display, pp);
 			return;
 		}
 	}
@@ -704,14 +701,14 @@ init_pacman(ModeInfo * mi)
 					display, MI_WINDOW(mi),
 					pp->spritexs, pp->spriteys, 1)) ==
 					None) {
-				free_pacman(display, pp);
+				free_pacman_screen(display, pp);
 				return;
 			}
 			gcv.foreground = 1;
 			gcv.background = 0;
 			if ((fg_gc = XCreateGC(display, pp->pacmanPixmap[dir][mouth],
 					GCForeground | GCBackground, &gcv)) == None) {
-				free_pacman(display, pp);
+				free_pacman_screen(display, pp);
 				return;
 			}
 			gcv.foreground = 0;
@@ -722,7 +719,7 @@ init_pacman(ModeInfo * mi)
 						GCBackground, &gcv)) ==
 					None) {
         			XFreeGC(display, fg_gc);
-				free_pacman(display, pp);
+				free_pacman_screen(display, pp);
 				return;
 			}
 			XFillRectangle(display,
@@ -758,7 +755,7 @@ init_pacman(ModeInfo * mi)
 	if (!pp->ghosts)
 		if ((pp->ghosts = (ghoststruct *) calloc((size_t)pp->nghosts,
 				sizeof (ghoststruct))) == NULL) {
-			free_pacman(display, pp);
+			free_pacman_screen(display, pp);
 			return;
 		}
 
@@ -770,7 +767,7 @@ init_pacman(ModeInfo * mi)
 
 /* Callback function called for each tick.  This is the complete machinery of
    everything that moves. */
-void
+ENTRYPOINT void
 draw_pacman(ModeInfo * mi)
 {
 	unsigned int g;
@@ -824,25 +821,29 @@ draw_pacman(ModeInfo * mi)
 			pp->ghosts[g].delta.y = pp->ys + pp->incy;
 	}
 
+#ifdef STANDALONE
+	drawlevel(mi);
+#endif
 	pacman_tick(mi);
 }
 
 /* Releases resources. */
-void
+ENTRYPOINT void
 release_pacman(ModeInfo * mi)
 {
 	if (pacmangames != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_pacman(MI_DISPLAY(mi), &pacmangames[screen]);
+			free_pacman_screen(MI_DISPLAY(mi), &pacmangames[screen]);
 		free(pacmangames);
 		pacmangames = (pacmangamestruct *) NULL;
 	}
 }
 
+#ifndef STANDALONE
 /* Refresh current level. */
-void
+ENTRYPOINT void
 refresh_pacman(ModeInfo * mi)
 {
 	drawlevel(mi);
@@ -850,12 +851,13 @@ refresh_pacman(ModeInfo * mi)
 }
 
 /* Callback to change level. */
-void
+ENTRYPOINT void
 change_pacman(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 	repopulate(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Pacman", pacman)
 

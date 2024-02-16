@@ -46,14 +46,14 @@ static const char sccsid[] = "@(#)helix.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_helix
-#define PROGCLASS "Helix"
-#define HACK_INIT init_helix
-#define HACK_DRAW draw_helix
-#define helix_opts xlockmore_opts
 #define DEFAULTS "*delay: 25000 \n" \
- "*cycles: 100 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n"
+	"*cycles: 100 \n" \
+	"*ncolors: 200 \n" \
+	"*fullrandom: True \n" \
+
+# define free_helix 0
+# define reshape_helix 0
+# define helix_handle_event 0
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -81,7 +81,7 @@ static OptionStruct desc[] =
 	{(char *) "-/+ellipse", (char *) "turn on/off ellipse format"}
 };
 
-ModeSpecOpt helix_opts =
+ENTRYPOINT ModeSpecOpt helix_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -282,18 +282,14 @@ random_trig(ModeInfo * mi)
 	trig(mi);
 }
 
-void
+ENTRYPOINT void
 init_helix(ModeInfo * mi)
 {
 	int         i;
 	static int  first = 1;
 	helixstruct *hp;
 
-	if (helixes == NULL) {
-		if ((helixes = (helixstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (helixstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, helixes);
 	hp = &helixes[MI_SCREEN(mi)];
 
 	if (first) {
@@ -326,7 +322,7 @@ init_helix(ModeInfo * mi)
 		random_helix(mi);
 }
 
-void
+ENTRYPOINT void
 draw_helix(ModeInfo * mi)
 {
 	helixstruct *hp;
@@ -351,7 +347,7 @@ draw_helix(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_helix(ModeInfo * mi)
 {
 	if (helixes != NULL) {
@@ -360,7 +356,8 @@ release_helix(ModeInfo * mi)
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_helix(ModeInfo * mi)
 {
 	helixstruct *hp;
@@ -376,6 +373,7 @@ refresh_helix(ModeInfo * mi)
 		hp->painted = False;
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Helix", helix)
 

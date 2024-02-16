@@ -31,14 +31,14 @@ static const char sccsid[] = "@(#)forest.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_forest
-#define PROGCLASS "Forest"
-#define HACK_INIT init_forest
-#define HACK_DRAW draw_forest
-#define forest_opts xlockmore_opts
 #define DEFAULTS "*delay: 400000 \n" \
- "*count: 100 \n" \
- "*cycles: 200 \n" \
- "*ncolors: 100 \n"
+	"*count: 100 \n" \
+	"*cycles: 200 \n" \
+	"*ncolors: 100 \n" \
+
+# define free_forest 0
+# define reshape_forest 0
+# define forest_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -48,7 +48,7 @@ static const char sccsid[] = "@(#)forest.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_forest
 
-ModeSpecOpt forest_opts =
+ENTRYPOINT ModeSpecOpt forest_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -141,16 +141,12 @@ draw_tree(ModeInfo * mi,
 	}
 }
 
-void
+ENTRYPOINT void
 init_forest(ModeInfo * mi)
 {
 	foreststruct *fp;
 
-	if (forests == NULL) {
-		if ((forests = (foreststruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (foreststruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, forests);
 	fp = &forests[MI_SCREEN(mi)];
 
 	fp->width = MI_WIDTH(mi);
@@ -166,7 +162,7 @@ init_forest(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_forest(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -208,7 +204,7 @@ draw_forest(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_forest(ModeInfo * mi)
 {
 	if (forests != NULL) {
@@ -217,11 +213,13 @@ release_forest(ModeInfo * mi)
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_forest(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif 
 
 XSCREENSAVER_MODULE ("Forest", forest)
 

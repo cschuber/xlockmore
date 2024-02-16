@@ -59,14 +59,14 @@ static const char sccsid[] = "@(#)sphere.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_sphere
-#define PROGCLASS "Sphere"
-#define HACK_INIT init_sphere
-#define HACK_DRAW draw_sphere
-#define sphere_opts xlockmore_opts
 #define DEFAULTS "*delay: 5000 \n" \
- "*cycles: 20 \n" \
- "*size: 0 \n" \
- "*ncolors: 64 \n"
+	"*cycles: 20 \n" \
+	"*size: 0 \n" \
+	"*ncolors: 64 \n" \
+
+# define free_sphere 0
+# define reshape_sphere 0
+# define sphere_handle_event 0
 #define BRIGHT_COLORS
 #include "xlockmore.h"		/* from the xscreensaver distribution */
 #else /* !STANDALONE */
@@ -75,13 +75,13 @@ static const char sccsid[] = "@(#)sphere.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_sphere
 
-ModeSpecOpt sphere_opts =
+ENTRYPOINT ModeSpecOpt sphere_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   sphere_description =
 {"sphere", "init_sphere", "draw_sphere", "release_sphere",
- "refresh_sphere", "init_sphere", (char *) NULL, &sphere_opts,
+ "refresh_sphere", "init_sphere", "free_sphere", &sphere_opts,
  5000, 1, 20, 0, 64, 1.0, "",
  "Shows a bunch of shaded spheres", 0, NULL};
 
@@ -111,16 +111,24 @@ typedef struct {
 
 static spherestruct *spheres = (spherestruct *) NULL;
 
-void
+static void
+free_sphere_screen(spherestruct *sp) {
+	if (sp == NULL) {
+		return;
+	}
+	if (sp->points) {
+		free(sp->points);
+		/* sp->points = NULL; */
+	}
+	sp = NULL;
+}
+
+ENTRYPOINT void
 init_sphere(ModeInfo * mi)
 {
 	spherestruct *sp;
 
-	if (spheres == NULL) {
-		if ((spheres = (spherestruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (spherestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, spheres);
 	sp = &spheres[MI_SCREEN(mi)];
 
 	if (sp->points != NULL) {
@@ -142,7 +150,7 @@ init_sphere(ModeInfo * mi)
 	sp->shadowy = (LRAND() & 1) ? 1 : -1;
 }
 
-void
+ENTRYPOINT void
 draw_sphere(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -271,26 +279,22 @@ draw_sphere(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_sphere(ModeInfo * mi)
 {
 	if (spheres != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			spherestruct *sp = &spheres[screen];
-
-			if (sp->points) {
-				free(sp->points);
-				/* sp->points = NULL; */
-			}
+			free_sphere_screen(&spheres[screen]);
 		}
 		free(spheres);
 		spheres = (spherestruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_sphere(ModeInfo * mi)
 {
 	spherestruct *sp;
@@ -303,6 +307,7 @@ refresh_sphere(ModeInfo * mi)
 
 	sp->x = -sp->radius;
 }
+#endif
 
 XSCREENSAVER_MODULE ("Sphere", sphere)
 

@@ -62,10 +62,10 @@ CXG = $(CX) $(DG)
 @GL@ATUNNELSOBJS = $(DOG)tunnel_draw$(O)
 @GL@BUBBLE3DOBJS = $(DOG)b_draw$(OG)b_sphere$(OG)b_lockglue$(O)
 @GL@GLPLANETOBJS = $(DOG)sphere$(O)
-@GL@MAZE3DOBJS = $(DOG)ximage-loader$(O)
-@GL@MOLECULEOBJS = $(DOG)tube$(OG)sphere$(O)
 @GL@JUGGLER3DOBJS = $(DOG)tube$(OG)sphere$(OG)rotator$(O)$(S)\
 @GL@$(DOG)glxfonts$(OG)gltrackball$(OG)trackball$(O)
+@GL@MAZE3DOBJS = $(DOG)ximage-loader$(O)
+@GL@MOLECULEOBJS = $(DOG)tube$(OG)sphere$(O)
 @GL@XLOCKDEPGLOBJS = $(DOG)xpm-ximage$(OG)pipeobjs$(O)$(S)\
 @GL@$(SPROINGIESOBJS)$(S)$(ATLANTISOBJS)$(S)$(ATUNNELSOBJS)$(S)\
 @GL@$(BUBBLE3DOBJS)$(S)$(JUGGLER3DOBJS)$(S)\
@@ -78,7 +78,7 @@ CXG = $(CX) $(DG)
 @GL@XLOCKMULTGLOBJS = $(DOG)fire$(OG)lament$(OG)sballs$(OG)molecule$(O)$(S)\
 @GL@$(DOG)pipes$(OG)sproingies$(OG)atlantis$(OG)atunnels$(O)$(S)\
 @GL@boxed$(OG)bubble3d$(OG)glplanet$(OG)juggler3d$(O)$(S)\
-@GL@maze3d$(OG)ximage-loader$(OG)$(XLOCKMULTCPPGLOBJS)
+@GL@maze3d$(OG)$(XLOCKMULTCPPGLOBJS)
 XLOCKGLOBJS = $(XLOCKNORMGLOBJS)$(S)\
 $(XLOCKDEPGLOBJS)$(S)$(XLOCKMULTGLOBJS)
 
@@ -441,7 +441,6 @@ $(GLOBJDIR)/b_lockglue.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/b_lockglue.o: $(top_objdir)/config.h
 $(GLOBJDIR)/b_lockglue.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/b_lockglue.o: $(UTILDIR)/random.h
-$(GLOBJDIR)/b_lockglue.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/b_lockglue.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/invert.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/invert.o: $(top_objdir)/config.h

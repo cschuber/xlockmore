@@ -40,22 +40,21 @@ static const char sccsid[] = "@(#)tik_tak.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_tik_tak
-#define PROGCLASS "Tik_Tak"
-#define HACK_INIT init_tik_tak
-#define HACK_DRAW draw_tik_tak
-#define tik_tak_opts xlockmore_opts
-#define DEFAULTS "*delay: 60000 \n" \
- "*count: -20 \n" \
- "*cycles: 200 \n" \
- "*size: -1000 \n" \
- "*ncolors: 64 \n" \
- "*fullrandom: True \n" \
- "*verbose: False \n"
+# define MODE_tik_tak
+# define DEFAULTS "*delay: 60000 \n" \
+	"*count: -20 \n" \
+	"*cycles: 200 \n" \
+	"*size: -1000 \n" \
+	"*ncolors: 64 \n" \
+	"*fullrandom: True \n" \
+	"*verbose: False \n" \
+
+# define reshape_tik_tak 0
+# define tik_tak_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
-#include "color.h"
+# include "xlock.h"		/* in xlockmore distribution */
+# include "color.h"
 #endif /* STANDALONE */
 
 #ifdef MODE_tik_tak
@@ -81,13 +80,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+cycle", (char *) "turn on/off colour cycling"}
 };
 
-ModeSpecOpt tik_tak_opts =
+ENTRYPOINT ModeSpecOpt tik_tak_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   tik_tak_description =
 {"tik_tak", "init_tik_tak", "draw_tik_tak", "release_tik_tak",
- "refresh_tik_tak", "init_tik_tak", (char *) NULL, &tik_tak_opts,
+ "refresh_tik_tak", "init_tik_tak", "free_tik_tak", &tik_tak_opts,
  60000, -20, 200, -1000, 64, 1.0, "",
  "Shows rotating polygons", 0, NULL};
 
@@ -116,7 +115,6 @@ typedef struct {
 	Bool        cycle_p, mono_p, no_colors;
 	unsigned long blackpixel, whitepixel, fg, bg;
 	int         direction;
-	ModeInfo   *mi;
 } tik_takstruct;
 
 static tik_takstruct *tik_taks = (tik_takstruct *) NULL;
@@ -213,10 +211,13 @@ tik_tak_drawobject(ModeInfo * mi, tik_takobject * object0 )
 }
 
 static void
-free_tik_tak(Display *display, tik_takstruct *tiktak)
+free_tik_tak_screen(ModeInfo *mi, tik_takstruct *tiktak)
 {
-	ModeInfo *mi = tiktak->mi;
+	Display    *display = MI_DISPLAY(mi);
 
+	if (tiktak == NULL) {
+		return;
+	}
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
 		MI_WHITE_PIXEL(mi) = tiktak->whitepixel;
 		MI_BLACK_PIXEL(mi) = tiktak->blackpixel;
@@ -225,8 +226,17 @@ free_tik_tak(Display *display, tik_takstruct *tiktak)
 		MI_BG_PIXEL(mi) = tiktak->bg;
 #endif
 		if (tiktak->colors != NULL) {
+#ifdef STANDALONE
+			Screen *screen = MI_SCREENPTR(mi);
+#endif
 			if (tiktak->ncolors && !tiktak->no_colors)
-				free_colors(display, tiktak->cmap, tiktak->colors, tiktak->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					screen,
+#else
+					display,
+#endif
+					tiktak->cmap, tiktak->colors, tiktak->ncolors);
 			free(tiktak->colors);
 			tiktak->colors = (XColor *) NULL;
 		}
@@ -253,7 +263,14 @@ free_tik_tak(Display *display, tik_takstruct *tiktak)
 		}
 		free(tiktak->object);
 		tiktak->object = (tik_takobject *) NULL;
-	 }
+	}
+	tiktak = NULL;
+}
+
+ENTRYPOINT void
+free_tik_tak(ModeInfo * mi)
+{
+        free_tik_tak_screen(mi, &tik_taks[MI_SCREEN(mi)]);
 }
 
 #ifndef STANDALONE
@@ -261,7 +278,7 @@ extern char *background;
 extern char *foreground;
 #endif
 
-void
+ENTRYPOINT void
 init_tik_tak(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -270,13 +287,8 @@ init_tik_tak(ModeInfo * mi)
 	tik_takstruct *tiktak;
 
 /* initialize */
-	if (tik_taks == NULL) {
-		if ((tik_taks = (tik_takstruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (tik_takstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, tik_taks);
 	tiktak = &tik_taks[MI_SCREEN(mi)];
-	tiktak->mi = mi;
 
 	if (tiktak->gc == None) {
 		if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
@@ -290,7 +302,7 @@ init_tik_tak(ModeInfo * mi)
 			tiktak->whitepixel = MI_WHITE_PIXEL(mi);
 			if ((tiktak->cmap = XCreateColormap(display, window,
 					MI_VISUAL(mi), AllocNone)) == None) {
-				free_tik_tak(display, tiktak);
+				free_tik_tak_screen(mi, tiktak);
 				return;
 			}
 			XSetWindowColormap(display, window, tiktak->cmap);
@@ -313,7 +325,7 @@ init_tik_tak(ModeInfo * mi)
 		}
 		if ((tiktak->gc = XCreateGC(display, MI_WINDOW(mi),
 			     (unsigned long) 0, (XGCValues *) NULL)) == None) {
-			free_tik_tak(display, tiktak);
+			free_tik_tak_screen(mi, tiktak);
 			return;
 		}
 	}
@@ -341,7 +353,7 @@ init_tik_tak(ModeInfo * mi)
 	if (tiktak->object == NULL)
 		if ((tiktak->object = (tik_takobject *) calloc(max_objects,
 				sizeof (tik_takobject))) == NULL) {
-			free_tik_tak(display, tiktak);
+			free_tik_tak_screen(mi, tiktak);
 			return;
 		}
 	size_object = MIN( tiktak->win_width , tiktak->win_height) / 3;
@@ -354,10 +366,19 @@ init_tik_tak(ModeInfo * mi)
 	  size_object = MI_SIZE(mi);
 	}
 	if (MI_IS_INSTALL(mi) && MI_NPIXELS(mi) > 2) {
+#ifdef STANDALONE
+		Screen *screen = MI_SCREENPTR(mi);
+#endif
 /* Set up colour map */
 		if (tiktak->colors != NULL) {
 			if (tiktak->ncolors && !tiktak->no_colors)
-				free_colors(display, tiktak->cmap, tiktak->colors, tiktak->ncolors);
+				free_colors(
+#ifdef STANDALONE
+					screen,
+#else
+					display,
+#endif
+					tiktak->cmap, tiktak->colors, tiktak->ncolors);
 			free(tiktak->colors);
 			tiktak->colors = (XColor *) NULL;
 		}
@@ -374,10 +395,17 @@ init_tik_tak(ModeInfo * mi)
 		else
 			if ((tiktak->colors = (XColor *) malloc(sizeof (*tiktak->colors) *
 					(tiktak->ncolors + 1))) == NULL) {
-				free_tik_tak(display, tiktak);
+				free_tik_tak_screen(mi, tiktak);
 				return;
 			}
-		tiktak->cycle_p = has_writable_cells(mi);
+		tiktak->cycle_p = has_writable_cells(
+#ifdef STANDALONE
+			screen, MI_VISUAL(mi)
+#else
+			mi
+#endif
+			);
+
 		if (tiktak->cycle_p) {
 			if (MI_IS_FULLRANDOM(mi)) {
 				if (!NRAND(8))
@@ -392,30 +420,39 @@ init_tik_tak(ModeInfo * mi)
 			if (!(LRAND() % 10))
 				make_random_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					tiktak->cmap, tiktak->colors, &tiktak->ncolors,
+					True, True, &tiktak->cycle_p, True
 #else
-            mi,
+                                        mi,
+					tiktak->cmap, tiktak->colors, &tiktak->ncolors,
+					True, True, &tiktak->cycle_p
 #endif
-						tiktak->cmap, tiktak->colors, &tiktak->ncolors,
-						True, True, &tiktak->cycle_p);
+                                        );
 			else if (!(LRAND() % 2))
 				make_uniform_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					tiktak->cmap, tiktak->colors, &tiktak->ncolors,
+					True, &tiktak->cycle_p, True
 #else
-            mi,
+                                        mi,
+					tiktak->cmap, tiktak->colors, &tiktak->ncolors,
+					True, &tiktak->cycle_p
 #endif
-                  tiktak->cmap, tiktak->colors, &tiktak->ncolors,
-						      True, &tiktak->cycle_p);
+                                        );
 			else
 				make_smooth_colormap(
 #ifdef STANDALONE
-						MI_DISPLAY(mi), MI_WINDOW(mi),
+					screen, MI_VISUAL(mi),
+					tiktak->cmap, tiktak->colors, &tiktak->ncolors,
+					True, &tiktak->cycle_p, True
 #else
-            mi,
+                                        mi,
+					tiktak->cmap, tiktak->colors, &tiktak->ncolors,
+					True, &tiktak->cycle_p
 #endif
-                 tiktak->cmap, tiktak->colors, &tiktak->ncolors,
-						     True, &tiktak->cycle_p);
+                                        );
 		}
 		XInstallColormap(display, tiktak->cmap);
 		if (tiktak->ncolors < 2) {
@@ -471,7 +508,7 @@ init_tik_tak(ModeInfo * mi)
 			free(object0->xy);
 	   if ((object0->xy = (XPoint *) malloc(sizeof( XPoint ) *
 				(2 * object0->num_point + 2))) == NULL) {
-			free_tik_tak(display, tiktak);
+			free_tik_tak_screen(mi, tiktak);
 			return;
 		}
 	   if ((LRAND() & 1) || object0->size_ob < 10 )
@@ -498,7 +535,7 @@ init_tik_tak(ModeInfo * mi)
 			free(object0->xy1);
 		if ((object0->xy1 = (XPoint *) malloc(sizeof( XPoint ) *
 				(2 * object0->num_point1 + 2))) == NULL) {
-			free_tik_tak(display, tiktak);
+			free_tik_tak_screen(mi, tiktak);
 			return;
 		}
 		object0->size_mult1 = 1.0;
@@ -511,7 +548,7 @@ init_tik_tak(ModeInfo * mi)
 	XSetFunction(display, tiktak->gc, GXcopy);
 }
 
-void
+ENTRYPOINT void
 draw_tik_tak(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -525,7 +562,7 @@ draw_tik_tak(ModeInfo * mi)
 		return;
 
 	if (tiktak->no_colors) {
-		free_tik_tak(display, tiktak);
+		free_tik_tak_screen(mi, tiktak);
 		init_tik_tak(mi);
 		return;
 	}
@@ -535,8 +572,13 @@ draw_tik_tak(ModeInfo * mi)
 
 /* Rotate colours */
 	if (tiktak->cycle_p) {
-		rotate_colors(display, tiktak->cmap, tiktak->colors, tiktak->ncolors,
-			      tiktak->direction);
+		rotate_colors(
+#ifdef STANDALONE
+			MI_SCREENPTR(mi),
+#else
+			display,
+#endif
+			tiktak->cmap, tiktak->colors, tiktak->ncolors, tiktak->direction);
 		if (!(LRAND() % 1000))
 			tiktak->direction = -tiktak->direction;
 	}
@@ -559,7 +601,21 @@ draw_tik_tak(ModeInfo * mi)
 	XSetFunction(display, tiktak->gc, GXcopy);
 }
 
-void
+ENTRYPOINT void
+release_tik_tak(ModeInfo * mi)
+{
+	if (tik_taks != NULL) {
+		int         screen;
+
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_tik_tak_screen(mi, &tik_taks[screen]);
+		free(tik_taks);
+		tik_taks = (tik_takstruct *) NULL;
+	}
+}
+
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_tik_tak(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -592,19 +648,7 @@ refresh_tik_tak(ModeInfo * mi)
 	}
 	XSetFunction(display, tiktak->gc, GXcopy);
 }
-
-void
-release_tik_tak(ModeInfo * mi)
-{
-	if (tik_taks != NULL) {
-		int         screen;
-
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_tik_tak(MI_DISPLAY(mi), &tik_taks[screen]);
-		free(tik_taks);
-		tik_taks = (tik_takstruct *) NULL;
-	}
-}
+#endif
 
 XSCREENSAVER_MODULE ("Tik_tak", tik_tak)
 

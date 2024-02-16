@@ -48,16 +48,15 @@ static const char sccsid[] = "@(#)shape.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_shape
-#define PROGCLASS "Shape"
-#define HACK_INIT init_shape
-#define HACK_DRAW draw_shape
-#define shape_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*count: 100 \n" \
- "*cycles: 256 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n" \
- "*verbose: False \n"
+	"*count: 100 \n" \
+	"*cycles: 256 \n" \
+	"*ncolors: 200 \n" \
+	"*fullrandom: True \n" \
+	"*verbose: False \n" \
+
+# define reshape_shape 0
+# define shape_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
@@ -126,13 +125,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+stipple", (char *) "turn on/off shape's stippling"}
 };
 
-ModeSpecOpt shape_opts =
+ENTRYPOINT ModeSpecOpt shape_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   shape_description =
 {"shape", "init_shape", "draw_shape", "release_shape",
- "refresh_shape", "init_shape", (char *) NULL, &shape_opts,
+ "refresh_shape", "init_shape", "free_shape", &shape_opts,
  10000, 100, 256, 1, 64, 1.0, "",
  "Shows overlaying rectangles, ellipses, and triangles", 0, NULL};
 
@@ -158,7 +157,7 @@ ModStruct   shape_description =
 #define SHAPEBITS(n,w,h)\
   if ((sp->pixmaps[sp->init_bits]=\
   XCreateBitmapFromData(display,window,(char *)n,w,h))==None){\
-  free_shape(display,sp); return;} else {sp->init_bits++;}
+  free_shape_screen(display,sp); return;} else {sp->init_bits++;}
 
 typedef struct {
 	int         width;
@@ -178,25 +177,31 @@ typedef struct {
 static shapestruct *shapes = (shapestruct *) NULL;
 
 static void
-free_shape(Display *display, shapestruct *sp)
+free_shape_screen(Display *display, shapestruct *sp)
 {
 	int         bits;
 
+	if (sp == NULL) {
+		return;
+	}
 	for (bits = 0; bits < sp->init_bits; bits++)
 		XFreePixmap(display, sp->pixmaps[bits]);
-	sp->init_bits = 0;
+	/*sp->init_bits = 0;*/
+	sp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_shape(ModeInfo * mi)
+{
+	free_shape_screen(MI_DISPLAY(mi), &shapes[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_shape(ModeInfo * mi)
 {
 	shapestruct *sp;
 
-	if (shapes == NULL) {
-		if ((shapes = (shapestruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (shapestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, shapes);
 	sp = &shapes[MI_SCREEN(mi)];
 
 	sp->width = MI_WIDTH(mi);
@@ -258,7 +263,7 @@ init_shape(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_shape(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -408,24 +413,26 @@ draw_shape(ModeInfo * mi)
 		init_shape(mi);
 }
 
-void
+ENTRYPOINT void
 release_shape(ModeInfo * mi)
 {
 	if (shapes != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_shape(MI_DISPLAY(mi), &shapes[screen]);
+			free_shape_screen(MI_DISPLAY(mi), &shapes[screen]);
 		free(shapes);
 		shapes = (shapestruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_shape(ModeInfo * mi)
 {
 	MI_CLEARWINDOW(mi);
 }
+#endif
 
 XSCREENSAVER_MODULE ("Shape", shape)
 

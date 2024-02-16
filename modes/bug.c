@@ -37,19 +37,18 @@ static const char sccsid[] = "@(#)bug.c	5.24 2007/01/18 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_bug
-#define PROGCLASS "Bug"
-#define HACK_INIT init_bug
-#define HACK_DRAW draw_bug
-#define bug_opts xlockmore_opts
-#define DEFAULTS "*delay: 75000 \n" \
- "*count: 10 \n" \
- "*cycles: 32767 \n" \
- "*size: -4 \n" \
- "*ncolors: 64 \n"
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# define MODE_bug
+# define DEFAULTS	"*delay: 75000 \n" \
+			"*count: 10 \n" \
+			"*cycles: 32767 \n" \
+			"*size: -4 \n" \
+		 	"*ncolors: 64 \n" \
+
+# define reshape_bug 0
+# define bug_handle_event 0
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 #define DO_STIPPLE
 #include "automata.h"
@@ -85,14 +84,14 @@ static OptionStruct desc[] =
 	{(char *) "-/+vertical", (char *) "change orientation for hexagons and triangles"}
 };
 
-ModeSpecOpt bug_opts =
+ENTRYPOINT ModeSpecOpt bug_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 
 #ifdef USE_MODULES
 ModStruct   bug_description =
 {"bug", "init_bug", "draw_bug", "release_bug",
- "refresh_bug", "init_bug", (char *) NULL, &bug_opts,
+ "refresh_bug", "init_bug", "free_bug", &bug_opts,
  75000, 10, 32767, -4, 64, 1.0, "",
  "Shows Palmiter's bug evolution and garden of Eden", 0, NULL};
 
@@ -105,7 +104,7 @@ ModStruct   bug_description =
 #define BUGBITS(n,w,h)\
   if ((bp->pixmaps[bp->init_bits]=\
   XCreatePixmapFromBitmapData(display,window,(char *)n,w,h,1,0,1))==None){\
-  free_bug(display,bp); return;} else {bp->init_bits++;}
+  free_bug_screen(display,bp); return;} else {bp->init_bits++;}
 
 #define BACTERIA 0
 #define BUG 1
@@ -1090,10 +1089,13 @@ redrawbacteria(ModeInfo * mi, int colrow)
 }
 
 static void
-free_bug(Display *display, bugfarmstruct *bp)
+free_bug_screen(Display *display, bugfarmstruct *bp)
 {
 	int         shade;
 
+	if (bp == NULL) {
+		return;
+	}
 	if (bp->stippledGC != None) {
 		XFreeGC(display, bp->stippledGC);
 		bp->stippledGC = None;
@@ -1130,9 +1132,16 @@ free_bug(Display *display, bugfarmstruct *bp)
 		free(bp->bacteria);
 		bp->bacteria = (char *) NULL;
 	}
+	bp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_bug(ModeInfo * mi)
+{
+	free_bug_screen(MI_DISPLAY(mi), &bugfarms[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_bug(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -1145,11 +1154,7 @@ init_bug(ModeInfo * mi)
 	bugstruct   info;
 	bugfarmstruct *bp;
 
-	if (bugfarms == NULL) {
-		if ((bugfarms = (bugfarmstruct *) calloc(MI_NUM_SCREENS(mi),
-					    sizeof (bugfarmstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, bugfarms);
 	bp = &bugfarms[MI_SCREEN(mi)];
 
 	if (MI_IS_FULLRANDOM(mi)) {
@@ -1166,7 +1171,7 @@ init_bug(ModeInfo * mi)
 			gcv.fill_style = FillOpaqueStippled;
 			if ((bp->stippledGC = XCreateGC(display, window,
 					GCFillStyle, &gcv)) == None) {
-				free_bug(display, bp);
+				free_bug_screen(display, bp);
 				return;
 			}
 		}
@@ -1181,7 +1186,7 @@ init_bug(ModeInfo * mi)
 		/* Set up what will be a 'triply' linked list.
 		   doubly linked list, doubly linked to an array */
 		if (!init_buglist(bp)) {
-			free_bug(display, bp);
+			free_bug_screen(display, bp);
 			return;
 		}
 		genexp[MAXGENE] = 1;
@@ -1250,14 +1255,14 @@ init_bug(ModeInfo * mi)
 		free(bp->arr);
 	if ((bp->arr = (BugList **) calloc(bp->ncols * bp->nrows,
 			sizeof (BugList *))) == NULL) {
-		free_bug(display, bp);
+		free_bug_screen(display, bp);
 		return;
 	}
 	if (bp->bacteria != NULL)
 		free(bp->bacteria);
 	if ((bp->bacteria = (char *) calloc(bp->ncols * bp->nrows,
 			sizeof (char))) == NULL) {
-		free_bug(display, bp);
+		free_bug_screen(display, bp);
 		return;
 	}
 	bp->edenheight = bp->nrows / 4;
@@ -1366,7 +1371,7 @@ init_bug(ModeInfo * mi)
 			info.row = row;
 			addto_buglist(bp, info);
 			if (bp->firstbug == NULL) {
-				free_bug(display, bp);
+				free_bug_screen(display, bp);
 				return;
 			}
 			bp->arr[colrow] = bp->currbug;
@@ -1383,7 +1388,7 @@ init_bug(ModeInfo * mi)
 }
 
 #define ENOUGH 16
-void
+ENTRYPOINT void
 draw_bug(ModeInfo * mi)
 {
 	int         col, row, ncol = -1, nrow = -1, colrow, ncolrow;
@@ -1460,7 +1465,7 @@ draw_bug(ModeInfo * mi)
 					bp->babybug->info.energy = INITENERGY;
 					dupin_buglist(bp);
 					if (bp->firstbug == NULL) {
-						free_bug(MI_DISPLAY(mi), bp);
+						free_bug_screen(MI_DISPLAY(mi), bp);
 						return;
 					}
 					mutatebug(&bp->babybug->previous->info, bp->neighbors);
@@ -1501,20 +1506,21 @@ draw_bug(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_bug(ModeInfo * mi)
 {
 	if (bugfarms != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_bug(MI_DISPLAY(mi), &bugfarms[screen]);
+			free_bug_screen(MI_DISPLAY(mi), &bugfarms[screen]);
 		free(bugfarms);
 		bugfarms = (bugfarmstruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_bug(ModeInfo * mi)
 {
 	bugfarmstruct *bp;
@@ -1530,6 +1536,7 @@ refresh_bug(ModeInfo * mi)
 		bp->redrawpos = 0;
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Bug", bug)
 

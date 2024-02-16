@@ -65,6 +65,7 @@ XCOMM MAZEBITMAP = m-xlock
 XCOMM PUZZLEBITMAP = $(LARGEBITMAP)
 PUZZLEBITMAP = l-xlock
 XCOMM PUZZLEBITMAP = l-linux
+PYRO2BITMAP = $(MEDIUMBITMAP)
 XCOMM BATPIXMAP = $(LARGEPIXMAP)
 BATPIXMAP = l-xlock
 XCOMM BATPIXMAP = l-linux
@@ -84,12 +85,14 @@ XCOMM MAZEPIXMAP = m-xlock
 XCOMM PUZZLEPIXMAP = $(LARGEPIXMAP)
 PUZZLEPIXMAP = l-xlock
 XCOMM PUZZLEPIXMAP = l-linux
+PYRO2PIXMAP = $(MEDIUMPIXMAP)
+XCOMM PYRO2PIXMAP = m-xlock
 
 XCOMM  List of object files
 XLOCKUTILOBJS = $(DOU)xlock$(OU)passwd$(OU)resource$(OU)parsecmd$(O)$(S)\
 $(DOU)util$(OU)logout$(OU)mode$(OU)xlockimage$(OU)ras$(OU)xbm$(O)$(S)\
 $(DOU)vis$(OU)visgl$(OU)color$(OU)random$(OU)iostuff$(O)$(S)\
-$(DOU)spline$(OU)erase$(OU)sound$(OU)xshm$(O)$(S)\
+$(DOU)spline$(OU)automata$(OU)erase$(OU)sound$(OU)xshm$(O)$(S)\
 $(DOU)aligned_malloc$(OU)thread_util$(OU)vtlock$(OU)vtlock_proc$(O)
 #ifdef Check
 XLOCKCHECKOBJS = $(S)memcheck$(O)
@@ -186,16 +189,16 @@ $(XLOCKDEPGLOBJS)$(S)$(XLOCKMULTGLOBJS)
 
 XCOMM  List of source files
 BITMAPS = bat.xbm bounce.xbm decay.xbm eyes.xbm eyes2.xbm flag.xbm \
-image.xbm life.xbm life2.xbm life1d.xbm maze.xbm puzzle.xbm
+image.xbm life.xbm life2.xbm life1d.xbm maze.xbm puzzle.xbm pyro2.xbm
 PIXMAPS = bat.xpm bounce.xpm decay.xpm flag.xpm image.xpm maze.xpm \
-puzzle.xpm
+puzzle.xpm pyro2.xpm
 XCOMM life.xpm
 XLOCKUTILHDRS = xlock.h mode.h vroot.h xlockimage.h ras.h spline.h \
-version.h config.h
+automata.h version.h config.h
 XLOCKUTILSRCS = $(DU)xlock$(CU)passwd$(CU)resource$(CU)parsecmd$(C) \
 $(DU)util$(CU)logout$(CU)mode$(CU)xlockimage$(CU)ras$(CU)xbm$(C) \
 $(DU)vis$(CU)color$(CU)random$(CU)iostuff$(C) \
-$(DU)spline$(CU)sound$(CU)erase$(C) \
+$(DU)spline$(CU)automata$(CU)sound$(CU)erase$(C) \
 $(DU)vtlock$(CU)vtlock_proc$(C)
 XLOCKCHECKSRCS = $(DU)memcheck$(C)
 XLOCKMODESRCS = $(DM)anemone$(CM)ant$(CM)ant3d$(CM)apollonian$(C) \
@@ -357,6 +360,7 @@ flag$(O) : flag$(C) flag.xbm flag.xpm
 image$(O) : image$(C) image.xbm image.xpm
 maze$(O) : maze$(C) maze.xbm maze.xpm
 puzzle$(O) : puzzle$(C) puzzle.xbm puzzle.xpm
+pyro2$(O) : pyro2$(C) pyro2.xbm pyro2.xpm
 
 bat.xbm : $(BITMAPDIR)$(BATBITMAP).xbm
 	$(RM) bat.xbm ; $(LN_S) $(BITMAPDIR)$(BATBITMAP).xbm bat.xbm
@@ -394,6 +398,9 @@ maze.xbm : $(BITMAPDIR)$(MAZEBITMAP).xbm
 puzzle.xbm : $(BITMAPDIR)$(PUZZLEBITMAP).xbm
 	$(RM) puzzle.xbm ; $(LN_S) $(BITMAPDIR)$(PUZZLEBITMAP).xbm puzzle.xbm
 
+pyro2.xbm : $(BITMAPDIR)$(PYRO2BITMAP).xbm
+	$(RM) pyro2.xbm ; $(LN_S) $(BITMAPDIR)$(PYRO2BITMAP).xbm pyro2.xbm
+
 bat.xpm : $(PIXMAPDIR)$(BATPIXMAP).xpm
 	$(RM) bat.xpm ; $(LN_S) $(PIXMAPDIR)$(BATPIXMAP).xpm bat.xpm
 
@@ -417,6 +424,9 @@ maze.xpm : $(PIXMAPDIR)$(MAZEPIXMAP).xpm
 
 puzzle.xpm : $(PIXMAPDIR)$(PUZZLEPIXMAP).xpm
 	$(RM) puzzle.xpm ; $(LN_S) $(PIXMAPDIR)$(PUZZLEPIXMAP).xpm puzzle.xpm
+
+pyro2.xpm : $(PIXMAPDIR)$(PYRO2PIXMAP).xpm
+	$(RM) pyro2.xpm ; $(LN_S) $(PIXMAPDIR)$(PYRO2PIXMAP).xpm pyro2.xpm
 
 $(UTILOBJDIR)xlock.o : $(UTILDIR)xlock.c
 $(UTILOBJDIR)passwd.o : $(UTILDIR)passwd.c

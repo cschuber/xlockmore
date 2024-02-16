@@ -28,19 +28,18 @@ static const char sccsid[] = "@(#)space.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_space
-#define PROGCLASS "Space"
-#define HACK_INIT init_space
-#define HACK_DRAW draw_space
-#define space_opts xlockmore_opts
 #define DEFAULTS "*delay: 10000 \n" \
- "*count: 100 \n" \
- "*ncolors: 64 \n" \
- "*use3d: False \n" \
- "*delta3d: 1.5 \n" \
- "*right3d: red \n" \
- "*left3d: blue \n" \
- "*both3d: magenta \n" \
- "*none3d: black \n"
+	"*count: 100 \n" \
+	"*ncolors: 64 \n" \
+	"*use3d: False \n" \
+	"*delta3d: 1.5 \n" \
+	"*right3d: red \n" \
+	"*left3d: blue \n" \
+	"*both3d: magenta \n" \
+	"*none3d: black \n" \
+
+# define reshape_space 0
+# define space_handle_event 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -49,13 +48,13 @@ static const char sccsid[] = "@(#)space.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_space
 
-ModeSpecOpt space_opts =
+ENTRYPOINT ModeSpecOpt space_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   space_description =
 {"space", "init_space", "draw_space", "release_space",
- "refresh_space", "init_space", (char *) NULL, &space_opts,
+ (char *) NULL, "init_space", "free_space", &space_opts,
  10000, 100, 1, 1, 64, 1.0, "",
  "a journey into deep space", 0, NULL};
 
@@ -101,8 +100,11 @@ typedef struct {
 static SpaceStruct *spaces = (SpaceStruct *) NULL;
 
 static void
-free_space(SpaceStruct *sp)
+free_space_screen(SpaceStruct *sp)
 {
+	if (sp == NULL) {
+		return;
+	}
 	if (sp->starX != NULL) {
 		free(sp->starX);
 		sp->starX = (double *) NULL;
@@ -131,20 +133,24 @@ free_space(SpaceStruct *sp)
 		free(sp->stars2b);
 		sp->stars2b = (XPoint *) NULL;
 	}
+	sp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_space(ModeInfo * mi)
+{
+	free_space_screen(&spaces[MI_SCREEN(mi)]);
+}
+
+
+ENTRYPOINT void
 init_space(ModeInfo * mi)
 {
 	int         i;
 	SpaceStruct *sp;
 
 	/* allocate a SpaceStruct for every screen */
-	if (spaces == NULL) {
-		if ((spaces = (SpaceStruct *) calloc(MI_NUM_SCREENS(mi),
-				sizeof (SpaceStruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, spaces);
 	sp = &spaces[MI_SCREEN(mi)];
 	/* star density is linked to screen surface */
 	sp->nb = MI_COUNT(mi);
@@ -156,7 +162,7 @@ init_space(ModeInfo * mi)
 	if (((sp->starX = (double *) calloc(sp->nb, sizeof (double))) == NULL) ||
 	    ((sp->starY = (double *) calloc(sp->nb, sizeof (double))) == NULL) ||
 	    ((sp->starZ = (double *) calloc(sp->nb, sizeof (double))) == NULL)) {
-		free_space(sp);
+		free_space_screen(sp);
 		return;
 	}
 
@@ -165,7 +171,7 @@ init_space(ModeInfo * mi)
 			sizeof (XPoint))) == NULL) ||
 	    ((sp->stars1b = (XPoint *) calloc(9 * sp->nb,
 			sizeof (XPoint))) == NULL)) {
-		free_space(sp);
+		free_space_screen(sp);
 		return;
 	}
 	if (MI_IS_USE3D(mi)) {
@@ -173,7 +179,7 @@ init_space(ModeInfo * mi)
 				sizeof (XPoint))) == NULL) ||
 		    ((sp->stars2b = (XPoint *) calloc(9 * sp->nb,
 				sizeof (XPoint))) == NULL)) {
-			free_space(sp);
+			free_space_screen(sp);
 			return;
 		}
 	}
@@ -206,7 +212,7 @@ init_space(ModeInfo * mi)
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_space(ModeInfo * mi)
 {
 	int         i, n, originX, originY, x, x2 = 0, y, IS_SMALL;
@@ -431,20 +437,14 @@ draw_space(ModeInfo * mi)
 	}
 }
 
-void
-refresh_space(ModeInfo * mi)
-{
-	/* Do nothing, it will refresh by itself */
-}
-
-void
+ENTRYPOINT void
 release_space(ModeInfo * mi)
 {
 	if (spaces != NULL) {
 		int screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_space(&spaces[screen]);
+			free_space_screen(&spaces[screen]);
 		free(spaces);
 		spaces = (SpaceStruct *) NULL;
 	}

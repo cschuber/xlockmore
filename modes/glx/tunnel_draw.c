@@ -1,7 +1,7 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* atunnels --- OpenGL Advanced Tunnel Demo */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)tunnel_draw.c	5.13 2004/07/19 xlockmore";
 #endif
 

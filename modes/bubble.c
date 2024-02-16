@@ -29,20 +29,19 @@ static const char sccsid[] = "@(#)bubble.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
-#define MODE_bubble
-#define PROGCLASS "Bubble"
-#define HACK_INIT init_bubble
-#define HACK_DRAW draw_bubble
-#define bubble_opts xlockmore_opts
-#define DEFAULTS "*delay: 100000 \n" \
- "*count: 25 \n" \
- "*size: 100 \n" \
- "*ncolors: 200 \n" \
- "*fullrandom: True \n"
-#define UNIFORM_COLORS
-#include "xlockmore.h"		/* in xscreensaver distribution */
+# define MODE_bubble
+# define DEFAULTS	"*delay: 100000 \n" \
+			"*count: 25 \n" \
+			"*size: 100 \n" \
+			"*ncolors: 200 \n" \
+			"*fullrandom: True \n" \
+
+# define reshape_bubble 0
+# define bubble_handle_event 0
+# define UNIFORM_COLORS
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_bubble
@@ -64,13 +63,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+boil", (char *) "turn on/off boil"}
 };
 
-ModeSpecOpt bubble_opts =
+ENTRYPOINT ModeSpecOpt bubble_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   bubble_description =
 {"bubble", "init_bubble", "draw_bubble", "release_bubble",
- "refresh_bubble", "init_bubble", (char *) NULL, &bubble_opts,
+ (char *) NULL, "init_bubble", "free_bubble", &bubble_opts,
  100000, 25, 1, 100, 64, 0.3, "",
  "Shows popping bubbles", 0, NULL};
 
@@ -166,8 +165,11 @@ changeBubble(ModeInfo * mi)
 }
 
 static void
-free_bubble(Display *display, bubblestruct *bp)
+free_bubble_screen(Display *display, bubblestruct *bp)
 {
+	if (bp == NULL) {
+		return;
+	}
 	if (bp->dbuf != None) {
 		XFreePixmap(display, bp->dbuf);
 		bp->dbuf = None;
@@ -180,9 +182,16 @@ free_bubble(Display *display, bubblestruct *bp)
 		free(bp->bubble);
 		bp->bubble = (bubbletype *) NULL;
 	}
+	bp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_bubble(ModeInfo * mi)
+{
+	free_bubble_screen(MI_DISPLAY(mi), &bubbles[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_bubble(ModeInfo * mi)
 {
 	bubblestruct *bp;
@@ -191,11 +200,7 @@ init_bubble(ModeInfo * mi)
 	Window      window = MI_WINDOW(mi);
 	XGCValues   gcv;
 
-	if (bubbles == NULL) {
-		if ((bubbles = (bubblestruct *) calloc(MI_NUM_SCREENS(mi),
-					     sizeof (bubblestruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, bubbles);
 	bp = &bubbles[MI_SCREEN(mi)];
 
 	bp->width = MI_WIDTH(mi);
@@ -226,7 +231,7 @@ init_bubble(ModeInfo * mi)
 		free(bp->bubble);
 	if ((bp->bubble = (bubbletype *) calloc(bp->nbubbles,
 			sizeof (bubbletype))) == NULL) {
-		free_bubble(display, bp);
+		free_bubble_screen(display, bp);
 		return;
 	}
 	if (MI_NPIXELS(mi) > 2)
@@ -236,7 +241,7 @@ init_bubble(ModeInfo * mi)
 		XFreePixmap(display, bp->dbuf);
 	if ((bp->dbuf = XCreatePixmap(display, window, bp->width, bp->height,
 			1)) == None) {
-		free_bubble(display, bp);
+		free_bubble_screen(display, bp);
 		return;
 	}
 	/* Do not want any exposure events from XCopyPlane */
@@ -252,13 +257,13 @@ init_bubble(ModeInfo * mi)
 	if ((bp->dbuf_gc = XCreateGC(display, bp->dbuf,
 	  		GCForeground | GCBackground | GCLineWidth | GCFunction,
 			&gcv)) == None) {
-		free_bubble(display, bp);
+		free_bubble_screen(display, bp);
 		return;
 	}
 	MI_CLEARWINDOW(mi);
 }
 
-void
+ENTRYPOINT void
 draw_bubble(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
@@ -290,23 +295,17 @@ draw_bubble(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_bubble(ModeInfo * mi)
 {
 	if (bubbles != NULL) {
 		int         screen;
 
 		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-			free_bubble(MI_DISPLAY(mi), &bubbles[screen]);
+			free_bubble_screen(MI_DISPLAY(mi), &bubbles[screen]);
 		free(bubbles);
 		bubbles = (bubblestruct *) NULL;
 	}
-}
-
-void
-refresh_bubble(ModeInfo * mi)
-{
-	/* Do nothing, it will refresh by itself */
 }
 
 XSCREENSAVER_MODULE ("Bubble", bubble)

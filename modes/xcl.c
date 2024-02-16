@@ -29,12 +29,11 @@ static const char sccsid[] = "@(#)xcl.c    5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_xcl
-#define PROGCLASS "Xcl"
-#define HACK_INIT init_xcl
-#define HACK_DRAW draw_xcl
-#define xcl_opts xlockmore_opts
 #define DEFAULTS "*delay: 20000 \n" \
- "*count: 2 \n"
+	"*count: 2 \n" \
+
+# define reshape_xcl 0
+# define xcl_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"        /* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -116,13 +115,13 @@ static OptionStruct desc[] =
   {(char *) "-/+randomstart", (char *) "turn on/off a random start point for models at startup"}
 };
 
-ModeSpecOpt xcl_opts =
+ENTRYPOINT ModeSpecOpt xcl_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES    /* for xlockmore */
 ModStruct   xcl_description =
 {"xcl", "init_xcl", "draw_xcl", "release_xcl",
- "draw_xcl", "init_xcl", (char *) NULL, &xcl_opts ,
+ "draw_xcl", "init_xcl", "free_xcl", &xcl_opts ,
  20000, -3, 1, 1, 64, 1.0, "",
  "Shows a control line combat model race", 0, NULL};
 #endif
@@ -270,10 +269,13 @@ static Bool get_GC(Display *dpy,Window win,GC *gc,long color)
 }
 
 static void
-free_xcl(Display *display, xclstruct  *dp)
+free_xcl_screen(Display *display, xclstruct  *dp)
 {
     int plane;
 
+    if (dp == NULL) {
+      return;
+    }
     for (plane = 0; plane < dp->planes; plane++) {
       if (dp->xseg[plane] != NULL) {
         free(dp->xseg[plane]);
@@ -292,30 +294,24 @@ free_xcl(Display *display, xclstruct  *dp)
       XFreeGC(display, dp->erase_gc);
       dp->erase_gc = None;
     }
+    dp = NULL;
 }
 
-void release_xcl(ModeInfo * mi)
+ENTRYPOINT void
+free_xcl(ModeInfo * mi)
 {
-  if (xcls != NULL) {
-    int screen;
-    for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-      free_xcl(MI_DISPLAY(mi), &xcls[screen]);
-    free(xcls);
-    xcls = (xclstruct *) NULL;
-  }
+	free_xcl_screen(MI_DISPLAY(mi), &xcls[MI_SCREEN(mi)]);
 }
 
-void init_xcl(ModeInfo * mi)
+
+ENTRYPOINT void
+init_xcl(ModeInfo * mi)
 {
   Display *display = MI_DISPLAY(mi);
   int i;            /* scratch */
   xclstruct *dp;
 
-  if (xcls == NULL) {
-    if ((xcls = (xclstruct *) calloc(MI_NUM_SCREENS(mi),
-                                     sizeof (xclstruct))) == NULL)
-      return;
-  }
+  MI_INIT(mi, xcls);
   dp = &xcls[MI_SCREEN(mi)];
 
   /* Update every time */
@@ -401,7 +397,7 @@ void init_xcl(ModeInfo * mi)
 
     if(dp->erase_gc == None)
       if (!get_GC(display, MI_WINDOW(mi), &(dp->erase_gc),dp->bg)) {
-        free_xcl(display, dp);
+        free_xcl_screen(display, dp);
         return;
       }
 
@@ -411,7 +407,7 @@ void init_xcl(ModeInfo * mi)
       if(dp->gc[i] == None)
         if (!get_GC(display, MI_WINDOW(mi), &(dp->gc[i]),
                     dp->planecolor[i])) {
-          free_xcl(display, dp);
+          free_xcl_screen(display, dp);
           return;
         }
       dp->omega_const[i] = speed[i]/3.6 /line_length*1000.0;
@@ -419,13 +415,13 @@ void init_xcl(ModeInfo * mi)
       if(dp->xseg[i] == NULL)
         if ((dp-> xseg[i] = (XSegment *) malloc(sizeof(XSegment) *
                                                 dp->lines)) == NULL) {
-          free_xcl(display, dp);
+          free_xcl_screen(display, dp);
           return;
         }
       if(dp->xseg_old[i] == NULL)
         if ((dp->xseg_old[i] = (XSegment *) malloc(sizeof(XSegment) *
                                                    dp->lines)) == NULL) {
-          free_xcl(display, dp);
+          free_xcl_screen(display, dp);
           return;
         }
     }
@@ -456,7 +452,8 @@ void init_xcl(ModeInfo * mi)
   dp->xcldelay = frametime;
 }
 
-void draw_xcl(ModeInfo * mi)
+ENTRYPOINT void
+draw_xcl(ModeInfo * mi)
 {
   static int count = 0;
   int i;
@@ -579,6 +576,18 @@ void draw_xcl(ModeInfo * mi)
         (void) printf("t_draw: %d, t_delay: %d\n",dp->drawtime,
                       dp->xcldelay);
     }
+  }
+}
+
+ENTRYPOINT void
+release_xcl(ModeInfo * mi)
+{
+  if (xcls != NULL) {
+    int screen;
+    for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+      free_xcl_screen(MI_DISPLAY(mi), &xcls[screen]);
+    free(xcls);
+    xcls = (xclstruct *) NULL;
   }
 }
 

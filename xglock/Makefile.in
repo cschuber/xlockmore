@@ -124,7 +124,7 @@ install-man :
 
 install-ad :
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(datadir)/xlock
-	$(INSTALL_PROGRAM) $(top_srcdir)/xglock/xglockrc $(DESTDIR)$(datadir)/xlock/xglockrc
+	$(INSTALL_DATA) $(top_srcdir)/xglock/xglockrc $(DESTDIR)$(datadir)/xlock/xglockrc
 
 uninstall : @UNINSTALL_XGLOCK@
 

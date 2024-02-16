@@ -1,9 +1,8 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* skewb --- Shows an auto-solving Skewb */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)skewb.c	5.00 2000/11/01 xlockmore";
-
 #endif
 
 #undef DEBUG_LISTS
@@ -83,15 +82,14 @@ static const char sccsid[] = "@(#)skewb.c	5.00 2000/11/01 xlockmore";
 #endif
 
 #ifdef STANDALONE
-#define MODE_skewb
-#define PROGCLASS "Skewb"
-#define HACK_INIT init_skewb
-#define HACK_DRAW draw_skewb
-#define skewb_opts xlockmore_opts
-#define DEFAULTS "*delay: 100000 \n" \
- "*count: -30 \n" \
- "*cycles: 5 \n"
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+# define MODE_skewb
+# define DEFAULTS	"*delay: 100000 \n" \
+			"*count: -30 \n" \
+			"*cycles: 5 \n" \
+
+# include "xlockmore.h"		/* from the xscreensaver distribution */
+# include "gltrackball.h"
+
 #else /* !STANDALONE */
 #include "xlock.h"		/* from the xlockmore distribution */
 #include "visgl.h"
@@ -120,13 +118,13 @@ static OptionStruct desc[] =
 	{(char *) "-/+hideshuffling", (char *) "turn on/off hidden shuffle phase"}
 };
 
-ModeSpecOpt skewb_opts =
+ENTRYPOINT ModeSpecOpt skewb_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
 ModStruct   skewb_description =
 {"skewb", "init_skewb", "draw_skewb", "release_skewb",
- "draw_skewb", "change_skewb", (char *) NULL, &skewb_opts,
+ "draw_skewb", "change_skewb", "free_skewb", &skewb_opts,
  100000, -30, 5, 1, 64, 1.0, "",
  "Shows an auto-solving Skewb", 0, NULL};
 
@@ -411,6 +409,10 @@ typedef struct {
 	GLfloat     rotateStep;
 	GLfloat     PX, PY, VX, VY;
 	Bool        AreObjectsDefined[2];
+#ifdef STANDALONE
+	Bool button_down_p;
+	trackball_state *trackball;
+#endif
 } skewbstruct;
 
 static float front_shininess[] =
@@ -499,7 +501,7 @@ pickColor(int C, int mono)
 }
 
 static void
-drawStickerlessCubit()
+drawStickerlessCubit(void)
 {
 	glBegin(GL_QUADS);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray);
@@ -568,7 +570,7 @@ drawStickerlessCubit()
 }
 
 static void
-drawStickerlessFacit()
+drawStickerlessFacit(void)
 {
 	glBegin(GL_QUADS);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray);
@@ -1395,7 +1397,7 @@ shuffle(ModeInfo * mi)
 	return True;
 }
 
-static void
+ENTRYPOINT void
 reshape_skewb(ModeInfo * mi, int width, int height)
 {
 	skewbstruct *sp = &skewb[MI_SCREEN(mi)];
@@ -1409,6 +1411,24 @@ reshape_skewb(ModeInfo * mi, int width, int height)
 	sp->AreObjectsDefined[ObjFacit] = False;
 	sp->AreObjectsDefined[ObjCubit] = False;
 }
+
+#ifdef STANDALONE
+ENTRYPOINT Bool
+skewb_handle_event (ModeInfo *mi, XEvent *event)
+{
+	skewbstruct *sp = &skewb[MI_SCREEN(mi)];
+
+	if (gltrackball_event_handler (event, sp->trackball,
+			MI_WIDTH (mi), MI_HEIGHT (mi),
+			&sp->button_down_p))
+		return True;
+	else if (screenhack_event_helper (MI_DISPLAY(mi), MI_WINDOW(mi), event)) {
+		sp->done = 1;
+		return True;
+	}
+	return False;
+}
+#endif
 
 static Bool
 pinit(ModeInfo * mi)
@@ -1440,51 +1460,63 @@ pinit(ModeInfo * mi)
 }
 
 static void
-free_skewb(skewbstruct *sp)
+free_skewb_screen(skewbstruct *sp)
 {
+	if (sp == NULL) {
+		return;
+	}
+#ifdef STANDALONE
+	if (sp->trackball)
+		gltrackball_free (sp->trackball);
+#endif
 	if (sp->moves != NULL) {
 		free(sp->moves);
 		sp->moves = (SkewbMove *) NULL;
 	}
+	sp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_skewb(ModeInfo * mi)
+{
+	free_skewb_screen(&skewb[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 release_skewb(ModeInfo * mi)
 {
 	if (skewb != NULL) {
 		int	 screen;
 
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			skewbstruct *sp = &skewb[screen];
-
-			free_skewb(sp);
-		}
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_skewb_screen(&skewb[screen]);
 		free(skewb);
 		skewb = (skewbstruct *) NULL;
 	}
 	FreeAllGL(mi);
 }
 
-void
+ENTRYPOINT void
 init_skewb(ModeInfo * mi)
 {
 	skewbstruct *sp;
 
-	if (skewb == NULL) {
-		if ((skewb = (skewbstruct *) calloc(MI_NUM_SCREENS(mi),
-					      sizeof (skewbstruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, skewb);
 	sp = &skewb[MI_SCREEN(mi)];
 
 	sp->step = NRAND(180);
 	sp->PX = ((float) LRAND() / (float) MAXRAND) * 2.0 - 1.0;
 	sp->PY = ((float) LRAND() / (float) MAXRAND) * 2.0 - 1.0;
+
+#ifdef STANDALONE
+	sp->trackball = gltrackball_init (True);
+#endif
+
 	if ((sp->glx_context = init_GL(mi)) != NULL) {
 		reshape_skewb(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 		glDrawBuffer(GL_BACK);
 		if (!pinit(mi)) {
-			free_skewb(sp);
+			free_skewb_screen(sp);
 			if (MI_IS_VERBOSE(mi)) {
 				 (void) fprintf(stderr,
 					"Could not allocate memory for skewb\n");
@@ -1495,7 +1527,7 @@ init_skewb(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 draw_skewb(ModeInfo * mi)
 {
 	Bool bounced = False;
@@ -1565,6 +1597,23 @@ draw_skewb(ModeInfo * mi)
 		glScalef(Scale4Iconic * sp->WindH / sp->WindW,
 			Scale4Iconic, Scale4Iconic);
 	}
+
+# ifdef HAVE_MOBILE     /* Keep it the same relative size when rotated. */
+	{
+		GLfloat h = MI_HEIGHT(mi) / (GLfloat) MI_WIDTH(mi);
+		int o = (int) current_device_rotation();
+		if (o != 0 && o != 180 && o != -180) {
+			glScalef (1/h, h, 1); /* #### not quite right */
+			h = 1.8;
+			glScalef (h, h, h);
+		}
+	}
+# endif
+
+#ifdef STANDALONE
+	gltrackball_rotate (sp->trackball);
+#endif
+
 	glRotatef(sp->step * 100, 1, 0, 0);
 	glRotatef(sp->step * 95, 0, 1, 0);
 	glRotatef(sp->step * 90, 0, 0, 1);
@@ -1606,7 +1655,7 @@ draw_skewb(ModeInfo * mi)
 		if (sp->done) {
 			if (++sp->rotateStep > DELAY_AFTER_SOLVING)
 				if (!shuffle(mi)) {
-					free_skewb(sp);
+					free_skewb_screen(sp);
 					if (MI_IS_VERBOSE(mi)) {
 						 (void) fprintf(stderr,
 							"Could not allocate memory for skewb\n");
@@ -1644,7 +1693,8 @@ draw_skewb(ModeInfo * mi)
 	sp->step += 0.05;
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 change_skewb(ModeInfo * mi)
 {
 	skewbstruct *sp;
@@ -1656,12 +1706,15 @@ change_skewb(ModeInfo * mi)
 	if (!sp->glx_context)
 		return;
 	if (!pinit(mi)) {
-		free_skewb(sp);
+		free_skewb_screen(sp);
 		if (MI_IS_VERBOSE(mi)) {
 			 (void) fprintf(stderr,
 				"Could not allocate memory for skewb\n");
 		}
 	}
 }
-
 #endif
+
+XSCREENSAVER_MODULE ("Skewb", skewb)
+
+#endif /* MODE_skewb */

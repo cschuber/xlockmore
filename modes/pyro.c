@@ -3,7 +3,6 @@
 
 #if 0
 static const char sccsid[] = "@(#)pyro.c	5.00 2000/11/01 xlockmore";
-
 #endif
 
 /*-
@@ -39,35 +38,34 @@ static const char sccsid[] = "@(#)pyro.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_pyro
-#define PROGCLASS "Pyro"
-#define HACK_INIT init_pyro
-#define HACK_DRAW draw_pyro
-#define pyro_opts xlockmore_opts
 #define DEFAULTS "*delay: 15000 \n" \
- "*count: 100 \n" \
- "*size: -3 \n" \
- "*ncolors: 200 \n" \
- "*use3d: False \n" \
- "*delta3d: 1.5 \n" \
- "*right3d: red \n" \
- "*left3d: blue \n" \
- "*both3d: magenta \n" \
- "*none3d: black \n"
-#define UNIFORM_COLORS
-#include "xlockmore.h"		/* in xscreensaver distribution */
+	"*count: 100 \n" \
+	"*size: -3 \n" \
+	"*ncolors: 200 \n" \
+	"*use3d: False \n" \
+	"*delta3d: 1.5 \n" \
+	"*right3d: red \n" \
+	"*left3d: blue \n" \
+	"*both3d: magenta \n" \
+	"*none3d: black \n" \
+
+# define reshape_pyro 0
+# define pyro_handle_event 0
+# define UNIFORM_COLORS
+# include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
-#include "xlock.h"		/* in xlockmore distribution */
+# include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
 #ifdef MODE_pyro
 
-ModeSpecOpt pyro_opts =
+ENTRYPOINT ModeSpecOpt pyro_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   pyro_description =
 {"pyro", "init_pyro", "draw_pyro", "release_pyro",
- "refresh_pyro", "init_pyro", (char *) NULL, &pyro_opts,
+ "refresh_pyro", "init_pyro", "free_pyro", &pyro_opts,
  15000, 100, 1, -3, 64, 1.0, "",
  "Shows fireworks", 0, NULL};
 
@@ -459,7 +457,25 @@ burst(ModeInfo * mi, pyrostruct * pp, rocket * rp)
 	}
 }
 
-void
+static void
+free_pyro_screen(pyrostruct * pp)
+{
+	if (pp == NULL) {
+		return;
+	}
+	if (pp->rockq != NULL) {
+		free(pp->rockq);
+	}
+	pp = NULL;
+}
+
+ENTRYPOINT void
+free_pyro(ModeInfo * mi)
+{
+	free_pyro_screen(&pyros[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_pyro(ModeInfo * mi)
 {
 	int         rockn, starn;
@@ -467,11 +483,7 @@ init_pyro(ModeInfo * mi)
 	rocket     *rp;
 	pyrostruct *pp;
 
-	if (pyros == NULL) {
-		if ((pyros = (pyrostruct *) calloc(MI_NUM_SCREENS(mi),
-					       sizeof (pyrostruct))) == NULL)
-			return;
-	}
+	MI_INIT(mi, pyros);
 	pp = &pyros[MI_SCREEN(mi)];
 
 	pp->width = MI_WIDTH(mi);
@@ -550,7 +562,7 @@ init_pyro(ModeInfo * mi)
 }
 
 /* ARGSUSED */
-void
+ENTRYPOINT void
 draw_pyro(ModeInfo * mi)
 {
 	rocket     *rp;
@@ -586,25 +598,21 @@ draw_pyro(ModeInfo * mi)
 	}
 }
 
-void
+ENTRYPOINT void
 release_pyro(ModeInfo * mi)
 {
 	if (pyros != NULL) {
 		int         screen;
 
-		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++) {
-			pyrostruct *pp = &pyros[screen];
-
-			if (pp->rockq != NULL) {
-				free(pp->rockq);
-			}
-		}
+		for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+			free_pyro_screen(&pyros[screen]);
 		free(pyros);
 		pyros = (pyrostruct *) NULL;
 	}
 }
 
-void
+#ifndef STANDALONE
+ENTRYPOINT void
 refresh_pyro(ModeInfo * mi)
 {
 	if (MI_IS_INSTALL(mi) && MI_IS_USE3D(mi)) {
@@ -613,6 +621,7 @@ refresh_pyro(ModeInfo * mi)
 		MI_CLEARWINDOW(mi);
 	}
 }
+#endif
 
 XSCREENSAVER_MODULE ("Pyro", pyro)
 

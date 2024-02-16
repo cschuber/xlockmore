@@ -1,11 +1,9 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* invert --- shere inversion */
 
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)invert.c	5.01 2001/03/01 xlockmore";
-
 #endif
-
 
 /*-
  * invert.c - Sphere inversion
@@ -44,7 +42,7 @@ static const char sccsid[] = "@(#)invert.c	5.01 2001/03/01 xlockmore";
 #include "i_linkage.h"
 #define STEPS 75
 
-ModeSpecOpt invert_opts =
+ENTRYPOINT ModeSpecOpt invert_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -52,7 +50,7 @@ ModStruct invert_description =
 {(char *) "invert", (char *) "init_invert",
  (char *) "draw_invert", (char *) "release_invert",
  (char *) "draw_invert", (char *) "init_invert",
- (char *) NULL, &invert_opts,
+ (char *) "free_invert", &invert_opts,
  80000, 1, 1, 1, 64, 1.0, (char *) "",
  (char *) "Shows a sphere inverted without wrinkles", 0, NULL};
 
@@ -121,8 +119,11 @@ pinit(void)
 }
 
 static void
-free_invert(Display *display, spherestruct *gp)
+free_invert_screen(Display *display, spherestruct *gp)
 {
+  if (gp == NULL) {
+    return;
+  }
   if (gp->glx_context) {
     /* Display lists MUST be freed while their glXContext is current. */
 #ifdef WIN32
@@ -140,18 +141,22 @@ free_invert(Display *display, spherestruct *gp)
     free(gp->partlist);
     gp->partlist = (char *) NULL;
   }
+  gp = NULL;
 }
 
-void
+ENTRYPOINT void
+free_invert(ModeInfo * mi)
+{
+	
+  free_invert_screen(MI_DISPLAY(mi), &spheres[MI_SCREEN(mi)]);
+}
+
+ENTRYPOINT void
 init_invert(ModeInfo * mi)
 {
   spherestruct *gp;
 
-  if (spheres == NULL) {
-    if ((spheres = (spherestruct *) calloc(MI_NUM_SCREENS(mi),
-					   sizeof (spherestruct))) == NULL)
-      return;
-  }
+  MI_INIT(mi, spheres);
   gp = &spheres[MI_SCREEN(mi)];
   gp->window = MI_WINDOW(mi);
 
@@ -164,7 +169,7 @@ init_invert(ModeInfo * mi)
   gp->view_rotz = NRAND(360);
   if ((gp->glx_context = init_GL(mi)) != NULL) {
     if ((gp->frames = glGenLists(STEPS)) == 0) {
-      free_invert(MI_DISPLAY(mi), gp);
+      free_invert_screen(MI_DISPLAY(mi), gp);
       return;
     }
     reshape(MI_WIDTH(mi), MI_HEIGHT(mi));
@@ -174,7 +179,7 @@ init_invert(ModeInfo * mi)
   }
 }
 
-void
+ENTRYPOINT void
 draw_invert(ModeInfo * mi)
 {
   Display    *display = MI_DISPLAY(mi);
@@ -199,7 +204,7 @@ draw_invert(ModeInfo * mi)
    glXMakeCurrent(display, window, *(gp->glx_context));
 #endif
   if (!invert_draw(gp)) {
-    free_invert(display, gp);
+    free_invert_screen(display, gp);
     return;
   }
 
@@ -223,21 +228,20 @@ draw_invert(ModeInfo * mi)
   glXSwapBuffers(display, window);
 }
 
-void
+ENTRYPOINT void
 release_invert(ModeInfo * mi)
 {
   if (spheres != NULL) {
     int         screen;
 
     for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-       free_invert(MI_DISPLAY(mi), &spheres[screen]);
+       free_invert_screen(MI_DISPLAY(mi), &spheres[screen]);
     free(spheres);
     spheres = (spherestruct *) NULL;
   }
   FreeAllGL(mi);
 }
 
-
-/*********************************************************/
+XSCREENSAVER_MODULE ("Invert", invert)
 
 #endif /* MODE_invert */
