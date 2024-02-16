@@ -95,7 +95,7 @@ XMLOCKINC = @XMLOCKINC@ -I.. -I$(top_srcdir)
 CFLAGS = @CFLAGS@
 #CFLAGS = -O
 #CFLAGS = -g
-XMLOCKLDFLAGS = @XMLOCKLDFLAGS@
+XMLOCKLDFLAGS = @XMLOCKLDFLAGS@ @LDFLAGS@
 XLIBS = @XLIBS@
 XMLOCKLIBS = @XMLOCKLIBS@
 #If you have purify, and want to use it, uncomment this definition or

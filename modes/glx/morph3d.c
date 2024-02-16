@@ -236,7 +236,7 @@ ENTRYPOINT ModeSpecOpt morph3d_opts =
 ModStruct   morph3d_description =
 {"morph3d", "init_morph3d", "draw_morph3d", "release_morph3d",
  "draw_morph3d", "change_morph3d", (char *) NULL, &morph3d_opts,
- 1000, 0, 1, 1, 4, 1.0, "",
+ 1000, 0, 1, 1, 64, 1.0, "",
  "Shows GL morphing polyhedra", 0, NULL};
 
 #endif

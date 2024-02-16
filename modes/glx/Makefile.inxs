@@ -97,7 +97,7 @@ HACKDIR_OBJS	= $(HACK_BIN)/screenhack.o $(HACK_BIN)/xlockmore.o \
 		  $(HACK_BIN)/fps.o $(HACK_BIN)/ximage-loader.o
 PNG		= $(HACK_BIN)/ximage-loader.o
 
-SRCS		= biof.c fire.c invert.c skewb.c \
+SRCS		= fire.c invert.c skewb.c \
 		  xscreensaver-gl-helper.c normals.c erase-gl.c fps-gl.c \
 		  atlantis.c b_draw.c b_lockglue.c b_sphere.c bubble3d.c \
 		  buildlwo.c cage.c dolphin.c gears.c lament.c lament_model.c \
@@ -150,7 +150,7 @@ SRCS		= biof.c fire.c invert.c skewb.c \
 		  gibson.c etruscanvenus.c sphereeversion.c covid19.c \
 		  co____9.c headroom.c headroom_model.c beats.c glsl-utils.c
 
-OBJS		= biof.o fire.o invert.o skewb.o \
+OBJS		= fire.o invert.o skewb.o \
 		  xscreensaver-gl-helper.o normals.o erase-gl.o fps-gl.o \
 		  atlantis.o b_draw.o b_lockglue.o b_sphere.o bubble3d.o \
 		  buildlwo.o cage.o dolphin.o gears.o lament.o lament_model.o \
@@ -204,7 +204,7 @@ OBJS		= biof.o fire.o invert.o skewb.o \
 		  headroom.o headroom_model.o beats.o glsl-utils.o
 
 
-GL_EXES		= biof boxed bubble3d cage fire juggler3d gears \
+GL_EXES		= boxed bubble3d cage fire juggler3d gears \
 		  moebius molecule morph3d noof pipes rubik sierpinski3d \
 		  skewb sproingies stairs superquadrics \
 		  maze3d invert atlantis atunnels glplanet lament sballs \
@@ -269,7 +269,7 @@ HDRS		= atlantis.h bubble3d.h buildlwo.h e_textures.h \
 		  dropshadow.h starwars.h teapot2.h dnapizza.h curlicue.h \
 		  quickhull.h dymaxionmap-coords.h handsy_anim.h
 GL_MEN		= atlantis.man boxed.man bubble3d.man cage.man circuit.man \
-		  biof.man skewb.man \
+		  skewb.man \
 		  cubenetic.man dangerball.man engine.man extrusion.man \
 		  flipscreen3d.man gears.man gflux.man \
 		  glplanet.man glsnake.man gltext.man lament.man lavalite.man \
@@ -620,9 +620,6 @@ atlantis:	atlantis.o	$(ATLANTIS_OBJS)
 ATUNNELS_OBJS = $(HACK_OBJS) tunnel_draw.o xpm-ximage.o
 atunnels:	atunnels.o	$(ATUNNELS_OBJS)
 	$(CC_HACK) -o $@ $@.o   $(ATUNNELS_OBJS) $(HACK_LIBS) -lXpm
-
-biof:		biof.o		$(HACK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HACK_LIBS)
 
 boxed:		boxed.o		$(HACK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(HACK_LIBS)
@@ -1230,20 +1227,6 @@ b_draw.o: $(UTILS_SRC)/usleep.h
 b_draw.o: $(UTILS_SRC)/visual.h
 b_draw.o: $(UTILS_SRC)/yarandom.h
 b_draw.o: $(HACK_SRC)/xlockmoreI.h
-biof.o: ../../../config.h
-biof.o: $(HACK_SRC)/fps.h
-biof.o: $(HACK_SRC)/recanim.h
-biof.o: $(HACK_SRC)/screenhackI.h
-biof.o: $(UTILS_SRC)/colors.h
-biof.o: $(UTILS_SRC)/erase.h
-biof.o: $(UTILS_SRC)/font-retry.h
-biof.o: $(UTILS_SRC)/grabscreen.h
-biof.o: $(UTILS_SRC)/hsv.h
-biof.o: $(UTILS_SRC)/resources.h
-biof.o: $(UTILS_SRC)/usleep.h
-biof.o: $(UTILS_SRC)/visual.h
-biof.o: $(UTILS_SRC)/yarandom.h
-biof.o: $(HACK_SRC)/xlockmoreI.h
 fire.o: ../../../config.h
 fire.o: $(HACK_SRC)/fps.h
 fire.o: $(HACK_SRC)/recanim.h

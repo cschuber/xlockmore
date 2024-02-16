@@ -179,7 +179,7 @@ ENTRYPOINT ModeSpecOpt deluxe_opts =
 #ifdef USE_MODULES
 ModStruct   deluxe_description =
 {"deluxe", "init_deluxe", "draw_deluxe", "release_deluxe",
- "(char *) NULL", "init_deluxe", (char *) NULL, &deluxe_opts,
+ (char *) NULL, "init_deluxe", (char *) NULL, &deluxe_opts,
  5000, 5, 1, 1, 64, 1.0, "",
  "Shows pulsing sequence of stars, circles, and lines.", 0, NULL};
 

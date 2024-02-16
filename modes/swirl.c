@@ -81,7 +81,7 @@ ENTRYPOINT ModeSpecOpt swirl_opts =
 #ifdef USE_MODULES
 ModStruct   swirl_description =
 {"swirl", "init_swirl", "draw_swirl", "release_swirl",
- "refresh_swirl", "init_swirl", (char* NULL), &swirl_opts,
+ "refresh_swirl", "init_swirl", (char *) NULL, &swirl_opts,
  5000, 5, 1, 1, 64, 1.0, "",
  "Shows animated swirling patterns", 0, NULL};
 

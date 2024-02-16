@@ -302,8 +302,8 @@ PAM_conv(int num_msg,
 
 #define COPY_STRING(s) (s) ? strdup(s) : NULL
 
-	reply = (struct pam_response *) malloc(sizeof (struct pam_response) *
-					       num_msg);
+	reply = (struct pam_response *) calloc(num_msg,
+					       sizeof (struct pam_response));
 
 /*
  * reply[] members is not initialized!

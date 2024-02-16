@@ -89,7 +89,7 @@ ENTRYPOINT ModeSpecOpt starfish_opts =
 #ifdef USE_MODULES
 ModStruct   starfish_description =
 {"starfish", "init_starfish", "draw_starfish", "release_starfish",
- "init_starfish", "init_starfish", (char *), &starfish_opts,
+ "init_starfish", "init_starfish", (char *) NULL, &starfish_opts,
  2000, 1, 1000, 1, 64, 1.0, "",
  "Shows starfish", 0, NULL};
 

@@ -40,6 +40,8 @@ XLOCKDEPCPPGLOBJS = $(INVERTOBJS)
 XLOCKMULTCPPGLOBJS = $(DOG)invert$(O)
 #if defined(TtfLibrary) && defined(GlttLibrary)
 XLOCKTEXTGLOBJS = $(DOG)text3d$(O)
+#endif
+#if defined(FreetypeLibrary) && defined(FtglLibrary)
 XLOCKTEXT2GLOBJS = $(DOG)text3d2$(O)
 #endif
 #endif

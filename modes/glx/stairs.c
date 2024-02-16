@@ -85,7 +85,7 @@ ENTRYPOINT ModeSpecOpt stairs_opts =
 ModStruct   stairs_description =
 {"stairs", "init_stairs", "draw_stairs", "release_stairs",
  "draw_stairs", "change_stairs", (char *) NULL, &stairs_opts,
- 1000, 1, 1, 1, 4, 1.0, "",
+ 200000, 0, 1, 1, 64, 1.0, "",
  "Shows Infinite Stairs, an Escher-like scene", 0, NULL};
 
 #endif

@@ -93,7 +93,7 @@ XGLOCKINC = @XGLOCKINC@ -I.. -I$(top_srcdir)
 CFLAGS = @GTK_CFLAGS@ @CFLAGS@
 #CFLAGS = -O
 #CFLAGS = -g
-XGLOCKLDFLAGS = @XGLOCKLDFLAGS@
+XGLOCKLDFLAGS = @XGLOCKLDFLAGS@ @LDFLAGS@
 XLIBS = @XLIBS@
 XGLOCKLIBS = @XGLOCKLIBS@
 #If you have purify, and want to use it, uncomment this definition or

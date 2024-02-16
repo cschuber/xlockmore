@@ -122,7 +122,7 @@ ENTRYPOINT ModeSpecOpt superquadrics_opts =
 ModStruct   superquadrics_description =
 {"superquadrics", "init_superquadrics", "draw_superquadrics", "release_superquadrics",
  (char *) NULL, "init_superquadrics", (char *) NULL, &superquadrics_opts,
- 40000, 25, 40, 1, 4, 1.0, "",
+ 40000, 25, 40, 1, 64, 1.0, "",
  "Shows 3D mathematical shapes", 0, NULL};
 
 #endif

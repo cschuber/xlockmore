@@ -1,4 +1,4 @@
-xlockmore-5.67: the maintained version of xlock
+xlockmore-5.68: the maintained version of xlock
 see docs/Revisions for more version stuff
 see docs/TODO for stuff to do :)
 Help is always appreciated too ;) .
@@ -518,6 +518,11 @@ XCOMM #define GLLibrary
 
   PAM
     http://www.kernel.org/pub/linux/libs/pam/
+    Problem reported (elho's patch there currently added):
+      https://nvd.nist.gov/vuln/detail/CVE-2006-0061
+      https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=318123
+      https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=399003
+
   Rplay
     Audio package.  See below on availability.  Follow its instructions and
       then go to iconfig.h and uncomment (should be autodetected if you use

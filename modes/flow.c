@@ -176,7 +176,7 @@ ENTRYPOINT ModeSpecOpt flow_opts =
 ModStruct   flow_description = {
 	"flow", "init_flow", "draw_flow", "release_flow",
 	"refresh_flow", "init_flow", (char *) NULL, &flow_opts,
-	1000, 1024, 10000, -10, 200, 1.0, "",
+	1000, 1024, 10000, -10, 64, 1.0, "",
 	"Shows dynamic strange attractors", 0, NULL
 };
 

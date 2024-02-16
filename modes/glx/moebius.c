@@ -133,7 +133,7 @@ ENTRYPOINT ModeSpecOpt moebius_opts =
 ModStruct   moebius_description =
 {"moebius", "init_moebius", "draw_moebius", "release_moebius",
  "draw_moebius", "change_moebius", (char *) NULL, &moebius_opts,
- 30000, 1, 1, 1, 4, 1.0, "",
+ 30000, 1, 1, 1, 64, 1.0, "",
  "Shows Moebius Strip II, an Escher-like GL scene with ants", 0, NULL};
 
 #endif

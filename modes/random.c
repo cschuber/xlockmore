@@ -944,7 +944,8 @@ parsemodelist(ModeInfo * mi)
 	if (MI_IS_DEBUG(mi)) {
 		(void) fprintf(stderr, "%d mode%s: ", nmodes, ((nmodes == 1) ? "" : "s"));
 		for (i = 0; i < nmodes; i++)
-			(void) fprintf(stderr, "%d ", modes[i]);
+			(void) fprintf(stderr, "%s, ",
+				LockProcs[i].cmdline_arg);
 		(void) fprintf(stderr, "\n");
 	}
 	return True;

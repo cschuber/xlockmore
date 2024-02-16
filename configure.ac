@@ -5003,7 +5003,7 @@ if test "$customization" = yes; then
   AC_DEFINE([CUSTOMIZATION], [1], [allow customization of XResoure])
 fi
 
-AC_ARG_ENABLE(modules, [  --enable-modules        enable modules (better to use xmkmf for this)],
+AC_ARG_ENABLE(modules, [  --enable-modules        enable modules (experimental!)],
               modules=$enableval,
               modules=no)
 if test "$modules" = yes; then
@@ -5191,6 +5191,8 @@ AC_SUBST(XPM)
 AC_SUBST(GL)
 AC_SUBST(GLTT)
 AC_SUBST(FTGL)
+AC_SUBST(TTF)
+AC_SUBST(FREETYPE)
 AC_SUBST(BOMB)
 AC_SUBST(INTERACTIVE)
 AC_SUBST(UNSTABLE)

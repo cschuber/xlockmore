@@ -633,6 +633,8 @@ DEPEND
 UNSTABLE
 INTERACTIVE
 BOMB
+FREETYPE
+TTF
 FTGL
 GLTT
 GL
@@ -1537,7 +1539,7 @@ Optional Features:
                           enable SUNOS Adjunct passwording
   --disable-mb            disable Xmb function series so will only display ASCII
   --enable-customization  enable customization of XResource
-  --enable-modules        enable modules (better to use xmkmf for this)
+  --enable-modules        enable modules (experimental!)
   --enable-blank-only     enable blank mode only (boring)
   --enable-nice-only      enable only low cpu modes
   --enable-check          enable check (experimental)
@@ -4876,7 +4878,7 @@ cat >>confdefs.h <<_ACEOF
 #define PACKAGE "$PACKAGE"
 _ACEOF
 
-VERSION=5.64
+VERSION=5.67
 
 
 cat >>confdefs.h <<_ACEOF
@@ -8927,7 +8929,7 @@ if ${ac_cv_mesa_version_string+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 8930 "configure"
+#line 8932 "configure"
 #include "confdefs.h"
 #include <GL/xmesa.h>
 configure: XMESA_MAJOR_VERSION XMESA_MINOR_VERSION
@@ -12714,6 +12716,8 @@ esac
 XLOCKLIBS="${XLOCKLIBPATHS} ${XLOCKLIBS} -lX11 -lXext -lm"
 XMLOCKLIBS="${XMLOCKLIBPATHS} ${XMLOCKLIBS} -lX11"
 XGLOCKLIBS="${XGLOCKLIBPATHS} ${XGLOCKLIBS} ${GTK_LIBS} -lX11"
+
+
 
 
 

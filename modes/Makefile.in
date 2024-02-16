@@ -102,8 +102,8 @@ wator$(OM)wire$(OM)world$(OM)worm$(OM)xcl$(OM)xjack$(O)
 @CCC@@GL@$(DOG)i_twojet$(OG)i_twojetvec$(O)
 @CCC@@GL@XLOCKDEPCPPGLOBJS = $(INVERTOBJS)
 @CCC@@GL@XLOCKMULTCPPGLOBJS = $(DOG)invert$(O)
-@CCC@@GL@@GLTT@XLOCKTEXTGLOBJS = $(DOG)text3d$(O)
-@CCC@@GL@@FTGL@XLOCKTEXT2GLOBJS = $(DOG)text3d2$(O)
+@CCC@@GL@@TTF@@GLTT@XLOCKTEXTGLOBJS = $(DOG)text3d$(O)
+@CCC@@GL@@FREETYPE@@FTGL@XLOCKTEXT2GLOBJS = $(DOG)text3d2$(O)
 @GL@SPROINGIESOBJS = $(DOG)buildlwo$(OG)sproingiewrap$(OG)s1_b$(O)$(S)\
 @GL@$(DOG)s1_1$(OG)s1_2$(OG)s1_3$(OG)s1_4$(OG)s1_5$(OG)s1_6$(O)
 @GL@ATLANTISOBJS = $(DOG)dolphin$(OG)shark$(OG)swim$(OG)whale$(O)
@@ -345,7 +345,7 @@ CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@
 #CFLAGS = -O
 #CFLAGS = -g
-XLOCKLDFLAGS = @XLOCKLDFLAGS@ $(CHECKLDFLAG)
+XLOCKLDFLAGS = @XLOCKLDFLAGS@ @LDFLAGS@ $(CHECKLDFLAG)
 XLIBS = @XLIBS@
 XLOCKLIBS = $(MODULELIB) @XLOCKLIBS@
 
@@ -634,9 +634,9 @@ install : install-program install-man install-ad install-sound
 install-program : xlock
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) $(INSTPGMFLAGS) $(UTILOBJDIR)xlock$(E) $(DESTDIR)$(bindir)
-	@MODULES@mkdir -p $(DEF_MODULEPATH)
-	@MODULES@cp *.xlk $(DEF_MODULEPATH)
-	@MODULES@cp glx/*.xlk $(DEF_MODULEPATH)
+	@MODULES@mkdir -p $(DESTDIR)$(DEF_MODULEPATH)
+	@MODULES@cp *.xlk $(DESTDIR)$(DEF_MODULEPATH)
+	@MODULES@cp glx/*.xlk $(DESTDIR)$(DEF_MODULEPATH)
 
 install-man :
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(mandir)

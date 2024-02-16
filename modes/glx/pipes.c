@@ -117,7 +117,7 @@ ModStruct   pipes_description =
  "change_pipes",
 #endif
  "change_pipes", (char *) NULL, &pipes_opts,
- 1000, 2, 5, 500, 4, 1.0, "",
+ 1000, 2, 5, 500, 64, 1.0, "",
  "Shows a selfbuilding pipe system", 0, NULL};
 
 #endif

@@ -120,8 +120,8 @@ ENTRYPOINT ModeSpecOpt atunnels_opts =
 #ifdef USE_MODULES
 ModStruct   atunnels_description =
 {"atunnels", "init_atunnels", "draw_atunnels", "release_atunnels",
- "draw_atunnels", "init_atunnels", NULL, &atunnels_opts,
- 25000, 1, 1, 1, 0, 1.0, "",
+ "draw_atunnels", "change_atunnels", NULL, &atunnels_opts,
+ 25000, 1, 1, 0, 64, 1.0, "",
  "Shows an OpenGL advanced tunnel screensaver", 0, NULL};
 #endif
 

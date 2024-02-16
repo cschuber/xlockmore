@@ -155,7 +155,7 @@ ENTRYPOINT ModeSpecOpt text3d2_opts =
 ModStruct text3d2_description =
 {"text3d2", "init_text3d2", "draw_text3d2", "release_text3d2",
  "refresh_text3d2", "change_text3d2", (char *) NULL, &text3d2_opts,
- 100000, 1, 10, 1, 64, 1.0, "",
+ 100000, 10, 1, 1, 64, 1.0, "",
  "Shows 3D text", 0, NULL};
 #endif
 

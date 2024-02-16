@@ -59,7 +59,7 @@ static const char sccsid[] = "@(#)text3d.cc	5.02 2001/11/09 xlockmore";
  *
  */
 
-#ifdef STANDALONE	/* xscreensaver mode: can't work ! */
+#ifdef STANDALONE
 #define MODE_text3d
 #define DEFAULTS 	"*delay: 	100000 \n"
 
