@@ -156,6 +156,9 @@ kick-off-able or really locked.
   o kill -HUP to change modes as well as middle mouse button.  Needed when
    using -inroot .
 
+  o xlock should obey SIGINT and cleanup to allow user to continue.
+   Nice to have for a forced rest breaks, see etc/rest.sh
+
   o -showfps option may give a Zero Page Read and SEGV error using Mesa
    and Sun
 
@@ -585,7 +588,7 @@ New mode ideas... (some may be very hard :) ):
      the screen. This would give the effect of the display being seen from
      above.
   o In decay mode, have a Blue Screen of Death option.
-
+  
 PLEASE NOTE:
 -----------
   I _REALLY_ hate to turn down contributions...  I will try to consider

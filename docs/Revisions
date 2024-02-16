@@ -1,4 +1,4 @@
-xlockmore-5.71 as of 16 August 2022, the maintained version of xlock
+xlockmore-5.74 as of 5 November 2023, the maintained version of xlock
 
 Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
@@ -11,6 +11,30 @@ send me mail if you want to be on a list for latest releases.
 
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
+
+5.74
+  dino mode center fix (probably never see error).
+  bevel mode added.  Better known as the Helicopter Cube.  Currently,
+    it only supports the 180 degree turns.  The ~71 degree turns would
+    be very challenging to simulate.  Taken from an unreleased xbevel
+    puzzle (which I am currently creating) and the skewb mode.
+
+5.73
+  dino mode added, mostly built from xdino and skewb mode.
+  fiberlamp mode fixed for multiscreen.
+  boxed mode report that it may be trapped in an infinite loop, I could
+    not reproduce but added a hack so this will not happen.
+
+5.72
+  Update for OpenVMS for x86_64, small change to xshm.h and new make.com
+    to work with clang and xmlock/xawlock thanks to Jouk Jansen.  I hear
+    its now possible to get a virtual OpenVMS on your Linux machine. :)
+  Update for xscreensaver-6.06 port to use grabclient instead of
+    grabscreen.
+  configure now configures xmlock for Athena if you do not want Motif.
+    Should work with most popular versions of Athena.  You may want
+    to change the name from xmlock to xawlock if you are using Athena.
+    xawlock directory removed and was not meant to be distributed.
 
 5.71
   Patch for Theobromine, Niacin, and Cobalamin from Richard Narron,
@@ -41,7 +65,7 @@ from others.
 5.68
   Updated xscreensaver port for xscreensaver-6.02.
   Various NetBsd install issues fixed including config.cygport.
-  pam vulnerabiliy patch added thanks to Elmar Hoffmann, elho AT elho.net.
+  pam vulnerability patch added thanks to Elmar Hoffmann, elho AT elho.net.
     Card vulnerability may remain, see README.
   module fixes for deluxe, eyes, starfish, swirl, text3d2, module use is
     still experimental.

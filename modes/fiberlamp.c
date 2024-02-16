@@ -162,12 +162,8 @@ ENTRYPOINT void
 init_fiberlamp(ModeInfo * mi)
 {
   fiberlampstruct *fl;
-  Bool init = False;
 
-  if (fiberlamps == NULL) {
-    init = True;
-    MI_INIT(mi, fiberlamps);
-  }
+  MI_INIT(mi, fiberlamps);
   fl = &fiberlamps[MI_SCREEN(mi)];
 
   /* Create or Resize double buffer */
@@ -182,9 +178,6 @@ init_fiberlamp(ModeInfo * mi)
   XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_BLACK_PIXEL(mi));
   XFillRectangle(MI_DISPLAY(mi), (Drawable) fl->buffer, MI_GC(mi), 0, 0,
 				 MI_WIDTH(mi), MI_HEIGHT(mi));
-
-  if(!init) /* Nothing else to do (probably a resize) */
-	return;
 
   fl->nfibers = MI_COUNT(mi);
   /* Allocate fibers */

@@ -61,17 +61,17 @@ XLOCK_BIN       = ../xlock
 INCLUDES	= -I$(srcdir) -I$(srcdir)/../.. -I$(UTILS_SRC) -I$(HACKS_SRC) -I../.. @INCLUDES@
 
 UTIL_SRCS	= $(UTILS_SRC)/alpha.c $(UTILS_SRC)/colors.c \
-		  $(UTILS_SRC)/grabscreen.c $(UTILS_SRC)/hsv.c \
+		  $(UTILS_SRC)/grabclient.c $(UTILS_SRC)/hsv.c \
 		  $(UTILS_SRC)/resources.c $(UTILS_SRC)/spline.c \
 		  $(UTILS_SRC)/usleep.c $(UTILS_SRC)/visual.c \
-		  $(UTILS_SRC)/xroger.c $(UTILS_SRC)/yarandom.c \
-	 	  $(UTILS_SRC)/erase.c $(UTILS_SRC)/sgivideo.c
+		  $(UTILS_SRC)/yarandom.c \
+	 	  $(UTILS_SRC)/erase.c
 UTIL_OBJS	= $(UTILS_BIN)/alpha.o $(UTILS_BIN)/colors.o \
-		  $(UTILS_BIN)/grabscreen.o $(UTILS_BIN)/hsv.o \
+		  $(UTILS_BIN)/grabclient.o $(UTILS_BIN)/hsv.o \
 		  $(UTILS_BIN)/resources.o $(UTILS_BIN)/spline.o \
 		  $(UTILS_BIN)/usleep.o $(UTILS_BIN)/visual.o \
-		  $(UTILS_BIN)/xroger.o $(UTILS_BIN)/yarandom.o \
-		  $(UTILS_BIN)/erase.o $(UTILS_BIN)/sgivideo.o
+		  $(UTILS_BIN)/yarandom.o \
+		  $(UTILS_BIN)/erase.o
 
 SRCS		= automata.c iostuff.c spline.c xbm.c color.c
 
@@ -84,7 +84,7 @@ HACK_OBJS_1	= $(UTILS_BIN)/resources.o $(UTILS_BIN)/visual.o \
 HACK_OBJS	= screenhack.o $(HACK_OBJS_1)
 XLOCK_OBJS	= screenhack-xlock.o $(HACKS_BIN)/xlockmore.o $(COLOR_OBJS) $(HACK_OBJS_1)
 COLOR_OBJS	= $(UTILS_BIN)/hsv.o $(UTILS_BIN)/colors.o
-GRAB_OBJS_1	= $(UTILS_BIN)/grabscreen.o $(SGI_VIDEO_OBJS)
+GRAB_OBJS_1	= $(UTILS_BIN)/grabclient.o $(SGI_VIDEO_OBJS)
 GRAB_OBJS	= $(GRAB_OBJS_1) $(COLOR_OBJS)
 GRAB_LIBS	= $(SGI_VIDEO_LIBS)
 
@@ -245,8 +245,7 @@ distdepend:: $(srcdir)/../setup.com
 #
 $(UTILS_BIN)/alpha.o:		$(UTILS_SRC)/alpha.c
 $(UTILS_BIN)/colors.o:		$(UTILS_SRC)/colors.c
-$(UTILS_BIN)/grabscreen.o:	$(UTILS_SRC)/grabscreen.c
-$(UTILS_BIN)/sgivideo.o:	$(UTILS_SRC)/sgivideo.c
+$(UTILS_BIN)/grabclient.o:	$(UTILS_SRC)/grabclient.c
 $(UTILS_BIN)/hsv.o:		$(UTILS_SRC)/hsv.c
 $(UTILS_BIN)/resources.o:	$(UTILS_SRC)/resources.c
 $(UTILS_BIN)/spline.o:		$(UTILS_SRC)/spline.c
@@ -294,7 +293,7 @@ xlock.o: $(srcdir)/$(UTILS_SRC)/usleep.h
 xlock.o: $(srcdir)/$(UTILS_SRC)/resources.h
 xlock.o: $(srcdir)/$(UTILS_SRC)/hsv.h
 xlock.o: $(srcdir)/$(UTILS_SRC)/colors.h
-xlock.o: $(srcdir)/$(UTILS_SRC)/grabscreen.h
+xlock.o: $(srcdir)/$(UTILS_SRC)/grabclient.h
 xlock.o: $(srcdir)/$(UTILS_SRC)/visual.h
 xlock.o: $(srcdir)/mode.h
 automata.o: $(srcdir)/$(UTILS_SRC)/utils.h
@@ -309,7 +308,7 @@ iostuff.o: $(srcdir)/$(UTILS_SRC)/usleep.h
 iostuff.o: $(srcdir)/$(UTILS_SRC)/resources.h
 iostuff.o: $(srcdir)/$(UTILS_SRC)/hsv.h
 iostuff.o: $(srcdir)/$(UTILS_SRC)/colors.h
-iostuff.o: $(srcdir)/$(UTILS_SRC)/grabscreen.h
+iostuff.o: $(srcdir)/$(UTILS_SRC)/grabclient.h
 iostuff.o: $(srcdir)/$(UTILS_SRC)/visual.h
 iostuff.o: $(srcdir)/iostuff.h
 iostuff.o: $(srcdir)/ras.h

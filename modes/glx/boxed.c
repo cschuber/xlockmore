@@ -463,6 +463,7 @@ static void updateballs(ballman *bman)
    
       /* check voor stuiteren */
       for (j=b+1;j<bman->num_balls;j++) {
+	 int count = 0;
 	 squaredist = (bman->balls[b].radius * bman->balls[b].radius) + (bman->balls[j].radius * bman->balls[j].radius);
 	 subvectors(&dvect,&bman->balls[b].loc,&bman->balls[j].loc);
 	 if ( squaremagnitude(&dvect) < squaredist ) { /* balls b and j touch */
@@ -477,7 +478,8 @@ static void updateballs(ballman *bman)
 	    addvectors(&bman->balls[j].loc,&bman->balls[j].loc,&bman->balls[j].dir);
 	    
 	    subvectors(&dvect,&bman->balls[b].loc,&bman->balls[j].loc);
-	    while (squaremagnitude(&dvect) < squaredist) {
+	    while (squaremagnitude(&dvect) < squaredist - count) {
+	       count++; /* else infinite loop may be possible */
 	       addvectors(&bman->balls[b].loc,&bman->balls[b].loc,&bman->balls[b].dir);
 	       addvectors(&bman->balls[j].loc,&bman->balls[j].loc,&bman->balls[j].dir);
 	       subvectors(&dvect,&bman->balls[b].loc,&bman->balls[j].loc);

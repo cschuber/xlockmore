@@ -84,6 +84,12 @@ LockStruct  LockProcs[] =
 	 100000, -8, 1, 0, 64, 1.0, (char *) "",
 	 (char *) "Shows bouncing flying bats", 0, NULL},
 #endif
+#ifdef MODE_bevel
+	{(char *) "bevel", init_bevel, draw_bevel, release_bevel,
+	 draw_bevel, change_bevel, (ModeHook *) NULL, &bevel_opts,
+	 100000, -30, 5, 1, 64, 1.0, (char *) "",
+	 (char *) "Shows an auto-solving Bevel or Helicopter Cube", 0, NULL},
+#endif
 #ifdef MODE_billiards
 	{(char *) "billiards", init_billiards, draw_billiards, release_billiards,
 	 refresh_billiards, init_billiards, (ModeHook *) NULL, &billiards_opts,
@@ -209,6 +215,12 @@ LockStruct  LockProcs[] =
 	 refresh_dilemma, init_dilemma, (ModeHook *) NULL, &dilemma_opts,
 	 200000, -2, 1000, 0, 64, 1.0, (char *) "",
 	 (char *) "Shows Lloyd's Prisoner's Dilemma simulation", 0, NULL},
+#endif
+#ifdef MODE_dino
+	{(char *) "dino", init_dino, draw_dino, release_dino,
+	 draw_dino, change_dino, (ModeHook *) NULL, &dino_opts,
+	 100000, -30, 5, 1, 64, 1.0, (char *) "",
+	 (char *) "Shows an auto-solving Dinosaur Cube", 0, NULL},
 #endif
 #ifdef MODE_discrete
 	{(char *) "discrete", init_discrete, draw_discrete, release_discrete,

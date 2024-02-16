@@ -845,6 +845,7 @@ if test "$no_motif" = yes; then
   INSTALL_XMLOCK=""
   UNINSTALL_XMLOCK=""
 else
+  AC_DEFINE([HAVE_MOTIF], [1], [Motif is available])
   XMLOCKLIBS="-lXm ${XMLOCKLIBS}"
   XMLOCK="xmlock"
   INSTALL_XMLOCK="install_xmlock"
@@ -864,6 +865,861 @@ if test "x$motif_libraries" != x && test "x$motif_libraries" != xNONE ; then
 fi
 if test "x$motif_includes" != x && test "x$motif_includes" != xNONE ; then
   XMLOCKINC="${XMLOCKINC} -I$motif_includes"
+fi
+
+dnl Athena ATHENA athena
+
+AC_ARG_WITH(athena, [  --without-athena        disable Athena (all Xaw libs)])
+if test "x$with_athena" = xno; then
+  with_xaw3dxft=no
+  with_xaw3d=no
+  with_nextaw=no
+  with_xaw=no
+fi
+
+dnl Xaw3dxft XAW3DXFT xaw3dxft
+
+AC_DEFUN([AC_PATH_XAW3DXFT_DIRECT],
+[test -z "$xaw3dxft_direct_test_library" && xaw3dxft_direct_test_library=Xaw3dxft
+test -z "$xaw3dxft_direct_test_function" && xaw3dxft_direct_test_function=XawDialGetValueString
+test -z "$xaw3dxft_direct_test_include" && xaw3dxft_direct_test_include=X11/Xaw3dxft/Command.h
+  for ac_dir in               \
+    /usr/X11R6/include        \
+    /usr/X11R5/include        \
+    /usr/X11R4/include        \
+                              \
+    /usr/include/X11R6        \
+    /usr/include/X11R5        \
+    /usr/include/X11R4        \
+                              \
+    /usr/local/X11R6/include  \
+    /usr/local/X11R5/include  \
+    /usr/local/X11R4/include  \
+                              \
+    /usr/local/include/X11R6  \
+    /usr/local/include/X11R5  \
+    /usr/local/include/X11R4  \
+                              \
+    /usr/X11/include          \
+    /usr/include/X11          \
+    /usr/local/X11/include    \
+    /usr/local/include/X11    \
+                              \
+    /usr/X386/include         \
+    /usr/x386/include         \
+    /usr/XFree86/include/X11  \
+                              \
+    /usr/dt/include           \
+                              \
+    /usr/local/include        \
+    /usr/remote/include       \
+    /usr/include              \
+    /usr/unsupported/include  \
+    /usr/local/x11r5/include  \
+    /usr/lpp/Xamples/include  \
+    $extra_include            \
+    ; \
+  do
+    if test -r "$ac_dir/$xaw3dxft_direct_test_include"; then
+      no_xaw3dxft= ac_xaw3dxft_includes=$ac_dir
+      break
+    fi
+  done
+
+# Check for the libraries.
+# See if we find them without any special options.
+# Don't add to $LIBS permanently.
+ac_save_LIBS="$LIBS"
+LIBS="-l$xaw3dxft_direct_test_library $LIBS"
+# First see if replacing the include by lib works.
+for ac_dir in `echo "$ac_xaw3dxft_includes" | sed s/include/lib/` \
+    /usr/X11R6/lib        \
+    /usr/X11R5/lib        \
+    /usr/X11R4/lib        \
+                          \
+    /usr/lib/X11R6        \
+    /usr/lib/X11R5        \
+    /usr/lib/X11R4        \
+                          \
+    /usr/local/X11R6/lib  \
+    /usr/local/X11R5/lib  \
+    /usr/local/X11R4/lib  \
+                          \
+    /usr/local/lib/X11R6  \
+    /usr/local/lib/X11R5  \
+    /usr/local/lib/X11R4  \
+                          \
+    /usr/X11/lib          \
+    /usr/lib/X11          \
+    /usr/local/X11/lib    \
+                          \
+    /usr/X386/lib         \
+    /usr/x386/lib         \
+    /usr/XFree86/lib/X11  \
+                          \
+    /usr/lib              \
+    /usr/local/lib        \
+    /usr/remote/lib       \
+    /usr/unsupported/lib  \
+    /usr/xaw3dxft/lib       \
+    /usr/local/x11r5/lib  \
+    /usr/lpp/Xamples/lib  \
+    $extra_lib            \
+    ; \
+do
+  for ac_extension in a so sl; do
+    if test -r $ac_dir/lib${xaw3dxft_direct_test_library}.$ac_extension; then
+      no_xaw3dxft= ac_xaw3dxft_libraries=$ac_dir
+      break 2
+    fi
+  done
+done
+LIBS="$ac_save_LIBS"])
+AC_DEFUN([AC_PATH_XAW3DXFT],
+[AC_REQUIRE_CPP()dnl
+
+xaw3dxft_includes=NONE
+xaw3dxft_libraries=NONE
+
+AC_MSG_CHECKING(for Xaw3dxft)
+AC_ARG_WITH(xaw3dxft, [  --without-xaw3dxft      disable Xaw3dxft])
+if test "x$with_xaw3dxft" = xno; then
+  no_xaw3dxft=yes
+else
+  if test "x$xaw3dxft_includes" != xNONE && test "x$xaw3dxft_libraries" != xNONE; then
+    no_xaw3dxft=
+  else
+AC_CACHE_VAL(ac_cv_path_xaw3dxft,
+[# One or both of these vars are not set, and there is no cached value.
+no_xaw3dxft=yes
+AC_PATH_XAW3DXFT_DIRECT
+
+if test "$no_xaw3dxft" = yes; then
+  ac_cv_path_xaw3dxft="no_xaw3dxft=yes"
+else
+  ac_cv_path_xaw3dxft="no_xaw3dxft= ac_xaw3dxft_includes=$ac_xaw3dxft_includes ac_xaw3dxft_libraries=$ac_xaw3dxft_libraries"
+fi])dnl
+  fi
+  eval "$ac_cv_path_xaw3dxft"
+fi # with_xaw3dxft != no
+
+if test "$no_motif" = yes; then
+  if test "$no_xaw3dxft" = yes; then
+    AC_MSG_RESULT(no)
+    XMLOCK=""
+    INSTALL_XMLOCK=""
+    UNINSTALL_XMLOCK=""
+  else
+    AC_DEFINE([HAVE_ATHENA], [1], [Athena is available])
+    AC_DEFINE([HAVE_LIB_XAW3DXFT], [1], [Xaw3dxft is available])
+    XMLOCKLIBS="-lXaw3dxft ${XMLOCKLIBS}"
+    XMLOCK="xmlock"
+    INSTALL_XMLOCK="install_xmlock"
+    UNINSTALL_XMLOCK="uninstall_xmlock"
+    test "x$xaw3dxft_includes" = xNONE && xaw3dxft_includes=$ac_xaw3dxft_includes
+    test "x$xaw3dxft_libraries" = xNONE && xaw3dxft_libraries=$ac_xaw3dxft_libraries
+    ac_cv_path_xaw3dxft="no_xaw3dxft= ac_xaw3dxft_includes=$xaw3dxft_includes ac_xaw3dxft_libraries=$xaw3dxft_libraries"
+    AC_MSG_RESULT([libraries $xaw3dxft_libraries, headers $xaw3dxft_includes])
+  fi
+else
+  AC_MSG_RESULT(ignored - using Motif)
+fi
+])
+
+AC_PATH_XAW3DXFT
+
+if test "x$xaw3dxft_libraries" != x ; then
+  XWIDGET_LDFLAGS="${XWIDGET_LDFLAGS}:$xaw3dxft_libraries"
+  XWIDGETLIBPATHS="-L$xaw3dxft_libraries ${XWIDGETLIBPATHS}"
+fi
+if test "x$xaw3dxft_includes" != x ; then
+  XWIDGETINC="${XWIDGETINC} -I$xaw3dxft_includes"
+fi
+
+dnl Xaw3d XAW3D xaw3d
+
+AC_DEFUN([AC_PATH_XAW3D_DIRECT],
+[test -z "$xaw3d_direct_test_library" && xaw3d_direct_test_library=Xaw3d
+test -z "$xaw3d_direct_test_function" && xaw3d_direct_test_function=XawDialGetValueString
+test -z "$xaw3d_direct_test_include" && xaw3d_direct_test_include=X11/Xaw3d/Command.h
+  for ac_dir in               \
+    /usr/X11R6/include        \
+    /usr/X11R5/include        \
+    /usr/X11R4/include        \
+                              \
+    /usr/include/X11R6        \
+    /usr/include/X11R5        \
+    /usr/include/X11R4        \
+                              \
+    /usr/local/X11R6/include  \
+    /usr/local/X11R5/include  \
+    /usr/local/X11R4/include  \
+                              \
+    /usr/local/include/X11R6  \
+    /usr/local/include/X11R5  \
+    /usr/local/include/X11R4  \
+                              \
+    /usr/X11/include          \
+    /usr/include/X11          \
+    /usr/local/X11/include    \
+    /usr/local/include/X11    \
+                              \
+    /usr/X386/include         \
+    /usr/x386/include         \
+    /usr/XFree86/include/X11  \
+                              \
+    /usr/dt/include           \
+                              \
+    /usr/local/include        \
+    /usr/remote/include       \
+    /usr/include              \
+    /usr/unsupported/include  \
+    /usr/local/x11r5/include  \
+    /usr/lpp/Xamples/include  \
+    $extra_include            \
+    ; \
+  do
+    if test -r "$ac_dir/$xaw3d_direct_test_include"; then
+      no_xaw3d= ac_xaw3d_includes=$ac_dir
+      break
+    fi
+  done
+
+# Check for the libraries.
+# See if we find them without any special options.
+# Don't add to $LIBS permanently.
+ac_save_LIBS="$LIBS"
+LIBS="-l$xaw3d_direct_test_library $LIBS"
+# First see if replacing the include by lib works.
+for ac_dir in `echo "$ac_xaw3d_includes" | sed s/include/lib/` \
+    /usr/X11R6/lib        \
+    /usr/X11R5/lib        \
+    /usr/X11R4/lib        \
+                          \
+    /usr/lib/X11R6        \
+    /usr/lib/X11R5        \
+    /usr/lib/X11R4        \
+                          \
+    /usr/local/X11R6/lib  \
+    /usr/local/X11R5/lib  \
+    /usr/local/X11R4/lib  \
+                          \
+    /usr/local/lib/X11R6  \
+    /usr/local/lib/X11R5  \
+    /usr/local/lib/X11R4  \
+                          \
+    /usr/X11/lib          \
+    /usr/lib/X11          \
+    /usr/local/X11/lib    \
+                          \
+    /usr/X386/lib         \
+    /usr/x386/lib         \
+    /usr/XFree86/lib/X11  \
+                          \
+    /usr/lib              \
+    /usr/local/lib        \
+    /usr/remote/lib       \
+    /usr/unsupported/lib  \
+    /usr/xaw3d/lib       \
+    /usr/local/x11r5/lib  \
+    /usr/lpp/Xamples/lib  \
+    $extra_lib            \
+    ; \
+do
+  for ac_extension in a so sl; do
+    if test -r $ac_dir/lib${xaw3d_direct_test_library}.$ac_extension; then
+      no_xaw3d= ac_xaw3d_libraries=$ac_dir
+      break 2
+    fi
+  done
+done
+LIBS="$ac_save_LIBS"])
+AC_DEFUN([AC_PATH_XAW3D],
+[AC_REQUIRE_CPP()dnl
+
+xaw3d_includes=NONE
+xaw3d_libraries=NONE
+
+AC_MSG_CHECKING(for Xaw3d)
+AC_ARG_WITH(xaw3d, [  --without-xaw3d         disable Xaw3d])
+if test "x$with_xaw3d" = xno; then
+  no_xaw3d=yes
+else
+  if test "x$xaw3d_includes" != xNONE && test "x$xaw3d_libraries" != xNONE; then
+    no_xaw3d=
+  else
+AC_CACHE_VAL(ac_cv_path_xaw3d,
+[# One or both of these vars are not set, and there is no cached value.
+no_xaw3d=yes
+AC_PATH_XAW3D_DIRECT
+
+if test "$no_xaw3d" = yes; then
+  ac_cv_path_xaw3d="no_xaw3d=yes"
+else
+  ac_cv_path_xaw3d="no_xaw3d= ac_xaw3d_includes=$ac_xaw3d_includes ac_xaw3d_libraries=$ac_xaw3d_libraries"
+fi])dnl
+  fi
+  eval "$ac_cv_path_xaw3d"
+fi # with_xaw3d != no
+
+if test "$no_motif" = yes; then
+  if test "$no_xaw3dxft" = yes; then
+    if test "$no_xaw3d" = yes; then
+      AC_MSG_RESULT(no)
+      XMLOCK=""
+      INSTALL_XMLOCK=""
+      UNINSTALL_XMLOCK=""
+    else
+      AC_DEFINE([HAVE_ATHENA], [1], [Athena is available])
+      AC_DEFINE([HAVE_LIB_XAW3D], [1], [Xaw3d is available])
+      XMLOCKLIBS="-lXaw3d ${XMLOCKLIBS}"
+      XMLOCK="xmlock"
+      INSTALL_XMLOCK="install_xmlock"
+      UNINSTALL_XMLOCK="uninstall_xmlock"
+      test "x$xaw3d_includes" = xNONE && xaw3d_includes=$ac_xaw3d_includes
+      test "x$xaw3d_libraries" = xNONE && xaw3d_libraries=$ac_xaw3d_libraries
+      ac_cv_path_xaw3d="no_xaw3d= ac_xaw3d_includes=$xaw3d_includes ac_xaw3d_libraries=$xaw3d_libraries"
+      AC_MSG_RESULT([libraries $xaw3d_libraries, headers $xaw3d_includes])
+    fi
+  else
+    AC_MSG_RESULT(ignored - using Xaw3dxft)
+  fi
+else
+  AC_MSG_RESULT(ignored - using Motif)
+fi
+])
+
+AC_PATH_XAW3D
+
+if test "x$xaw3d_libraries" != x ; then
+  XWIDGET_LDFLAGS="${XWIDGET_LDFLAGS}:$xaw3d_libraries"
+  XWIDGETLIBPATHS="-L$xaw3d_libraries ${XWIDGETLIBPATHS}"
+fi
+if test "x$xaw3d_includes" != x ; then
+  XWIDGETINC="${XWIDGETINC} -I$xaw3d_includes"
+fi
+
+dnl neXtaw NEXTAW nextaw
+
+AC_DEFUN([AC_PATH_NEXTAW_DIRECT],
+[test -z "$nextaw_direct_test_library" && nextaw_direct_test_library=neXtaw
+test -z "$nextaw_direct_test_function" && nextaw_direct_test_function=XawDialGetValueString
+test -z "$nextaw_direct_test_include" && nextaw_direct_test_include=X11/neXtaw/Command.h
+  for ac_dir in               \
+    /usr/X11R6/include        \
+    /usr/X11R5/include        \
+    /usr/X11R4/include        \
+                              \
+    /usr/include/X11R6        \
+    /usr/include/X11R5        \
+    /usr/include/X11R4        \
+                              \
+    /usr/local/X11R6/include  \
+    /usr/local/X11R5/include  \
+    /usr/local/X11R4/include  \
+                              \
+    /usr/local/include/X11R6  \
+    /usr/local/include/X11R5  \
+    /usr/local/include/X11R4  \
+                              \
+    /usr/X11/include          \
+    /usr/include/X11          \
+    /usr/local/X11/include    \
+    /usr/local/include/X11    \
+                              \
+    /usr/X386/include         \
+    /usr/x386/include         \
+    /usr/XFree86/include/X11  \
+                              \
+    /usr/dt/include           \
+                              \
+    /usr/local/include        \
+    /usr/remote/include       \
+    /usr/include              \
+    /usr/unsupported/include  \
+    /usr/local/x11r5/include  \
+    /usr/lpp/Xamples/include  \
+    $extra_include            \
+    ; \
+  do
+    if test -r "$ac_dir/$nextaw_direct_test_include"; then
+      no_nextaw= ac_nextaw_includes=$ac_dir
+      break
+    fi
+  done
+
+# Check for the libraries.
+# See if we find them without any special options.
+# Don't add to $LIBS permanently.
+ac_save_LIBS="$LIBS"
+LIBS="-l$nextaw_direct_test_library $LIBS"
+# First see if replacing the include by lib works.
+for ac_dir in `echo "$ac_nextaw_includes" | sed s/include/lib/` \
+    /usr/X11R6/lib        \
+    /usr/X11R5/lib        \
+    /usr/X11R4/lib        \
+                          \
+    /usr/lib/X11R6        \
+    /usr/lib/X11R5        \
+    /usr/lib/X11R4        \
+                          \
+    /usr/local/X11R6/lib  \
+    /usr/local/X11R5/lib  \
+    /usr/local/X11R4/lib  \
+                          \
+    /usr/local/lib/X11R6  \
+    /usr/local/lib/X11R5  \
+    /usr/local/lib/X11R4  \
+                          \
+    /usr/X11/lib          \
+    /usr/lib/X11          \
+    /usr/local/X11/lib    \
+                          \
+    /usr/X386/lib         \
+    /usr/x386/lib         \
+    /usr/XFree86/lib/X11  \
+                          \
+    /usr/lib              \
+    /usr/local/lib        \
+    /usr/remote/lib       \
+    /usr/unsupported/lib  \
+    /usr/nextaw/lib       \
+    /usr/local/x11r5/lib  \
+    /usr/lpp/Xamples/lib  \
+    $extra_lib            \
+    ; \
+do
+  for ac_extension in a so sl; do
+    if test -r $ac_dir/lib${nextaw_direct_test_library}.$ac_extension; then
+      no_nextaw= ac_nextaw_libraries=$ac_dir
+      break 2
+    fi
+  done
+done
+LIBS="$ac_save_LIBS"])
+AC_DEFUN([AC_PATH_NEXTAW],
+[AC_REQUIRE_CPP()dnl
+
+nextaw_includes=NONE
+nextaw_libraries=NONE
+
+AC_MSG_CHECKING(for neXtaw)
+AC_ARG_WITH(nextaw, [  --without-nextaw        disable neXtaw])
+if test "x$with_nextaw" = xno; then
+  no_nextaw=yes
+else
+  if test "x$nextaw_includes" != xNONE && test "x$nextaw_libraries" != xNONE; then
+    no_nextaw=
+  else
+AC_CACHE_VAL(ac_cv_path_nextaw,
+[# One or both of these vars are not set, and there is no cached value.
+no_nextaw=yes
+AC_PATH_NEXTAW_DIRECT
+
+if test "$no_nextaw" = yes; then
+  ac_cv_path_nextaw="no_nextaw=yes"
+else
+  ac_cv_path_nextaw="no_nextaw= ac_nextaw_includes=$ac_nextaw_includes ac_nextaw_libraries=$ac_nextaw_libraries"
+fi])dnl
+  fi
+  eval "$ac_cv_path_nextaw"
+fi # with_nextaw != no
+
+if test "$no_motif" = yes; then
+  if test "$no_xaw3dxft" = yes; then
+    if test "$no_xaw3d" = yes; then
+      if test "$no_editres" = yes; then
+        no_nextaw=yes
+        AC_MSG_RESULT(ignored - requires editres)
+      else
+        if test "$no_nextaw" = yes; then
+          AC_MSG_RESULT(no)
+          XMLOCK=""
+          INSTALL_XMLOCK=""
+          UNINSTALL_XMLOCK=""
+        else
+          AC_DEFINE([HAVE_ATHENA], [1], [Athena is available])
+          AC_DEFINE([HAVE_LIB_NEXTAW], [1], [neXtaw is available])
+          XMLOCKLIBS="-lneXtaw ${XMLOCKLIBS}"
+          XMLOCK="xmlock"
+          INSTALL_XMLOCK="install_xmlock"
+          UNINSTALL_XMLOCK="uninstall_xmlock"
+          test "x$nextaw_includes" = xNONE && nextaw_includes=$ac_nextaw_includes
+          test "x$nextaw_libraries" = xNONE && nextaw_libraries=$ac_nextaw_libraries
+          ac_cv_path_nextaw="no_nextaw= ac_nextaw_includes=$nextaw_includes ac_nextaw_libraries=$nextaw_libraries"
+          AC_MSG_RESULT([libraries $nextaw_libraries, headers $nextaw_includes])
+        fi
+      fi
+    else
+      AC_MSG_RESULT(ignored - using Xaw3d)
+    fi
+  else
+    AC_MSG_RESULT(ignored - using Xaw3dxft)
+  fi
+else
+  AC_MSG_RESULT(ignored - using Motif)
+fi
+])
+
+AC_PATH_NEXTAW
+
+if test "x$nextaw_libraries" != x ; then
+  XWIDGET_LDFLAGS="${XWIDGET_LDFLAGS}:$nextaw_libraries"
+  XWIDGETLIBPATHS="-L$nextaw_libraries ${XWIDGETLIBPATHS}"
+fi
+if test "x$xaw3d_includes" != x ; then
+  XWIDGETINC="${XWIDGETINC} -I$nextaw_includes"
+fi
+
+dnl XawPlus XAWPLUS xawplus
+
+AC_DEFUN([AC_PATH_XAWPLUS_DIRECT],
+[test -z "$xawplus_direct_test_library" && xawplus_direct_test_library=XawPlus
+test -z "$xawplus_direct_test_function" && xawplus_direct_test_function=XawDialGetValueString
+test -z "$xawplus_direct_test_include" && xawplus_direct_test_include=X11/XawPlus/Command.h
+  for ac_dir in               \
+    /usr/athena/include       \
+                              \
+    /usr/X11R6/include        \
+    /usr/X11R5/include        \
+    /usr/X11R4/include        \
+                              \
+    /usr/include/X11R6        \
+    /usr/include/X11R5        \
+    /usr/include/X11R4        \
+                              \
+    /usr/local/X11R6/include  \
+    /usr/local/X11R5/include  \
+    /usr/local/X11R4/include  \
+                              \
+    /usr/local/include/X11R6  \
+    /usr/local/include/X11R5  \
+    /usr/local/include/X11R4  \
+                              \
+    /usr/X11/include          \
+    /usr/include/X11          \
+    /usr/local/X11/include    \
+    /usr/local/include/X11    \
+                              \
+    /usr/X386/include         \
+    /usr/x386/include         \
+    /usr/XFree86/include/X11  \
+                              \
+    /usr/dt/include           \
+                              \
+    /usr/local/include        \
+    /usr/remote/include       \
+    /usr/include              \
+    /usr/unsupported/include  \
+    /usr/local/x11r5/include  \
+    /usr/lpp/Xamples/include  \
+    $extra_include            \
+    ; \
+  do
+    if test -r "$ac_dir/$xawplus_direct_test_include"; then
+      no_xawplus= ac_xawplus_includes=$ac_dir
+      break
+    fi
+  done
+
+# Check for the libraries.
+# See if we find them without any special options.
+# Don't add to $LIBS permanently.
+ac_save_LIBS="$LIBS"
+LIBS="-l$xawplus_direct_test_library $LIBS"
+# First see if replacing the include by lib works.
+for ac_dir in `echo "$ac_xawplus_includes" | sed s/include/lib/` \
+    /usr/athena/lib       \
+                          \
+    /usr/X11R6/lib        \
+    /usr/X11R5/lib        \
+    /usr/X11R4/lib        \
+                          \
+    /usr/lib/X11R6        \
+    /usr/lib/X11R5        \
+    /usr/lib/X11R4        \
+                          \
+    /usr/local/X11R6/lib  \
+    /usr/local/X11R5/lib  \
+    /usr/local/X11R4/lib  \
+                          \
+    /usr/local/lib/X11R6  \
+    /usr/local/lib/X11R5  \
+    /usr/local/lib/X11R4  \
+                          \
+    /usr/X11/lib          \
+    /usr/lib/X11          \
+    /usr/local/X11/lib    \
+                          \
+    /usr/X386/lib         \
+    /usr/x386/lib         \
+    /usr/XFree86/lib/X11  \
+                          \
+    /usr/lib              \
+    /usr/local/lib        \
+    /usr/remote/lib       \
+    /usr/unsupported/lib  \
+    /usr/local/x11r5/lib  \
+    /usr/lpp/Xamples/lib  \
+    $extra_lib            \
+    ; \
+do
+  for ac_extension in a so sl; do
+    if test -r $ac_dir/lib${xawplus_direct_test_library}.$ac_extension; then
+      no_xawplus= ac_xawplus_libraries=$ac_dir
+      break 2
+    fi
+  done
+done
+LIBS="$ac_save_LIBS"])
+AC_DEFUN([AC_PATH_XAWPLUS],
+[AC_REQUIRE_CPP()dnl
+
+xawplus_includes=NONE
+xawplus_libraries=NONE
+
+AC_MSG_CHECKING(for XawPlus)
+AC_ARG_WITH(xawplus, [  --without-xawplus           disable XawPlus])
+if test "x$with_xawplus" = xno; then
+  no_xawplus=yes
+else
+  if test "x$xawplus_includes" != xNONE && test "x$xawplus_libraries" != xNONE; then
+    no_xawplus=
+  else
+AC_CACHE_VAL(ac_cv_path_xawplus,
+[# One or both of these vars are not set, and there is no cached value.
+no_xawplus=yes
+AC_PATH_XAWPLUS_DIRECT
+
+if test "$no_xawplus" = yes; then
+  ac_cv_path_xawplus="no_xawplus=yes"
+else
+  ac_cv_path_xawplus="no_xawplus= ac_xawplus_includes=$ac_xawplus_includes ac_xawplus_libraries=$ac_xawplus_libraries"
+fi])dnl
+  fi
+  eval "$ac_cv_path_xawplus"
+fi # with_xawplus != no
+
+if test "$no_motif" = yes; then
+  if test "$no_xaw3dxft" = yes; then
+    if test "$no_xaw3d" = yes; then
+      if test "$no_nextaw" = yes; then
+        if test "$no_xawplus" = yes; then
+          AC_MSG_RESULT(no)
+          XMLOCK=""
+          INSTALL_XMLOCK=""
+          UNINSTALL_XMLOCK=""
+        else
+          AC_DEFINE([HAVE_ATHENA], [1], [Athena is available])
+          AC_DEFINE([HAVE_LIB_XAWPLUS], [1], [XawPlus is available])
+          XMLOCKLIBS="-lXawPlus ${XMLOCKLIBS}"
+          XMLOCK="xmlock"
+          INSTALL_XMLOCK="install_xmlock"
+          UNINSTALL_XMLOCK="uninstall_xmlock"
+          test "x$xawplus_includes" = xNONE && xawplus_includes=$ac_xawplus_includes
+          test "x$xawplus_libraries" = xNONE && xawplus_libraries=$ac_xawplus_libraries
+          ac_cv_path_xawplus="no_xawplus= ac_xawplus_includes=$xawplus_includes ac_xawplus_libraries=$xawplus_libraries"
+          AC_MSG_RESULT([libraries $xawplus_libraries, headers $xawplus_includes])
+        fi
+      else
+        AC_MSG_RESULT(ignored - using neXtaw)
+      fi
+    else
+      AC_MSG_RESULT(ignored - using Xaw3d)
+    fi
+  else
+    AC_MSG_RESULT(ignored - using Xaw3dxft)
+  fi
+else
+  AC_MSG_RESULT(ignored - using Motif)
+fi
+])
+
+AC_PATH_XAWPLUS
+
+if test "x$xawplus_libraries" != x ; then
+  XWIDGET_LDFLAGS="${XWIDGET_LDFLAGS}:$xawplus_libraries"
+  XWIDGETLIBPATHS="-L$xawplus_libraries ${XWIDGETLIBPATHS}"
+fi
+if test "x$xawplus_includes" != x ; then
+  XWIDGETINC="${XWIDGETINC} -I$xawplus_includes"
+fi
+
+dnl Xaw XAW xaw
+
+AC_DEFUN([AC_PATH_XAW_DIRECT],
+[test -z "$xaw_direct_test_library" && xaw_direct_test_library=Xaw
+test -z "$xaw_direct_test_function" && xaw_direct_test_function=XawDialGetValueString
+test -z "$xaw_direct_test_include" && xaw_direct_test_include=X11/Xaw/Command.h
+  for ac_dir in               \
+    /usr/athena/include       \
+                              \
+    /usr/X11R6/include        \
+    /usr/X11R5/include        \
+    /usr/X11R4/include        \
+                              \
+    /usr/include/X11R6        \
+    /usr/include/X11R5        \
+    /usr/include/X11R4        \
+                              \
+    /usr/local/X11R6/include  \
+    /usr/local/X11R5/include  \
+    /usr/local/X11R4/include  \
+                              \
+    /usr/local/include/X11R6  \
+    /usr/local/include/X11R5  \
+    /usr/local/include/X11R4  \
+                              \
+    /usr/X11/include          \
+    /usr/include/X11          \
+    /usr/local/X11/include    \
+    /usr/local/include/X11    \
+                              \
+    /usr/X386/include         \
+    /usr/x386/include         \
+    /usr/XFree86/include/X11  \
+                              \
+    /usr/dt/include           \
+                              \
+    /usr/local/include        \
+    /usr/remote/include       \
+    /usr/include              \
+    /usr/unsupported/include  \
+    /usr/local/x11r5/include  \
+    /usr/lpp/Xamples/include  \
+    $extra_include            \
+    ; \
+  do
+    if test -r "$ac_dir/$xaw_direct_test_include"; then
+      no_xaw= ac_xaw_includes=$ac_dir
+      break
+    fi
+  done
+
+# Check for the libraries.
+# See if we find them without any special options.
+# Don't add to $LIBS permanently.
+ac_save_LIBS="$LIBS"
+LIBS="-l$xaw_direct_test_library $LIBS"
+# First see if replacing the include by lib works.
+for ac_dir in `echo "$ac_xaw_includes" | sed s/include/lib/` \
+    /usr/athena/lib       \
+                          \
+    /usr/X11R6/lib        \
+    /usr/X11R5/lib        \
+    /usr/X11R4/lib        \
+                          \
+    /usr/lib/X11R6        \
+    /usr/lib/X11R5        \
+    /usr/lib/X11R4        \
+                          \
+    /usr/local/X11R6/lib  \
+    /usr/local/X11R5/lib  \
+    /usr/local/X11R4/lib  \
+                          \
+    /usr/local/lib/X11R6  \
+    /usr/local/lib/X11R5  \
+    /usr/local/lib/X11R4  \
+                          \
+    /usr/X11/lib          \
+    /usr/lib/X11          \
+    /usr/local/X11/lib    \
+                          \
+    /usr/X386/lib         \
+    /usr/x386/lib         \
+    /usr/XFree86/lib/X11  \
+                          \
+    /usr/lib              \
+    /usr/local/lib        \
+    /usr/remote/lib       \
+    /usr/unsupported/lib  \
+    /usr/local/x11r5/lib  \
+    /usr/lpp/Xamples/lib  \
+    $extra_lib            \
+    ; \
+do
+  for ac_extension in a so sl; do
+    if test -r $ac_dir/lib${xaw_direct_test_library}.$ac_extension; then
+      no_xaw= ac_xaw_libraries=$ac_dir
+      break 2
+    fi
+  done
+done
+LIBS="$ac_save_LIBS"])
+AC_DEFUN([AC_PATH_XAW],
+[AC_REQUIRE_CPP()dnl
+
+xaw_includes=NONE
+xaw_libraries=NONE
+
+AC_MSG_CHECKING(for Xaw)
+AC_ARG_WITH(xaw, [  --without-xaw           disable Xaw])
+if test "x$with_xaw" = xno; then
+  no_xaw=yes
+else
+  if test "x$xaw_includes" != xNONE && test "x$xaw_libraries" != xNONE; then
+    no_xaw=
+  else
+AC_CACHE_VAL(ac_cv_path_xaw,
+[# One or both of these vars are not set, and there is no cached value.
+no_xaw=yes
+AC_PATH_XAW_DIRECT
+
+if test "$no_xaw" = yes; then
+  ac_cv_path_xaw="no_xaw=yes"
+else
+  ac_cv_path_xaw="no_xaw= ac_xaw_includes=$ac_xaw_includes ac_xaw_libraries=$ac_xaw_libraries"
+fi])dnl
+  fi
+  eval "$ac_cv_path_xaw"
+fi # with_xaw != no
+
+if test "$no_motif" = yes; then
+  if test "$no_xaw3dxft" = yes; then
+    if test "$no_xaw3d" = yes; then
+      if test "$no_nextaw" = yes; then
+        if test "$no_xawplus" = yes; then
+          if test "$no_xaw" = yes; then
+            AC_MSG_RESULT(no)
+            XMLOCK=""
+            INSTALL_XMLOCK=""
+            UNINSTALL_XMLOCK=""
+          else
+            AC_DEFINE([HAVE_ATHENA], [1], [Athena is available])
+            XMLOCKLIBS="-lXaw ${XMLOCKLIBS}"
+            XMLOCK="xmlock"
+            INSTALL_XMLOCK="install_xmlock"
+            UNINSTALL_XMLOCK="uninstall_xmlock"
+            test "x$xaw_includes" = xNONE && xaw_includes=$ac_xaw_includes
+            test "x$xaw_libraries" = xNONE && xaw_libraries=$ac_xaw_libraries
+            ac_cv_path_xaw="no_xaw= ac_xaw_includes=$xaw_includes ac_xaw_libraries=$xaw_libraries"
+            AC_MSG_RESULT([libraries $xaw_libraries, headers $xaw_includes])
+          fi
+        else
+          AC_MSG_RESULT(ignored - using XawPlus)
+        fi
+      else
+        AC_MSG_RESULT(ignored - using neXtaw)
+      fi
+    else
+      AC_MSG_RESULT(ignored - using Xaw3d)
+    fi
+  else
+    AC_MSG_RESULT(ignored - using Xaw3dxft)
+  fi
+else
+  AC_MSG_RESULT(ignored - using Motif)
+fi
+])
+
+AC_PATH_XAW
+
+if test "x$xaw_libraries" != x ; then
+  XWIDGET_LDFLAGS="${XWIDGET_LDFLAGS}:$xaw_libraries"
+  XWIDGETLIBPATHS="-L$xaw_libraries ${XWIDGETLIBPATHS}"
+fi
+if test "x$xaw_includes" != x ; then
+  XWIDGETINC="${XWIDGETINC} -I$xaw_includes"
 fi
 
 dnl Xmu EDITRES Editres editres
@@ -2973,15 +3829,19 @@ fi])dnl
   eval "$ac_cv_path_dtsaver"
 fi # with_dtsaver != no
 
-if test "$no_dtsaver" = yes; then
-  AC_MSG_RESULT(no)
+if test "$no_motif" = no; then
+  if test "$no_dtsaver" = yes; then
+    AC_MSG_RESULT(no)
+  else
+    AC_DEFINE([USE_DTSAVER], [1], [Desktop Saver])
+    XLOCKLIBS="${XLOCKLIBS} -lDtSvc"
+    test "x$dtsaver_includes" = xNONE && dtsaver_includes=$ac_dtsaver_includes
+    test "x$dtsaver_libraries" = xNONE && dtsaver_libraries=$ac_dtsaver_libraries
+    ac_cv_path_dtsaver="no_dtsaver= ac_dtsaver_includes=$dtsaver_includes ac_dtsaver_libraries=$dtsaver_libraries"
+    AC_MSG_RESULT([libraries $dtsaver_libraries, headers $dtsaver_includes])
+  fi
 else
-  AC_DEFINE([USE_DTSAVER], [1], [Desktop Saver])
-  XLOCKLIBS="${XLOCKLIBS} -lDtSvc"
-  test "x$dtsaver_includes" = xNONE && dtsaver_includes=$ac_dtsaver_includes
-  test "x$dtsaver_libraries" = xNONE && dtsaver_libraries=$ac_dtsaver_libraries
-  ac_cv_path_dtsaver="no_dtsaver= ac_dtsaver_includes=$dtsaver_includes ac_dtsaver_libraries=$dtsaver_libraries"
-  AC_MSG_RESULT([libraries $dtsaver_libraries, headers $dtsaver_includes])
+  AC_MSG_RESULT(ignored - needs Motif)
 fi
 ])
 

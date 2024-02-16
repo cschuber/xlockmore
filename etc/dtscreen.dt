@@ -223,6 +223,15 @@ ACTION StartDtscreenBat
 	DESCRIPTION	bat: Bouncing flying bats
 }
 
+ACTION StartDtscreenBevel
+{
+	LABEL		StartDtscreenBevel
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	$DTSCREEN -mode bevel
+	DESCRIPTION	bevel: An auto-solving Bevel or Helicopter Cube
+}
+
 ACTION StartDtscreenBlot
 {
 	LABEL		StartDtscreenBlot
@@ -382,6 +391,15 @@ ACTION StartDtscreenDilemma
 	WINDOW_TYPE	NO_STDIO
 	EXEC_STRING	$DTSCREEN -mode dilemma
 	DESCRIPTION	dilemma: Lloyd's Prisoner's Dilemma simulation
+}
+
+ACTION StartDtscreenDino
+{
+	LABEL		StartDtscreenDino
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	$DTSCREEN -mode dino
+	DESCRIPTION	dino: An auto-solving Dinosaur Cube
 }
 
 ACTION StartDtscreenDiscrete

@@ -173,6 +173,11 @@ XLock.bat.count: -8
 !XLock.bat.cycles: 1
 XLock.bat.size: 0
 XLock.bat.saturation: 1.0
+XLock.bevel.delay: 100000
+XLock.bevel.count: -30
+XLock.bevel.cycles: 5
+!XLock.bevel.size: 1
+XLock.bevel.saturation: 1.0
 XLock.blot.delay: 200000
 XLock.blot.count: 6
 XLock.blot.cycles: 30
@@ -188,6 +193,11 @@ XLock.bounce.count: -10
 !XLock.bounce.cycles: 1
 XLock.bounce.size: 0
 XLock.bounce.saturation: 1.0
+XLock.boxed.delay: 1000
+!XLock.boxed.count: 1
+!XLock.boxed.cycles: 2
+!XLock.boxed.size: 1
+XLock.boxed.saturation: 1.0
 XLock.braid.delay: 1000
 XLock.braid.count: 15
 XLock.braid.cycles: 100
@@ -201,7 +211,7 @@ XLock.bubble.saturation: 0.3
 XLock.bubble.boil: off
 XLock.bubble3d.delay: 20000
 !XLock.bubble3d.count: 1
-!XLock.bubble3d.cycles: 1
+!XLock.bubble3d.cycles: 2
 !XLock.bubble3d.size: 1
 XLock.bubble3d.saturation: 1.0
 XLock.bug.delay: 75000
@@ -285,6 +295,11 @@ XLock.dilemma.bonus: 1.85
 XLock.dilemma.conscious: on
 ! dilemma neighbors (3, 4, 6, 8, 9, 12, all else defaults to 4 or 8 for bitmap)
 XLock.dilemma.neighbors: 0
+XLock.dino.delay: 100000
+XLock.dino.count: -30
+XLock.dino.cycles: 5
+!XLock.dino.size: 1
+XLock.dino.saturation: 1.0
 XLock.discrete.delay: 1000
 XLock.discrete.count: 4096
 XLock.discrete.cycles: 2500

@@ -13,21 +13,21 @@
        echokey ] [ -/+enablesaver ] [  -/+resetsaver  ]  [  -/+grabmouse  ]  [
        -/+grabserver  ]  [  -/+install  ]  [  -/+mousemotion  ] [ -/+sound ] [
        -/+showdate ] [ -/+timeelapsed ] [ -/+usefirst ] [ -/+verbose ] [ -nice
-       level  ] [ -lockdelay seconds ] [ -timeout seconds ] [ -font fontname ]
-       [ -planfont fontname ] [ -bg color ] [ -fg color ] [ -background  color
-       ]  [  -foreground  color  ] [ -username string ] [ -password string ] [
-       -info string ] [ -validate string ] [ -invalid  string  ]  [  -geometry
-       geom  ]  [ -icongeometry geom ] [ -glgeometry geom ] [ -/+wireframe ] [
-       -/+showfps ] [ -fpsfont fontname  ]  [  -/+fpstop  ]  [  -/+use3d  ]  [
-       -delta3d value ] [ -none3d color ] [ -right3d color ] [ -left3d color ]
-       [ -both3d color ] [ -program programname ] [  -messagesfile  formatted-
-       filename ] [ -messagefile filename ] [ -message string ] [ -messagefont
-       fontname ] [  -bitmap  filename  ]  [  -cpasswd  crypted-password  ]  [
-       -forceLogout  minutes  ] [ -logoutButton minutes ] [ -logoutButtonLabel
-       textstring ] [ -logoutButtonHelp  textstring  ]  [  -logoutFailedString
-       textstring  ]  [  -/+dtsaver  ]  [ -/+xinerama ] [ -modulepath path ] [
-       -locksound string ] [ -infosound string ] [ -validsound string ] [ -in-
-       validsound  string  ]  [  -startCmd  string  ]  [  -endCmd  string  ] [
+       level  ]  [  -lockdelay  seconds ] [ -timeout seconds ] [ -xkblockgroup
+       layout ] [ -font fontname ] [ -planfont fontname ] [ -bg color ] [  -fg
+       color  ] [ -background color ] [ -foreground color ] [ -username string
+       ] [ -password string ] [ -info string ] [ -validate string ] [ -invalid
+       string ] [ -geometry geom ] [ -icongeometry geom ] [ -glgeometry geom ]
+       [ -/+wireframe ] [ -/+showfps ] [ -fpsfont fontname ] [ -/+fpstop  ]  [
+       -/+use3d  ]  [  -delta3d value ] [ -none3d color ] [ -right3d color ] [
+       -left3d color ] [ -both3d color ] [ -program programname ] [ -messages-
+       file formatted-filename ] [ -messagefile filename ] [ -message string ]
+       [ -messagefont fontname ] [ -bitmap filename ] [ -cpasswd crypted-pass-
+       word ] [ -forceLogout minutes ] [ -logoutButton minutes ] [ -logoutBut-
+       tonLabel textstring ] [ -logoutButtonHelp textstring ] [ -logoutFailed-
+       String textstring ] [ -/+dtsaver ] [ -/+xinerama ] [ -modulepath path ]
+       [ -locksound string ] [ -infosound string ] [ -validsound  string  ]  [
+       -invalidsound  string  ]  [  -startCmd  string  ]  [ -endCmd string ] [
        -pipepassCmd string ] [ -logoutCmd string ]
 
 2 Description
@@ -118,6 +118,8 @@
                Shows Mimi's bouboule of moving stars.
 
        bounce  Shows bouncing footballs.
+
+       boxed   Shows GL's boxed balls.
 
        braid   Shows random braids and knots.
 
@@ -1781,7 +1783,7 @@
 
 2 Copyright
        Copyright (c) 1988-1991 by Patrick J. Naughton
-       Copyright (c) 1993-2020 by David A. Bagley
+       Copyright (c) 1993-2023 by David A. Bagley
 
        Permission  to  use, copy, modify, and distribute this software and its
        documentation for any purpose and without fee is hereby  granted,  pro-

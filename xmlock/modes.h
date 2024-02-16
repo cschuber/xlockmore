@@ -20,6 +20,9 @@ static LockStruct LockProcs[] =
 #endif
 {(char *) "ball", (char *) "Shows bouncing balls"},
 {(char *) "bat", (char *) "Shows bouncing flying bats"},
+#ifdef USE_GL
+{(char *) "bevel", (char *) "Shows an auto-solving Bevel or Helicopter Cube"},
+#endif
 {(char *) "blot", (char *) "Shows Rorschach's ink blot test"},
 {(char *) "bouboule", (char *) "Shows Mimi's bouboule of moving stars"},
 {(char *) "bounce", (char *) "Shows bouncing footballs"},
@@ -44,6 +47,9 @@ static LockStruct LockProcs[] =
 {(char *) "deco", (char *) "Shows art as ugly as sin"},
 {(char *) "demon", (char *) "Shows Griffeath's cellular automata"},
 {(char *) "dilemma", (char *) "Shows Lloyd's Prisoner's Dilemma simulation"},
+#ifdef USE_GL
+{(char *) "dino", (char *) "Shows an auto-solving Dinosaur Cube"},
+#endif
 {(char *) "discrete", (char *) "Shows various discrete maps"},
 {(char *) "dragon", (char *) "Shows Deventer's Hexagonal Dragons Maze"},
 {(char *) "drift", (char *) "Shows cosmic drifting flame fractals"},

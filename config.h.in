@@ -177,6 +177,16 @@
  */
 #undef HAVE_GLBINDTEXTURE
 
+/* Define one for xmlock, rename executable to xawlock
+    if using Athena or friends.
+*/
+#undef HAVE_MOTIF
+#undef HAVE_ATHENA
+#undef HAVE_LIB_XAW3DXFT
+#undef HAVE_LIB_XAW3D
+#undef HAVE_LIB_NEXTAW
+#undef HAVE_LIB_XAWPLUS
+
 /* Define if you have XPM (look for it under a X11 dir).  */
 #undef HAVE_XPM
 

@@ -118,7 +118,7 @@ wator$(OM)wire$(OM)world$(OM)worm$(OM)xcl$(OM)xjack$(O)
 @GL@$(SPROINGIESOBJS)$(S)$(ATLANTISOBJS)$(S)$(ATUNNELSOBJS)$(S)\
 @GL@$(BUBBLE3DOBJS)$(S)$(JUGGLER3DOBJS)$(S)\
 @GL@$(MAZE3DOBJS)$(S)$(XLOCKDEPCPPGLOBJS)
-@GL@XLOCKNORMGLOBJS = $(DOG)cage$(OG)gears$(O)$(S)\
+@GL@XLOCKNORMGLOBJS = $(DOG)bevel$(OG)cage$(OG)dino$(OG)gears$(O)$(S)\
 @GL@$(DOG)moebius$(OG)morph3d$(OG)noof$(OG)rubik$(O)$(S)\
 @GL@$(DOG)sierpinski3d$(OG)skewb$(OG)stairs$(OG)superquadrics$(O)$(S)\
 @GL@$(XLOCKTEXTGLOBJS)$(S)\
@@ -189,8 +189,9 @@ $(DM)wator$(CM)wire$(CM)world$(CM)worm$(CM)xcl$(CM)xjack$(C)
 @UNSTABLE@XLOCKUNSTABLESRCS = $(DM)run$(C) $(CONTRUCTIONSRCS)
 @CCC@XLOCKCPPSRCS = $(DM)solitaire$(CX) $(CONTRUCTIONCPPSRCS)
 @XPM@XLOCKXPMSRCS =
-@GL@XLOCKGLSRCS = $(DG)cage$(CG)fire$(CG)gears$(CG)juggler3d$(C) \
-@GL@$(DG)glplanet$(CG)sphere$(CG)lament$(CG)moebius$(CG)morph3d$(C) \
+@GL@XLOCKGLSRCS = $(DG)bevel$(CG)cage$(CG)dino$(CG)fire$(CG)gears$(C) \
+@GL@$(DG)juggler3d$(CG)glplanet$(CG)sphere$(CG)lament$(C) \
+@GL@$(DG)moebius$(CG)morph3d$(C) \
 @GL@$(DG)molecule$(CG)tube$(CG)noof$(CG)rubik$(CG)sballs$(C) \
 @GL@$(DG)sierpinski3d$(CG)skewb$(CG)stairs$(CG)superquadrics$(C) \
 @GL@$(DG)xpm-ximage$(CG)buildlwo$(CG)pipes$(CG)pipeobjs$(C) \
@@ -557,7 +558,9 @@ $(UTILOBJDIR)memcheck.o : $(UTILDIR)memcheck.c
 # 	cd $(UTILOBJDIR) ; \
 #$(MAKE) $(@F) CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
+$(GLOBJDIR)bevel.o : $(GLDIR)bevel.c
 $(GLOBJDIR)cage.o : $(GLDIR)cage.c
+$(GLOBJDIR)dino.o : $(GLDIR)dino.c
 $(GLOBJDIR)fire.o : $(GLDIR)fire.c
 $(GLOBJDIR)gears.o : $(GLDIR)gears.c
 $(GLOBJDIR)glplanet.o : $(GLDIR)glplanet.c
@@ -879,12 +882,22 @@ solitaire.o: $(UTILDIR)/xlock.h
 solitaire.o: $(top_objdir)/config.h
 solitaire.o: $(UTILDIR)/mode.h
 solitaire.o: $(UTILDIR)/random.h
+$(GLOBJDIR)/bevel.o: $(UTILDIR)/xlock.h
+$(GLOBJDIR)/bevel.o: $(top_objdir)/config.h
+$(GLOBJDIR)/bevel.o: $(UTILDIR)/mode.h
+$(GLOBJDIR)/bevel.o: $(UTILDIR)/random.h
+$(GLOBJDIR)/bevel.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/cage.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/cage.o: $(top_objdir)/config.h
 $(GLOBJDIR)/cage.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/cage.o: $(UTILDIR)/random.h
 $(GLOBJDIR)/cage.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/cage.o: $(GLDIR)/e_textures.h
+$(GLOBJDIR)/dino.o: $(UTILDIR)/xlock.h
+$(GLOBJDIR)/dino.o: $(top_objdir)/config.h
+$(GLOBJDIR)/dino.o: $(UTILDIR)/mode.h
+$(GLOBJDIR)/dino.o: $(UTILDIR)/random.h
+$(GLOBJDIR)/dino.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/fire.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/fire.o: $(top_objdir)/config.h
 $(GLOBJDIR)/fire.o: $(UTILDIR)/mode.h

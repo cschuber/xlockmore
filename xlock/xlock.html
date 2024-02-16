@@ -4,7 +4,7 @@ Content-type: text/html; charset=UTF-8
 <HTML><HEAD><TITLE>Man page of XLOCK</TITLE>
 </HEAD><BODY>
 <H1>XLOCK</H1>
-Section: User Commands  (1)<BR>Updated: 04 Dec 2019<BR><A HREF="#index">Index</A>
+Section: User Commands  (1)<BR>Updated: 08 Sep 2023<BR><A HREF="#index">Index</A>
 <A HREF="../index.html">Return to Main Contents</A><HR>
 
 <A NAME="lbAB">&nbsp;</A>
@@ -184,6 +184,10 @@ xlock - Locks the local X display until a password is entered.
 ]
 [
 <B>-timeout</B><I> seconds</I>
+
+]
+[
+<B>-xkblockgroup</B><I> layout</I>
 
 ]
 [
@@ -516,8 +520,14 @@ Shows bouncing balls.
 
 <DD>
 Shows bouncing flying bats.
-<DT><B>blot</B>
+<DT><B>bevel</B>
 
+<DD>
+Shows an auto-solving Bevel or Helicopter Cube.  May not be available
+depending on how it was configured.
+<DT><DT><B>blot</B>
+
+<DD>
 <DD>
 Shows Rorschach's ink blot test.
 <DT><B>bouboule</B>
@@ -528,6 +538,10 @@ Shows Mimi's bouboule of moving stars.
 
 <DD>
 Shows bouncing footballs.
+<DT><B>boxed</B>
+
+<DD>
+Shows GL's boxed balls.
 <DT><B>braid</B>
 
 <DD>
@@ -577,6 +591,11 @@ Shows Griffeath's cellular automata.
 
 <DD>
 Shows Lloyd's Prisoner's Dilemma simulation.
+<DT><B>dino</B>
+
+<DD>
+Shows an auto-solving Dinosaur Cube.  May not be available depending on how
+it was configured.
 <DT><B>discrete</B>
 
 <DD>
@@ -1044,6 +1063,8 @@ In ball mode it is the number of balls.
 <P>
 In bat mode it is the number of bats, could be less because of conflicts.
 <P>
+In bevel mode it is the number of moves.
+<P>
 In blot mode this refers to the number of pixels rendered in the same color.
 <P>
 In bouboule mode it is the number of stars.
@@ -1075,6 +1096,8 @@ In deco mode it is the depth.
 In demon mode this refers the number of colors.
 <P>
 In dilemma mode this refers the number of initial defectors.
+<P>
+In dino mode it is the number of moves.
 <P>
 In discrete mode it is the number of points.
 <P>
@@ -1310,7 +1333,9 @@ daisy, deco, demon, dilemma, discrete, dragon,
 eyes, fiberlamp, flag, flow, forest, galaxy, helix, hop, hyper, ico, juggle,
 juggler3d, laser, life, life1d, life3d, lisa, lissie, loop, mandelbrot,
 mountain, petal, sierpinski, shape, spline +erase, t3d, thornbird, triangle,
-tube, voters, wator, and wire.  For euler2d and worm it is the length
+tube, voters, wator, and wire.  For bevel it is the nuber of steps to
+complete a 180 degree move, for dino it is the number of steps to complete
+a move (120 or 180 degree), for euler2d and worm it is the length
 of the lines, for atlantis it is the shark speed,
 for fadeplot, julia and spiral it is the length of the trail of dots,
 munch it is the minimum size of the squares,
@@ -1817,8 +1842,8 @@ and triangle.
 
 <DD>
 Turn on/off frame per sec display, available on atlantis, atunnels,
-bubble3d, cage, fire, gears, invert, lament, moebius, morph3d, rubik,
-sballs, skewb, stairs, and superquadrics.
+bevel, dino, bubble3d, cage, fire, gears, invert, lament, moebius,
+morph3d, rubik, sballs, skewb, stairs, and superquadrics.
 <DT><B>-/+fpstop</B>
 
 <DD>
@@ -3010,7 +3035,7 @@ numbers offer randomness from 2 to the absolute value of the number.
 
 <DD>
 Turn on or off hidden shuffle phase for
-<I>rubik</I>
+<I>bevel, dino, rubik</I>
 
 and
 <I>skewb.</I>
@@ -3408,10 +3433,10 @@ David A. Bagley, &lt;<I>bagleyd AT verizon.net</I>&gt;
 <P>
 The latest version is currently at:
 <DL COMPACT><DT><DD>
-<I><A HREF="https://www.sillycycle.com/xlock">https://www.sillycycle.com/xlock</A></I>
+<I><A HREF="https://www.sillycycle.com/xlock/">https://www.sillycycle.com/xlock/</A></I>
 <BR>
 
-<I><A HREF="http://ibiblio.org/pub/Linux/X11/screensavers">http://ibiblio.org/pub/Linux/X11/screensavers</A></I>
+<I><A HREF="http://www.ibiblio.org/pub/Linux/X11/screensavers/">http://www.ibiblio.org/pub/Linux/X11/screensavers/</A></I>
 </DL>
 
 <P>
@@ -3441,7 +3466,7 @@ with many additional contributors.
 Copyright (c) 1988-1991 by Patrick J. Naughton
 <BR>
 
-Copyright (c) 1993-2019 by David A. Bagley
+Copyright (c) 1993-2023 by David A. Bagley
 <P>
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted,
@@ -3486,6 +3511,6 @@ copyrights.
 This document was created by
 <A HREF="/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 02:00:37 GMT, April 03, 2020
+Time: 23:27:26 GMT, October 25, 2023
 </BODY>
 </HTML>

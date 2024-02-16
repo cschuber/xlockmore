@@ -143,6 +143,9 @@ static char gl_modes[][MAXMODECHARS] =
 #ifdef MODE_atunnels
 	"atunnels",
 #endif
+#ifdef MODE_bevel
+	"bevel",
+#endif
 #ifdef MODE_boxed
 	"boxed",
 #endif
@@ -151,6 +154,9 @@ static char gl_modes[][MAXMODECHARS] =
 #endif
 #ifdef MODE_cage
 	"cage",
+#endif
+#ifdef MODE_dino
+	"dino",
 #endif
 #ifdef MODE_fire
 	"fire",

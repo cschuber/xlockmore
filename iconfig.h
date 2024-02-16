@@ -15,7 +15,6 @@ XCOMM #define CPPCompiler
 XCOMM #define XpmLibrary
 XCOMM #define XmLibrary
 XCOMM #define XawLibrary
-XCOMM #define Xaw3dLibrary
 XCOMM #define GLLibrary
 XCOMM #define TtfLibrary
 XCOMM #define GlttLibrary
@@ -94,7 +93,7 @@ XPMINC = -I/usr/local/include
 XCOMM SGI's ViewKit put in a link so the include is under X11 as well
 XCOMM  XPMINC = -I/usr/include/Vk
 
-XCOMM If you get an error "Cannot find libXpm" while linking, set XPMLIBPATH
+XCOMM If you get an error "Cannot find libXpm" while linking, set the path
 XCOMM to the directory libXpm.* is in.  Below is a guess.
 XPMLIB = -L/usr/local/lib -lXpm
 
@@ -118,7 +117,7 @@ XCOMM If you get an error "Cannot find Xm/PanedW.h" while compiling, set
 XCOMM XMINC to the directory Xm/PanedW.h is in.  Below is a guess.
 XCOMM  XMINC = -I$(MOTIFHOME)/include
 
-XCOMM If you get an error "Cannot find libXm" while linking, set XMLIBPATH
+XCOMM If you get an error "Cannot find libXm" while linking, set the path 
 XCOMM to the directory libXm.* is in.  Below is a guess.
 XCOMM  XMLIB = -L$(MOTIFHOME)/lib -lXm
 XMLIB = -lXm
@@ -133,17 +132,33 @@ XCOMM   *** END XM CONFIG SECTION ***
 XCOMM   *** BEGIN XAW CONFIG SECTION ***
 
 XCOMM Only options.c and xmlock.c uses Athena.
-XCOMM Use as fallback if you have or want Motif.
-XCOMM If you have XAW3D use that instead of Athena.
+XCOMM Use as fallback if you do not Motif.
+XCOMM You may want to use other variants of Athena.
 XCOMM If your system has libXaw, remove the 'XCOMM  ' from the next line.
 XCOMM  #define XawLibrary
 
 #ifdef XawLibrary
 XMDEF = -DHAVE_ATHENA
-XCOMM  XMDEF = -DHAVE_XAW3D
-
+XCOMM XMDEF = -DHAVE_ATHENA -DHAVE_LIB_XAW3DXFT
+XCOMM XMLIB = -lXaw3dxft
+XCOMM XMDEF = -DHAVE_ATHENA -DHAVE_LIB_XAW3D
+XCOMM XMLIB = -lXaw3d
+XCOMM XMDEF = -DHAVE_ATHENA -DHAVE_LIB_NEXTAW
+XCOMM XMLIB = -lneXtaw
+XCOMM XMDEF = -DHAVE_ATHENA -DHAVE_LIB_XAWPLUS
+XCOMM XMLIB = -lXawPlus
+XMDEF = -DHAVE_ATHENA
 XMLIB = -lXaw
-XCOMM  XMLIB = -lXaw3d
+
+XCOMM If you get an error "Cannot find Xaw/Form.h" while compiling, set
+XCOMM XAWINC to the directory Xaw/Form.h is in.  Below is a guess
+XCOMM of the location of the Motif include directory.
+XCOMM  XAWINC = -I$(ATHENAHOME)/include
+
+XCOMM If you get an error "Cannot find libXaw" while linking, set the path
+XCOMM to the directory libXaw.* is in.  Below is a guess of the
+XCOMM location of the Athena library directory.
+XCOMM  XAWLIB = -L$(ATHENAHOME)/lib -lXaw
 
 XCOMM Debugging with editres
 XCOMM  EDITRESDEF = -DUSE_XMU
@@ -166,7 +181,7 @@ XCOMM If you get an error "Cannot find GL/gl.h" while compiling, set
 XCOMM GLINC to the directory GL/gl.h is in.
 GLINC = -I/usr/local/include
 
-XCOMM If you get an error "Cannot find libMesaGL" while linking, set GLLIBPATH
+XCOMM If you get an error "Cannot find libMesaGL" while linking, set the path 
 XCOMM to the directory libMesaGL.* is in.  Below is a guess.
 XCOMM !!!WARNING!!! Known security hole with MesaGL < 3.0 if setuid root
 GLLIB = -L/usr/local/lib -lGL -lGLU
@@ -587,7 +602,7 @@ FIRSTLIB = -L/usr/lib32
 LOCAL_LIBRARIES = $(FIRSTLIB) $(MODULELIB) $(XLIB) \
 $(XPMLIB) $(GLLIB) $(TTFLIB) $(GLTTLIB) $(DTSAVERLIB) $(DPMSLIB) $(SOUNDLIB) \
 $(THREADS_LIBS)
-MLIBS = $(FIRSTLIB) $(XPMLIB) $(XMLIB) $(EDITRESLIB) -lXt \
+MLIBS = $(FIRSTLIB) $(XPMLIB) $(XMLIB) $(XAWLIB) $(EDITRESLIB) -lXt \
 $(XLIB) $(SMLIB) $(ICELIB)
 LINTLIBS = $(LINTXLIB)
 #if HasLibCrypt

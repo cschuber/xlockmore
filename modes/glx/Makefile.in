@@ -70,7 +70,7 @@ CXG = $(CX) $(DG)
 @GL@$(SPROINGIESOBJS)$(S)$(ATLANTISOBJS)$(S)$(ATUNNELSOBJS)$(S)\
 @GL@$(BUBBLE3DOBJS)$(S)$(JUGGLER3DOBJS)$(S)\
 @GL@$(MAZE3DOBJS)$(S)$(XLOCKDEPCPPGLOBJS)
-@GL@XLOCKNORMGLOBJS = $(DOG)cage$(OG)gears$(O)$(S)\
+@GL@XLOCKNORMGLOBJS = $(DOG)bevel$(OG)cage$(OG)dino$(OG)gears$(O)$(S)\
 @GL@$(DOG)moebius$(OG)morph3d$(OG)noof$(OG)rubik$(O)$(S)\
 @GL@$(DOG)sierpinski3d$(OG)skewb$(OG)stairs$(OG)superquadrics$(O)$(S)\
 @GL@$(XLOCKTEXTGLOBJS)$(S)\
@@ -241,12 +241,22 @@ distdepend :
 #
 # DO NOT DELETE: updated by make distdepend
 
+$(GLOBJDIR)/bevel.o: $(UTILDIR)/xlock.h
+$(GLOBJDIR)/bevel.o: $(top_objdir)/config.h
+$(GLOBJDIR)/bevel.o: $(UTILDIR)/mode.h
+$(GLOBJDIR)/bevel.o: $(UTILDIR)/random.h
+$(GLOBJDIR)/bevel.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/cage.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/cage.o: $(top_objdir)/config.h
 $(GLOBJDIR)/cage.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/cage.o: $(UTILDIR)/random.h
 $(GLOBJDIR)/cage.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/cage.o: $(GLDIR)/e_textures.h
+$(GLOBJDIR)/dino.o: $(UTILDIR)/xlock.h
+$(GLOBJDIR)/dino.o: $(top_objdir)/config.h
+$(GLOBJDIR)/dino.o: $(UTILDIR)/mode.h
+$(GLOBJDIR)/dino.o: $(UTILDIR)/random.h
+$(GLOBJDIR)/dino.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/fire.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/fire.o: $(top_objdir)/config.h
 $(GLOBJDIR)/fire.o: $(UTILDIR)/mode.h
@@ -284,7 +294,6 @@ $(GLOBJDIR)/morph3d.o: $(top_objdir)/config.h
 $(GLOBJDIR)/morph3d.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/morph3d.o: $(UTILDIR)/random.h
 $(GLOBJDIR)/morph3d.o: $(UTILDIR)/visgl.h
-$(GLOBJDIR)/morph3d.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/noof.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/noof.o: $(top_objdir)/config.h
 $(GLOBJDIR)/noof.o: $(UTILDIR)/mode.h
@@ -315,7 +324,6 @@ $(GLOBJDIR)/skewb.o: $(top_objdir)/config.h
 $(GLOBJDIR)/skewb.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/skewb.o: $(UTILDIR)/random.h
 $(GLOBJDIR)/skewb.o: $(UTILDIR)/visgl.h
-$(GLOBJDIR)/skewb.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/stairs.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/stairs.o: $(top_objdir)/config.h
 $(GLOBJDIR)/stairs.o: $(UTILDIR)/mode.h
@@ -332,7 +340,6 @@ $(GLOBJDIR)/xpm-ximage.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/xpm-ximage.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/xpm-ximage.o: $(UTILDIR)/random.h
 $(GLOBJDIR)/xpm-ximage.o: $(UTILDIR)/visgl.h
-$(GLOBJDIR)/xpm-ximage.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/buildlwo.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/buildlwo.o: $(top_objdir)/config.h
 $(GLOBJDIR)/buildlwo.o: $(UTILDIR)/mode.h
@@ -342,7 +349,6 @@ $(GLOBJDIR)/pipes.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/pipes.o: $(top_objdir)/config.h
 $(GLOBJDIR)/pipes.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/pipes.o: $(UTILDIR)/random.h
-$(GLOBJDIR)/pipes.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/pipes.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/pipes.o: $(GLDIR)/buildlwo.h
 $(GLOBJDIR)/pipeobjs.o: $(UTILDIR)/xlock.h
@@ -359,7 +365,6 @@ $(GLOBJDIR)/sproingiewrap.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/sproingiewrap.o: $(top_objdir)/config.h
 $(GLOBJDIR)/sproingiewrap.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/sproingiewrap.o: $(UTILDIR)/random.h
-$(GLOBJDIR)/sproingiewrap.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/sproingiewrap.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/s1_b.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/s1_b.o: $(top_objdir)/config.h
@@ -543,14 +548,12 @@ $(GLOBJDIR)/text3d.o: $(top_objdir)/config.h
 $(GLOBJDIR)/text3d.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/text3d.o: $(UTILDIR)/random.h
 $(GLOBJDIR)/text3d.o: $(UTILDIR)/visgl.h
-$(GLOBJDIR)/text3d.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/text3d.o: $(UTILDIR)/iostuff.h
 $(GLOBJDIR)/text3d.o: $(GLDIR)/text3d.h
 $(GLOBJDIR)/text3d2.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/text3d2.o: $(top_objdir)/config.h
 $(GLOBJDIR)/text3d2.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/text3d2.o: $(UTILDIR)/random.h
-$(GLOBJDIR)/text3d2.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/text3d2.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/text3d2.o: $(UTILDIR)/iostuff.h
 $(GLOBJDIR)/text3d2.o: $(GLDIR)/text3d2.h

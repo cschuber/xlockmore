@@ -167,7 +167,7 @@ ModStruct   skewb_description =
 #define BOTTOM 10
 #define LEFT 11
 #define MAX_ROTATE 3
-#define MAXCUBES (MAX_ORIENT+1)
+#define MAX_CUBES (MAX_ORIENT+1)
 #define MINOR 0
 #define MAJOR 1
 #define MAX_FACES 6
@@ -403,8 +403,8 @@ typedef struct {
 	int         action;
 	int         done;
 	GLfloat     anglestep;
-	SkewbLoc    cubeLoc[MAX_FACES][MAXCUBES];
-	SkewbLoc    rowLoc[MAX_ORIENT][MAXCUBES];
+	SkewbLoc    cubeLoc[MAX_FACES][MAX_CUBES];
+	SkewbLoc    rowLoc[MAX_ORIENT][MAX_CUBES];
 	SkewbLoc    minorLoc[MAX_ORIENT], majorLoc[MAX_ORIENT][MAX_ORIENT];
 	SkewbMove   movement;
 	GLfloat     rotateStep;
@@ -1104,7 +1104,7 @@ drawCube(ModeInfo * mi)
 static void
 rotateFace(skewbstruct * sp, int face, int direction)
 {
-	SkewbLoc faceLoc[MAXCUBES];
+	SkewbLoc faceLoc[MAX_CUBES];
 	int corner;
 
 	/* Read Face */
@@ -1131,7 +1131,7 @@ readFace(skewbstruct * sp, int face, int h)
 {
 	int position;
 
-	for (position = 0; position < MAXCUBES; position++)
+	for (position = 0; position < MAX_CUBES; position++)
 		sp->rowLoc[h][position] = sp->cubeLoc[face][position];
 }
 
@@ -1287,7 +1287,7 @@ printCube(skewbstruct * sp)
 	int	 face, position;
 
 	for (face = 0; face < MAX_FACES; face++) {
-		for (position = 0; position < MAXCUBES; position++) {
+		for (position = 0; position < MAX_CUBES; position++) {
 			(void) printf("%d %d  ", sp->cubeLoc[face][position].face,
 			sp->cubeLoc[face][position].rotation);
 		}
@@ -1344,7 +1344,7 @@ shuffle(ModeInfo * mi)
 	SkewbMove   move;
 
 	for (face = 0; face < MAX_FACES; face++) {
-		for (position = 0; position < MAXCUBES; position++) {
+		for (position = 0; position < MAX_CUBES; position++) {
 			sp->cubeLoc[face][position].face = face;
 			sp->cubeLoc[face][position].rotation = TOP;
 		}

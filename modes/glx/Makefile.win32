@@ -17,9 +17,11 @@ INCS=-I../../xlock -I../../win32 -I..
 # C sources
 SRC=		atlantis.c whale.c dolphin.c shark.c swim.c \
 		atunnels.c tunnel_draw.c \
-		bubble3d.c b_draw.c b_lockglue.c b_sphere.c \
+		bevel.c			\
 		boxed.c			\
+		bubble3d.c b_draw.c b_lockglue.c b_sphere.c \
 		cage.c			\
+		dino.c			\
 		fire.c			\
 		gears.c			\
 		invert.c		\

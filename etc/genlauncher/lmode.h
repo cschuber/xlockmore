@@ -96,6 +96,11 @@ LockStruct  LockProcs[] =
 	{"bat",
 	 100000, -8, 1, 0, 64, 1.0, "",
 	 "Shows bouncing flying bats", 0, NULL, NULL},
+#ifdef USE_GL
+	{"bevel",
+	 100000, -30, 5, 1, 64, 1.0, "",
+	 "Shows an auto-solving Bevel or Dinosaur Cube", 0, NULL, "#ifdef USE_GL"},
+#endif
 	{"blot",
 	 200000, 6, 30, 1, 64, 0.3, "",
 	 "Shows Rorschach's ink blot test", 0, NULL, NULL},
@@ -156,6 +161,11 @@ LockStruct  LockProcs[] =
 	{"dilemma",
 	 200000, -2, 1000, 0, 64, 1.0, "",
 	 "Shows Lloyd's Prisoner's Dilemma simulation", 0, NULL, NULL},
+#ifdef USE_GL
+	{"dino",
+	 100000, -30, 5, 1, 64, 1.0, "",
+	 "Shows an auto-solving Dino puzzle", 0, NULL, "#ifdef USE_GL"},
+#endif
 	{"discrete",
 	 1000, 4096, 2500, 1, 64, 1.0, "",
 	 "Shows various discrete maps", 0, NULL, NULL},

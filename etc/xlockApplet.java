@@ -86,6 +86,7 @@ public class xlockApplet extends Applet implements ItemListener {
 		list.add("atunnels");
 		list.add("ball");
 		list.add("bat");
+		list.add("bevel");
 		list.add("blot");
 		list.add("bouboule");
 		list.add("bounce");
@@ -104,6 +105,7 @@ public class xlockApplet extends Applet implements ItemListener {
 		list.add("deco");
 		list.add("demon");
 		list.add("dilemma");
+		list.add("dino");
 		list.add("discrete");
 		list.add("dragon");
 		list.add("drift");

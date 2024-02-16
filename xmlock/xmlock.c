@@ -60,7 +60,6 @@ static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
 #include <sys/stat.h>
 
 #ifdef VMS
-#include "vms_x_fix.h"
 #include <descrip.h>
 #include <lib$routines.h>
 #endif
@@ -78,9 +77,22 @@ static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
 #include <Xm/Form.h>
 #include <Xm/Label.h>
 #include <Xm/Scale.h>
-#elif defined(HAVE_XAW3D)
+#else
 #include <X11/StringDefs.h>
 #include <X11/Intrinsic.h>
+#ifdef HAVE_LIB_XAW3DXFT
+#include <X11/Xaw3dxft/Form.h>
+#include <X11/Xaw3dxft/Label.h>
+#include <X11/Xaw3dxft/Toggle.h>
+#include <X11/Xaw3dxft/Box.h>
+#include <X11/Xaw3dxft/Scrollbar.h>
+#include <X11/Xaw3dxft/SimpleMenu.h>
+#include <X11/Xaw3dxft/MenuButton.h>
+#include <X11/Xaw3dxft/SmeBSB.h>
+#include <X11/Xaw3dxft/Command.h>
+#include <X11/Xaw3dxft/Dialog.h>
+#define HAVE_ATHENA 1
+#elif defined(HAVE_LIB_XAW3D)
 #include <X11/Xaw3d/Form.h>
 #include <X11/Xaw3d/Label.h>
 #include <X11/Xaw3d/Toggle.h>
@@ -92,9 +104,32 @@ static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
 #include <X11/Xaw3d/Command.h>
 #include <X11/Xaw3d/Dialog.h>
 #define HAVE_ATHENA 1
-#elif defined(HAVE_ATHENA)
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
+#elif defined(HAVE_LIB_NEXTAW)
+#include <X11/neXtaw/Form.h>
+#include <X11/neXtaw/Label.h>
+#include <X11/neXtaw/Toggle.h>
+#include <X11/neXtaw/Box.h>
+#include <X11/neXtaw/Scrollbar.h>
+#undef XtCDelay
+#include <X11/neXtaw/SimpleMenu.h>
+#include <X11/neXtaw/MenuButton.h>
+#include <X11/neXtaw/SmeBSB.h>
+#include <X11/neXtaw/Command.h>
+#include <X11/neXtaw/Dialog.h>
+#define HAVE_ATHENA 1
+#elif defined(HAVE_LIB_XAWPLUS)
+#include <X11/XawPlus/Form.h>
+#include <X11/XawPlus/Label.h>
+#include <X11/XawPlus/Toggle.h>
+#include <X11/XawPlus/Box.h>
+#include <X11/XawPlus/Scrollbar.h>
+#include <X11/XawPlus/SimpleMenu.h>
+#include <X11/XawPlus/MenuButton.h>
+#include <X11/XawPlus/SmeBSB.h>
+#include <X11/XawPlus/Command.h>
+#include <X11/XawPlus/Dialog.h>
+#define HAVE_ATHENA 1
+#elif defined(HAVE_ATHENA) /* HAVE_LIB_XAW */
 #include <X11/Xaw/Form.h>
 #include <X11/Xaw/Label.h>
 #include <X11/Xaw/Toggle.h>
@@ -106,6 +141,7 @@ static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
 #include <X11/Xaw/Command.h>
 #include <X11/Xaw/Dialog.h>
 /*#include <X11/Xaw/AsciiText.h>*/
+#endif
 #endif
 
 #if USE_XMU

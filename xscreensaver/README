@@ -1,26 +1,29 @@
 # Previously written for xscreensaver-2.17 and xscreensaver-5.10.
-Currently this is for getting xlockmore modes running in xscreensaver-6.04.
+Currently this is for getting xlockmore modes running in xscreensaver-6.08.
 
 First figure out how to compile xscreensaver without my changes.
 For me I had to do this:
   sudo apt-get -y install intltool # install intltool 0.51.0
-  tar xvzf ~/Downloads/xscreensaver-6.04.tar.gz
-  cd xscreensaver-6.04
+  tar xvzf ~/Downloads/xscreensaver-6.08.tar.gz
+  cd xscreensaver-6.08
   ./configure # Says needs systemd, not sure where to get this
   make
-  used to die trying to build ximage-loader.o n 5.44... not my issue
+  used to die trying to build ximage-loader.o in 5.44... not my issue
   used to die in xscreenaver.o for XInput2.h in 6.01
-  (previously had trouble with: libglade-2.0 not found... no demo it warns and no jpeg)
+  (previously had trouble with: libglade-2.0 not found...
+  it warns about no demo and no jpeg)
 
-Then... with a "make -f Makefile.in disclean" copy of latest code, say its xlockmore-5.70
+Then... with a "make -f Makefile.in distclean" copy of latest xlock code,
+  say its xlockmore-5.74:
   cd ..
-  cp -rp xlockmore-5.70 xscreensaver-6.04/xlockmore 
-  cd xscreensaver-6.04
+  cp -rp xlockmore-5.74 xscreensaver-6.08/xlockmore 
+  cd xscreensaver-6.08
   # edit configure.ac (previously configure.in) replace 
   sed -i 's#utils jwxyz hacks hacks/glx driver#utils jwxyz hacks xlockmore/xlock xlockmore/modes xlockmore/modes/glx hacks/glx driver#' configure.ac
   sed -i 's#hacks/Makefile#hacks/Makefile\n          xlockmore/xlock/Makefile\n          xlockmore/modes/Makefile\n          xlockmore/modes/glx/Makefile#' configure.ac
   autoconf
-(I made copies configure.ac and configure in this directory, but may go out of date)
+  # (I made copies configure.ac and configure in this directory.   If you do
+  # not have autoconf just replace the ones there, but may go out of date.)
   cd xlockmore/xlock
   mv Makefile.inxs Makefile.in
   cd ../modes
@@ -30,8 +33,8 @@ Then... with a "make -f Makefile.in disclean" copy of latest code, say its xlock
   cd ../../..
   ./configure
 # For me I had to edit the config.h:
-sed -i 's/\/* #undef HAVE_GTK2 *\//#define HAVE_GTK2 1/' config.h
-sed -i 's/#define HAVE_EGL 1/\/*#undef HAVE_EGL *\//' config.h
+  sed -i 's/\/* #undef HAVE_GTK2 *\//#define HAVE_GTK2 1/' config.h
+  sed -i 's/#define HAVE_EGL 1/\/*#undef HAVE_EGL *\//' config.h
 # (for 5.45 and above did not need to do this:
 # I had to add -lpng16 to the end of HACK_POST in many Makefiles (hacks/Makefile))
 
@@ -49,7 +52,8 @@ sed -i 's/#define HAVE_EGL 1/\/*#undef HAVE_EGL *\//' config.h
  make # fails so needed -lpng16 also (< 5.45)
  cd ../../xlockmore/xlock
  make
-# gives a few warnings about fgets in iostuff.c
+# gives a few warnings about fgets in iostuff.c and unrecognized command line option
+   ‘-Wno-language-extension-token’
  cd ../modes
  make
 # gives a few warnings about kill, wait, geoms_buf in run.c

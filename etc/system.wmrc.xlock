@@ -157,8 +157,10 @@
 "GL" MENU
 	"Atlantis"	EXEC	xlock -mode atlantis
 	"Atunnels"	EXEC	xlock -mode atunnels
+	"Bevel"		EXEC	xlock -mode bevel 
 	"Bubble3d"	EXEC	xlock -mode bubble3d
 	"Cage"		EXEC	xlock -mode cage
+	"Dino"		EXEC	xlock -mode dino 
 	"Fire"		EXEC	xlock -mode fire
 	"Gears"		EXEC	xlock -mode gears
 	"GL-Planet"	EXEC	xlock -mode glplanet
@@ -363,8 +365,10 @@
 "GL" MENU
 	"Atlantis"	EXEC	xlock -nolock -mode atlantis
 	"Atunnels"	EXEC	xlock -nolock -mode atunnels
+	"Bevel"		EXEC	xlock -nolock -mode bevel
 	"Bubble3d"	EXEC	xlock -nolock -mode bubble3d
 	"Cage"		EXEC	xlock -nolock -mode cage
+	"Dino"		EXEC	xlock -nolock -mode dino
 	"Fire"		EXEC	xlock -nolock -mode fire
 	"Gears"		EXEC	xlock -nolock -mode gears
 	"GL-Planet"	EXEC	xlock -nolock -mode glplanet

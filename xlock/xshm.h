@@ -26,6 +26,7 @@
 
 #ifdef HAVE_XSHM_EXTENSION
 
+# include <time.h>
 # include <sys/ipc.h>
 # include <sys/shm.h>
 # include <X11/extensions/XShm.h>

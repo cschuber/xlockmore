@@ -160,8 +160,10 @@
 	  "GL" TITLE
 		"Atlantis"		exec xlock -mode atlantis
 		"Atunnels"		exec xlock -mode atunnels
+		"Bevel"			exec xlock -mode bevel
 		"Bubble3d"		exec xlock -mode bubble3d
 		"Cage"			exec xlock -mode cage
+		"Dino"			exec xlock -mode dino
 		"Fire"			exec xlock -mode fire
 		"Gears"			exec xlock -mode gears
 		"GL-Planet"		exec xlock -mode glplanet
@@ -367,8 +369,10 @@
 	  "GL" TITLE
 		"Atlantis"		exec xlock -nolock -mode atlantis
 		"Atunnels"		exec xlock -nolock -mode atunnels
+		"Bevel"			exec xlock -nolock -mode bevel 
 		"Bubble3d"		exec xlock -nolock -mode bubble3d
 		"Cage"			exec xlock -nolock -mode cage
+		"Dino"			exec xlock -nolock -mode dino
 		"Fire"			exec xlock -nolock -mode fire
 		"Gears"			exec xlock -nolock -mode gears
 		"GL-Planet"		exec xlock -nolock -mode glplanet

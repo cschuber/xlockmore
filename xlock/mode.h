@@ -333,8 +333,10 @@ extern void release_last_mode(ModeInfo *);
 #ifndef NICE_ONLY
 /* comment out following defines to remove modes */
 #ifdef USE_GL
+#define MODE_bevel
 #define MODE_boxed
 #define MODE_cage
+#define MODE_dino
 #define MODE_fire
 #define MODE_gears
 #ifndef WIN32
@@ -662,6 +664,14 @@ extern ModeHook free_bat;
 extern ModeSpecOpt bat_opts;
 #endif
 
+#ifdef MODE_bevel
+extern ModeHook init_bevel;
+extern ModeHook draw_bevel;
+extern ModeHook release_bevel;
+extern ModeHook change_bevel;
+extern ModeSpecOpt bevel_opts;
+#endif
+
 #ifdef MODE_billiards
 extern ModeHook init_billiards;
 extern ModeHook draw_billiards;
@@ -826,6 +836,14 @@ extern ModeHook draw_dilemma;
 extern ModeHook release_dilemma;
 extern ModeHook refresh_dilemma;
 extern ModeSpecOpt dilemma_opts;
+#endif
+
+#ifdef MODE_dino
+extern ModeHook init_dino;
+extern ModeHook draw_dino;
+extern ModeHook release_dino;
+extern ModeHook change_dino;
+extern ModeSpecOpt dino_opts;
 #endif
 
 #ifdef MODE_discrete

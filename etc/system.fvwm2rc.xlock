@@ -156,8 +156,10 @@ AddToMenu "GL-Lock"
 +	"GL-Lock"	Title
 +	"Atlantis"	Exec	xlock -mode atlantis
 +	"Atunnels"	Exec	xlock -mode atunnels
++	"Bevel"		Exec	xlock -mode bevel
 +	"Bubble3d"	Exec	xlock -mode bubble3d
 +	"Cage"		Exec	xlock -mode cage
++	"Dino"		Exec	xlock -mode dino
 +	"Fire"		Exec	xlock -mode fire
 +	"Gears"		Exec	xlock -mode gears
 +	"GL-Planet"	Exec	xlock -mode glplanet
@@ -360,8 +362,10 @@ AddToMenu "GL-Saver"
 +	"GL-Saver"	Title
 +	"Atlantis"	Exec	xlock -nolock -mode atlantis
 +	"Atunnels"	Exec	xlock -nolock -mode atunnels
++	"Bevel"		Exec	xlock -nolock -mode bevel
 +	"Bubble3d"	Exec	xlock -nolock -mode bubble3d
 +	"Cage"		Exec	xlock -nolock -mode cage
++	"Dino"		Exec	xlock -nolock -mode dino
 +	"Fire"		Exec	xlock -nolock -mode fire
 +	"Gears"		Exec	xlock -nolock -mode gears
 +	"GL-Planet"	Exec	xlock -nolock -mode glplanet

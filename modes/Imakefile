@@ -166,7 +166,7 @@ $(DOG)glxfonts$(OG)gltrackball$(OG)trackball$(O)
 XLOCKDEPGLOBJS = $(DOG)xpm-ximage$(OG)pipeobjs$(O)$(S)\
 $(SPROINGIESOBJS)$(S)$(ATLANTISOBJS)$(S)$(ATUNNELSOBJS)$(S)\
 $(BUBBLE3DOBJS)$(S)$(JUGGLER3DOBJS)$(S)$(XLOCKDEPCPPGLOBJS)
-XLOCKNORMGLOBJS = $(DOG)cage$(OG)gears$(O)$(S)\
+XLOCKNORMGLOBJS = $(DOG)bevel$(OG)cage$(OG)$(OG)dino$(OG)gears$(O)$(S)\
 $(DOG)moebius$(OG)morph3d$(OG)noof$(OG)rubik$(O)$(S)\
 $(DOG)sierpinski3d$(OG)skewb$(OG)stairs$(OG)superquadrics$(O)$(S)\
 $(XLOCKTEXTGLOBJS)$(S)\
@@ -231,8 +231,9 @@ XLOCKUNSTABLESRCS = $(DM)run$(C)
 XCOMM CONSTRUCTIONSRCS = $(DM)billiards(CX)
 XLOCKCPPSRCS = $(DM)solitaire$(CX) $(CONSTRUCTIONSRCS)
 XLOCKXPMSRCS =
-XLOCKGLSRCS = $(DG)cage$(CG)fire$(CG)gears$(CG)juggler3d$(C) \
-$(DG)glplanet$(CG)sphere$(CG)lament$(CG)moebius$(CG)morph3d$(C) \
+XLOCKGLSRCS = $(DG)bevel$(CG)cage$(CG)dino$(CG)fire$(CG)gears$(C) \
+$(DG)juggler3d$(CG)glplanet$(CG)sphere$(CG)lament$(C) \
+$(DG)moebius$(CG)morph3d$(C) \
 $(DG)molecule$(CG)tube$(CG)noof$(CG)rubik$(CG)sballs$(C) \
 $(DG)sierpinski3d$(CG)skewb$(CG)stairs$(CG)superquadrics$(C) \
 $(DG)xpm-ximage$(CG)buildlwo$(CG)pipes$(CG)pipeobjs$(C) \
@@ -455,7 +456,9 @@ $(XLOCKUTILOBJS) :
 	cd $(UTILOBJDIR) ; \
 $(MAKE) $(@F) CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
+$(GLOBJDIR)bevel.o : $(GLDIR)bevel.c
 $(GLOBJDIR)cage.o : $(GLDIR)cage.c
+$(GLOBJDIR)dino.o : $(GLDIR)dino.c
 $(GLOBJDIR)fire.o : $(GLDIR)fire.c
 $(GLOBJDIR)gears.o : $(GLDIR)gears.c
 $(GLOBJDIR)glplanet.o : $(GLDIR)glplanet.c

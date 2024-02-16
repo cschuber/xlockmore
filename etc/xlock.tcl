@@ -658,6 +658,7 @@ atlantis\
 atunnels\
 ball\
 bat\
+bevel\
 blot\
 bouboule\
 bounce\
@@ -676,6 +677,7 @@ decay\
 deco\
 demon\
 dilemma\
+dino\
 discrete\
 dragon\
 drift\

@@ -90,9 +90,13 @@ ECHO = echo
 #RM_S = set file/remove/nolog
 #ECHO = write sys$output
 
-DEFS = @DEFS@ $(DEFINES) -DHAVE_MOTIF
+DEFS = @DEFS@ $(DEFINES)
+#DEFS = @DEFS@ $(DEFINES) -DHAVE_MOTIF
+#DEFS = @DEFS@ $(DEFINES) -DHAVE_LIB_XAW3DXFT # change -lXm to -lXaw3dxft
+#DEFS = @DEFS@ $(DEFINES) -DHAVE_LIB_XAW3D # change -lXm to -lXaw3d
+#DEFS = @DEFS@ $(DEFINES) -DHAVE_LIB_NEXTAW # change -lXm to -lneXtaw
+#DEFS = @DEFS@ $(DEFINES) -DHAVE_LIB_XAWPLUS # change -lXm to -lXawPlus
 #DEFS = @DEFS@ $(DEFINES) -DHAVE_ATHENA # change -lXm to -lXaw
-#DEFS = @DEFS@ $(DEFINES) -DHAVE_XAW3D # change -lXm to -lXaw3d
 XMLOCKINC = @XMLOCKINC@ -I.. -I$(top_srcdir)
 CFLAGS = @CFLAGS@
 #CFLAGS = -O

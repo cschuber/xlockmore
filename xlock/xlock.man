@@ -1,7 +1,7 @@
-.\" @(#)xlock.man	5.65 2020/12/29
+.\" @(#)xlock.man	5.74 2023/10/23
 .\" Copyright (c) 1991 - Patrick J. Naughton
 .\" xlockmore updates from David A. Bagley
-.TH XLOCK 1 "29 Dec 2020" "X11R6 Contrib"
+.TH XLOCK 1 "08 Sep 2023" "X11R6 Contrib"
 .SH NAME
 xlock \- Locks the local X display until a password is entered.
 .sp
@@ -385,6 +385,11 @@ Shows bouncing balls.
 .B bat
 Shows bouncing flying bats.
 .TP 8
+.B bevel
+Shows an auto-solving Bevel or Helicopter Cube.  May not be available
+depending on how it was configured.
+.TP 8
+.TP 8
 .B blot
 Shows Rorschach's ink blot test.
 .TP 8
@@ -393,6 +398,9 @@ Shows Mimi's bouboule of moving stars.
 .TP 8
 .B bounce
 Shows bouncing footballs.
+.TP 8
+.B boxed
+Shows GL's boxed balls.
 .TP 8
 .B braid
 Shows random braids and knots.
@@ -430,6 +438,10 @@ Shows Griffeath's cellular automata.
 .TP 8
 .B dilemma
 Shows Lloyd's Prisoner's Dilemma simulation.
+.TP 8
+.B dino
+Shows an auto-solving Dinosaur Cube.  May not be available depending on how
+it was configured.
 .TP 8
 .B discrete
 Shows various discrete maps.
@@ -788,6 +800,8 @@ In ball mode it is the number of balls.
 
 In bat mode it is the number of bats, could be less because of conflicts.
 
+In bevel mode it is the number of moves.
+
 In blot mode this refers to the number of pixels rendered in the same color.
 
 In bouboule mode it is the number of stars.
@@ -819,6 +833,8 @@ In deco mode it is the depth.
 In demon mode this refers the number of colors.
 
 In dilemma mode this refers the number of initial defectors.
+
+In dino mode it is the number of moves.
 
 In discrete mode it is the number of points.
 
@@ -1045,7 +1061,9 @@ daisy, deco, demon, dilemma, discrete, dragon,
 eyes, fiberlamp, flag, flow, forest, galaxy, helix, hop, hyper, ico, juggle,
 juggler3d, laser, life, life1d, life3d, lisa, lissie, loop, mandelbrot,
 mountain, petal, sierpinski, shape, spline +erase, t3d, thornbird, triangle,
-tube, voters, wator, and wire.  For euler2d and worm it is the length
+tube, voters, wator, and wire.  For bevel it is the nuber of steps to
+complete a 180 degree move, for dino it is the number of steps to complete
+a move (120 or 180 degree), for euler2d and worm it is the length
 of the lines, for atlantis it is the shark speed,
 for fadeplot, julia and spiral it is the length of the trail of dots,
 munch it is the minimum size of the squares,
@@ -1427,8 +1445,8 @@ and triangle.
 .TP 5
 .B -/+showfps
 Turn on/off frame per sec display, available on atlantis, atunnels,
-bubble3d, cage, fire, gears, invert, lament, moebius, morph3d, rubik,
-sballs, skewb, stairs, and superquadrics.
+bevel, dino, bubble3d, cage, fire, gears, invert, lament, moebius,
+morph3d, rubik, sballs, skewb, stairs, and superquadrics.
 .TP 5
 .B -/+fpstop
 Turn on/off frame per sec display on top of screen, used if showfps is on.
@@ -2259,7 +2277,7 @@ numbers offer randomness from 2 to the absolute value of the number.
 .TP 5
 .BI -/+hideshuffling
 Turn on or off hidden shuffle phase for
-.I rubik
+.I bevel, dino, rubik
 and
 .I skewb.
 .TP 5
@@ -2563,7 +2581,7 @@ with many additional contributors.
 .SH COPYRIGHT
 Copyright (c) 1988-1991 by Patrick J. Naughton
 .br
-Copyright (c) 1993-2020 by David A. Bagley
+Copyright (c) 1993-2023 by David A. Bagley
 .sp
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted,

@@ -163,8 +163,10 @@ EndPopup
 Popup "GL-Lock"
 	Exec	"Atlantis"	exec xlock -mode atlantis &
 	Exec	"Atunnels"	exec xlock -mode atunnels &
+	Exec	"Bevel"		exec xlock -mode bevel &
 	Exec	"Bubble3d"	exec xlock -mode bubble3d &
 	Exec	"Cage"		exec xlock -mode cage &
+	Exec	"Dino"		exec xlock -mode dino &
 	Exec	"Fire"		exec xlock -mode fire &
 	Exec	"Gears"		exec xlock -mode gears &
 	Exec	"GL-Planet"	exec xlock -mode glplanet &
@@ -402,8 +404,10 @@ EndPopup
 Popup "GL-Saver"
 	Exec	"Atlantis"	exec xlock -nolock -mode atlantis &
 	Exec	"Atunnels"	exec xlock -nolock -mode atunnels &
+	Exec	"Bevel"		exec xlock -nolock -mode bevel &
 	Exec	"Bubble3d"	exec xlock -nolock -mode bubble3d &
 	Exec	"Cage"		exec xlock -nolock -mode cage &
+	Exec	"Dino"		exec xlock -nolock -mode dino &
 	Exec	"Fire"		exec xlock -nolock -mode fire &
 	Exec	"Gears"		exec xlock -nolock -mode gears &
 	Exec	"GL-Planet"	exec xlock -nolock -mode glplanet &

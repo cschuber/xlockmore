@@ -177,8 +177,10 @@ Menu GL-Lock
 	"GL-Lock" f.title
 	"Atlantis"	f.exec "xlock -mode atlantis &"
 	"Atunnels"	f.exec "xlock -mode atunnels &"
+	"Bevel"		f.exec "xlock -mode bevel &"
 	"Bubble3d"	f.exec "xlock -mode bubble3d &"
 	"Cage"		f.exec "xlock -mode cage &"
+	"Dino"		f.exec "xlock -mode dino &"
 	"Fire"		f.exec "xlock -mode fire &"
 	"Gears"		f.exec "xlock -mode gears &"
 	"GL-Planet"	f.exec "xlock -mode glplanet &"
@@ -429,8 +431,10 @@ Menu GL-Saver
 	"GL-Saver"	f.title
 	"Atlantis"	f.exec "xlock -nolock -mode atlantis &"
 	"Atunnels"	f.exec "xlock -nolock -mode atunnels &"
+	"Bevel"		f.exec "xlock -nolock -mode bevel &"
 	"Bubble3d"	f.exec "xlock -nolock -mode bubble3d &"
 	"Cage"		f.exec "xlock -nolock -mode cage &"
+	"Dino"		f.exec "xlock -nolock -mode dino &"
 	"Fire"		f.exec "xlock -nolock -mode fire &"
 	"Gears"		f.exec "xlock -nolock -mode gears &"
 	"GL-Planet"	f.exec "xlock -nolock -mode glplanet &"
