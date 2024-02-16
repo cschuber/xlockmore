@@ -10,9 +10,9 @@
 
 #define BUFFER_PAD 4
 
-#define DEFAULT_NCHANNELS      	1
+#define DEFAULT_NCHANNELS	1
 #define DEFAULT_ENCODING	WAVE_FORMAT_MULAW
-#define DEFAULT_SAMPLESIZE     	8
+#define DEFAULT_SAMPLESIZE	8
 #define DEFAULT_SAMPLERATE	8000
 
 #define DIV_ROUND_UP_(n,d) ((n + d - 1) / d)
@@ -99,7 +99,7 @@ void play_sound_mmov( char* FileName , int verbose )
 	    DEFAULT_ENCODING,
 	    DEFAULT_NCHANNELS,
 	    DEFAULT_SAMPLERATE,
-    	    0,
+	    0,
 	    0,
 	    DEFAULT_SAMPLESIZE,
 	    NUM_DATA

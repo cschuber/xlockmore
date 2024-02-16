@@ -71,7 +71,7 @@ CXG = $(CX) $(DG)
 @GL@$(BUBBLE3DOBJS)$(S)$(JUGGLER3DOBJS)$(S)\
 @GL@$(MAZE3DOBJS)$(S)$(XLOCKDEPCPPGLOBJS)
 @GL@XLOCKNORMGLOBJS = $(DOG)bevel$(OG)cage$(OG)dino$(OG)gears$(O)$(S)\
-@GL@$(DOG)moebius$(OG)morph3d$(OG)noof$(OG)rubik$(O)$(S)\
+@GL@$(DOG)moebius$(OG)morph3d$(OG)noof$(OG)pyraminx$(OG)rubik$(O)$(S)\
 @GL@$(DOG)sierpinski3d$(OG)skewb$(OG)stairs$(OG)superquadrics$(O)$(S)\
 @GL@$(XLOCKTEXTGLOBJS)$(S)\
 @GL@$(XLOCKTEXT2GLOBJS)$(S)$(XLOCKUNSTABLEGLOBJS)
@@ -299,6 +299,11 @@ $(GLOBJDIR)/noof.o: $(top_objdir)/config.h
 $(GLOBJDIR)/noof.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/noof.o: $(UTILDIR)/random.h
 $(GLOBJDIR)/noof.o: $(UTILDIR)/visgl.h
+$(GLOBJDIR)/pyraminx.o: $(UTILDIR)/xlock.h
+$(GLOBJDIR)/pyraminx.o: $(top_objdir)/config.h
+$(GLOBJDIR)/pyraminx.o: $(UTILDIR)/mode.h
+$(GLOBJDIR)/pyraminx.o: $(UTILDIR)/random.h
+$(GLOBJDIR)/pyraminx.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/rubik.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/rubik.o: $(top_objdir)/config.h
 $(GLOBJDIR)/rubik.o: $(UTILDIR)/mode.h

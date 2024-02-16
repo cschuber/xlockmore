@@ -826,6 +826,11 @@ Shows attempts to place polyominoes into a rectangle.
 
 <DD>
 Shows a puzzle being scrambled and then solved.
+<DT><B>pyraminx</B>
+
+<DD>
+Shows an auto-solving Pyraminx puzzle.  May not be available depending on how
+it was configured.
 <DT><B>pyro</B>
 
 <DD>
@@ -1212,6 +1217,8 @@ In polyominoes mode it means nothing.
 <P>
 In puzzle mode it the number of moves.
 <P>
+In pyraminx mode it is the number of moves.
+<P>
 In pyro mode it is the maximum number flying rockets at one time.
 <P>
 In pyro2 mode it is means nothing.
@@ -1347,6 +1354,7 @@ for gears it is the number of degrees to increment the spin of each gear by,
 for glplanet it is the number of hundredth degrees to rotate the planet by,
 for molecule it is the time in seconds until timeout,
 for pipes it is the number of systems to draw before clearing the screen,
+for pyraminx it is the number of steps to complete a 120 degree move,
 for rubik it is the number of steps to complete a 90 degree move,
 for sballs it is the sphere speed value,
 for scooter it is the speed,
@@ -1843,7 +1851,7 @@ and triangle.
 <DD>
 Turn on/off frame per sec display, available on atlantis, atunnels,
 bevel, dino, bubble3d, cage, fire, gears, invert, lament, moebius,
-morph3d, rubik, sballs, skewb, stairs, and superquadrics.
+morph3d, pyraminx, rubik, sballs, skewb, stairs, and superquadrics.
 <DT><B>-/+fpstop</B>
 
 <DD>
@@ -2008,7 +2016,7 @@ support was compiled in.
 <DT><B>-/+xinerama</B>
 
 <DD>
-Turn on/off Xinerama.  This option is only available if Xinerama 
+Turn on/off Xinerama.  This option is only available if Xinerama
 support was compiled in.
 <DT><B>-modulepath</B><I>&nbsp;path</I>
 
@@ -3011,7 +3019,7 @@ Turn on or off complete graph morphing in
 <DT><B>-msg</B><I>&nbsp;textstring</I>
 
 <DD>
-Allows one to pass different explosion elements to 
+Allows one to pass different explosion elements to
 <I>pyro2.</I>
 
 The explosion types is one of &amp;0, &amp;1, ... &amp;9, &amp;a, ... &amp;f each of
@@ -3021,7 +3029,7 @@ An operation system logo will be shown, if the # sign is sent.
 <DT><B>-fnt</B><I>&nbsp;font</I>
 
 <DD>
-Allows one to pass different elements to 
+Allows one to pass different elements to
 <I>pyro2.</I>
 
 <DT><B>-size[xyz]</B><I>&nbsp;num</I>
@@ -3035,7 +3043,7 @@ numbers offer randomness from 2 to the absolute value of the number.
 
 <DD>
 Turn on or off hidden shuffle phase for
-<I>bevel, dino, rubik</I>
+<I>bevel, dino, pyraminx, rubik</I>
 
 and
 <I>skewb.</I>
@@ -3511,6 +3519,6 @@ copyrights.
 This document was created by
 <A HREF="/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 23:27:26 GMT, October 25, 2023
+Time: 03:37:40 GMT, February 05, 2024
 </BODY>
 </HTML>

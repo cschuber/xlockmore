@@ -105,7 +105,7 @@ Bool *glOK = (Bool *) NULL;
 static XFontStruct *font_struct = (XFontStruct *) NULL;
 static GLuint   font_dlist;
 extern Bool     fpsTop;
-extern char 	*fpsfontname;
+extern char	*fpsfontname;
 
 /*-
  * NOTE WELL:  We _MUST_ destroy the glXContext between each mode
@@ -194,7 +194,7 @@ init_GL(ModeInfo * mi)
 		(void) fprintf(stderr, "Could not get XVisualInfo\n");
 		return (GLXContext *) NULL;
 	}
-   
+
 	if ( xvi_out->CLASS == DirectColor ) {
 		XColor xc[256];
 		int maxColors = 256, i;
@@ -238,7 +238,7 @@ init_GL(ModeInfo * mi)
 		XStoreColors(display, cmap, xc, maxColors);
 		XInstallColormap(display, cmap);
 	}
-   
+
 	if (glOK && glOK[screen]) {
 #ifdef SUN_OGL_NO_VERTEX_MACROS
 /* Cores when run in GrayScale|StaticGray|StaticColor on OpenGL Solaris 10 */
@@ -331,13 +331,13 @@ FreeAllGL(ModeInfo * mi)
 		/* Free font stuff */
 		if (font_struct)
 		{
-  			int last;
+			int last;
 
-  			last = font_struct->max_char_or_byte2;
-  			clear_gl_error ();
+			last = font_struct->max_char_or_byte2;
+			clear_gl_error ();
 			if (glIsList(font_dlist)) {
-	  			glDeleteLists (font_dlist,(GLuint) last+1);
-  				(void) check_gl_error ("glDeleteLists");
+				glDeleteLists (font_dlist,(GLuint) last+1);
+				(void) check_gl_error ("glDeleteLists");
 				font_dlist = 0;
 			}
 			XFreeFont(MI_DISPLAY(mi),font_struct);
@@ -410,7 +410,7 @@ fps_init (ModeInfo *mi)
   clear_gl_error ();
   font_dlist = glGenLists ((GLuint) last+1);
   if (check_gl_error ("glGenLists"))
- 	return False;
+	return False;
 
   if (fpsTop) /* Draw string on top of screen */
     fps_text_y = - (f->ascent + 10);

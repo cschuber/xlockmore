@@ -44,35 +44,34 @@ sub search {
 			$number = $number * 10 + ($c - '0');
                 } elsif ($c =~ /[b]/) {
 			if ($number == 0) {
-                		printf ".";
+				printf ".";
 			} else {
 				for ($j = 0; $j < $number; $j++) {
-                			printf ".";
+					printf ".";
 				}
 				$number = 0;
 			}
 		} elsif ($c =~ /[o]/) {
 			if ($number == 0) {
-                		printf "o";
-    			} else {
+				printf "o";
+			} else {
 				for ($j = 0; $j < $number; $j++) {
-                			printf "o";
+					printf "o";
 				}
 				$number = 0;
 			}
 		} elsif ($c =~ /[\$]/) {
 			if ($number == 0) {
-                		printf "\n";
-    			} else {
+				printf "\n";
+			} else {
 				for ($j = 0; $j < $number; $j++) {
-                			printf "\n";
+					printf "\n";
 				}
 				$number = 0;
 			}
 		} elsif ($c =~ /[\!]/) {
-                	printf "\n";
+			printf "\n";
 			return;
-
 		}
 		$row++;
 	    }

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ -z "$1" ] 
+if [ -z "$1" ]
     then message="Go ahead and log me out if you want to."
-else 
+else
     message="$1"
 fi
 

@@ -397,7 +397,7 @@ LockStruct  LockProcs[] =
 	 (char *) "Shows a kaleidoscope", 0, NULL},
 #endif
 #ifdef MODE_kaleid2
- 	{"kaleid2", init_kaleid2, draw_kaleid2, release_kaleid2,
+	{"kaleid2", init_kaleid2, draw_kaleid2, release_kaleid2,
 	 refresh_kaleid2, init_kaleid2, NULL, &kaleid2_opts,
 	 20000, 1, 700, 1, 64, 1.0, "",
 	 (char *) "Shows a kaleidoscope", 0, NULL},
@@ -586,6 +586,12 @@ LockStruct  LockProcs[] =
 	 init_puzzle, init_puzzle, (ModeHook *) NULL, &puzzle_opts,
 	 10000, 250, 1, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows a puzzle being scrambled and then solved", 0, NULL},
+#endif
+#ifdef MODE_pyraminx
+	{(char *) "pyraminx", init_pyraminx, draw_pyraminx, release_pyraminx,
+	 draw_pyraminx, change_pyraminx, (ModeHook *) NULL, &pyraminx_opts,
+	 100000, -30, 5, -4, 64, 1.0, (char *) "",
+	 (char *) "Shows an auto-solving Pyraminx puzzle", 0, NULL},
 #endif
 #ifdef MODE_pyro
 	{(char *) "pyro", init_pyro, draw_pyro, release_pyro,

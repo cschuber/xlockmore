@@ -171,6 +171,7 @@ AddToMenu "GL-Lock"
 +	"Morph3d"	Exec	xlock -mode morph3d
 +	"Noof"		Exec	xlock -mode noof
 +	"Pipes"		Exec	xlock -mode pipes
++	"Pyraminx"	Exec	xlock -mode pyraminx
 +	"Rubik"		Exec	xlock -mode rubik
 +	"Sballs"	Exec	xlock -mode sballs
 +	"Sierpinski3d"	Exec	xlock -mode sierpinski3d
@@ -376,6 +377,7 @@ AddToMenu "GL-Saver"
 +	"Morph3d"	Exec	xlock -nolock -mode morph3d
 +	"Noof"		Exec	xlock -nolock -mode noof
 +	"Pipes"		Exec	xlock -nolock -mode pipes
++	"Pyraminx"	Exec	xlock -nolock -mode pyraminx
 +	"Rubik"		Exec	xlock -nolock -mode rubik
 +	"Sballs"	Exec	xlock -nolock -mode sballs
 +	"Sierpinski3d"	Exec	xlock -nolock -mode sierpinski3d
@@ -443,17 +445,17 @@ AddToMenu Screensaver
 +	"Cellular Automata"	Menu Automata-Saver Close
 +	""			Nop
 +	"Fractal"		Menu Fractal-Saver Close
-+       ""      		Nop
++       ""			Nop
 +	"Geometry"		Menu Geometry-Saver Close
-+       ""      		Nop
++       ""			Nop
 +	"Space"			Menu Space-Saver Close
-+       ""      		Nop
++       ""			Nop
 +	"Assorted"		Menu Assorted-Saver Close
-+       ""      		Nop
++       ""			Nop
 +	"XPM"		Menu XPM-Saver Close
-+       ""      		Nop
++       ""			Nop
 +	"GL"		Menu GL-Saver Close
-+       ""      		Nop
++       ""			Nop
 +	"Marquee Message"	Menu Marquee-Message-Saver Close
 +       ""                      Nop
 +	"Nose Message"		Menu Nose-Message-Saver Close

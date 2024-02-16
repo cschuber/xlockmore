@@ -37,7 +37,7 @@ typedef struct {
 #else
 	unsigned char red[COLORMAP_SIZE], green[COLORMAP_SIZE], blue[COLORMAP_SIZE];
 #endif
-   	unsigned char *data;
+	unsigned char *data;
 	unsigned long sign;
 	unsigned long width, height;
 	unsigned long depth;

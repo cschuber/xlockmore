@@ -157,10 +157,10 @@
 "GL" MENU
 	"Atlantis"	EXEC	xlock -mode atlantis
 	"Atunnels"	EXEC	xlock -mode atunnels
-	"Bevel"		EXEC	xlock -mode bevel 
+	"Bevel"		EXEC	xlock -mode bevel
 	"Bubble3d"	EXEC	xlock -mode bubble3d
 	"Cage"		EXEC	xlock -mode cage
-	"Dino"		EXEC	xlock -mode dino 
+	"Dino"		EXEC	xlock -mode dino
 	"Fire"		EXEC	xlock -mode fire
 	"Gears"		EXEC	xlock -mode gears
 	"GL-Planet"	EXEC	xlock -mode glplanet
@@ -172,6 +172,7 @@
 	"Morph3d"	EXEC	xlock -mode morph3d
 	"Noof"		EXEC	xlock -mode noof
 	"Pipes"		EXEC	xlock -mode pipes
+	"Pyraminx"	EXEC	xlock -mode pyraminx
 	"Rubik"		EXEC	xlock -mode rubik
 	"Sballs"	EXEC	xlock -mode sballs
 	"Sierpinski3d"	EXEC	xlock -mode sierpinski3d
@@ -380,6 +381,7 @@
 	"Morph3d"	EXEC	xlock -nolock -mode morph3d
 	"Noof"		EXEC	xlock -nolock -mode noof
 	"Pipes"		EXEC	xlock -nolock -mode pipes
+	"Pyraminx"	EXEC	xlock -nolock -mode pyraminx
 	"Rubik"		EXEC	xlock -nolock -mode rubik
 	"Sballs"	EXEC	xlock -nolock -mode sballs
 	"Sierpinski3d"	EXEC	xlock -nolock -mode sierpinski3d

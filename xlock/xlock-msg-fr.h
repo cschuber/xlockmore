@@ -2,7 +2,7 @@
  * XLock messages for French.
  */
 
-#ifndef __XLOCK_MSG_FR_H__ 
+#ifndef __XLOCK_MSG_FR_H__
 #define __XLOCK_MSG_FR_H__
 
 #define TIME_ELAPSED_MINUTE	"%d minute écoulée depuis verrouillage.                      \n"

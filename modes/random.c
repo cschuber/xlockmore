@@ -195,6 +195,9 @@ static char gl_modes[][MAXMODECHARS] =
 	"pipes",
 #endif
 #ifdef MODE_rubik
+	"pyraminx",
+#endif
+#ifdef MODE_rubik
 	"rubik",
 #endif
 #ifdef MODE_sballs

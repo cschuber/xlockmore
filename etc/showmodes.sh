@@ -17,7 +17,7 @@
 # other special, indirect and consequential damages.
 #
 # xlock-show-modes Copyright (C)  1998 Andrea Arcangeli
-# 		by Andrea Arcangeli <arcangeli@mbox.queen.it>
+#		by Andrea Arcangeli <arcangeli@mbox.queen.it>
 #
 # Revision History:
 # 00-Jan-23  erase-modename threw it off, an extra space did the trick

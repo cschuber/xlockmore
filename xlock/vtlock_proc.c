@@ -39,13 +39,13 @@ static const char sccsid[] = "@(#)vtlock_proc.c	1.2 00/08/30 xlockmore";
 /* Misc definitions to modify if not applicable on the current system */
 #if defined( __linux__ ) && HAVE_DIRENT_H
 #include <dirent.h>	/* for alphasort() */
-#define PROCDIR 	"/proc"
-#define DEVDIR 		"/dev"
+#define PROCDIR		"/proc"
+#define DEVDIR		"/dev"
 #define TTY		DEVDIR "/tty%c"
-#define CONSOLE 	DEVDIR "/console"
+#define CONSOLE		DEVDIR "/console"
 #define BASEVTNAME	DEVDIR "/tty%d"
-#define XPATH 		"/usr/X11R6/bin" /* default path of X server */
-#define XNAME 		"X"		 /* X server name : mandatory ! */
+#define XPATH		"/usr/X11R6/bin" /* default path of X server */
+#define XNAME		"X"		 /* X server name : mandatory ! */
 #define MAX_VT		20
 #else
 #error Sorry ! You must adapt this file to your system !
@@ -331,7 +331,7 @@ scan_x_fds( struct inode_ref *inotab, int ln_ttys, pid_t proc )
 	    {
               if ( !strncmp( linkref, inotab[ix].ref, strlen( inotab[ix].ref ) ) )
               {
-      		free(namelist);
+		free(namelist);
                 return inotab[ix].n;
               }
             }

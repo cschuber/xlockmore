@@ -1330,7 +1330,7 @@ checkPasswd(char *buffer)
 					  "response", NULL, "", buffer) > 0) {
 				done = True;
 				if (!*buffer)
-	 				/*
+					/*
 					 * root has no password, don't let him in...
 					 */
 					done = False;
@@ -2299,7 +2299,7 @@ int checkGroupXlockPasswds(char *buffer)
 #endif
 			return unlock;
 		}
-       		i++;
+		i++;
 	}
 	return False;
 }

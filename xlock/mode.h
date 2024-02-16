@@ -192,7 +192,7 @@ typedef struct ModeInfo_s {
 
 #define MI_DISPLAY(mi)		((mi)->windowinfo.display)
 #define MI_SCREEN(mi)		((mi)->windowinfo.screen)
-#define MI_SCREENPTR(mi)      	((mi)->windowinfo.screenptr)
+#define MI_SCREENPTR(mi)	((mi)->windowinfo.screenptr)
 #define MI_REAL_SCREEN(mi)	((mi)->windowinfo.real_screen)
 #define MI_NUM_SCREENS(mi)	((mi)->windowinfo.num_screens)
 #define MI_MAX_SCREENS(mi)	((mi)->windowinfo.max_screens)
@@ -205,8 +205,8 @@ typedef struct ModeInfo_s {
 #define MI_SET_FLAG_STATE(mi,f,bool) ((mi)->windowinfo.flags = \
 					(bool) ? (mi)->windowinfo.flags | f \
 					: (mi)->windowinfo.flags & ~(f))
-#define MI_FLAG_IS_SET(mi,f) 	((mi)->windowinfo.flags & f)
-#define MI_FLAG_NOT_SET(mi,f) 	( ! MI_FLAG_IS_SET(mi,f))
+#define MI_FLAG_IS_SET(mi,f)	((mi)->windowinfo.flags & f)
+#define MI_FLAG_NOT_SET(mi,f)	( ! MI_FLAG_IS_SET(mi,f))
 #define MI_IS_ICONIC(mi)	(MI_FLAG_IS_SET (mi, WI_FLAG_ICONIC))
 #define MI_IS_MONO(mi)		(MI_FLAG_IS_SET (mi, WI_FLAG_MONO))
 #define MI_IS_INWINDOW(mi)	(MI_FLAG_IS_SET (mi, WI_FLAG_INWINDOW))
@@ -216,7 +216,7 @@ typedef struct ModeInfo_s {
 #define MI_IS_DEBUG(mi)		(MI_FLAG_IS_SET (mi, WI_FLAG_DEBUG))
 #define MI_IS_USE3D(mi)		(MI_FLAG_IS_SET (mi, WI_FLAG_USE3D))
 #define MI_IS_VERBOSE(mi)	(MI_FLAG_IS_SET (mi, WI_FLAG_VERBOSE))
-#define MI_IS_FULLRANDOM(mi) 	(MI_FLAG_IS_SET (mi, WI_FLAG_FULLRANDOM))
+#define MI_IS_FULLRANDOM(mi)	(MI_FLAG_IS_SET (mi, WI_FLAG_FULLRANDOM))
 #define MI_IS_WIREFRAME(mi)	(MI_FLAG_IS_SET (mi, WI_FLAG_WIREFRAME))
 #define MI_IS_FPS(mi)		(MI_FLAG_IS_SET (mi, WI_FLAG_FPS))
 
@@ -353,6 +353,7 @@ extern void release_last_mode(ModeInfo *);
 #endif
 #define MODE_morph3d
 #define MODE_noof
+#define MODE_pyraminx
 #define MODE_rubik
 #define MODE_sierpinski3d
 #define MODE_skewb
@@ -1334,6 +1335,14 @@ extern ModeHook release_puzzle;
 extern ModeHook refresh_puzzle;	/* Needed */
 #endif
 extern ModeSpecOpt puzzle_opts;
+#endif
+
+#ifdef MODE_pyraminx
+extern ModeHook init_pyraminx;
+extern ModeHook draw_pyraminx;
+extern ModeHook release_pyraminx;
+extern ModeHook change_pyraminx;
+extern ModeSpecOpt pyraminx_opts;
 #endif
 
 #ifdef MODE_pyro

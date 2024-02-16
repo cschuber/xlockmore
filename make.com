@@ -473,6 +473,7 @@ $  call make [.modes.glx]moebius.obj  "xl_cc /object=[.modes.glx] [.modes.glx]mo
 $  call make [.modes.glx]molecule.obj  "xl_cc /object=[.modes.glx] [.modes.glx]molecule.c"  [.modes.glx]molecule.c [.xlock]xlock.h [.xlock]mode.h
 $  call make [.modes.glx]morph3d.obj  "xl_cc /object=[.modes.glx] [.modes.glx]morph3d.c"  [.modes.glx]morph3d.c [.xlock]xlock.h [.xlock]mode.h
 $  call make [.modes.glx]noof.obj      "xl_cc /object=[.modes.glx] [.modes.glx]noof.c"      [.modes.glx]noof.c [.xlock]xlock.h [.xlock]mode.h
+$  call make [.modes.glx]pyraminx.obj    "xl_cc /object=[.modes.glx] [.modes.glx]pyraminx.c"    [.modes.glx]pyraminx.c [.xlock]xlock.h [.xlock]mode.h
 $  call make [.modes.glx]rubik.obj    "xl_cc /object=[.modes.glx] [.modes.glx]rubik.c"    [.modes.glx]rubik.c [.xlock]xlock.h [.xlock]mode.h
 $  call make [.modes.glx]sballs.obj    "xl_cc /object=[.modes.glx] [.modes.glx]sballs.c"    [.modes.glx]sballs.c [.xlock]xlock.h [.xlock]mode.h
 $  call make [.modes.glx]sierpinski3d.obj  "xl_cc /object=[.modes.glx] [.modes.glx]sierpinski3d.c"  [.modes.glx]sierpinski3d.c [.xlock]xlock.h [.xlock]mode.h

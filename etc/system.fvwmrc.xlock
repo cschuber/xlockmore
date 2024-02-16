@@ -178,6 +178,7 @@ Popup "GL-Lock"
 	Exec	"Morph3d"	exec xlock -mode morph3d &
 	Exec	"Noof"		exec xlock -mode noof &
 	Exec	"Pipes"		exec xlock -mode pipes &
+	Exec	"Pyraminx"	exec xlock -mode pyraminx &
 	Exec	"Rubik"		exec xlock -mode rubik &
 	Exec	"Sballs"	exec xlock -mode sballs &
 	Exec	"Sierpinski3d"	exec xlock -mode sierpinski3d &
@@ -419,6 +420,7 @@ Popup "GL-Saver"
 	Exec	"Morph3d"	exec xlock -nolock -mode morph3d &
 	Exec	"Noof"		exec xlock -nolock -mode noof &
 	Exec	"Pipes"		exec xlock -nolock -mode pipes &
+	Exec	"Pyraminx"	exec xlock -nolock -mode pyraminx &
 	Exec	"Rubik"		exec xlock -nolock -mode rubik &
 	Exec	"Sballs"	exec xlock -nolock -mode sballs &
 	Exec	"Sierpinski3d"	exec xlock -nolock -mode sierpinski3d &

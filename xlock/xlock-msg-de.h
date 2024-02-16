@@ -2,9 +2,9 @@
  * XLock messages for German.
  */
 
-#ifndef __XLOCK_MSG_DE_H__ 
+#ifndef __XLOCK_MSG_DE_H__
 #define __XLOCK_MSG_DE_H__
- 
+
 #define TIME_ELAPSED_MINUTE	"Seit %d Minute gesperrt.                                  \n"
 #define TIME_ELAPSED_MINUTES	"Seit %d Minuten gesperrt.                                  \n"
 #define TIME_ELAPSED_HOURS	"Seit %d:%02d Stunden gesperrt.                                 \n"

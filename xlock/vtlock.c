@@ -28,22 +28,22 @@ static const char sccsid[] = "@(#)vtlock.c	1.3 2000/01/28 xlockmore";
  *       98/10/01: Eric Lassauge - vtlock renamed from lockvt.
  *                 Merge changes from Remi and David.
  *       98/09/07: Remi Cohen-Scali - A problem stayed in the vtlock process:
- * 	If a user has switched vt while an xautolock is running, it could
- * 	be possible that the vt is locked. Then the user cannot unlock
- * 	vt switch without the vtswitch command I wrote to test.
- * 	(if you want it just send me a mail to remi.cohenscali@pobox.com
- * 	and I will send it back).
- * 	In order to avoid it, we need to know the active vt (this is easily
- * 	achieved with VT_GETSTATE ioctl), and, more dificult, we need to
- * 	know the vt used by the X server.The vt used by X is known as an
+ *	If a user has switched vt while an xautolock is running, it could
+ *	be possible that the vt is locked. Then the user cannot unlock
+ *	vt switch without the vtswitch command I wrote to test.
+ *	(if you want it just send me a mail to remi.cohenscali@pobox.com
+ *	and I will send it back).
+ *	In order to avoid it, we need to know the active vt (this is easily
+ *	achieved with VT_GETSTATE ioctl), and, more dificult, we need to
+ *	know the vt used by the X server.The vt used by X is known as an
  *      internal variable in the xf86Info structure (xf86InfoRec defined in
  *	xc/programs/Xserver/hw/xfree86/common/xf86Priv.h).
- * 	The problem is that this structure in not accessible to the clients.
- * 	In order to access this information, the workaround is to use
- * 	the proc filesystem.
- * 	All proc specific routines are implemented in vtlock_proc.c
- * 	in order to help porting to other procfs.
- * 	The method is explained in the vtlock_proc.c file.
+ *	The problem is that this structure in not accessible to the clients.
+ *	In order to access this information, the workaround is to use
+ *	the proc filesystem.
+ *	All proc specific routines are implemented in vtlock_proc.c
+ *	in order to help porting to other procfs.
+ *	The method is explained in the vtlock_proc.c file.
  *
  *	PS from E.L: all this stuff is significant for Linux only. For other
  *      OSs the problem remains the same but the details are different !

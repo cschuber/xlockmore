@@ -28,7 +28,7 @@ for i in $LIST; do
 	if test $FOUND -eq 0; then
 		cp -rp $i $PROG
 	fi
-done	
+done
 tar cvf - $PROG | xz > $PROGZIP
 rm -rf $PROG
 mv $PROGZIP ..

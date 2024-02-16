@@ -107,7 +107,7 @@ MagickFileToImage(ModeInfo * mi, char *filename, XImage ** image ,
      *image = XCreateImage( MI_DISPLAY(mi), MI_VISUAL(mi), depth, format, 0,
 			 (char *) xlockimage.data, (int) xlockimage.width,
 			 (int) xlockimage.height, 16, (int) xlockimage.width*4 );
-     
+
    if (!*image)
      {
 	(void) fprintf(stderr, "could not create image from file\n");
@@ -138,7 +138,7 @@ MagickFileToImage(ModeInfo * mi, char *filename, XImage ** image ,
 						     imageData->rows ,
 						     exception );
 #endif
-	
+
 	imageData->colors = COLORMAP_SIZE + 1;
 	tmpdata0 = (int *) malloc((int) ( xlockimage.width *
 						  xlockimage.height *
@@ -148,7 +148,7 @@ MagickFileToImage(ModeInfo * mi, char *filename, XImage ** image ,
 					 sizeof( PixelPacket ) );
 #if (QuantumDepth == 8) || (MAGICKCORE_QUANTUM_DEPTH == 8 )
 	for ( fuzz=0; imageData->colors > COLORMAP_SIZE; fuzz++ )
-#elif (QuantumDepth == 16) || (MAGICKCORE_QUANTUM_DEPTH == 16 ) 
+#elif (QuantumDepth == 16) || (MAGICKCORE_QUANTUM_DEPTH == 16 )
 	for ( fuzz=0; imageData->colors > COLORMAP_SIZE; fuzz+=256 )
 #elif (QuantumDepth == 32) || (MAGICKCORE_QUANTUM_DEPTH == 32 )
 	for ( fuzz=0; imageData->colors > COLORMAP_SIZE; fuzz+=65536 )
@@ -250,7 +250,7 @@ MagickFileToImage(ModeInfo * mi, char *filename, XImage ** image ,
 	for ( i=0 ; i<xlockimage.colors ; i++ )
 	  {
 	     XColor Xcol;
-	     
+
 #if (QuantumDepth == 8) || (MAGICKCORE_QUANTUM_DEPTH == 8 )
 	     xlockimage.red[ i ] =  pixtmp2->red * 257;
 	     xlockimage.green[ i ] = pixtmp2->green *257;

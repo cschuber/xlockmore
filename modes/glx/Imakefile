@@ -58,7 +58,7 @@ XLOCKDEPGLOBJS = $(DOG)xpm-ximage$(OG)pipeobjs$(O)$(S)\
 $(SPROINGIESOBJS)$(S)$(ATLANTISOBJS)$(S)$(ATUNNELSOBJS)$(S)\
 $(BUBBLE3DOBJS)$(S)$(JUGGLER3DOBJS)$(S)$(XLOCKDEPCPPGLOBJS)
 XLOCKNORMGLOBJS = $(DOG)bevel$(OG)cage$(OG)dino$(OG)gears$(O)$(S)\
-$(DOG)moebius$(OG)morph3d$(OG)noof$(OG)rubik$(O)$(S)\
+$(DOG)moebius$(OG)morph3d$(OG)noof$(OG)pyraminx$(OG)rubik$(O)$(S)\
 $(DOG)sierpinski3d$(OG)skewb$(OG)stairs$(OG)superquadrics$(O)$(S)\
 $(XLOCKTEXTGLOBJS)$(S)\
 $(XLOCKTEXT2GLOBJS)$(S)$(XLOCKUNSTABLEGLOBJS)

@@ -4,11 +4,10 @@
 import subprocess
 import sys
 def cmd_exists(cmd):
-  return subprocess.call("type " + cmd, shell=True, 
+  return subprocess.call("type " + cmd, shell=True,
     stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 def put(string):
   sys.stdout.write(string)
-    
 
 if cmd_exists("/usr/games/fortune"):
   p1 = subprocess.Popen(["/usr/games/fortune"], shell=True, stdout=subprocess.PIPE)

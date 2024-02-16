@@ -82,13 +82,13 @@ sub search {
     for ($j = $MINROW; $j <= $MAXROW; $j++) {
       for ($i = $MINCOL; $i <= $MAXCOL; $i++) {
         if ($array{$i, $j, $k}) {
-	  if ("$pl" eq "dd") { 
+	  if ("$pl" eq "dd") {
             print "O ";
 	  } else {
             print "*";
 	  }
         } else {
-	  if ("$pl" eq "dd") { 
+	  if ("$pl" eq "dd") {
             print ". ";
 	  } else {
             print ".";

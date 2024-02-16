@@ -523,7 +523,7 @@ openfilesel filename
 set f [ open $filename r ]
 while { ! [eof $f ] } {
 	gets $f line
-       	switch -regexp $line {
+	switch -regexp $line {
 	{^XLock\.[a-zA-Z]+:} {
 		if { [ regexp -nocase {\: $} tyty ]} {
 		}
@@ -737,6 +737,7 @@ petri\
 pipes\
 polyominoes\
 puzzle\
+pyraminx\
 pyro\
 pyro2\
 qix\

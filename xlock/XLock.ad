@@ -118,7 +118,7 @@ Current user could not be automatically logged out.
 ! Mode options: If count, cycles, or size options are set to 1 ...
 ! they are probably not used by the mode.
 XLock.anemone.delay: 5000
-!XLock.anemone.count: 1 
+!XLock.anemone.count: 1
 !XLock.anemone.cycles: 1
 !XLock.anemone.size: 1
 XLock.anemone.arms: 256
@@ -690,6 +690,11 @@ XLock.puzzle.count: 250
 !XLock.puzzle.cycles: 1
 !XLock.puzzle.size: 1
 XLock.puzzle.saturation: 1.0
+XLock.pyraminx.delay: 100000
+XLock.pyraminx.count: -30
+XLock.pyraminx.cycles: 5
+XLock.pyraminx.size: -4
+XLock.pyraminx.saturation: 1.0
 XLock.pyro.delay: 15000
 XLock.pyro.count: 100
 !XLock.pyro.cycles: 1

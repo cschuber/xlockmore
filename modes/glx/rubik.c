@@ -444,9 +444,9 @@ static rubikstruct *rubik = (rubikstruct *) NULL;
 
 
 static void
-pickcolor(int C, int mono)
+pickColor(int c, int mono)
 {
-	switch (C) {
+	switch (c) {
 		case TOP_FACE:
 			if (mono)
 				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray3);
@@ -699,7 +699,7 @@ draw_cubit(ModeInfo * mi,
 		return False;
 	if (back != NO_FACE) {
 		glBegin(GL_POLYGON);
-		pickcolor(back, mono);
+		pickColor(back, mono);
 		glNormal3f(0.00, 0.00, -1.00);
 		glVertex3f(-STICKER_SHORT, STICKER_LONG, -STICKER_DEPTH);
 		glVertex3f(STICKER_SHORT, STICKER_LONG, -STICKER_DEPTH);
@@ -713,7 +713,7 @@ draw_cubit(ModeInfo * mi,
 	}
 	if (front != NO_FACE) {
 		glBegin(GL_POLYGON);
-		pickcolor(front, mono);
+		pickColor(front, mono);
 		glNormal3f(0.00, 0.00, 1.00);
 		glVertex3f(-STICKER_SHORT, -STICKER_LONG, STICKER_DEPTH);
 		glVertex3f(STICKER_SHORT, -STICKER_LONG, STICKER_DEPTH);
@@ -727,7 +727,7 @@ draw_cubit(ModeInfo * mi,
 	}
 	if (left != NO_FACE) {
 		glBegin(GL_POLYGON);
-		pickcolor(left, mono);
+		pickColor(left, mono);
 		glNormal3f(-1.00, 0.00, 0.00);
 		glVertex3f(-STICKER_DEPTH, -STICKER_SHORT, STICKER_LONG);
 		glVertex3f(-STICKER_DEPTH, STICKER_SHORT, STICKER_LONG);
@@ -741,7 +741,7 @@ draw_cubit(ModeInfo * mi,
 	}
 	if (right != NO_FACE) {
 		glBegin(GL_POLYGON);
-		pickcolor(right, mono);
+		pickColor(right, mono);
 		glNormal3f(1.00, 0.00, 0.00);
 		glVertex3f(STICKER_DEPTH, -STICKER_SHORT, -STICKER_LONG);
 		glVertex3f(STICKER_DEPTH, STICKER_SHORT, -STICKER_LONG);
@@ -755,7 +755,7 @@ draw_cubit(ModeInfo * mi,
 	}
 	if (bottom != NO_FACE) {
 		glBegin(GL_POLYGON);
-		pickcolor(bottom, mono);
+		pickColor(bottom, mono);
 		glNormal3f(0.00, -1.00, 0.00);
 		glVertex3f(STICKER_LONG, -STICKER_DEPTH, -STICKER_SHORT);
 		glVertex3f(STICKER_LONG, -STICKER_DEPTH, STICKER_SHORT);
@@ -769,7 +769,7 @@ draw_cubit(ModeInfo * mi,
 	}
 	if (top != NO_FACE) {
 		glBegin(GL_POLYGON);
-		pickcolor(top, mono);
+		pickColor(top, mono);
 		glNormal3f(0.00, 1.00, 0.00);
 		glVertex3f(-STICKER_LONG, STICKER_DEPTH, -STICKER_SHORT);
 		glVertex3f(-STICKER_LONG, STICKER_DEPTH, STICKER_SHORT);

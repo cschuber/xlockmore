@@ -119,7 +119,7 @@ wator$(OM)wire$(OM)world$(OM)worm$(OM)xcl$(OM)xjack$(O)
 @GL@$(BUBBLE3DOBJS)$(S)$(JUGGLER3DOBJS)$(S)\
 @GL@$(MAZE3DOBJS)$(S)$(XLOCKDEPCPPGLOBJS)
 @GL@XLOCKNORMGLOBJS = $(DOG)bevel$(OG)cage$(OG)dino$(OG)gears$(O)$(S)\
-@GL@$(DOG)moebius$(OG)morph3d$(OG)noof$(OG)rubik$(O)$(S)\
+@GL@$(DOG)moebius$(OG)morph3d$(OG)noof$(OG)pyraminx$(OG)rubik$(O)$(S)\
 @GL@$(DOG)sierpinski3d$(OG)skewb$(OG)stairs$(OG)superquadrics$(O)$(S)\
 @GL@$(XLOCKTEXTGLOBJS)$(S)\
 @GL@$(XLOCKTEXT2GLOBJS)$(S)$(XLOCKUNSTABLEGLOBJS)
@@ -192,7 +192,8 @@ $(DM)wator$(CM)wire$(CM)world$(CM)worm$(CM)xcl$(CM)xjack$(C)
 @GL@XLOCKGLSRCS = $(DG)bevel$(CG)cage$(CG)dino$(CG)fire$(CG)gears$(C) \
 @GL@$(DG)juggler3d$(CG)glplanet$(CG)sphere$(CG)lament$(C) \
 @GL@$(DG)moebius$(CG)morph3d$(C) \
-@GL@$(DG)molecule$(CG)tube$(CG)noof$(CG)rubik$(CG)sballs$(C) \
+@GL@$(DG)molecule$(CG)tube \
+@GL@$(DG)noof$(CG)pyraminx$(CG)rubik$(CG)sballs$(C) \
 @GL@$(DG)sierpinski3d$(CG)skewb$(CG)stairs$(CG)superquadrics$(C) \
 @GL@$(DG)xpm-ximage$(CG)buildlwo$(CG)pipes$(CG)pipeobjs$(C) \
 @GL@$(DG)sproingies$(CG)sproingiewrap$(CG)s1_b$(C) \
@@ -573,6 +574,7 @@ $(GLOBJDIR)molecule.o : $(GLDIR)molecule.c
 $(GLOBJDIR)tube.o : $(GLDIR)tube.c
 $(GLOBJDIR)morph3d.o : $(GLDIR)morph3d.c
 $(GLOBJDIR)noof.o : $(GLDIR)noof.c
+$(GLOBJDIR)pyraminx.o : $(GLDIR)pyraminx.c
 $(GLOBJDIR)rubik.o : $(GLDIR)rubik.c
 $(GLOBJDIR)sballs.o : $(GLDIR)sballs.c
 $(GLOBJDIR)sierpinski3d.o : $(GLDIR)sierpinski3d.c
@@ -936,6 +938,11 @@ $(GLOBJDIR)/morph3d.o: $(UTILDIR)/mode.h
 $(GLOBJDIR)/morph3d.o: $(UTILDIR)/random.h
 $(GLOBJDIR)/morph3d.o: $(UTILDIR)/vis.h
 $(GLOBJDIR)/morph3d.o: $(UTILDIR)/visgl.h
+$(GLOBJDIR)/pyraminx.o: $(UTILDIR)/xlock.h
+$(GLOBJDIR)/pyraminx.o: $(top_objdir)/config.h
+$(GLOBJDIR)/pyraminx.o: $(UTILDIR)/mode.h
+$(GLOBJDIR)/pyraminx.o: $(UTILDIR)/random.h
+$(GLOBJDIR)/pyraminx.o: $(UTILDIR)/visgl.h
 $(GLOBJDIR)/rubik.o: $(UTILDIR)/xlock.h
 $(GLOBJDIR)/rubik.o: $(top_objdir)/config.h
 $(GLOBJDIR)/rubik.o: $(UTILDIR)/mode.h

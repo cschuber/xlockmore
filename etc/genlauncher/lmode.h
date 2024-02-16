@@ -99,7 +99,7 @@ LockStruct  LockProcs[] =
 #ifdef USE_GL
 	{"bevel",
 	 100000, -30, 5, 1, 64, 1.0, "",
-	 "Shows an auto-solving Bevel or Dinosaur Cube", 0, NULL, "#ifdef USE_GL"},
+	 "Shows an auto-solving Bevel or Helicopter Cube", 0, NULL, "#ifdef USE_GL"},
 #endif
 	{"blot",
 	 200000, 6, 30, 1, 64, 0.3, "",
@@ -164,7 +164,7 @@ LockStruct  LockProcs[] =
 #ifdef USE_GL
 	{"dino",
 	 100000, -30, 5, 1, 64, 1.0, "",
-	 "Shows an auto-solving Dino puzzle", 0, NULL, "#ifdef USE_GL"},
+	 "Shows an auto-solving Dinosaur Cube", 0, NULL, "#ifdef USE_GL"},
 #endif
 	{"discrete",
 	 1000, 4096, 2500, 1, 64, 1.0, "",
@@ -359,6 +359,11 @@ LockStruct  LockProcs[] =
 	{"puzzle",
 	 10000, 250, 1, 1, 64, 1.0, "",
 	 "Shows a puzzle being scrambled and then solved", 0, NULL, NULL},
+#ifdef USE_GL
+	{"pyraminx",
+	 100000, -30, 5, -4, 64, 1.0, "",
+	 "Shows an auto-solving Pyraminx puzzle", 0, NULL, "#ifdef USE_GL"},
+#endif
 	{"pyro",
 	 15000, 100, 1, -3, 64, 1.0, "",
 	 "Shows fireworks", 0, NULL, NULL},
@@ -512,10 +517,8 @@ LockStruct  LockProcs[] =
 	{"xjack",
 	 50000, 1, 1, 1, 64, 1.0, "",
 	 "Shows Jack having one of those days", 0, NULL, NULL},
-
 /* SPECIAL MODES */
 	{"blank",
 	 3000000, 1, 1, 1, 64, 1.0, "",
 	 "Shows nothing but a black screen", 0, NULL, NULL}
-
 };

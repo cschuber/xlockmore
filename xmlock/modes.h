@@ -133,6 +133,9 @@ static LockStruct LockProcs[] =
 #endif
 {(char *) "polyominoes", (char *) "Shows attempts to place polyominoes into a rectangle"},
 {(char *) "puzzle", (char *) "Shows a puzzle being scrambled and then solved"},
+#ifdef USE_GL
+{(char *) "pyraminx", (char *) "Shows an auto-solving Pyraminx puzzle"},
+#endif
 {(char *) "pyro", (char *) "Shows fireworks"},
 {(char *) "pyro2", (char *) "Shows other fireworks"},
 {(char *) "qix", (char *) "Shows spinning lines a la Qix(tm)"},

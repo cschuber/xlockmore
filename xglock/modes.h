@@ -336,6 +336,11 @@ LockStruct  LockProcs[] =
 	{"puzzle",
 	 10000, 250, 1, 1, 1.00,
 	 "Shows a puzzle being scrambled and then solved", (void *) NULL},
+#ifdef USE_GL
+	{"pyraminx",
+	 100000, -30, 5, -4, 1.00,
+	 "Shows an auto-solving Pyraminx puzzle", (void *) NULL},
+#endif
 	{"pyro",
 	 15000, 100, 1, -3, 1.00,
 	 "Shows fireworks", (void *) NULL},
@@ -517,7 +522,7 @@ guint nb_mode = 0;
 #define DEF_CYCLES		2
 #define DEF_SIZE		3
 #define DEF_SATURATION		4
-#define NB_DEFAULTED_OPTIONS 	5
+#define NB_DEFAULTED_OPTIONS	5
 
 /* Default values options names */
 static gchar *defaulted_options[NB_DEFAULTED_OPTIONS] = {
@@ -540,7 +545,7 @@ typedef struct struct_option_bool_s {
 	gchar       *label;
 	gchar       *desc;
 	gchar	       defval;
-	gchar 	     value;
+	gchar	     value;
 } struct_option_bool;
 
 /* Description of the boolean options */
@@ -671,10 +676,10 @@ typedef enum enum_type_option_fntcol_e {
 
 /* Font/Color/File option entry struct */
 typedef struct struct_option_fntcol_s {
-    enum_type_option_fntcol 	type;
-    gchar       	       *cmdarg;
-    gchar       	       *label;
-    gchar       	       *desc;
+    enum_type_option_fntcol	type;
+    gchar		       *cmdarg;
+    gchar		       *label;
+    gchar		       *desc;
     gchar		       *help_anchor;
     GtkWidget		       *entry;
     GtkWidget		       *drawing_area;
@@ -722,7 +727,7 @@ guint nb_fntColorOpt = 0;
 
 /* Font/Color/File option dialog callback struct */
 typedef struct struct_option_fntcol_callback_s {
-    GtkWidget  		       *fntcol_dialog;
+    GtkWidget		       *fntcol_dialog;
     GtkWidget		       *entry;
     GtkWidget		       *drawing_area;
 } struct_option_fntcol_callback;

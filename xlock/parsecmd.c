@@ -87,7 +87,7 @@ extern void XlockrmParseCommand(
     register XrmOptionDescList options, /* pointer to table of valid options */
     int                 num_options,	/* number of options		     */
     char               *prefix,		/* name to prefix resources with     */
-    int                *arg_c,		/* address of argument count 	     */
+    int                *arg_c,		/* address of argument count	     */
     char              **arg_v);		/* argument list (command line)	     */
 
 void
@@ -95,12 +95,12 @@ XlockrmParseCommand(
     XrmDatabase		*pdb,		/* data base */
     register XrmOptionDescList options, /* pointer to table of valid options */
     int			num_options,	/* number of options		     */
-    char	*prefix,	/* name to prefix resources with     */
-    int			*arg_c,		/* address of argument count 	     */
-    char		**arg_v)		/* argument list (command line)	     */
+    char	       *prefix,		/* name to prefix resources with     */
+    int		       *arg_c,		/* address of argument count	     */
+    char	      **arg_v)		/* argument list (command line)	     */
 {
 #ifndef WIN32
-    int 		foundOption;
+    int			foundOption;
     char		**argsave;
     register int	i, myargc;
     XrmBinding		bindings[100];

@@ -218,7 +218,7 @@ static int  descr();
 # define DEF_MAILAPP ""
 #endif
 #ifdef USE_VTLOCK
-# define VTLOCKMODE_OFF     	"off"
+# define VTLOCKMODE_OFF		 "off"
 # define VTLOCKMODE_NOSWITCH     "noswitch"
 # define VTLOCKMODE_SWITCH       "switch"
 # define VTLOCKMODE_RESTORE      "restore"
@@ -993,7 +993,7 @@ static argtype genvars[] =
 #endif
 
 	{(void *) & mailCmd, (char *) "mailCmd", (char *) "MailCmd", (char *) DEF_MAILAPP, t_String},
-     	{(void *) & mailIcon, (char *) "mailIcon", (char *) "MailIcon", (char *) DEF_MAILAPP, t_String},
+	{(void *) & mailIcon, (char *) "mailIcon", (char *) "MailIcon", (char *) DEF_MAILAPP, t_String},
 	{(void *) & nomailIcon, (char *) "nomailIcon", (char *) "NomailIcon", (char *) DEF_MAILAPP, t_String},
 #ifdef USE_VTLOCK
 	{(void *) & vtlockres, (char *) "vtlock", (char *) "VtLock", DEF_VTLOCK, t_String},
@@ -1834,7 +1834,7 @@ extern void XlockrmParseCommand(
     register XrmOptionDescList options, /* pointer to table of valid options */
     int                 num_options,	/* number of options		     */
     char               *prefix,		/* name to prefix resources with     */
-    int                *arg_c,		/* address of argument count 	     */
+    int                *arg_c,		/* address of argument count	     */
     char              **arg_v);		/* argument list (command line)	     */
 
 #if defined( USE_AUTO_LOGOUT ) || defined( USE_BUTTON_LOGOUT )
@@ -1987,7 +1987,7 @@ getResources(Display ** displayp, int argc, char **argv)
 #ifdef USE_VTLOCK
         /* Process the vtlock resource */
         if ( !vtlockres || !*vtlockres )
-        	vtlock = False;
+		vtlock = False;
         else {
 	    if (debug)
 		(void) fprintf(stderr,"vtlock: %s\n",vtlockres);

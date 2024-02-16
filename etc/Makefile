@@ -41,9 +41,9 @@ jar : $(APP).jar
 %$(C) : %$(J)
 	$(JAVAC) $< -d $(DEST)
 
-clean : 
+clean :
 	$(RM) jlock.exe jlock
-	$(RM)r $(DEST) 
+	$(RM)r $(DEST)
 
 run : $(APP).jar
 	$(NICE) java -jar $(APP).jar

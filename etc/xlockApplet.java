@@ -1,5 +1,5 @@
 // Charles Vidal <cvidal AT ivsweb.com>
-// Updated by David Bagley 
+// Updated by David Bagley
 
 import java.applet.*;
 import java.awt.*;
@@ -165,6 +165,7 @@ public class xlockApplet extends Applet implements ItemListener {
 		list.add("pipes");
 		list.add("polyominoes");
 		list.add("puzzle");
+		list.add("pyraminx");
 		list.add("pyro");
 		list.add("pyro2");
 		list.add("qix");
@@ -229,7 +230,7 @@ public class xlockApplet extends Applet implements ItemListener {
 		Panel2.add(launchInWinButton);
 		Panel2.add(quitButton);
 		errorFrame = new ErrorFrame("An error occurred, can not launch xlock");
- 		errorFrame.setSize(350, 150);
+		errorFrame.setSize(350, 150);
 		choice.addItemListener(this);
 
 		launchButton.addActionListener(new ActionListener() {

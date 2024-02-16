@@ -668,7 +668,7 @@ static void *_start_routine(void *startup_raw)
 	require) that a thread run on a certain core/set of cores. */
 
 /*	Neither Linux nor libnuma seem to support the concept of a preferred/ideal
-  	CPU for a thread/process. */
+ 	CPU for a thread/process. */
 
 /*	Untested. */
 /*	{

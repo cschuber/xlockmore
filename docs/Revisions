@@ -1,4 +1,4 @@
-xlockmore-5.74 as of 5 November 2023, the maintained version of xlock
+xlockmore-5.75 as of 11 February 2024, the maintained version of xlock
 
 Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
@@ -12,12 +12,18 @@ send me mail if you want to be on a list for latest releases.
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
 
+5.75
+  pyraminx mode added.  Sizes 2-4.  With a "sticky" mode where its
+    a size 4 but only certain turns are permitted.  So far only the
+    normal Period 3 turning is permitted (i.e. faces or corners turn
+    but not edges).  Taken from xpyraminx and dino and rubik modes.
+
 5.74
   dino mode center fix (probably never see error).
   bevel mode added.  Better known as the Helicopter Cube.  Currently,
     it only supports the 180 degree turns.  The ~71 degree turns would
-    be very challenging to simulate.  Taken from an unreleased xbevel
-    puzzle (which I am currently creating) and the skewb mode.
+    be very challenging to simulate.  Taken from an xbevel puzzle and
+    the skewb mode.
 
 5.73
   dino mode added, mostly built from xdino and skewb mode.
@@ -1161,7 +1167,7 @@ from others.
       added defined(__CYGWIN__) where appropriate
     modified configure.in (and configure) to add libcrypt in XLOCKLIBS
     usage: xlockrc running mode is used. At the first use the password is asked
-      "Key: " and a $HOME/.xlockrc file is created with crypted password.
+      "Key: " and a $HOME/.xlockrc file is created with encrypted password.
     Specific bitmap and pixmap for cygwin, xmlock update
     What is not done yet:
       sound support, text3d

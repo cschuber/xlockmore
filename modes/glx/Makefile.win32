@@ -29,8 +29,9 @@ SRC=		atlantis.c whale.c dolphin.c shark.c swim.c \
 		moebius.c		\
 		morph3d.c		\
 		noof.c			\
-		rubik.c			\
 		pipes.c	pipeobjs.c buildlwo.c \
+		pyraminx.c		\
+		rubik.c			\
 		sballs.c		\
 		sierpinski3d.c		\
 		skewb.c			\

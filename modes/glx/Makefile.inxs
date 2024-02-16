@@ -97,7 +97,7 @@ HACKDIR_OBJS	= $(HACK_BIN)/screenhack.o $(HACK_BIN)/xlockmore.o \
 		  $(HACK_BIN)/fps.o $(HACK_BIN)/ximage-loader.o
 PNG		= $(HACK_BIN)/ximage-loader.o
 
-SRCS		= fire.c invert.c skewb.c dino.c bevel.c \
+SRCS		= fire.c invert.c skewb.c dino.c bevel.c pyraminx.c \
 		  xscreensaver-gl-helper.c normals.c erase-gl.c fps-gl.c \
 		  atlantis.c b_draw.c b_lockglue.c b_sphere.c bubble3d.c \
 		  buildlwo.c cage.c dolphin.c gears.c lament.c lament_model.c \
@@ -150,7 +150,7 @@ SRCS		= fire.c invert.c skewb.c dino.c bevel.c \
 		  gibson.c etruscanvenus.c sphereeversion.c covid19.c \
 		  co____9.c headroom.c headroom_model.c beats.c glsl-utils.c
 
-OBJS		= fire.o invert.o skewb.o dino.o bevel.o \
+OBJS		= fire.o invert.o skewb.o dino.o bevel.o pyraminx.o \
 		  xscreensaver-gl-helper.o normals.o erase-gl.o fps-gl.o \
 		  atlantis.o b_draw.o b_lockglue.o b_sphere.o bubble3d.o \
 		  buildlwo.o cage.o dolphin.o gears.o lament.o lament_model.o \
@@ -205,8 +205,8 @@ OBJS		= fire.o invert.o skewb.o dino.o bevel.o \
 
 
 GL_EXES		= bevel boxed bubble3d cage dino fire juggler3d gears \
-		  moebius molecule morph3d noof pipes rubik sierpinski3d \
-		  skewb sproingies stairs superquadrics \
+		  moebius molecule morph3d noof pipes pyraminx rubik \
+		  sierpinski3d skewb sproingies stairs superquadrics \
 		  maze3d invert atlantis atunnels glplanet lament sballs \
 		  text3d2 text3d
 
@@ -683,6 +683,9 @@ noof:	noof.o			$(HACK_OBJS)
 PIPE_OBJS=pipeobjs.o buildlwo.o sphere.o $(HACK_BIN)/glx/normals.o
 pipes:		pipes.o		$(PIPE_OBJS) $(HACK_TRACK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(PIPE_OBJS) $(HACK_TRACK_OBJS) $(HACK_LIBS)
+
+pyraminx:	pyraminx.o	$(HACK_TRACK_OBJS)
+	$(CC_HACK) -o $@ $@.o	$(HACK_TRACK_OBJS) $(HACK_LIBS)
 
 rubik:		rubik.o		$(HACK_TRACK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(HACK_TRACK_OBJS) $(HACK_LIBS)
@@ -3006,6 +3009,22 @@ pulsar.o: $(UTILS_SRC)/yarandom.h
 pulsar.o: $(HACK_SRC)/ximage-loader.h
 pulsar.o: $(HACK_SRC)/xlockmoreI.h
 pulsar.o: $(HACK_SRC)/xlockmore.h
+pyraminx.o: ../../../config.h
+pyraminx.o: $(HACK_SRC)/fps.h
+pyraminx.o: $(HACK_SRC)/glx/gltrackball.h
+pyraminx.o: $(HACK_SRC)/recanim.h
+pyraminx.o: $(HACK_SRC)/screenhackI.h
+pyraminx.o: $(UTILS_SRC)/colors.h
+pyraminx.o: $(UTILS_SRC)/erase.h
+pyraminx.o: $(UTILS_SRC)/font-retry.h
+pyraminx.o: $(UTILS_SRC)/grabclient.h
+pyraminx.o: $(UTILS_SRC)/hsv.h
+pyraminx.o: $(UTILS_SRC)/resources.h
+pyraminx.o: $(UTILS_SRC)/usleep.h
+pyraminx.o: $(UTILS_SRC)/visual.h
+pyraminx.o: $(UTILS_SRC)/yarandom.h
+pyraminx.o: $(HACK_SRC)/xlockmoreI.h
+pyraminx.o: $(HACK_SRC)/xlockmore.h
 quasicrystal.o: ../../../config.h
 quasicrystal.o: $(HACK_SRC)/fps.h
 quasicrystal.o: $(HACK_SRC)/recanim.h

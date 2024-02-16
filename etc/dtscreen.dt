@@ -104,16 +104,6 @@ ACTION StartDtscreenPyro
 }
 #	EXEC_STRING	/usr/dt/bin/dtscreen -mode pyro
 
-ACTION StartDtscreenPyro2
-{
-	LABEL		StartDtscreenPyro2
-	TYPE		COMMAND
-	WINDOW_TYPE	NO_STDIO
-	EXEC_STRING	$DTSCREEN -mode pyro2
-	DESCRIPTION	pyro2: Other fireworks
-}
-#	EXEC_STRING	/usr/dt/bin/dtscreen -mode pyro2
-
 ACTION StartDtscreenFlame
 {
 	LABEL		StartDtscreenFlame
@@ -202,7 +192,7 @@ ACTION StartDtscreenAtunnels
 	TYPE		COMMAND
 	WINDOW_TYPE	NO_STDIO
 	EXEC_STRING	$DTSCREEN -mode atunnels
-	DESCRIPTION	atunnels: An OpenGL advanced tunnel screensaver 
+	DESCRIPTION	atunnels: An OpenGL advanced tunnel screensaver
 }
 
 ACTION StartDtscreenBall
@@ -888,6 +878,24 @@ ACTION StartDtscreenPuzzle
 	DESCRIPTION	puzzle: A puzzle being scrambled and then solved
 }
 
+ACTION StartDtscreenPyraminx
+{
+	LABEL		StartDtscreenPyraminx
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	$DTSCREEN -mode pyraminx
+	DESCRIPTION	pyraminx: An auto-solving Pyraminx puzzle
+}
+
+ACTION StartDtscreenPyro2
+{
+	LABEL		StartDtscreenPyro2
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	$DTSCREEN -mode pyro2
+	DESCRIPTION	pyro2: Other fireworks
+}
+
 ACTION StartDtscreenRain
 {
 	LABEL		StartDtscreenRain
@@ -912,7 +920,7 @@ ACTION StartDtscreenRubik
 	TYPE		COMMAND
 	WINDOW_TYPE	NO_STDIO
 	EXEC_STRING	$DTSCREEN -mode rubik
-	DESCRIPTION	rubik: An auto-solving Rubik's cube
+	DESCRIPTION	rubik: An auto-solving Rubik's Cube
 }
 
 ACTION StartDtscreenSballs

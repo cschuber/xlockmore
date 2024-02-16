@@ -1230,7 +1230,7 @@ merge_colors (int argc, XColor **argv, XColor *into_color, int mask,
     }
 }
 
-static int 
+static int
 i_exp (int i, int j)
 {
   int k = 1;

@@ -600,7 +600,7 @@ xlockmore_screenhack(Display * dpy, Window window,
 #include <X11/keysym.h>
 #else
 #include "Xapi.h"
-int GCCreate(void); 
+int GCCreate(void);
 #endif /* WIN32 */
 
 #if USE_XVMSUTILS
@@ -779,7 +779,7 @@ extern char *fontname;
 extern char *planfontname;
 
 #ifdef USE_MB
-XFontSet    fontset = NULL; 
+XFontSet    fontset = NULL;
 extern char *fontsetname;
 XFontSet    planfontset = NULL;
 extern char *planfontsetname;
@@ -1088,7 +1088,7 @@ error(const char *buf)
 		/* We are still alive?? */
 		error_exitcode = sig + 128;
 	}
-	exit(error_exitcode); 
+	exit(error_exitcode);
 }
 
 /* Server access control support. */
@@ -1600,7 +1600,7 @@ putText(Display * display, Window window, GC gc,
 }
 
 /* language dependent strings */
-#if defined DE 
+#if defined DE
 #include "xlock-msg-de.h"
 #elif defined FR
 #include "xlock-msg-fr.h"
@@ -2175,7 +2175,7 @@ ReadXString(char *s, int slen, Bool *capsLock
 						mode_info(dsp, screen, Scr[screen].window, False));
 				} else if (install)
 					/* next line : refresh would be logical. But some modes
- 					 * look weird when continuing from an erased screen */
+					 * look weird when continuing from an erased screen */
 					call_refresh_hook((LockStruct *) NULL,
 						mode_info(dsp, screen, Scr[screen].window, False));
 
@@ -2660,7 +2660,7 @@ getPassword(void)
 			XFillRectangle(dsp, Scr[screen].window, Scr[screen].gc,
 				Scr[screen].iconpos.x, y - fontAscent + screenOffset,
 				2 * XTextWidth(font, text_invalidCapsLock, strlen(text_invalidCapsLock)),
-				fontHeight +  5 + screenOffset); 
+				fontHeight +  5 + screenOffset);
 
 			(void) XDrawString(dsp, Scr[screen].window, Scr[screen].textgc,
 				Scr[screen].iconpos.x, y, text_valid, strlen(text_valid));
@@ -2679,7 +2679,7 @@ getPassword(void)
 			XFillRectangle(dsp, Scr[screen].window, Scr[screen].gc,
 				Scr[screen].iconpos.x, y - fontAscent + screenOffset,
 				XTextWidth(font, text_valid, strlen(text_valid)),
-				fontHeight +  8 + screenOffset); 
+				fontHeight +  8 + screenOffset);
 			(void) XDrawString(dsp, Scr[screen].window, Scr[screen].textgc,
 				Scr[screen].iconpos.x, y, textInvalid, strlen(textInvalid));
 			if (echokeys)	/* erase old echo */
@@ -3526,7 +3526,7 @@ main(int argc, char **argv)
 		Colormap    cmap = (Colormap) NULL;
 
 /* Start of MI_ROOT_PIXMAP hack */
-		Window 			temp_rw;
+		Window			temp_rw;
 		XGCValues		temp_gcv;
 		GC			temp_gc;
 		XWindowAttributes	temp_xgwa;
@@ -3551,7 +3551,7 @@ main(int argc, char **argv)
 		if (*plantext) {
 			char **planp;
 			int tmp;
-	
+
 			Scr[screen].planpos.x = Scr[screen].planpos.y = 0;
 			for (planp = plantext; *planp; ++planp) {
 				tmp = XTextWidth(planfont, *planp, strlen(*planp));

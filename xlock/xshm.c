@@ -5,7 +5,7 @@
  * the above copyright notice appear in all copies and that both that
  * copyright notice and this permission notice appear in supporting
  * documentation.  No representations are made about the suitability of this
- * software for any purpose.  It is provided "as is" without express or 
+ * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  */
 
@@ -85,14 +85,14 @@ shm_ehandler (Display *dpy, XErrorEvent *error)
 
 
 #define CATCH_X_ERROR(DPY) do {				\
-  XSync((DPY), False); 					\
+  XSync((DPY), False);					\
   shm_got_x_error = False;				\
   if (old_handler != shm_ehandler)			\
     old_handler = XSetErrorHandler (shm_ehandler);	\
 } while(0)
 
 #define UNCATCH_X_ERROR(DPY) do {			\
-  XSync((DPY), False); 					\
+  XSync((DPY), False);					\
   if (old_handler)					\
     XSetErrorHandler (old_handler);			\
     old_handler = 0;					\

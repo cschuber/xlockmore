@@ -79,7 +79,7 @@ RasterFileToImage(ModeInfo * mi, char *filename, XImage ** image ,
 	read_width = (int) xlockimage.width;
 	if ((xlockimage.width & 1) != 0)
 		read_width++;
-   
+
    depth = MI_DEPTH(mi);
    rasdata = (unsigned char *) malloc((int) (read_width * xlockimage.height));
    if ( depth < 9 )
@@ -92,7 +92,7 @@ RasterFileToImage(ModeInfo * mi, char *filename, XImage ** image ,
 	if (!xlockimage.data) {
 		(void) fclose(file);
 		(void) fprintf(stderr, "out of memory for Raster file\n");
-   		free( rasdata );
+		free( rasdata );
 		return RasterNoMemory;
 	}
    format=(depth == 1) ? XYBitmap : ZPixmap;
@@ -109,7 +109,7 @@ RasterFileToImage(ModeInfo * mi, char *filename, XImage ** image ,
 	if (!*image) {
 		(void) fclose(file);
 		(void) fprintf(stderr, "could not create image from Raster file\n");
-   		free( rasdata );
+		free( rasdata );
 		return RasterColorError;
 	}
 	(void) fread((void *) xlockimage.color, (int) xlockimage.colors, 3, file);
@@ -170,6 +170,6 @@ RasterFileToImage(ModeInfo * mi, char *filename, XImage ** image ,
      }
    free( rasdata );
    free( pixel_num );
-   
+
    return RasterSuccess;
 }

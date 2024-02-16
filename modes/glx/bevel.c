@@ -433,9 +433,9 @@ static float MaterialGray7[] =
 static bevelstruct *bevel = (bevelstruct *) NULL;
 
 static void
-pickColor(int C, int mono)
+pickColor(int c, int mono)
 {
-	switch (C) {
+	switch (c) {
 		case TOP_FACE:
 			if (mono)
 				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MaterialGray3);

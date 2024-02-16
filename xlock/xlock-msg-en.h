@@ -2,9 +2,9 @@
  * XLock messages for English.
  */
 
-#ifndef __XLOCK_MSG_EN_H__ 
+#ifndef __XLOCK_MSG_EN_H__
 #define __XLOCK_MSG_EN_H__
- 
+
 #define TIME_ELAPSED_MINUTE	"%d minute elapsed since locked.                           \n"
 #define TIME_ELAPSED_MINUTES	"%d minutes elapsed since locked.                           \n"
 #define TIME_ELAPSED_HOURS	"%d:%02d hours elapsed since locked.                            \n"

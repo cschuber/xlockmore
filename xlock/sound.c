@@ -193,14 +193,14 @@ typedef struct _esd_sample
 
 typedef EsdSample_t    *EsdSample_ptr;
 
-static EsdSample_ptr 	EsdSamplesList =(EsdSample_ptr)NULL;
-static int	     	sound_fd = -1;
+static EsdSample_ptr	EsdSamplesList =(EsdSample_ptr)NULL;
+static int		sound_fd = -1;
 
-static EsdSample_ptr   	sound_esd_load_sample(char *file);
-static void 	     	sound_esd_play(EsdSample_ptr s);
-static void	     	sound_esd_destroy_sample(EsdSample_ptr s);
-static int	     	sound_esd_init(void);
-static void	     	sound_esd_shutdown(void);
+static EsdSample_ptr	sound_esd_load_sample(char *file);
+static void		sound_esd_play(EsdSample_ptr s);
+static void		sound_esd_destroy_sample(EsdSample_ptr s);
+static int		sound_esd_init(void);
+static void		sound_esd_shutdown(void);
 
 
 /*
@@ -253,8 +253,8 @@ sound_esd_load_sample(char *file)
    int                 in_format, in_width, in_channels, frame_count;
    int                 bytes_per_frame;
    double              in_rate;
-   char 	      *origfile;
-   char 	       fullfile[MAXPATHLEN];
+   char		      *origfile;
+   char		       fullfile[MAXPATHLEN];
 
    s = EsdSamplesList;
 #ifdef DEBUG
@@ -278,13 +278,13 @@ sound_esd_load_sample(char *file)
    if (stat(file, &stbuf) < 0)
    {
        (void) fprintf( stderr, "Error ! Cannot find the sound file %s\n", file);
-       free(origfile); 
+       free(origfile);
        return NULL;
    }
    if ( !( in_file = afOpenFile(file, "r", NULL) ) )
    {
        (void) fprintf( stderr, "Error ! Cannot open sound sample ! Bad format ?\n" );
-       free(origfile); 
+       free(origfile);
        return NULL;
    }
    s = EsdSamplesList;
@@ -297,7 +297,7 @@ sound_esd_load_sample(char *file)
        {
            (void) fprintf( stderr, "Error ! cannot allocate sample data !\n" );
            (void) afCloseFile(in_file);
-       	   free(origfile); 
+	   free(origfile);
            return NULL;
        }
        s = s->next;
@@ -310,7 +310,7 @@ sound_esd_load_sample(char *file)
        {
            (void) fprintf( stderr, "Error ! cannot allocate sample data !\n" );
            (void) afCloseFile(in_file);
-       	   free(origfile); 
+	   free(origfile);
            return NULL;
        }
        EsdSamplesList = s;

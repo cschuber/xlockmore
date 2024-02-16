@@ -617,6 +617,10 @@ Shows attempts to place polyominoes into a rectangle.
 .B puzzle
 Shows a puzzle being scrambled and then solved.
 .TP 8
+.B pyraminx
+Shows an auto-solving Pyraminx puzzle.  May not be available depending on how
+it was configured.
+.TP 8
 .B pyro
 Shows fireworks.
 .TP 8
@@ -949,6 +953,8 @@ In polyominoes mode it means nothing.
 
 In puzzle mode it the number of moves.
 
+In pyraminx mode it is the number of moves.
+
 In pyro mode it is the maximum number flying rockets at one time.
 
 In pyro2 mode it is means nothing.
@@ -1075,6 +1081,7 @@ for gears it is the number of degrees to increment the spin of each gear by,
 for glplanet it is the number of hundredth degrees to rotate the planet by,
 for molecule it is the time in seconds until timeout,
 for pipes it is the number of systems to draw before clearing the screen,
+for pyraminx it is the number of steps to complete a 120 degree move,
 for rubik it is the number of steps to complete a 90 degree move,
 for sballs it is the sphere speed value,
 for scooter it is the speed,
@@ -1446,7 +1453,7 @@ and triangle.
 .B -/+showfps
 Turn on/off frame per sec display, available on atlantis, atunnels,
 bevel, dino, bubble3d, cage, fire, gears, invert, lament, moebius,
-morph3d, rubik, sballs, skewb, stairs, and superquadrics.
+morph3d, pyraminx, rubik, sballs, skewb, stairs, and superquadrics.
 .TP 5
 .B -/+fpstop
 Turn on/off frame per sec display on top of screen, used if showfps is on.
@@ -1569,7 +1576,7 @@ Turn on/off CDE Saver Mode.  This option is only available if CDE
 support was compiled in.
 .TP 5
 .B -/+xinerama
-Turn on/off Xinerama.  This option is only available if Xinerama 
+Turn on/off Xinerama.  This option is only available if Xinerama
 support was compiled in.
 .TP 5
 .BI \-modulepath \ path
@@ -2259,7 +2266,7 @@ Turn on or off complete graph morphing in
 .I qix.
 .TP 5
 .BI \-msg \ textstring
-Allows one to pass different explosion elements to 
+Allows one to pass different explosion elements to
 .I pyro2.
 The explosion types is one of &0, &1, ... &9, &a, ... &f each of
 which presents a different type of explosion.
@@ -2267,7 +2274,7 @@ Normal text can be sent,  the string may contain blanks if quoted.
 An operation system logo will be shown, if the # sign is sent.
 .TP 5
 .BI \-fnt \ font
-Allows one to pass different elements to 
+Allows one to pass different elements to
 .I pyro2.
 .TP 5
 .BI \-size[xyz] \ num
@@ -2277,7 +2284,7 @@ numbers offer randomness from 2 to the absolute value of the number.
 .TP 5
 .BI -/+hideshuffling
 Turn on or off hidden shuffle phase for
-.I bevel, dino, rubik
+.I bevel, dino, pyraminx, rubik
 and
 .I skewb.
 .TP 5
