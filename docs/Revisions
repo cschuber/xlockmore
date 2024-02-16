@@ -1,4 +1,4 @@
-xlockmore-5.64 as of 4 June 2020, the maintained version of xlock
+xlockmore-5.65 as of 20 July 2020, the maintained version of xlock
 
 Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
@@ -11,6 +11,12 @@ send me mail if you want to be on a list for latest releases.
 
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
+
+5.65
+  Fix from Jan Kratochvil and Adrian Reber, adrian AT lisas.de for Fedora.
+    xlock -startCmd true... would core on Fedora, exit() replaced with
+    _exit().
+  Update for magick.c to use strncpy thanks to Jouk Jansen.
 
 5.64
   Fix for hyper mode from original author, for potential but not

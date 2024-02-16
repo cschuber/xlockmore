@@ -3942,7 +3942,7 @@ both3d, (char *)DEF_BOTH3D);
 			(void) sigsetmask(old_sigmask);
 #endif
 			(void) system(startCmd);
-			exit(0);
+			_exit(0);
 		}
 	}
 	lock_delay = lockdelay;
@@ -3981,7 +3981,7 @@ both3d, (char *)DEF_BOTH3D);
 			cmd_pid = 0;
 		} else if (!cmd_pid) {
 			(void) system(endCmd);
-			exit(0);
+			_exit(0);
 		}
 	}
 

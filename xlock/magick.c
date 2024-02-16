@@ -6,7 +6,7 @@ static const char sccsid[] = "@(#)magick.c     5.00 00/10/26 xlockmore";
 /*-
  * Utilities for Reading images using ImageMagick
  *
- * Copyright (c) 2000-2011 by J.Jansen (joukj AT hrem.nano.tudelft.nl)
+ * Copyright (c) 2000-2020 by J.Jansen (joukj AT hrem.nano.tudelft.nl)
  *
  * See xlock.c for copying information.
  *
@@ -15,6 +15,7 @@ static const char sccsid[] = "@(#)magick.c     5.00 00/10/26 xlockmore";
  * 15-Mar-06: Corrected for other QuantumDepth than 8
  * 04-Apr-06: Corrected for TrueColor visuals
  * 18-Oct-11: Upgraded for current version of Imagemagick
+ * 30-Jun-20: Bug-fix for the case Imagemagick is compiled with MagickPathExtent>4096
  */
 
 #include "xlock.h"
@@ -57,7 +58,7 @@ MagickFileToImage(ModeInfo * mi, char *filename, XImage ** image ,
 /* PURIFY reports a memory leak on the next line */
    GetImageInfo( &imageInfo );
    imageInfo.dither = 0;
-   (void) strcpy( imageInfo.filename , filename );
+   (void) strncpy( imageInfo.filename , filename , strlen( filename ) );
 #if MagickLibVersion < 0x700
    GetExceptionInfo( &exception );
    imageData = ReadImage ( &imageInfo, &exception );
