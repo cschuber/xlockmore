@@ -23,7 +23,10 @@ static const char sccsid[] = "@(#)magick.c     5.00 00/10/26 xlockmore";
 #undef inline
 #include "magick.h"
 
+#ifdef VMS
+/* VMS does not build ras.c if ImageMagick is present */
 XLockImage xlockimage;
+#endif
 
 int
 MagickFileToImage(ModeInfo * mi, char *filename, XImage ** image ,

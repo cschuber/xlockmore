@@ -4876,7 +4876,7 @@ cat >>confdefs.h <<_ACEOF
 #define PACKAGE "$PACKAGE"
 _ACEOF
 
-VERSION=5.63BETA
+VERSION=5.64
 
 
 cat >>confdefs.h <<_ACEOF

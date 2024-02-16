@@ -62,7 +62,6 @@ public class xlockApplet extends Applet implements ItemListener {
 		"-use3d "
 	};
 	Checkbox checkbox[] = new Checkbox[booleanOptions.length];
-	final Runtime r = Runtime.getRuntime();
 
 	public void init() {
 		Panel Panel1 = new Panel();
@@ -128,7 +127,7 @@ $%LISTJAVA		list.add("bomb");
 	}
 
 	public void itemStateChanged(ItemEvent event) {
-		String label = (String) choice.getSelectedItem();
+		String label = choice.getSelectedItem();
 
 		valueOptions[currentOption] = textField.getText();
 		for (int i = 0; i < descriptOptions.length; i++) {
@@ -163,7 +162,7 @@ $%LISTJAVA		list.add("bomb");
 		cmdline = cmdline.concat(list.getSelectedItem());
 		try {
 			System.out.println(cmdline);
-			r.getRuntime().exec(cmdline);
+			Runtime.getRuntime().exec(cmdline);
 		} catch (Exception e) {
 			errorFrame.setVisible(true);
 		}

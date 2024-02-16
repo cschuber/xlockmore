@@ -1181,7 +1181,7 @@ init_dclock(ModeInfo * mi)
 			char *p, *p2, *p3, buf[BUFSIZ];
 			int height, w;
 
-			p = strncpy(buf, message, BUFSIZ);
+			p = strncpy(buf, message, BUFSIZ - 1);
 			while (strlen(p) > 0) {
 				p2 = p + strlen(p) - 1;
 				if (*p2 == '\n')

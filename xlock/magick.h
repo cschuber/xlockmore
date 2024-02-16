@@ -20,6 +20,9 @@
 #include <stdarg.h>
 #include <magick/MagickCore.h>
 
+/* this old one is not going to work */
+/* #include <magick/api.h> */
+
 #include "xlockimage.h"
 
 #define MagickColorError   1

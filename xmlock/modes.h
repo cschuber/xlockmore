@@ -102,6 +102,8 @@ static LockStruct LockProcs[] =
 {(char *) "maze", (char *) "Shows a random maze and a depth first search solution"},
 #ifdef USE_GL
 {(char *) "maze3d", (char *) "Shows a 3D maze"},
+#endif
+#ifdef USE_GL
 {(char *) "moebius", (char *) "Shows Moebius Strip II, an Escher-like GL scene with ants"},
 #endif
 #ifdef USE_GL

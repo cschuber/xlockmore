@@ -38,7 +38,7 @@ if (-x "$PROG") {
     print "generating $GUI_NAME\n";
     if (-w "$GUI_FILE") {
       if (-r "$GUI_TPL") {
-        $CMD="cat $GUI_TPL | ./xlockgen > $GUI_FILE";
+        $CMD="cat $GUI_TPL | ./xlockgen > $GUI_FILE.try";
         print "$CMD\n";
         `$CMD`;
         if ($GUI_BUILD) {

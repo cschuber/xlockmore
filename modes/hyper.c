@@ -8,7 +8,7 @@ static const char sccsid[] = "@(#)hyper.c	5.00 2000/11/01 xlockmore";
 
 /*-
  * hyper.c (nee multidico)
- * Copyright (C) 1992,1998 John Heidemann <johnh@isi.edu>
+ * Copyright (C) 1992,1998 John Heidemann <johnh AT isi.edu>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -974,17 +974,17 @@ calc_transformation(ModeInfo * mi)
 	if ((Ttmp == NULL) || (Tpre == NULL) || (Tuser == NULL) ||
 			(Tpretranspose == NULL) || (Tscale == NULL) ||
 			(Tposttranspose == NULL)) {
-		if (Ttmp == NULL)
+		if (Ttmp != NULL)
 			free(Ttmp);
-		if (Tpre == NULL)
+		if (Tpre != NULL)
 			free(Tpre);
-		if (Tuser == NULL)
+		if (Tuser != NULL)
 			free(Tuser);
-		if (Tpretranspose == NULL)
+		if (Tpretranspose != NULL)
 			free(Tpretranspose);
-		if (Tscale == NULL)
+		if (Tscale != NULL)
 			free(Tscale);
-		if (Tposttranspose == NULL)
+		if (Tposttranspose != NULL)
 			free(Tposttranspose);
 		return False;
 	}
@@ -1070,7 +1070,7 @@ calc_transformation(ModeInfo * mi)
 	offset.y = hp->maxy / 2.0;
 
 	/*
-	 * Setup & compute the matricies
+	 * Setup & compute the matrices.
 	 */
 	MatIdent(Tpretranspose, hp->num_mat);
 	Tpretranspose[0 * hp->num_mat + hp->num_d] = 0;

@@ -359,7 +359,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR CmdLine, int nC
         /* copy the savers name (if any) */
         while (ISSPACE(*++p))
           ;
-        strncpy(szSaverName, p, _MAX_PATH);
+        strncpy(szSaverName, p, _MAX_PATH - 1);
 
         /* start screen saver */
         return LaunchScreenSaver(NULL);

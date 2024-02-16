@@ -88,7 +88,7 @@ char *End="\"";
   int  numprocs = sizeof (LockProcs) / sizeof (LockProcs[0]);
 
   for (i = 0; i < numprocs; i++) {
-    printf("		lst.add(\"%s\");\n", LockProcs[i].cmdline_arg);
+    printf("		list.add(\"%s\");\n", LockProcs[i].cmdline_arg);
   }
 }
 %%

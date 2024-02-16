@@ -24,7 +24,7 @@ all : xlockgen
 lex.yy.c : xlockgen.lex
 	$(LEX) xlockgen.lex
 
-xlockgen : lex.yy.c
+xlockgen : lex.yy.c lmode.h
 	$(CC) lex.yy.c -o $@ $(LEXLIB)
 
 clean :

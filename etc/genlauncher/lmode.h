@@ -105,6 +105,11 @@ LockStruct  LockProcs[] =
 	{"bounce",
 	 5000, -10, 1, 0, 64, 1.0, "",
 	 "Shows bouncing footballs", 0, NULL, NULL},
+#ifdef USE_GL
+	 {"boxed",
+	 1000, 1, 2, 1, 64, 1.0, "",
+	 "Shows GL's boxed balls", 0, NULL, "#ifdef USE_GL"},
+#endif
 	{"braid",
 	 1000, 15, 100, -7, 64, 1.0, "",
 	 "Shows random braids and knots", 0, NULL, NULL},
@@ -232,12 +237,12 @@ LockStruct  LockProcs[] =
 	 80000, 1, 1, 1, 64, 1.0, "",
 	 "Shows a sphere inverted without wrinkles", 0, NULL, "#if defined( USE_GL ) && defined( HAVE_CXX )"},
 #endif
-        {"juggle",
-         10000, 200, 1000, 1, 64, 1.0, "",
-         "Shows a Juggler, juggling", 0, NULL, NULL},
+	{"juggle",
+	 10000, 200, 1000, 1, 64, 1.0, "",
+	 "Shows a Juggler, juggling", 0, NULL, NULL},
 #ifdef USE_GL
 	{"juggler3d",
-         10000, 200, 1000, 1, 64, 1.0, "",
+	 10000, 200, 1000, 1, 64, 1.0, "",
 	 "Shows a 3D Juggler, juggling", 0, NULL, "#ifdef USE_GL"},
 #endif
 	{"julia",
@@ -292,8 +297,11 @@ LockStruct  LockProcs[] =
 	 "Shows the matrix", 0, NULL, NULL},
 	{"maze",
 	 1000, 1, 3000, -40, 64, 1.0, "",
-     "Shows a random maze and a depth first search solution", 0, NULL, NULL},
+	 "Shows a random maze and a depth first search solution", 0, NULL, NULL},
 #ifdef USE_GL
+	{"maze3d",
+	 20000, 1, 2, 1, 64, 1.0, "",
+	 "Shows a 3D maze", 0, NULL, "#ifdef USE_GL"},
 	{"moebius",
 	 30000, 1, 1, 1, 64, 1.0, "",
 	 "Shows Moebius Strip II, an Escher-like GL scene with ants", 0, NULL, "#ifdef USE_GL"},
@@ -369,9 +377,9 @@ LockStruct  LockProcs[] =
 	 40000, 0, 10, 0, 64, 1.0, "",
 	 "Balls spinning like crazy in GL", 0, NULL, "#ifdef USE_GL"},
 #endif
-        {"scooter",
-         20000, 24, 3, 100, 64, 1.0, "",
-         "Shows a journey through space tunnel and stars", 0, NULL, NULL},
+	{"scooter",
+	 20000, 24, 3, 100, 64, 1.0, "",
+	 "Shows a journey through space tunnel and stars", 0, NULL, NULL},
 	{"shape",
 	 10000, 100, 256, 1, 64, 1.0, "",
 	 "Shows stippled rectangles, ellipses, and triangles", 0, NULL, NULL},
@@ -380,8 +388,8 @@ LockStruct  LockProcs[] =
 	 "Shows Sierpinski's triangle", 0, NULL, NULL},
 #ifdef USE_GL
 	{"sierpinski3d",
-         15000, 1, 2, 1, 64, 1.0, "",
-         "Shows GL's Sierpinski gasket", 0, NULL, "#ifdef USE_GL"},
+	 15000, 1, 2, 1, 64, 1.0, "",
+	 "Shows GL's Sierpinski gasket", 0, NULL, "#ifdef USE_GL"},
 #endif
 #ifdef USE_GL
 	{"skewb",
@@ -478,7 +486,7 @@ LockStruct  LockProcs[] =
 	 "Shows Dewdney's Voters", 0, NULL, NULL},
 	{"wator",
 	 750000, 1, 32767, 0, 64, 1.0, "",
-     "Shows Dewdney's Water-Torus planet of fish and sharks", 0, NULL, NULL},
+	 "Shows Dewdney's Water-Torus planet of fish and sharks", 0, NULL, NULL},
 	{"wire",
 	 500000, 1000, 150, -8, 64, 1.0, "",
 	 "Shows a random circuit with 2 electrons", 0, NULL, NULL},

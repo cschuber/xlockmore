@@ -1,4 +1,4 @@
-xlockmore-5.63 as of 10 May 2020, the maintained version of xlock
+xlockmore-5.64 as of 4 June 2020, the maintained version of xlock
 
 Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
@@ -11,6 +11,15 @@ send me mail if you want to be on a list for latest releases.
 
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
+
+5.64
+  Fix for hyper mode from original author, for potential but not
+    likely memory leak and free(NULL) issue John Heidemann, johnh
+    AT isi.edu.
+  More buffer gcc warnings removed for dclock.c, image.c, and
+    scrnsave.c.
+  ras.c/magick.c gcc 10 fix from Adrian Reber, adrian AT lisas.de .
+    VMS already handles this in make.com.
 
 5.63
   Lots of spelling errors fixed due to codespell

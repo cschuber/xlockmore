@@ -1505,6 +1505,7 @@ else
         magick_prefix=`($magick_config --prefix) 2>/dev/null`
      fi
    fi
+dnl need magick/MagickCore.h, magick/api.h (Magick-config --version 1.3.28) is not going to work
 AC_CACHE_VAL(ac_cv_path_magick,
 [# One or both of these vars are not set, and there is no cached value.
 no_magick=yes

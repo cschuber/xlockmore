@@ -74,6 +74,11 @@ LockStruct  LockProcs[] =
 	{"bounce",
 	 5000, -10, 1, 0, 1.00,
 	 "Shows bouncing footballs", (void *) NULL},
+#ifdef USE_GL
+	{"boxed",
+	 1000, 1, 2, 1, 1.00,
+	 "Shows GL's boxed balls", (void *) NULL},
+#endif
 	{"braid",
 	 1000, 15, 100, -7, 1.00,
 	 "Shows random braids and knots", (void *) NULL},
@@ -264,6 +269,11 @@ LockStruct  LockProcs[] =
 	{"maze",
 	 1000, 1, 3000, -40, 1.00,
 	 "Shows a random maze and a depth first search solution", (void *) NULL},
+#ifdef USE_GL
+	{"maze3d",
+	 20000, 1, 2, 1, 1.00,
+	 "Shows a 3D maze", (void *) NULL},
+#endif
 #ifdef USE_GL
 	{"moebius",
 	 30000, 1, 1, 1, 1.00,
