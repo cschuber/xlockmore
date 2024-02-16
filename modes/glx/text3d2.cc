@@ -100,8 +100,8 @@ extern "C" { void refresh_text3d2(ModeInfo * mi); }
 #endif
 
 /* arial.ttf is not supplied for legal reasons. */
-/* NT and Windows 3.1 in c:\WINDOWS\SYSTEM\ARIAL.TTF */
-/* Windows95 in c:\windows\fonts\arial.ttf */
+/* NT and Windows 3.1 in C:\WINDOWS\SYSTEM\ARIAL.TTF */
+/* Windows95 in C:\Windows\Fonts\arial.ttf */
 #ifndef DEF_TTFONT
 /* Directory of only *.ttf */
 /* symbol.ttf and wingding.ttf should be excluded or it may core dump */

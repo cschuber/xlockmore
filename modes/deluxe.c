@@ -64,7 +64,9 @@ extern Bool allocate_alpha_colors (Screen *screen, Visual *visual,
 # include "xdbe.h"
 #endif /* HAVE_DOUBLE_BUFFER_EXTENSION */
 
+#ifndef countof
 #define countof(x) (sizeof(x)/sizeof(*(x)))
+#endif
 
 #define DEF_THICKNESS "50"
 #define DEF_SPEED "15"

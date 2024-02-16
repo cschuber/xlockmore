@@ -112,7 +112,7 @@ extern "C" { void refresh_text3d(ModeInfo * mi); }
 #endif
 
 /* arial.ttf is not supplied for legal reasons. */
-/* NT and Windows 3.1 in c:\WINDOWS\SYSTEM\ARIAL.TTF */
+/* NT and Windows 3.1 in C:\WINDOWS\SYSTEM\ARIAL.TTF */
 /* Windows95 in C:\Windows\Fonts\arial.ttf */
 
 #ifndef DEF_TTFONT

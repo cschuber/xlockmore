@@ -19,7 +19,7 @@
 # https://www.sillycycle.com/xlockmore.html
 
 %define	name		xlockmore
-%define	stableversion	5.66
+%define	stableversion	5.67
 %define	release		1
 %define	serial		1
 # Comment quality for stable release

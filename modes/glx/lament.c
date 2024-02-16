@@ -155,7 +155,9 @@ ModStruct   lament_description =
 #include "pixmaps/lament.xpm"
 #endif
 
+#ifndef RANDSIGN
 #define RANDSIGN() ((LRAND() & 1) ? 1 : -1)
+#endif
 #define FLOATRAND(a) (((double)LRAND() / (double)MAXRAND) * a)
 
 typedef enum {

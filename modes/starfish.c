@@ -98,7 +98,10 @@ ModStruct   starfish_description =
 #define SCALE        1000	/* fixed-point math, for sub-pixel motion */
 
 #define RAND(n) ((long) ((LRAND() & 0x7fffffff) % ((long) (n))))
+
+#ifndef RANDSIGN
 #define RANDSIGN() ((LRAND() & 1) ? 1 : -1)
+#endif
 
 enum starfish_mode {
 	pulse,

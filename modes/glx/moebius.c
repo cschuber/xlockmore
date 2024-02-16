@@ -614,7 +614,9 @@ pinit(void)
 
 
 /* lifted from lament.c */
+#ifndef RANDSIGN
 #define RANDSIGN() ((LRAND() & 1) ? 1 : -1)
+#endif
 #define FLOATRAND(a) (((double)LRAND() / (double)MAXRAND) * a)
 
 static void

@@ -1,4 +1,4 @@
-xlockmore-5.66 as of 25 October 2020, the maintained version of xlock
+xlockmore-5.67 as of 29 August 2021, the maintained version of xlock
 
 Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
@@ -11,6 +11,13 @@ send me mail if you want to be on a list for latest releases.
 
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
+
+5.67
+  Fixing specified bound equals destination size warning in iostuff.c.
+  Port updated for xscreensaver-6.01.  With help from EoflaOE ViceCity.
+     Also removed some warnings.
+  maze3d.c updated for VMS as CRTL now contains more standard functions,
+    thanks to Jouk Jansen.
 
 5.66
   GL mode atunnels, juggler3d, atlantis, lament, invert, solitaire, text3d,
@@ -31,6 +38,7 @@ from others.
     in xscreensaver port.
   Bug fix in qix and toneclock for xscreensaver port, xlock was not
     affected by negative NRAND input.
+
   euler2d synced up with xscreensaver version.
   Change to fzort to use __asm__ instead of asm as its probably more
     likely to work.

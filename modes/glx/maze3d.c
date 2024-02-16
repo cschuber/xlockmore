@@ -23,7 +23,9 @@
 #undef USE_FRACTAL_IMAGES
 
 #ifdef __VMS
+#if __CRTL_VER <= 80400000
 #define roundf nint
+#endif
 #endif
 
 #ifdef STANDALONE

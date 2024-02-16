@@ -115,8 +115,9 @@ ModStruct   goop_description =
 #define SCALE       10000	/* fixed-point math, for sub-pixel motion */
 #define DEF_COUNT   12		/* When planes and count are 0, how many blobs. */
 
-
+#ifndef RANDSIGN
 #define RANDSIGN() ((LRAND() & 1) ? 1 : -1)
+#endif 
 
 typedef struct {
 	long        x, y;	/* position of midpoint */

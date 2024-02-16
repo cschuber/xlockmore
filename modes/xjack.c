@@ -47,6 +47,7 @@ static const char sccsid[] = "@(#)xjack.c	5.00 2000/11/01 xlockmore";
 #include "xlock.h"     /* in xlockmore distribution */
 #include "iostuff.h"
 #endif
+#include <ctype.h>
 
 #ifdef MODE_xjack
 

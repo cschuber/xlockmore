@@ -1,5 +1,5 @@
 /* xlockmore.h --- xscreensaver compatibility layer for xlockmore modules.
- * xscreensaver, Copyright (c) 1997-2018 Jamie Zawinski <jwz@jwz.org>
+ * xscreensaver, Copyright (c) 1997-2021 Jamie Zawinski <jwz@jwz.org>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -15,10 +15,6 @@
  * in the older xlock.h by Charles Hannum <mycroft@ai.mit.edu>.  (I had
  * to redo it, since xlockmore has diverged so far from xlock...)
  */
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif /* HAVE_CONFIG_H */
 
 #ifndef __STDC__
 ERROR!  Sorry, xlockmore.h requires ANSI C (gcc, for example.)
@@ -231,21 +227,23 @@ ERROR!  Sorry, xlockmore.h requires ANSI C (gcc, for example.)
 # define COLOR_SCHEME XLOCKMORE_COLOR_SCHEME
 #endif
 
-#define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) 			\
+
+#define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX)			\
 									\
   static struct xlockmore_function_table				\
-	 NAME ## _xlockmore_function_table = {				\
+	 NAME ## _xlockmore_function_table = {			\
 	   CLASS,							\
 	   DEFAULTS,							\
 	   WRITABLE_COLORS,						\
-	   COLOR_SCHEME,						\
+	   COLOR_SCHEME,					\
 	   init_    ## PREFIX,						\
 	   draw_    ## PREFIX,						\
 	   reshape_ ## PREFIX,						\
 	   release_ ## PREFIX,						\
 	   free_    ## PREFIX,						\
 	   PREFIX   ## _handle_event,					\
-	   & PREFIX ## _opts						\
+	   & PREFIX ## _opts,						\
+	   0,								\
   };									\
 									\
   struct xscreensaver_function_table					\
@@ -265,16 +263,16 @@ ERROR!  Sorry, xlockmore.h requires ANSI C (gcc, for example.)
 
 /* A few edits to get more code working in xlockmore */
 
-#define MI_IS_INWINDOW(MI)	(MI_WIN_IS_INWINDOW(MI))
-#define MI_IS_INROOT(MI)	(MI_WIN_IS_INROOT(MI))
-#define MI_IS_USE3D(MI)		(MI_WIN_IS_USE3D(MI))
-#define MI_IS_NOLOCK(MI)	(True)
-#define MI_BITMAP(MI)		((MI)->bitmap)
-#define MI_VISUALCLASS(MI)	((MI)->visualclass)
-#define MI_RED_MASK(MI)		((MI)->red_mask)
-#define MI_GREEN_MASK(MI)	((MI)->green_mask)
-#define MI_BLUE_MASK(MI)	((MI)->blue_mask)
-#define MI_RECURSION_DEPTH(MI)	((MI)->recursion_depth)
+#define MI_IS_INWINDOW(MI)      (MI_WIN_IS_INWINDOW(MI))
+#define MI_IS_INROOT(MI)        (MI_WIN_IS_INROOT(MI))
+#define MI_IS_USE3D(MI)         (MI_WIN_IS_USE3D(MI))
+#define MI_IS_NOLOCK(MI)        (True)
+#define MI_BITMAP(MI)           ((MI)->bitmap)
+#define MI_VISUALCLASS(MI)      ((MI)->visualclass)
+#define MI_RED_MASK(MI)         ((MI)->red_mask)
+#define MI_GREEN_MASK(MI)       ((MI)->green_mask)
+#define MI_BLUE_MASK(MI)        ((MI)->blue_mask)
+#define MI_RECURSION_DEPTH(MI)  ((MI)->recursion_depth)
 
 #if HAVE_GETTIMEOFDAY
 #ifdef GETTIMEOFDAY_TWO_ARGS

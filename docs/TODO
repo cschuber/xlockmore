@@ -398,8 +398,6 @@ Mode specific problems:
 
   ant:
     round ants.  This would involve masking and images to do efficiently.
-    3d version (up, down, left, right turns)?  May be hard to see interior
-    though.
 
   ball: can it be updated to use a pixmap instead of a slow circle fill?
 
@@ -446,10 +444,6 @@ Mode specific problems:
       symmetry/asymmetry centered on hexagon corner; for triangles have 3
       fold symmetry/asymmetry centered on a triangle, and 3 and 6 fold
       symmetry/asymmetry centered on triangle corner.
-
-  life3d:
-    A densely packed spherical version on corners of a cuboctahedron (or
-       rhombic dodecahedrons).
 
   lyapunov: needs to be speeded up
 

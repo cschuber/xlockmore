@@ -507,7 +507,7 @@ getImage(ModeInfo * mi, XImage ** logo,
 				MI_BITMAP(mi));
 			return;
 		}
-		(void) strncpy(bitmap_local, MI_BITMAP(mi), 256);
+		(void) strncpy(bitmap_local, MI_BITMAP(mi), 255);
 #if HAVE_DIRENT_H
 		getRandomFile(MI_BITMAP(mi), bitmap_local);
 #endif
@@ -716,7 +716,7 @@ getPixmap(ModeInfo * mi, Drawable drawable,
 				MI_BITMAP(mi));
 			return;
 		}
-		(void) strncpy(bitmap_local, MI_BITMAP(mi), 256);
+		(void) strncpy(bitmap_local, MI_BITMAP(mi), 255);
 #if HAVE_DIRENT_H
 		getRandomFile(MI_BITMAP(mi), bitmap_local);
 #endif
@@ -745,7 +745,7 @@ getModeFont(char *infont)
 				infont);
 			return (char *) NULL;
 		}
-		(void) strncpy(localfont, infont, 256);
+		(void) strncpy(localfont, infont, 255);
 #if HAVE_DIRENT_H
 		getRandomFile(infont, localfont);
 #endif

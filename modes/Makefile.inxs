@@ -53,13 +53,12 @@ X_CFLAGS	= @X_CFLAGS@
 X_LIBS		= @X_LIBS@
 X_PRE_LIBS	= @X_PRE_LIBS@
 X_EXTRA_LIBS	= @X_EXTRA_LIBS@
-XMU_LIBS	= @XMU_LIBS@
 XFT_LIBS	= @XFT_LIBS@
 
 # Note: see comment in ../driver/Makefile.in for explanation of X_LIBS, etc.
 #
 HACK_PRE	= $(LIBS) $(X_LIBS)
-HACK_POST	= $(X_PRE_LIBS) $(XFT_LIBS) -lXt -lX11 $(XMU_LIBS) -lXext $(X_EXTRA_LIBS) -lm
+HACK_POST	= $(X_PRE_LIBS) $(XFT_LIBS) -lXt -lX11 -lXext $(X_EXTRA_LIBS) -lm
 HACK_LIBS	= $(HACK_PRE) @ANIM_LIBS@ @HACK_LIBS@ $(HACK_POST)
 PNG_LIBS	= $(HACK_PRE) @PNG_LIBS@ @HACK_LIBS@ $(HACK_POST)
 JPEG_LIBS	= @JPEG_LIBS@
@@ -90,7 +89,7 @@ UTIL_SRCS	= $(UTILS_SRC)/alpha.c $(UTILS_SRC)/colors.c \
 		  $(UTILS_SRC)/xshm.c $(UTILS_SRC)/xdbe.c \
 		  $(UTILS_SRC)/textclient.c $(UTILS_SRC)/aligned_malloc.c \
 		  $(UTILS_SRC)/thread_util.c $(UTILS_SRC)/pow2.c \
-		  $(UTILS_SRC)/font-retry.c
+		  $(UTILS_SRC)/font-retry.c $(UTILS_SRC)/xmu.c
 UTIL_OBJS	= $(UTILS_BIN)/alpha.o $(UTILS_BIN)/colors.o \
 		  $(UTILS_BIN)/grabclient.o \
 		  $(UTILS_BIN)/hsv.o $(UTILS_BIN)/resources.o \
@@ -102,7 +101,7 @@ UTIL_OBJS	= $(UTILS_BIN)/alpha.o $(UTILS_BIN)/colors.o \
 		  $(UTILS_BIN)/textclient.o $(UTILS_BIN)/aligned_malloc.o \
 		  $(UTILS_BIN)/thread_util.o $(UTILS_BIN)/pow2.o \
 		  $(UTILS_BIN)/xft.o $(UTILS_BIN)/utf8wc.o \
-		  $(UTILS_BIN)/font-retry-xft.o
+		  $(UTILS_BIN)/xmu.o
 
 XLOCKMORE_HDRS = $(XLOCK_SRC)/automata.h $(XLOCK_SRC)/iostuff.h \
 $(XLOCK_SRC)/spline.h $(XLOCK_SRC)/xbm.h $(XLOCK_SRC)/color.h
@@ -308,8 +307,9 @@ RETIRED_EXES	= ant bubbles critical flag forest hyperball hypercube laser \
 
 HACK_OBJS_1	= $(HACKS_BIN)/fps.o $(UTILS_BIN)/resources.o $(UTILS_BIN)/visual.o \
 		  $(UTILS_BIN)/usleep.o $(UTILS_BIN)/yarandom.o \
-		  $(UTILS_BIN)/utf8wc.o $(UTILS_BIN)/font-retry-xft.o \
-		  @XMU_OBJS@ @XFT_OBJS@ @ANIM_OBJS@
+		  $(UTILS_BIN)/utf8wc.o \
+		  $(UTILS_BIN)/font-retry.o \
+		  $(UTILS_BIN)/xmu.o @XFT_OBJS@ @ANIM_OBJS@
 HACK_OBJS	= $(HACKS_BIN)/screenhack.o $(HACK_OBJS_1)
 XLOCK_OBJS	= $(HACKS_BIN)/screenhack.o $(HACKS_BIN)/xlockmore.o $(COLOR_OBJS) $(HACK_OBJS_1) \
 		  $(ERASE) $(XLOCKMORE_OBJS)
@@ -627,7 +627,6 @@ $(UTILS_BIN)/textclient.o:	$(UTILS_SRC)/textclient.c
 $(UTILS_BIN)/aligned_malloc.o:	$(UTILS_SRC)/aligned_malloc.c
 $(UTILS_BIN)/thread_util.o:	$(UTILS_SRC)/thread_util.c
 $(UTILS_BIN)/pow2.o:		$(UTILS_SRC)/pow2.c
-$(UTILS_BIN)/font-retry-xft.o:	$(UTILS_SRC)/font-retry.c
 
 $(UTIL_OBJS):
 	cd $(UTILS_BIN) ; \
@@ -795,7 +794,7 @@ pyro2.xpm : $(PIXMAPDIR)$(PYRO2PIXMAP).xpm
 
 xscreensaver-sgigl: xscreensaver-sgigl.c
 	$(CC) $(LDFLAGS) -o $@ $< -I$(UTILS_SRC) $(HACK_PRE) \
-		$(XMU_LIBS) -lX11 -lXext $(X_EXTRA_LIBS) -lm
+		-lX11 -lXext $(X_EXTRA_LIBS) -lm
 
 test-utf8wc: $(UTILS_SRC)/utf8wc.c
 	$(CC) $(HACK_CFLAGS_BASE) $(LDFLAGS)\

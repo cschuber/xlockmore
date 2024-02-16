@@ -458,7 +458,9 @@ pinit(ModeInfo *mi)
 
 /* lifted from lament.c */
 #define RAND(n) ((long) ((LRAND() & 0x7fffffff) % ((long) (n))))
+#ifndef RANDSIGN
 #define RANDSIGN() ((LRAND() & 1) ? 1 : -1)
+#endif
 
 static void
 rotate(GLfloat *pos, GLfloat *v, GLfloat *dv, GLfloat max_v, Bool verbose)
