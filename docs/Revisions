@@ -1,4 +1,4 @@
-xlockmore-5.61 as of 10 December 2019, the maintained version of xlock
+xlockmore-5.62 as of 1 February 2020, the maintained version of xlock
 
 Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
@@ -12,6 +12,11 @@ send me mail if you want to be on a list for latest releases.
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
 
+5.62
+  Fix from brett.diamond AT gmail.com to get "xlock -help" from
+    crashing.
+  As a Blake's 7 fan, I had to add the Liberator to star mode.
+
 5.61
   Same fix from Jouk Jansen and Adrian Reber, adrian AT lisas.de
     for juggler3d.cc in previous release.
@@ -19,7 +24,7 @@ from others.
     https://bugzilla.redhat.com/show_bug.cgi?id=874484
     This helps xlock's parent process to know xlock crashed.
   ico mode added truncated octahedron.
-  Another  gl mode, sierpinski3d, fixed up by EoflaOE ViceCity to run
+  Another gl mode, sierpinski3d, fixed up by EoflaOE ViceCity to run
     in xscreensaver.
 
 5.60

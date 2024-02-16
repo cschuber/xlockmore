@@ -1111,9 +1111,13 @@ Help(void)
 
 		(void) printf("          %-23s %s\n",
 			      LockProcs[i].cmdline_arg, LockProcs[i].desc);
-		for (j = 0; j < LockProcs[i].msopt->numvarsdesc; j++)
+		for (j = 0; j < LockProcs[i].msopt->numvarsdesc; j++) {
+			if (LockProcs[i].msopt->desc == NULL)
+				continue;
 			(void) printf("              %-23s %s\n",
-				      LockProcs[i].msopt->desc[j].opt, LockProcs[i].msopt->desc[j].desc);
+				LockProcs[i].msopt->desc[j].opt,
+				LockProcs[i].msopt->desc[j].desc);
+		}
 	}
 	(void) printf("\n");
 

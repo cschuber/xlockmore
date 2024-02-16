@@ -2,7 +2,7 @@
 /* star --- flying through an asteroid field */
 
 #if 0
-static const char sccsid[] = "@(#)star.c	5.00 2000/11/01 xlockmore";
+static const char sccsid[] = "@(#)star.c	5.62 2020/01/25 xlockmore";
 
 #endif
 
@@ -23,6 +23,7 @@ static const char sccsid[] = "@(#)star.c	5.00 2000/11/01 xlockmore";
  * other special, indirect and consequential damages.
  *
  * Revision History:
+ * 25-Jan-2020: Blake's 7 Liberator aka DSV2
  * 01-Nov-2000: Allocation checks
  * 10-Oct-1996: Renamed from rock.  Added trek and rock options.
  *              Combined with features from star by Heath Rice
@@ -76,16 +77,19 @@ static const char sccsid[] = "@(#)star.c	5.00 2000/11/01 xlockmore";
 #ifdef MODE_star
 
 #define DEF_TREK  "50"
+#define DEF_BLAKE  "50"
 #define DEF_ROCK  "False"
 #define DEF_STRAIGHT  "False"
 
 static int  trek;
+static int  blake;
 static Bool rock;
 static Bool straight;
 
 static XrmOptionDescRec opts[] =
 {
 	{(char *) "-trek", (char *) ".star.trek", XrmoptionSepArg, (caddr_t) NULL},
+	{(char *) "-blake", (char *) ".star.blake", XrmoptionSepArg, (caddr_t) NULL},
 	{(char *) "-rock", (char *) ".star.rock", XrmoptionNoArg, (caddr_t) "on"},
 	{(char *) "+rock", (char *) ".star.rock", XrmoptionNoArg, (caddr_t) "off"},
 	{(char *) "-straight", (char *) ".star.straight", XrmoptionNoArg, (caddr_t) "on"},
@@ -95,6 +99,7 @@ static XrmOptionDescRec opts[] =
 static argtype vars[] =
 {
 	{(void *) & trek, (char *) "trek", (char *) "Trek", (char *) DEF_TREK, t_Int},
+	{(void *) & blake, (char *) "blake", (char *) "Blake", (char *) DEF_TREK, t_Int},
 	{(void *) & rock, (char *) "rock", (char *) "Rock", (char *) DEF_ROCK, t_Bool},
 	{(void *) & straight, (char *) "straight", (char *) "Straight", (char *) DEF_STRAIGHT, t_Bool}
 };
@@ -102,6 +107,7 @@ static argtype vars[] =
 static OptionStruct desc[] =
 {
 	{(char *) "-trek num", (char *) "chance of a Star Trek encounter"},
+	{(char *) "-blake num", (char *) "chance of a Blake's 7 encounter"},
 	{(char *) "-/+rock", (char *) "turn on/off rocks"},
 	{(char *) "-/+straight", (char *) "turn on/off spin and shifting origin"}
 };
@@ -127,6 +133,12 @@ typedef struct _BitmapType {
 #include "bitmaps/enterprise-5.xbm"	/* Enterprise SOUTH WEST */
 #include "bitmaps/enterprise-6.xbm"	/* Enterprise WEST */
 #define TREKIES 4
+#include "bitmaps/liberator-1.xbm"	/* Enterprise NORTH EAST */
+#include "bitmaps/liberator-2.xbm"	/* Enterprise EAST */
+#include "bitmaps/liberator-6.xbm"	/* Enterprise WEST */
+#include "bitmaps/liberator-7.xbm"	/* Enterprise NORTH WEST */
+#define BLAKES 4
+#define ALL_SHIPS (TREKIES+BLAKES)
 
 static BitmapType trekie[] =
 {
@@ -134,6 +146,14 @@ static BitmapType trekie[] =
 	{3, enterprise3_width, enterprise3_height},
 	{5, enterprise5_width, enterprise5_height},
 	{6, enterprise6_width, enterprise6_height}
+};
+
+static BitmapType dsv2[] =
+{
+	{1, liberator1_width, liberator1_height},
+	{2, liberator2_width, liberator2_height},
+	{6, liberator6_width, liberator6_height},
+	{7, liberator7_width, liberator7_height}
 };
 
 /*-
@@ -165,11 +185,10 @@ static BitmapType trekie[] =
   higher resolution or compute power.
  */
 
-#define TREKBITS(n,w,h)\
-  if ((sp->trekPixmaps[sp->init_treks]=\
+#define SHIPBITS(n,w,h)\
+  if ((sp->shipPixmaps[sp->init_ships]=\
   XCreateBitmapFromData(display,window,(char *)n,w,h))==None){\
-  return False;} else {sp->init_treks++;}
-
+  return False;} else {sp->init_ships++;}
 
 typedef struct {
 	int         real_size;
@@ -183,7 +202,7 @@ typedef struct {
 
 typedef struct {
 	XPoint      loc, delta, size;
-} trekstruct;
+} shipstruct;
 
 typedef struct {
 	int         current_delta;	/* observer Z rotation */
@@ -201,11 +220,11 @@ typedef struct {
 	int         max_star_size;
 	astar      *astars;
 	Pixmap     *pixmaps;
-	Pixmap      trekPixmaps[TREKIES];
-	int         init_treks;
-	int         current_trek;
+	Pixmap      shipPixmaps[ALL_SHIPS];
+	int         init_ships;
+	int         current_ship;
 	GC          stippledGC;
-	trekstruct  trek;
+	shipstruct  ship;
 } starstruct;
 
 static float cos_array[RESOLUTION], sin_array[RESOLUTION];
@@ -279,55 +298,83 @@ star_tick(ModeInfo * mi, astar * astars, int d)
 }
 
 static void
-move_trek(starstruct * sp, int direction, int width, int height)
+move_ship(starstruct * sp, int direction, int width, int height)
 {
-	switch (direction) {	/* Format: 0 = N, 1 = NE, etc */
+	switch (direction) {
+		case 0:	/* NORTH */
+			sp->ship.loc.x = NRAND(sp->width);
+			sp->ship.loc.y = -height;
+			sp->ship.delta.x = NRAND(7) - 3;
+			sp->ship.delta.y = NRAND(3) + 1;
+			break;
+		case 1:	/* NORTH EAST */
+			if (LRAND() & 1) {	/* Bottom to Right */
+				sp->ship.loc.x = NRAND(sp->width);
+				sp->ship.loc.y = sp->height;
+			} else {	/* Left to Top */
+				sp->ship.loc.x = -width;
+				sp->ship.loc.y = NRAND(sp->height);
+			}
+			sp->ship.delta.x = NRAND(3) + 1;
+			sp->ship.delta.y = -(NRAND(3) + 1);
+			break;
 		case 2:	/* EAST */
-			sp->trek.loc.x = -width;
-			sp->trek.loc.y = NRAND(sp->height);
-			sp->trek.delta.x = NRAND(3) + 1;
-			sp->trek.delta.y = NRAND(7) - 4;
+			sp->ship.loc.x = -width;
+			sp->ship.loc.y = NRAND(sp->height);
+			sp->ship.delta.x = NRAND(3) + 1;
+			sp->ship.delta.y = NRAND(7) - 3;
 			break;
 		case 3:	/* SOUTH EAST */
 			if (LRAND() & 1) {	/* Top to Right */
-				sp->trek.loc.x = NRAND(sp->width);
-				sp->trek.loc.y = -height;
+				sp->ship.loc.x = NRAND(sp->width);
+				sp->ship.loc.y = -height;
 			} else {	/* Left to Bottom */
-				sp->trek.loc.x = -width;
-				sp->trek.loc.y = NRAND(sp->height);
+				sp->ship.loc.x = -width;
+				sp->ship.loc.y = NRAND(sp->height);
 			}
-			sp->trek.delta.x = NRAND(3) + 1;
-			sp->trek.delta.y = NRAND(3) + 1;
+			sp->ship.delta.x = NRAND(3) + 1;
+			sp->ship.delta.y = NRAND(3) + 1;
 			break;
 		case 4:	/* SOUTH */
-			sp->trek.loc.x = NRAND(sp->width);
-			sp->trek.loc.y = sp->height;
-			sp->trek.delta.x = NRAND(7) - 4;
-			sp->trek.delta.y = -(NRAND(3) + 1);
+			sp->ship.loc.x = NRAND(sp->width);
+			sp->ship.loc.y = sp->height;
+			sp->ship.delta.x = NRAND(7) - 3;
+			sp->ship.delta.y = -(NRAND(3) + 1);
 			break;
-		case 5:	/* SOUTH EAST */
-			if (LRAND() & 1) {	/* Top to Right */
-				sp->trek.loc.x = NRAND(sp->width);
-				sp->trek.loc.y = -height;
-			} else {	/* Left to Bottom */
-				sp->trek.loc.x = sp->width;
-				sp->trek.loc.y = NRAND(sp->height);
+		case 5:	/* SOUTH WEST */
+			if (LRAND() & 1) {	/* Top to Left */
+				sp->ship.loc.x = NRAND(sp->width);
+				sp->ship.loc.y = -height;
+			} else {	/* Right to Bottom */
+				sp->ship.loc.x = sp->width;
+				sp->ship.loc.y = NRAND(sp->height);
 			}
-			sp->trek.delta.x = -(NRAND(3) + 1);
-			sp->trek.delta.y = NRAND(3) + 1;
+			sp->ship.delta.x = -(NRAND(3) + 1);
+			sp->ship.delta.y = NRAND(3) + 1;
 			break;
 		case 6:	/* WEST */
-			sp->trek.loc.x = sp->width;
-			sp->trek.loc.y = NRAND(sp->height);
-			sp->trek.delta.x = -(NRAND(3) + 1);
-			sp->trek.delta.y = NRAND(7) - 4;
+			sp->ship.loc.x = sp->width;
+			sp->ship.loc.y = NRAND(sp->height);
+			sp->ship.delta.x = -(NRAND(3) + 1);
+			sp->ship.delta.y = NRAND(7) - 3;
+			break;
+		case 7:	/* NORTH WEST */
+			if (LRAND() & 1) {	/* Bottom to Left */
+				sp->ship.loc.x = NRAND(sp->width);
+				sp->ship.loc.y = sp->height;
+			} else {	/* Right to Top */
+				sp->ship.loc.x = sp->width;
+				sp->ship.loc.y = NRAND(sp->height);
+			}
+			sp->ship.delta.x = -(NRAND(3) + 1);
+			sp->ship.delta.y = -(NRAND(3) + 1);
 			break;
 		default:
 			(void) printf("not implemented for direction %d", direction);
 			break;
 	}
-	sp->trek.size.x = width;
-	sp->trek.size.y = height;
+	sp->ship.size.x = width;
+	sp->ship.size.y = height;
 }
 
 static void
@@ -352,10 +399,10 @@ free_star_screen(Display *display, starstruct *sp)
 		XFreeGC(display, sp->stippledGC);
 		sp->stippledGC = None;
 	}
-	for (i = 0; i < sp->init_treks; i++) {
-		XFreePixmap(display, sp->trekPixmaps[i]);
+	for (i = 0; i < sp->init_ships; i++) {
+		XFreePixmap(display, sp->shipPixmaps[i]);
 	}
-	/*sp->init_treks = 0;*/
+	/*sp->init_ships = 0;*/
 	sp = NULL;
 }
 
@@ -366,7 +413,7 @@ free_star(ModeInfo * mi)
 }
 
 static void
-draw_trek(ModeInfo * mi)
+draw_ship(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);
 	Window      window = MI_WINDOW(mi);
@@ -374,66 +421,75 @@ draw_trek(ModeInfo * mi)
 	starstruct *sp = &stars[MI_SCREEN(mi)];
 	int         new_one = 0;
 
-	if (TREKIES == sp->current_trek)
+	if (ALL_SHIPS == sp->current_ship) {
 		if (NRAND(10000) < trek) {
-			sp->current_trek = NRAND(TREKIES);
+			sp->current_ship = NRAND(TREKIES);
 			new_one = 1;
-			move_trek(sp, trekie[sp->current_trek].direction,
-				  trekie[sp->current_trek].width, trekie[sp->current_trek].height);
+			move_ship(sp, trekie[sp->current_ship].direction,
+				trekie[sp->current_ship].width,
+				trekie[sp->current_ship].height);
+		} else if (NRAND(10000) < blake) {
+			sp->current_ship = NRAND(BLAKES);
+			new_one = 1;
+			move_ship(sp, dsv2[sp->current_ship].direction,
+				dsv2[sp->current_ship].width,
+				dsv2[sp->current_ship].height);
+			sp->current_ship += TREKIES; 
 		}
-	if (TREKIES != sp->current_trek) {
-		sp->trek.loc.x += sp->trek.delta.x;
-		sp->trek.loc.y += sp->trek.delta.y;
+	}
+	if (ALL_SHIPS != sp->current_ship) {
+		sp->ship.loc.x += sp->ship.delta.x;
+		sp->ship.loc.y += sp->ship.delta.y;
 
-		if ((sp->trek.loc.x < -sp->trek.size.x) ||
-		    (sp->trek.loc.y < -sp->trek.size.y) ||
-		    (sp->trek.loc.y >= sp->height) ||
-		    (sp->trek.loc.x >= sp->width)) {
-			sp->current_trek = TREKIES;
+		if ((sp->ship.loc.x < -sp->ship.size.x) ||
+		    (sp->ship.loc.y < -sp->ship.size.y) ||
+		    (sp->ship.loc.y >= sp->height) ||
+		    (sp->ship.loc.x >= sp->width)) {
+			sp->current_ship = ALL_SHIPS;
 			XSetForeground(display, gc, MI_BLACK_PIXEL(mi));
 			XFillRectangle(display, window, gc,
-				       sp->trek.loc.x - sp->trek.delta.x,
-				       sp->trek.loc.y - sp->trek.delta.y,
-				       sp->trek.size.x, sp->trek.size.y);
+				sp->ship.loc.x - sp->ship.delta.x,
+				sp->ship.loc.y - sp->ship.delta.y,
+				sp->ship.size.x, sp->ship.size.y);
 		} else {
-			int trekx, treky, trekwidth, trekheight;
+			int ship_x, ship_y, ship_width, ship_height;
 
 			XSetForeground(display, sp->stippledGC, MI_WHITE_PIXEL(mi));
-			XSetTSOrigin(display, sp->stippledGC, sp->trek.loc.x, sp->trek.loc.y);
-			XSetStipple(display, sp->stippledGC, sp->trekPixmaps[sp->current_trek]);
+			XSetTSOrigin(display, sp->stippledGC, sp->ship.loc.x, sp->ship.loc.y);
+			XSetStipple(display, sp->stippledGC, sp->shipPixmaps[sp->current_ship]);
 			XSetFillStyle(display, sp->stippledGC, FillOpaqueStippled);
 
-			trekx = sp->trek.loc.x;
-			treky = sp->trek.loc.y,
-			trekwidth = sp->trek.size.x;
-			trekheight = sp->trek.size.y;
+			ship_x = sp->ship.loc.x;
+			ship_y = sp->ship.loc.y,
+			ship_width = sp->ship.size.x;
+			ship_height = sp->ship.size.y;
 			/* Bound checks needed for Sun but does not hurt elsewhere */
-			if (trekx < 0) {
-				trekwidth = sp->trek.size.x + trekx;
-				trekx = 0;
+			if (ship_x < 0) {
+				ship_width = sp->ship.size.x + ship_x;
+				ship_x = 0;
 			}
-			if (treky < 0) {
-				trekheight = sp->trek.size.y + treky;
-				treky = 0;
+			if (ship_y < 0) {
+				ship_height = sp->ship.size.y + ship_y;
+				ship_y = 0;
 			}
 			/* This part is not needed but it jives with above */
-			if (trekx + trekwidth >= sp->width) {
-				trekwidth = sp->width - trekx;
+			if (ship_x + ship_width >= sp->width) {
+				ship_width = sp->width - ship_x;
 			}
-			if (treky + trekheight >= sp->height) {
-				trekheight = sp->height - treky;
+			if (ship_y + ship_height >= sp->height) {
+				ship_height = sp->height - ship_y;
 			}
 			XFillRectangle(display, window, sp->stippledGC,
-				       trekx, treky,
-				       trekwidth, trekheight);
+				       ship_x, ship_y,
+				       ship_width, ship_height);
 
 			if (!new_one) {
 				XSetForeground(display, gc, MI_BLACK_PIXEL(mi));
 				ERASE_IMAGE(display, window, gc,
-					    sp->trek.loc.x, sp->trek.loc.y,
-					 (sp->trek.loc.x - sp->trek.delta.x),
-					 (sp->trek.loc.y - sp->trek.delta.y),
-					    sp->trek.size.x, sp->trek.size.y);
+					sp->ship.loc.x, sp->ship.loc.y,
+					(sp->ship.loc.x - sp->ship.delta.x),
+					(sp->ship.loc.y - sp->ship.delta.y),
+					sp->ship.size.x, sp->ship.size.y);
 
 			}
 		}
@@ -618,13 +674,17 @@ init_pixmaps(ModeInfo * mi)
 				 GCForeground | GCBackground, &gcv)) == None)
 			return False;
 	}
-	if (!sp->init_treks && trek) {
+	if (!sp->init_ships) {
 /* PURIFY 4.0.1 on SunOS4 reports a 3264 byte memory leak on the next line. *
    PURIFY 4.0.1 on Solaris 2 does not report this memory leak. */
-		TREKBITS(enterprise2_bits, enterprise2_width, enterprise2_height);
-		TREKBITS(enterprise3_bits, enterprise3_width, enterprise3_height);
-		TREKBITS(enterprise5_bits, enterprise5_width, enterprise5_height);
-		TREKBITS(enterprise6_bits, enterprise6_width, enterprise6_height);
+		SHIPBITS(enterprise2_bits, enterprise2_width, enterprise2_height);
+		SHIPBITS(enterprise3_bits, enterprise3_width, enterprise3_height);
+		SHIPBITS(enterprise5_bits, enterprise5_width, enterprise5_height);
+		SHIPBITS(enterprise6_bits, enterprise6_width, enterprise6_height);
+		SHIPBITS(liberator1_bits, liberator1_width, liberator1_height);
+		SHIPBITS(liberator2_bits, liberator2_width, liberator2_height);
+		SHIPBITS(liberator6_bits, liberator6_width, liberator6_height);
+		SHIPBITS(liberator7_bits, liberator7_width, liberator7_height);
 	}
 	return True;
 }
@@ -718,7 +778,7 @@ init_star(ModeInfo * mi)
 	sp->move_p = True;
 	sp->dep_x = 0;
 	sp->dep_y = 0;
-	sp->current_trek = TREKIES;
+	sp->current_ship = TREKIES + BLAKES;
 	sp->nstars = MI_COUNT(mi);
 	if (sp->nstars < -MIN_STARS) {
 		if (sp->astars) {
@@ -781,7 +841,7 @@ draw_star(ModeInfo * mi)
 		}
 	}
 	tick_stars(mi, sp->current_delta);
-	draw_trek(mi);
+	draw_ship(mi);
 #if 0
 	/* this is for making stars go backwards, not ready for prime-time */
 	if (!NRAND(500)) {
