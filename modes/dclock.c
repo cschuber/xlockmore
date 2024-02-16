@@ -93,6 +93,7 @@ static const char sccsid[] = "@(#)dclock.c	5.00 2000/11/01 xlockmore";
 	"*cycles: 10000 \n" \
 	"*ncolors: 64 \n" \
 
+# define free_dclock 0
 # define reshape_dclock 0
 # define dclock_handle_event 0
 #define BRIGHT_COLORS
@@ -110,7 +111,7 @@ static const char sccsid[] = "@(#)dclock.c	5.00 2000/11/01 xlockmore";
 #define METRIC 1
 #endif
 
-#if METRIC
+#ifdef METRIC
 #define AREA_MIN 35.303144
 #define AREA_TIME_START 1184193000.0
 #else
@@ -275,7 +276,7 @@ ENTRYPOINT ModeSpecOpt dclock_opts =
 #ifdef USE_MODULES
 ModStruct dclock_description =
 {"dclock", "init_dclock", "draw_dclock", "release_dclock",
- "refresh_dclock", "init_dclock", "free_dclock", &dclock_opts,
+ "refresh_dclock", "init_dclock", (char *) NULL, &dclock_opts,
  10000, 1, 10000, 1, 64, 0.3, "",
  "Shows a floating digital clock or message", 0, NULL};
 
@@ -654,12 +655,6 @@ free_dclock_screen(Display *display, dclockstruct *dp)
 	dp = NULL;
 }
 
-
-ENTRYPOINT void
-free_dclock(ModeInfo * mi)
-{
-        free_dclock_screen(MI_DISPLAY(mi), &dclocks[MI_SCREEN(mi)]);
-}
 
 static void
 drawDclock(ModeInfo * mi)

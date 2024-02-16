@@ -1,4 +1,4 @@
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)logout.c	4.02 97/04/01 xlockmore";
 
 #endif
@@ -34,6 +34,12 @@ static const char sccsid[] = "@(#)logout.c	4.02 97/04/01 xlockmore";
 
 #include "xlock.h"
 #include "iostuff.h"
+
+extern void logoutUser(Display * display
+#ifdef CLOSEDOWN_LOGOUT
+ , int screens
+#endif
+);
 
 #if defined( USE_AUTO_LOGOUT ) || defined( USE_BUTTON_LOGOUT ) || defined( USE_BOMB )
 

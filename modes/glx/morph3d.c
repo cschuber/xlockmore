@@ -770,7 +770,7 @@ draw_icosa(ModeInfo * mi)
 	TRIANGLE(1.5, mp->seno, mp->edgedivisions, (3 * SQRT3 + SQRT15) / 12, mp->VisibleSpikes);
 }
 
-ENTRYPOINT void
+static void
 reshape_morph3d(ModeInfo * mi, int width, int height)
 {
 	morph3dstruct *mp = &morph3d[MI_SCREEN(mi)];

@@ -100,8 +100,8 @@ static const char sccsid[] = "@(#)lament.c	5.03 2001/11/28 xlockmore";
 #define DEFAULTS	"*delay:	10000   \n"	\
 			"*showFps:      False   \n"     \
 			"*wireframe:	False	\n"	\
-			"*texture:	True	\n"
 
+#define free_lament 0
 #define lament_handle_event 0
 #include "xlockmore.h"
 #else /* !STANDALONE */
@@ -149,11 +149,10 @@ ModStruct   lament_description =
 #ifdef HAVE_XPM
 #include "xpm-ximage.h"
 
-#ifdef STANDALONE
+#if 0
 #include "../images/lament.xpm"
-#else
-#include "pixmaps/lament.xpm"
 #endif
+#include "pixmaps/lament.xpm"
 #endif
 
 #define RANDSIGN() ((LRAND() & 1) ? 1 : -1)
@@ -2165,7 +2164,7 @@ rotate(GLfloat * pos, GLfloat * v, GLfloat * dv, GLfloat max_v, Bool verbose)
 /* Window management, etc
  */
 
-ENTRYPOINT void
+static void
 reshape_lament(ModeInfo *mi, int width, int height)
 {
 	int         target_size = 180;
@@ -2232,12 +2231,6 @@ free_lament_screen(Display *display, lament_configuration *lc)
 		lc->texture = None;
 	}
 	lc = NULL;
-}
-
-ENTRYPOINT void
-free_lament(ModeInfo *mi)
-{
-	free_lament_screen(MI_DISPLAY(mi), &lcs[MI_SCREEN(mi)]);
 }
 
 static Bool

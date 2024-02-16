@@ -36,6 +36,7 @@ static const char sccsid[] = "@(#)sproingies.c	5.00 2000/11/01 xlockmore";
 
 #include <GL/gl.h>
 #include "buildlwo.h"
+#include "sproingies.h"
 
 #define MAXSPROING 100
 #define T_COUNT 40
@@ -56,8 +57,6 @@ typedef struct {
 
 static sp_instance *si_list = (sp_instance *) NULL;
 static int  active_screens = 0;
-
-void        SproingieSwap(void);
 
 extern struct lwo LWO_s1_1, LWO_s1_2, LWO_s1_3, LWO_s1_4;
 extern struct lwo LWO_s1_5, LWO_s1_6, LWO_s1_b;

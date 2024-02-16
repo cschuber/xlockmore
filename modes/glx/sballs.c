@@ -45,11 +45,8 @@ static const char sccsid[] = "@(#)sballs.c	5.02 2001/03/10 xlockmore";
 # define DEFAULTS 	"*delay: 	40000 \n" \
  			"*size: 	    0 \n" \
 			"*cycles:	   10 \n" \
- 			"*object: 	    0 \n" \
- 			"*trackmouse: 	False \n" \
  			"*showFPS: 	False \n" \
  			"*wireframe:  	False \n" \
- 			"*texture:  	True  \n"
 
 # define free_sballs 0
 # define sballs_handle_event 0
@@ -71,13 +68,12 @@ static const char sccsid[] = "@(#)sballs.c	5.02 2001/03/10 xlockmore";
 #ifdef HAVE_XPM
 #include "xpm-ximage.h"
 
-#ifdef STANDALONE
+#if 0
 #include "../images/face.xpm"
 #include "../images/back.xpm"
-#else /* !STANDALONE */
+#endif /* !STANDALONE */
 #include "pixmaps/face.xpm"
 #include "pixmaps/back.xpm"
-#endif /* !STANDALONE */
 #endif /* HAVE_XPM */
 
 /* Manage option vars */
@@ -543,7 +539,7 @@ static void drawSphere(ModeInfo * mi,int sphere_num)
  *-----------------------------------------------------------------------------
  */
 
-ENTRYPOINT void
+static void
 reshape_sballs(ModeInfo * mi, int width, int height)
 {
 

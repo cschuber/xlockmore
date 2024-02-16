@@ -39,6 +39,7 @@ static const char sccsid[] = "@(#)discrete.c	5.00 2000/11/01 xlockmore";
 	"*cycles: 2500 \n" \
 	"*ncolors: 100 \n" \
 
+# define free_discrete 0
 # define reshape_discrete 0
 # define discrete_handle_event 0
 #define SMOOTH_COLORS
@@ -55,7 +56,7 @@ ENTRYPOINT ModeSpecOpt discrete_opts =
 #ifdef USE_MODULES
 ModStruct   discrete_description =
 {"discrete", "init_discrete", "draw_discrete", "release_discrete",
- "refresh_discrete", "init_discrete", "free_discrete", &discrete_opts,
+ "refresh_discrete", "init_discrete", (char *) NULL, &discrete_opts,
  1000, 4096, 2500, 1, 64, 1.0, "",
  "Shows various discrete maps", 0, NULL};
 
@@ -113,12 +114,6 @@ free_discrete_screen(discretestruct *hp)
 		/* hp->pointBuffer = NULL; */
 	}
 	hp = NULL;
-}
-
-ENTRYPOINT void
-free_discrete(ModeInfo * mi)
-{
-        free_discrete_screen(&discretes[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

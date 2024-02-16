@@ -61,27 +61,31 @@ static const char sccsid[] = "@(#)text3d.cc	5.02 2001/11/09 xlockmore";
 
 #ifdef STANDALONE	/* xscreensaver mode: can't work ! */
 #define MODE_text3d
-#define DEFAULTS 	"*delay: 	100000 \n" \
- 			"*ncolors: 	    64 \n" \
- 			"*font: 	       \n" \
- 			"*text: 	       \n" \
+#define DEFAULTS 	"*delay: 	100000 \n"
+
+/* 			"*ncolors: 	    64 \n" \
+ 			"*font:	     arial.ttf \n" \
+ 			"*text:X-Window System \n"
+
  			"*filename: 	       \n" \
  			"*fortunefile: 	       \n" \
- 			"*program: 	       \n"
+ 			"*program: 	       \n"*/
 
 #define free_text3d 0
+#define text3d_handle_event 0
 extern "C"
 {
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+  #include "xlockmore.h"	/* from the xscreensaver distribution */
+  /*#include "iostuff.h"*/
 }
 #else				/* !STANDALONE */
-#include "xlock.h"		/* from the xlockmore distribution */
-#include "visgl.h"
-#ifdef HAS_MMOV
-#undef error
-#endif
+  #include "xlock.h"		/* from the xlockmore distribution */
+  #include "visgl.h"
+  #ifdef HAS_MMOV
+    #undef error
+  #endif
+  #include "iostuff.h"
 #endif				/* !STANDALONE */
-#include "iostuff.h"
 
 #ifdef MODE_text3d
 
@@ -99,28 +103,34 @@ extern "C"
 #include <GL/glu.h>
 
 /* Yes, it's an ugly mix of 'C' and 'C++' functions */
+#ifndef STANDALONE
 extern "C" { void init_text3d(ModeInfo * mi); }
 extern "C" { void draw_text3d(ModeInfo * mi); }
 extern "C" { void change_text3d(ModeInfo * mi); }
 extern "C" { void release_text3d(ModeInfo * mi); }
 extern "C" { void refresh_text3d(ModeInfo * mi); }
+#endif
 
 /* arial.ttf is not supplied for legal reasons. */
 /* NT and Windows 3.1 in c:\WINDOWS\SYSTEM\ARIAL.TTF */
-/* Windows95 in c:\windows\fonts\arial.ttf */
+/* Windows95 in C:\Windows\Fonts\arial.ttf */
 
 #ifndef DEF_TTFONT
 /* Directory of only *.ttf */
 /* symbol.ttf and wingding.ttf should be excluded or it may core dump */
 /* can be excluded if gltt is modified see README */
+#ifdef __CYGWIN__
+#define DEF_TTFONT "C:\\Windows\\Fonts\\"
+#else
 #define DEF_TTFONT "/usr/lib/X11/xlock/fonts/"
+#endif
 #endif
 
 #define DEF_EXTRUSION  "25.0"
 #define DEF_ROTAMPL  "1.0"
 #define DEF_ROTFREQ  "0.001"
 #define DEF_FONTSIZE  220
-#define DEF_NOSPLIT	0
+#define DEF_NOSPLIT   "False"
 #define DEF_ANIMATE   "Default"
 static float extrusion;
 static float rampl;
@@ -134,35 +144,35 @@ static char *animate;
 static XrmOptionDescRec opts[] =
 {
     {(char *) "-ttfont", (char *) ".text3d.ttfont", XrmoptionSepArg, (caddr_t) NULL},
+    {(char *) "-no_split", (char *) ".text3d.no_split", XrmoptionNoArg, (caddr_t) "on"},
+    {(char *) "+no_split", (char *) ".text3d.no_split", XrmoptionNoArg, (caddr_t) "off"},
     {(char *) "-extrusion", (char *) ".text3d.extrusion", XrmoptionSepArg, (caddr_t) NULL},
     {(char *) "-rot_amplitude", (char *) ".text3d.rot_amplitude", XrmoptionSepArg, (caddr_t) NULL},
     {(char *) "-rot_frequency", (char *) ".text3d.rot_frequency", XrmoptionSepArg, (caddr_t) NULL},
-    {(char *) "-no_split", (char *) ".text3d.no_split", XrmoptionNoArg, (caddr_t) "on"},
-    {(char *) "+no_split", (char *) ".text3d.no_split", XrmoptionNoArg, (caddr_t) "off"},
     {(char *) "-ttanimate", (char *) ".text3d.ttanimate", XrmoptionSepArg, (caddr_t) NULL},
 };
 
 static argtype vars[] =
 {
     {(void *) & mode_font, (char *) "ttfont", (char *) "TTFont", (char *) DEF_TTFONT, t_String},
+    {(void *) & nosplit, (char *) "no_split", (char *) "NoSplit", (char *) DEF_NOSPLIT, t_Bool},
     {(void *) & extrusion, (char *) "extrusion", (char *) "Extrusion", (char *) DEF_EXTRUSION, t_Float},
     {(void *) & rampl, (char *) "rot_amplitude", (char *) "RotationAmplitude", (char *) DEF_ROTAMPL, t_Float},
     {(void *) & rfreq, (char *) "rot_frequency", (char *) "RotationFrequency", (char *) DEF_ROTFREQ, t_Float},
-    {(void *) & nosplit, (char *) "no_split", (char *) "NoSplit", (char *) DEF_NOSPLIT, t_Bool},
     {(void *) & animate, (char *) "ttanimate", (char *) "TTAnimate", (char *) DEF_ANIMATE, t_String},
 };
 
 static OptionStruct desc[] =
 {
     {(char *) "-ttfont filename", (char *) "Text3d TrueType font file name"},
+    {(char *) "-/+no_split", (char *) "Text3d words splitting off/on"},
     {(char *) "-extrusion float", (char *) "Text3d extrusion length"},
     {(char *) "-rot_amplitude float", (char *) "Text3d rotation amplitude"},
     {(char *) "-rot_frequency float", (char *) "Text3d rotation frequency"},
-    {(char *) "-/+no_split", (char *) "Text3d words splitting off/on"},
     {(char *) "-ttanimate anim_name", (char *) "Text3d animation function"},
 };
 
-ModeSpecOpt text3d_opts =
+ENTRYPOINT ModeSpecOpt text3d_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -647,6 +657,7 @@ static void
     int text_length;
     char *c_text;
 
+#ifndef STANDALONE
     if (!nosplit)
     {
 	text_length = index_dir(tp->words, (char *) " ");
@@ -656,6 +667,7 @@ static void
 	strncpy(c_text, tp->words, text_length);
     }
     else
+#endif
     {
 	c_text = tp->words_start;
 	text_length = strlen(tp->words_start);
@@ -738,8 +750,10 @@ static void
 	t->triangulate();
     }
 
+#ifndef STANDALONE
     if (!nosplit)
 	free(c_text);
+#endif
     if (size_x == 0.0)
     {
 	(void) fprintf(stderr, "Please give something to draw !\n");
@@ -1037,6 +1051,32 @@ static void
 
 /*
  *-----------------------------------------------------------------------------
+ *    The display is being taken away from us.  Free up malloc'ed
+ *      memory and X resources that we've alloc'ed.  Only called
+ *      once, we must zap everything for every screen.
+ *-----------------------------------------------------------------------------
+ */
+
+ENTRYPOINT void
+ release_text3d(ModeInfo * mi)
+{
+    if (text3d != NULL)
+    {
+	for (int screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+	{
+	    text3dstruct *tp = &text3d[screen];
+
+	    if (tp->face)
+		delete tp->face;
+	}
+	free(text3d);
+	text3d = (text3dstruct *) NULL;
+    }
+    FreeAllGL(mi);
+}
+
+/*
+ *-----------------------------------------------------------------------------
  *    Initialize text3d.  Called each time the window changes.
  *-----------------------------------------------------------------------------
  */
@@ -1093,8 +1133,12 @@ ENTRYPOINT void
     }
 
     tp->counter = 0;
-
+#ifdef STANDALONE
+	if ((fontfile = (char *) malloc(strlen(mode_font) + 10)) != NULL)
+		sprintf(fontfile, "%s%s", mode_font, "arial.ttf");
+#else
 	fontfile = getModeFont(mode_font);
+#endif
 	if (!fontfile) {
 		MI_CLEARWINDOW(mi);
 		release_text3d(mi);
@@ -1168,6 +1212,7 @@ ENTRYPOINT void
     if (!tp->glx_context)
 	return;
     tp->counter = tp->counter + 1;
+#ifndef STANDALONE
     if (tp->counter > (MI_CYCLES(mi) & !nosplit))
     {
 	int text_length = index_dir(tp->words, (char *) " ");
@@ -1184,6 +1229,7 @@ ENTRYPOINT void
 		getWords(MI_SCREEN(mi), MI_NUM_SCREENS(mi));
 	}
     }
+#endif
     glDrawBuffer(GL_BACK);
 #ifdef WIN32
     wglMakeCurrent(hdc, tp->glx_context);
@@ -1201,32 +1247,6 @@ ENTRYPOINT void
 		       MI_NAME(mi), tp->camera_dist, tp->theta, tp->phi,
 		       tp->extrusion, tp->rampl,tp->rfreq,tp->direction);
     }
-}
-
-/*
- *-----------------------------------------------------------------------------
- *    The display is being taken away from us.  Free up malloc'ed
- *      memory and X resources that we've alloc'ed.  Only called
- *      once, we must zap everything for every screen.
- *-----------------------------------------------------------------------------
- */
-
-ENTRYPOINT void
- release_text3d(ModeInfo * mi)
-{
-    if (text3d != NULL)
-    {
-	for (int screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-	{
-	    text3dstruct *tp = &text3d[screen];
-
-	    if (tp->face)
-		delete tp->face;
-	}
-	free(text3d);
-	text3d = (text3dstruct *) NULL;
-    }
-    FreeAllGL(mi);
 }
 
 #ifndef STANDALONE
@@ -1256,5 +1276,7 @@ ENTRYPOINT void
 #endif
 }
 #endif
+
+XSCREENSAVER_MODULE ("Text3d", text3d)
 
 #endif				/* MODE_text3d */

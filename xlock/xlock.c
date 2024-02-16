@@ -905,13 +905,13 @@ static int  signalUSR2 = 0;
 static int  timex, timey;	/* position for the times */
 static unsigned long start_time;
 static Bool fullscreen = False;
+static char *plantext[TEXTLINES + 2];	/* Message is stored here */
 #endif
 
 static int  sstimeout;		/* screen saver parameters */
 static int  ssinterval;
 static int  ssblanking;
 static int  ssexposures;
-static char *plantext[TEXTLINES + 2];	/* Message is stored here */
 
 #if defined( USE_AUTO_LOGOUT ) || defined( USE_BUTTON_LOGOUT )
 static int  tried_logout = 0;
@@ -2229,8 +2229,11 @@ modeDescription(ModeInfo * mi)
 	putText(dsp, Scr[scrn].window, Scr[scrn].textgc, "\n", False, left, &x, &y);
 }
 
-void
-update_plan() /* updates current time in plantext */
+/* WIN32 machines handle reading passwords automatically */
+#ifndef WIN32
+
+static void
+update_plan(void) /* updates current time in plantext */
 {
 	if (showdate) {
 		time_t t;
@@ -2242,9 +2245,6 @@ update_plan() /* updates current time in plantext */
 		}
 	}
 }
-
-/* WIN32 machines handle reading passwords automatically */
-#ifndef WIN32
 
 static int
 getPassword(void)

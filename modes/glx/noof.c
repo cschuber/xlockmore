@@ -101,7 +101,7 @@ static void drawleaf(noofstruct *np, int l);
 static void initshapes(noofstruct *np, int i);
 
 /* new window size or exposure */
-ENTRYPOINT void
+static void
 reshape_noof(ModeInfo *mi, int width, int height)
 {
 	noofstruct *np;

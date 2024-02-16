@@ -32,10 +32,11 @@ static const char sccsid[] = "@(#)xjack.c	5.00 2000/11/01 xlockmore";
 #ifdef STANDALONE
 #define MODE_xjack
 #define DEFAULTS "*delay: 50000 \n" \
-	"*font: fixed \n" \
+	"*font: fixed\n" \
 	"*text: \n" \
 	"*fullrandom: True \n" \
 
+# define free_xjack 0
 # define reshape_xjack 0
 # define xjack_handle_event 0
 #define DEF_FONT "-*-courier-medium-r-*-*-*-240-*-*-m-*-*-*",
@@ -55,13 +56,13 @@ ENTRYPOINT ModeSpecOpt xjack_opts =
 #ifdef USE_MODULES
 ModStruct xjack_description =
 {"xjack", "init_xjack", "draw_xjack", "release_xjack",
- "init_xjack", "init_xjack", "free_xjack", &xjack_opts,
+ "init_xjack", "init_xjack", (char *) NULL, &xjack_opts,
  50000, 1, 1, 1, 64, 1.0, "",
  "Shows Jack having one of those days", 0, NULL};
 
 #endif
 
-#if USE_MB
+#ifdef USE_MB
 static int font_height(XFontStruct *f)
 {
         XRectangle mbRect;
@@ -119,17 +120,10 @@ free_xjack_screen(Display *display, jackstruct *jp)
 	if (jp == NULL) {
 		return;
 	}
-	if (jp->gc)
+	if (jp->gc != None)
 		XFreeGC(display, jp->gc);
 	jp = NULL;
 }
-
-ENTRYPOINT void
-free_xjack(ModeInfo * mi)
-{
-	free_xjack_screen(MI_DISPLAY(mi), &jacks[MI_SCREEN(mi)]);
-}
-
 
 ENTRYPOINT void
 release_xjack(ModeInfo * mi)

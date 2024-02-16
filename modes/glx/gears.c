@@ -50,6 +50,7 @@ static const char sccsid[] = "@(#)gears.c	5.03 2001/11/28 xlockmore";
 					"*showFps:      	False   \n"	\
 					"*wireframe:		False	\n"
 
+#define free_gears 0
 #define gears_handle_event 0
 # include "xlockmore.h"				/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
@@ -92,7 +93,7 @@ ENTRYPOINT ModeSpecOpt gears_opts =
 #ifdef USE_MODULES
 ModStruct   gears_description =
 {"gears", "init_gears", "draw_gears", "release_gears",
- "draw_gears", "init_gears", "free_gears", &gears_opts,
+ "draw_gears", "init_gears", (char *) NULL, &gears_opts,
  50000, 1, 2, 0, 64, 1.0, "",
  "Shows GL's gears", 0, NULL};
 
@@ -636,7 +637,7 @@ draw(ModeInfo * mi)
 
 
 /* new window size or exposure */
-ENTRYPOINT void
+static void
 reshape_gears(ModeInfo *mi, int width, int height)
 {
 	gearsstruct *gp = &gears[MI_SCREEN(mi)];
@@ -717,11 +718,6 @@ free_gears_screen(Display *display, gearsstruct *gp)
 #endif
 	}
 	gp = NULL;
-}
-
-ENTRYPOINT void
-free_gears(ModeInfo *mi) {
-	free_gears_screen(MI_DISPLAY(mi), &gears[MI_SCREEN(mi)]);
 }
 
 static Bool

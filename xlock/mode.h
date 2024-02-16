@@ -877,6 +877,14 @@ extern ModeHook refresh_fadeplot;
 extern ModeSpecOpt fadeplot_opts;
 #endif
 
+#ifdef MODE_fiberlamp
+extern ModeHook init_fiberlamp;
+extern ModeHook draw_fiberlamp;
+extern ModeHook release_fiberlamp;
+extern ModeHook change_fiberlamp;
+extern ModeSpecOpt fiberlamp_opts;
+#endif
+
 #ifdef MODE_fire
 extern ModeHook init_fire;
 extern ModeHook draw_fire;
@@ -884,14 +892,6 @@ extern ModeHook release_fire;
 extern ModeHook refresh_fire;
 extern ModeHook change_fire;
 extern ModeSpecOpt fire_opts;
-#endif
-
-#ifdef MODE_fiberlamp
-extern ModeHook init_fiberlamp;
-extern ModeHook draw_fiberlamp;
-extern ModeHook release_fiberlamp;
-extern ModeHook change_fiberlamp;
-extern ModeSpecOpt fiberlamp_opts;
 #endif
 
 #ifdef MODE_flag
@@ -1053,20 +1053,20 @@ extern ModeHook refresh_julia;
 extern ModeSpecOpt julia_opts;
 #endif
 
-#ifdef MODE_kaleid2
-extern ModeHook init_kaleid2;
-extern ModeHook draw_kaleid2;
-extern ModeHook release_kaleid2;
-extern ModeHook refresh_kaleid2;
-extern ModeSpecOpt kaleid2_opts;
-#endif
-
 #ifdef MODE_kaleid
 extern ModeHook init_kaleid;
 extern ModeHook draw_kaleid;
 extern ModeHook release_kaleid;
 extern ModeHook refresh_kaleid;
 extern ModeSpecOpt kaleid_opts;
+#endif
+
+#ifdef MODE_kaleid2
+extern ModeHook init_kaleid2;
+extern ModeHook draw_kaleid2;
+extern ModeHook release_kaleid2;
+extern ModeHook refresh_kaleid2;
+extern ModeSpecOpt kaleid2_opts;
 #endif
 
 #ifdef MODE_kumppa
@@ -1339,6 +1339,7 @@ extern ModeHook init_qix;
 extern ModeHook draw_qix;
 extern ModeHook release_qix;
 extern ModeHook refresh_qix;
+extern ModeHook free_qix;
 extern ModeSpecOpt qix_opts;
 #endif
 

@@ -46,9 +46,18 @@ static const char sccsid[] = "@(#)puzzle.c	5.00 2000/11/01 xlockmore";
 	"*ncolors: 64 \n" \
 	"*bitmap: \n" \
 
+# define free_puzzle 0
 # define reshape_puzzle 0
 # define puzzle_handle_event 0
+# define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
+static XImage blogo =
+{
+	0, 0,			/* width, height */
+	0, XYBitmap, 0,		/* xoffset, format, data */
+	LSBFirst, 8,		/* byte-order, bitmap-unit */
+	LSBFirst, 8, 1		/* bitmap-bit-order, bitmap-pad, depth */
+};
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #include "color.h"
@@ -63,23 +72,34 @@ ENTRYPOINT ModeSpecOpt puzzle_opts =
 #ifdef USE_MODULES
 ModStruct   puzzle_description =
 {"puzzle", "init_puzzle", "draw_puzzle", "release_puzzle",
- "init_puzzle", "init_puzzle", "free_puzzle", &puzzle_opts,
+ "init_puzzle", "init_puzzle", (char *) NULL, &puzzle_opts,
  10000, 250, 1, 1, 64, 1.0, "",
  "Shows a puzzle being scrambled and then solved", 0, NULL};
 
 #endif
 
-#ifndef STANDALONE
-#define PUZZLE_WIDTH   image_width
-#define PUZZLE_HEIGHT    image_height
-#define PUZZLE_BITS    image_bits
+#ifdef STANDALONE
+#define PUZZLE_WIDTH	xscreensaver_width
+#define PUZZLE_HEIGHT	xscreensaver_height
+#define PUZZLE_BITS	xscreensaver_bits
+#include "bitmaps/xscreensaver.xbm"
+#else
+#define PUZZLE_WIDTH	image_width
+#define PUZZLE_HEIGHT	image_height
+#define PUZZLE_BITS	image_bits
 #include "puzzle.xbm"
+#endif
 
 #ifdef HAVE_XPM
-#define PUZZLE_NAME    image_name
+#ifdef STANDALONE
+#include <X11/xpm.h>
+#define PUZZLE_NAME	xscreensaver
+#include "pixmaps/xscreensaver.xpm"
+#else
+#define PUZZLE_NAME	image_name
 #include "puzzle.xpm"
-#define DEFAULT_XPM 1
 #endif
+#define DEFAULT_XPM 1
 #endif
 
 #define NOWAY 255
@@ -162,11 +182,6 @@ free_puzzle_screen(Display * display, puzzlestruct * pp)
 	}
 #endif
 	pp = NULL;
-}
-
-ENTRYPOINT void
-free_puzzle(ModeInfo * mi) {
-	free_puzzle_screen(MI_DISPLAY(mi), &puzzles[MI_SCREEN(mi)]);
 }
 
 #ifdef NUMBERED
@@ -443,7 +458,34 @@ static Bool
 init_stuff(ModeInfo * mi)
 {
 	puzzlestruct *pp = &puzzles[MI_SCREEN(mi)];
-#ifndef STANDALONE
+#ifdef STANDALONE
+#ifdef HAVE_XPM
+	XpmAttributes attrib;
+	attrib.visual = MI_VISUAL(mi);
+	attrib.colormap = MI_COLORMAP(mi);
+	attrib.depth = MI_DEPTH(mi);
+	attrib.valuemask = XpmVisual | XpmColormap | XpmDepth;
+	if (MI_NPIXELS(mi) > 2 &&
+			(XpmSuccess == XpmCreateImageFromData(MI_DISPLAY(mi),
+			PUZZLE_NAME, &(pp->logo), (XImage **) NULL, &attrib))) {
+		pp->graphics_format = IS_XPM;
+	} else
+#endif
+	{
+
+		int default_width = PUZZLE_WIDTH;
+		int default_height = PUZZLE_HEIGHT;
+		unsigned char * default_bits = PUZZLE_BITS;
+		if (!blogo.data) {
+			blogo.data = (char *) default_bits;
+			blogo.width = default_width;
+			blogo.height = default_height;
+			blogo.bytes_per_line = (blogo.width + 7) / 8;
+		}
+		pp->logo = &blogo;
+		pp->graphics_format = IS_XBM;
+	}
+#else
 	Display    *display = MI_DISPLAY(mi);
 
 	if (pp->logo == None)

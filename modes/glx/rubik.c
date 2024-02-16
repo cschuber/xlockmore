@@ -116,6 +116,7 @@ static const char sccsid[] = "@(#)rubik.c	5.01 2001/03/01 xlockmore";
 			"*size: -6 \n" \
 			"*suppressRotationAnimation: True\n" \
 
+# define free_rubik 0
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 # include "gltrackball.h"
 #else /* !STANDALONE */
@@ -168,7 +169,7 @@ ENTRYPOINT ModeSpecOpt rubik_opts =
 #ifdef USE_MODULES
 ModStruct   rubik_description =
 {"rubik", "init_rubik", "draw_rubik", "release_rubik",
- "draw_rubik", "change_rubik", "free_rubik", &rubik_opts,
+ "draw_rubik", "change_rubik", (char *) NULL, &rubik_opts,
  100000, -30, 5, -6, 64, 1.0, "",
  "Shows an auto-solving Rubik's Cube", 0, NULL};
 
@@ -491,21 +492,24 @@ static void
 faceSizes(rubikstruct * rp, int face, int * sizeOfRow, int * sizeOfColumn)
 {
 	switch (face) {
-		case 0: /* TOP */
-		case 4: /* BOTTOM */
-			*sizeOfRow = MAXSIZEX;
-			*sizeOfColumn = MAXSIZEZ;
-			break;
-		case 1: /* LEFT */
-		case 3: /* RIGHT */
-			*sizeOfRow = MAXSIZEZ;
-			*sizeOfColumn = MAXSIZEY;
-			break;
-		case 2: /* FRONT */
-		case 5: /* BACK */
-			*sizeOfRow = MAXSIZEX;
-			*sizeOfColumn = MAXSIZEY;
-			break;
+	case 0: /* TOP */
+	case 4: /* BOTTOM */
+		*sizeOfRow = MAXSIZEX;
+		*sizeOfColumn = MAXSIZEZ;
+		break;
+	case 1: /* LEFT */
+	case 3: /* RIGHT */
+		*sizeOfRow = MAXSIZEZ;
+		*sizeOfColumn = MAXSIZEY;
+		break;
+	case 2: /* FRONT */
+	case 5: /* BACK */
+		*sizeOfRow = MAXSIZEX;
+		*sizeOfColumn = MAXSIZEY;
+		break;
+	default:
+		*sizeOfRow = 0;
+		*sizeOfColumn = 0;
 	}
 }
 
@@ -2066,12 +2070,6 @@ free_rubik_screen(rubikstruct *rp)
 		rp->moves = (RubikMove *) NULL;
 	}
 	rp = NULL;
-}
-
-ENTRYPOINT void
-free_rubik(ModeInfo * mi)
-{
-	free_rubik_screen(&rubik[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

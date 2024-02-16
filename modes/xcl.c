@@ -32,6 +32,7 @@ static const char sccsid[] = "@(#)xcl.c    5.00 2000/11/01 xlockmore";
 #define DEFAULTS "*delay: 20000 \n" \
 	"*count: 2 \n" \
 
+# define free_xcl 0
 # define reshape_xcl 0
 # define xcl_handle_event 0
 #define UNIFORM_COLORS
@@ -121,7 +122,7 @@ ENTRYPOINT ModeSpecOpt xcl_opts =
 #ifdef USE_MODULES    /* for xlockmore */
 ModStruct   xcl_description =
 {"xcl", "init_xcl", "draw_xcl", "release_xcl",
- "draw_xcl", "init_xcl", "free_xcl", &xcl_opts ,
+ "draw_xcl", "init_xcl", (char *) NULL, &xcl_opts ,
  20000, -3, 1, 1, 64, 1.0, "",
  "Shows a control line combat model race", 0, NULL};
 #endif
@@ -296,13 +297,6 @@ free_xcl_screen(Display *display, xclstruct  *dp)
     }
     dp = NULL;
 }
-
-ENTRYPOINT void
-free_xcl(ModeInfo * mi)
-{
-	free_xcl_screen(MI_DISPLAY(mi), &xcls[MI_SCREEN(mi)]);
-}
-
 
 ENTRYPOINT void
 init_xcl(ModeInfo * mi)

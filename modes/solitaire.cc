@@ -1,7 +1,7 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* solitaire --- Shows a pointless game, used in the Mandarin Candidate */
 
-#if !defined( lint ) && !defined( SABER ) && !defined( STANDALONE )
+#if 0
 static const char sccsid[] = "@(#)solitaire.cc	5.00 2000/11/01 xlockmore";
 
 #endif
@@ -48,8 +48,11 @@ static const char sccsid[] = "@(#)solitaire.cc	5.00 2000/11/01 xlockmore";
 # define reshape_solitaire 0
 # define free_solitaire 0
 # define solitaire_handle_event 0
-
-#include "xlockmore.h"		/* from the xscreensaver distribution */
+#define UNIFORM_COLORS
+extern "C"
+{
+  #include "xlockmore.h"		/* from the xscreensaver distribution */
+}
 #else				/* !STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #endif				/* !STANDALONE */
@@ -126,84 +129,122 @@ font_width(XFontStruct * font, char ch)
 }
 #endif
 
-// I am probably not thinking object oriented here...
-void
-drawSuit(ModeInfo * mi, Suits suit, int x, int y, int width, int height)
+static void
+drawSpade(ModeInfo * mi, int x, int y, int width, int height)
 {
 	Display    *display = MI_DISPLAY(mi);
 	Window      window = MI_WINDOW(mi);
 	GC          gc = MI_GC(mi);
-	XPoint			polygon[4];
+	XPoint      polygon[4];
 
+	polygon[0].x =  x + width / 2;
+	polygon[0].y =  y;
+	polygon[1].x =  short(float(-width) / 3.0);
+	polygon[1].y =  height / 3;
+	polygon[2].x =  short(float(width) / 3.0);
+	polygon[2].y =  height / 3;
+	polygon[3].x =  short(float(width) / 3.0) + 1;
+	polygon[3].y =  -height / 3;
+	XFillPolygon(display, window, gc,
+		polygon, 4, Convex, CoordModePrevious);
+	XFillArc(display, window, gc,
+		x, y + height / 3, width / 2, height / 2, 0, 23040);
+	XFillArc(display, window, gc,
+		x + width / 2, y + height / 3, width / 2, height / 2, 0, 23040);
+	polygon[0].x =  x + width / 2;
+	polygon[0].y =  y + height / 2;
+	polygon[1].x =  -width / 8;
+	polygon[1].y =  height / 2;
+	polygon[2].x =  width / 4;
+	polygon[2].y =  0;
+	XFillPolygon(display, window, gc,
+		polygon, 3, Convex, CoordModePrevious);
+}
+
+static void
+drawDiamond(ModeInfo * mi, int x, int y, int width, int height)
+{
+	Display    *display = MI_DISPLAY(mi);
+	Window      window = MI_WINDOW(mi);
+	GC          gc = MI_GC(mi);
+	XPoint      polygon[4];
+
+	polygon[0].x =  x + width / 2;
+	polygon[0].y =  y;
+	polygon[1].x =  -width / 2;
+	polygon[1].y =  height / 2;
+	polygon[2].x =  width / 2;
+	polygon[2].y =  height / 2;
+	polygon[3].x =  width / 2;
+	polygon[3].y =  -height / 2;
+	XFillPolygon(display, window, gc,
+		polygon, 4, Convex, CoordModePrevious);
+}
+
+static void
+drawClub(ModeInfo * mi, int x, int y, int width, int height)
+{
+	Display    *display = MI_DISPLAY(mi);
+	Window      window = MI_WINDOW(mi);
+	GC          gc = MI_GC(mi);
+	XPoint      polygon[3];
+
+	XFillArc(display, window, gc,
+		x, y + short(float(height) / 3.6), width / 2, height / 2, 0, 23040);
+	XFillArc(display, window, gc,
+		x + width / 2, y + short(float(height) / 3.6), width / 2, height / 2, 0, 23040);
+	XFillArc(display, window, gc,
+		x + width / 4, y, width / 2, height / 2, 0, 23040);
+	polygon[0].x =  x + width / 2;
+	polygon[0].y =  y + height / 2 - 2;
+	polygon[1].x =  -width / 8 - 1;
+	polygon[1].y =  height / 2 + 2;
+	polygon[2].x =  width / 4;
+	polygon[2].y =  0;
+	XFillPolygon(display, window, gc,
+		polygon, 3, Convex, CoordModePrevious);
+}
+
+static void
+drawHeart(ModeInfo * mi, int x, int y, int width, int height)
+{
+	Display    *display = MI_DISPLAY(mi);
+	Window      window = MI_WINDOW(mi);
+	GC          gc = MI_GC(mi);
+	XPoint      polygon[4];
+
+	XFillArc(display, window, gc,
+		x + 1, y, width / 2, height / 2, 0, 23040);
+	XFillArc(display, window, gc,
+		x + width / 2 - 1, y, width / 2, height / 2, 0, 23040);
+	polygon[0].x =  x + width / 2;
+	polygon[0].y =  y + short(float(height) / 4.1);
+	polygon[1].x =  short(float(-width) / 2.7);
+	polygon[1].y =  short(float(height) / 4.1);
+	polygon[2].x =  short(float(width) / 2.7);
+	polygon[2].y =  short(float(height) / 2.05);
+	polygon[3].x =  short(float(width) / 2.7);
+	polygon[3].y =  short(float(-height) / 2.05);
+	XFillPolygon(display, window, gc,
+		polygon, 4, Convex, CoordModePrevious);
+}
+
+void
+drawSuit(ModeInfo * mi, Suits suit, int x, int y, int width, int height)
+{
 	switch (suit) {
-		case spade:
-			polygon[0].x =  x + width / 2;
-			polygon[0].y =  y;
-			polygon[1].x =  short(float(-width) / 3.0);
-			polygon[1].y =  height / 3;
-			polygon[2].x =  short(float(width) / 3.0);
-			polygon[2].y =  height / 3;
-			polygon[3].x =  short(float(width) / 3.0) + 1;
-			polygon[3].y =  -height / 3;
-			XFillPolygon(display, window, gc,
-				polygon, 4, Convex, CoordModePrevious);
-			XFillArc(display, window, gc,
-				x, y + height / 3, width / 2, height / 2, 0, 23040);
-			XFillArc(display, window, gc,
-				x + width / 2, y + height / 3, width / 2, height / 2, 0, 23040);
-			polygon[0].x =  x + width / 2;
-			polygon[0].y =  y + height / 2;
-			polygon[1].x =  -width / 8;
-			polygon[1].y =  height / 2;
-			polygon[2].x =  width / 4;
-			polygon[2].y =  0;
-			XFillPolygon(display, window, gc,
-				polygon, 3, Convex, CoordModePrevious);
-			break;
-		case diamond:
-			polygon[0].x =  x + width / 2;
-			polygon[0].y =  y;
-			polygon[1].x =  -width / 2;
-			polygon[1].y =  height / 2;
-			polygon[2].x =  width / 2;
-			polygon[2].y =  height / 2;
-			polygon[3].x =  width / 2;
-			polygon[3].y =  -height / 2;
-			XFillPolygon(display, window, gc,
-				polygon, 4, Convex, CoordModePrevious);
-			break;
-		case club:
-			XFillArc(display, window, gc,
-				x, y + short(float(height) / 3.6), width / 2, height / 2, 0, 23040);
-			XFillArc(display, window, gc,
-				x + width / 2, y + short(float(height) / 3.6), width / 2, height / 2, 0, 23040);
-			XFillArc(display, window, gc,
-				x + width / 4, y, width / 2, height / 2, 0, 23040);
-			polygon[0].x =  x + width / 2;
-			polygon[0].y =  y + height / 2 - 1;
-			polygon[1].x =  -width / 8;
-			polygon[1].y =  height / 2 + 1;
-			polygon[2].x =  width / 4;
-			polygon[2].y =  0;
-			XFillPolygon(display, window, gc,
-				polygon, 3, Convex, CoordModePrevious);
-			break;
-		case heart:
-			XFillArc(display, window, gc,
-				x + 1, y, width / 2, height / 2, 0, 23040);
-			XFillArc(display, window, gc,
-				x + width / 2 - 1, y, width / 2, height / 2, 0, 23040);
-			polygon[0].x =  x + width / 2;
-			polygon[0].y =  y + short(float(height) / 4.1);
-			polygon[1].x =  short(float(-width) / 2.7);
-			polygon[1].y =  short(float(height) / 4.1);
-			polygon[2].x =  short(float(width) / 2.7);
-			polygon[2].y =  short(float(height) / 2.05);
-			polygon[3].x =  short(float(width) / 2.7);
-			polygon[3].y =  short(float(-height) / 2.05);
-			XFillPolygon(display, window, gc,
-				polygon, 4, Convex, CoordModePrevious);
-			break;
+	case spade:
+		drawSpade(mi, x, y, width, height);
+		break;
+	case diamond:
+		drawDiamond(mi, x, y, width, height);
+		break;
+	case club:
+		drawClub(mi, x, y, width, height);
+		break;
+	case heart:
+		drawHeart(mi, x, y, width, height);
+		break;
 	}
 }
 
@@ -237,7 +278,7 @@ public:
 	CardView(ModeInfo * mi, Card * card);
 	CardView(ModeInfo *mi, Suits suit, int rank);
 	Card * thisCard();
-	void draw();
+	void draw(int pileCount);
 	void erase();
 	Bool isFaceUp();
 	void flip();
@@ -275,7 +316,7 @@ CardView::CardView(ModeInfo * a_mi, Suits suit, int rank)
 	locationX = locationY = 0;
 }
 
-void CardView::draw()
+void CardView::draw(int pileCount)
 {
 	Display * display = MI_DISPLAY(mi);
 	Window window = MI_WINDOW(mi);
@@ -291,7 +332,7 @@ void CardView::draw()
 		} else {
 			XSetForeground(display, gc, MI_BLACK_PIXEL(mi));
 		}
-		if (width() > 16 && height() > 34) {
+		if (width() > 16 && height() > 39) {
 #ifdef CENTERLABEL
 			XDrawString(display, window, gc,
 				x() + width() / 2 - strlen(RankNames[card->whichRank()]) * 8,
@@ -300,12 +341,12 @@ void CardView::draw()
 #else
 			XDrawString(display, window, gc,
 				x() + 10 - strlen(RankNames[card->whichRank()]) * 8 + width() / 8,
-				y() + 20,
+				y() + 25,
 				(char *) RankNames[card->whichRank()], strlen(RankNames[card->whichRank()]));
 #endif
 		}
 #ifdef SUITNAMES
-			const char *SuitNames[] = {"Spade", "Diamond", "Club", "Heart"};
+		const char *SuitNames[] = {"Spade", "Diamond", "Club", "Heart"};
 		XDrawString(display, window, gc, x() + 0.2, y() + int_round(height() * 0.8),
 			(char *) SuitNames[card->whichSuit()], strlen(SuitNames[card->whichSuit()]));
 #endif
@@ -314,9 +355,9 @@ void CardView::draw()
 			x() + int_round(width() * 0.35), y() + int_round(height() * 0.55),
 			int_round(0.3 * width()), int_round(0.3 * height()));
 #else
-		if (width() > 16 && height() > 34) {
+		if (width() > 16 && height() > 39) {
 			drawSuit(mi, card->whichSuit(),
-				x() + 5, y() + 25,
+				x() + 5, y() + 30,
 				int_round(0.3 * width()), int_round(0.3 * height()));
 		} else {
 			drawSuit(mi, card->whichSuit(),
@@ -336,28 +377,29 @@ void CardView::draw()
 			x() + width() - 2, y() + 1,
 			x() + width() - 2, y() + height() - 2);
 	} else {
-		int n;
+		int n, s, e;
+		int modCount = pileCount % 2; // shake it up a bit
 
 		XSetForeground(display, gc, cyan_pixel);
 		XFillRectangle(display, window, gc,
 			x(), y(), width(), height());
 		XSetForeground(display, gc, MI_BLACK_PIXEL(mi));
-		n = x() + int_round(int_round(width() * 0.3));
+		n = x() + int_round(int_round(width() * 0.3)) + modCount;
+		s = y() + int_round(height() * 0.1);
+		e = y() + int_round(height() * 0.9) - 1;
 		XDrawLine(display, window, gc,
-			n, y() + int_round(height() * 0.1),
-			n, y() + int_round(height() * 0.9) - 1);
-		n = x() + int_round(width() * 0.7) - 1;
+			n, s, n, e);
+		n = x() + int_round(width() * 0.7) - 1 + modCount;
 		XDrawLine(display, window, gc,
-			n, y() + int_round(height() * 0.1),
-			n, y() + int_round(height() * 0.9) - 1);
-		n = y() + int_round(height() * 0.3);
+			n, s, n, e);
+		n = y() + int_round(height() * 0.3) + modCount;
+		s = x() + int_round(height() * 0.1);
+		e = x() + int_round(width() * 0.9) - 1;
 		XDrawLine(display, window, gc,
-			x() + int_round(height() * 0.1), n,
-			x() + int_round(width() * 0.9) - 1, n);
-		n = y() + int_round(height() * 0.7) - 1;
+			s, n, e, n);
+		n = y() + int_round(height() * 0.7) - 1 + modCount;
 		XDrawLine(display, window, gc,
-			x() + int_round(width() * 0.1), n,
-			x() + int(width() * 0.9) - 1, n);
+			s, n, e, n);
 	}
 	// Shadow
 #if 1
@@ -424,6 +466,7 @@ public:
 	CardLink * removeCard();
 	virtual Bool select(int, int); // mouse interaction
 	virtual Bool select(Bool); // generator
+	int pileCount();
 
 protected:
 	int x, y;
@@ -503,6 +546,7 @@ public:
 	Bool alternateCanAdd(Card *);
 	CardPile * alternateAddPile(Card *);
 	void Resize(ModeInfo *);
+	void Draw(ModeInfo *);
 	void Redraw(ModeInfo *);
 	Bool HandleMouse(ModeInfo *);
 	Bool HandleGenerate();
@@ -572,6 +616,14 @@ Bool CardPile::contains(int a, int b)
 	return False;
 }
 
+int CardPile::pileCount()
+{
+	int number = 0;
+	for (CardLink *p = top; p!= nilLink; p = p->nextCard())
+		number++;
+	return number;
+}
+
 void CardPile::displayPile()
 {
 	solitairestruct *bp = &solitaire[MI_SCREEN(mi)];
@@ -584,7 +636,7 @@ void CardPile::displayPile()
 		XFillRectangle(display, window, gc,
 			x, y, bp->cardwidth, bp->cardheight);
 	} else {
-		top->draw();
+		top->draw(pileCount());
 	}
 }
 
@@ -922,7 +974,7 @@ static void stackDisplay(CardLink *p)
 {
 	if (p->nextCard())
 		stackDisplay(p->nextCard());
-	p->draw();
+	p->draw(0);
 }
 
 void AlternatePile::displayPile()
@@ -947,7 +999,7 @@ Bool AlternatePile::select(int a_x, int a_y)
 	// if top card is not flipped, flip it now
 	if (!top->isFaceUp()) {
 		top->flip();
-		top->draw();
+		top->draw(pileCount());
 		return True;
 	}
 
@@ -989,7 +1041,7 @@ Bool AlternatePile::select(Bool first)
 	// if top card is not flipped, flip it now
 	if (!top->isFaceUp()) {
 		top->flip();
-		top->draw();
+		top->draw(pileCount());
 		return True;
 	}
 	// see if we ca move it to a suit pile
@@ -1128,16 +1180,22 @@ Bool GameTable::newGame(ModeInfo * mi)
 	return True;
 }
 
-void GameTable::Redraw(ModeInfo * mi)
+void GameTable::Draw(ModeInfo * mi)
 {
 	int pile;
 
+	// display the piles
+	for (pile = 0; pile < MAXPILES; pile++)
+		allPiles[pile]->displayPile();
+}
+
+// this is where the smarts is/is not
+void GameTable::Redraw(ModeInfo * mi)
+{
 	//first clear the entire playing area
 	MI_CLEARWINDOW(mi);
 
-	// then display the piles
-	for (pile = 0; pile < MAXPILES; pile++)
-		allPiles[pile]->displayPile();
+	Draw(mi);
 }
 
 // this is where the smarts is/is not
@@ -1231,12 +1289,15 @@ CardPile * GameTable::alternateAddPile(Card * card)
 }
 
 /* Yes, it's an ugly mix of 'C' and 'C++' functions */
+#ifdef STANDALONE
+static void draw_solitaire(ModeInfo * mi);
+#else
 extern "C" { void init_solitaire(ModeInfo * mi); }
 extern "C" { void draw_solitaire(ModeInfo * mi); }
 extern "C" { void change_solitaire(ModeInfo * mi); }
 extern "C" { void release_solitaire(ModeInfo * mi); }
 extern "C" { void refresh_solitaire(ModeInfo * mi); }
-
+#endif
 #ifndef DISABLE_INTERACTIVE
 static XrmOptionDescRec opts[] =
 {
@@ -1254,7 +1315,7 @@ static OptionStruct desc[] =
 	{(char *) "-/+trackmouse", (char *) "turn on/off the tracking of the mouse"}
 };
 
-ModeSpecOpt solitaire_opts =
+ENTRYPOINT ModeSpecOpt solitaire_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 #else
 ModeSpecOpt solitaire_opts =
@@ -1278,6 +1339,23 @@ ModStruct solitaire_description =
  *-----------------------------------------------------------------------------
  *-----------------------------------------------------------------------------
  */
+
+ENTRYPOINT void
+refresh_solitaire(ModeInfo * mi)
+{
+	solitairestruct *bp;
+
+	if (solitaire == NULL)
+		return;
+	bp = &solitaire[MI_SCREEN(mi)];
+	if (!bp->game)
+		return;
+
+	if (bp->painted) {
+		bp->game->Redraw(mi);
+	  bp->painted = False;
+	}
+}
 
 /*
  *-----------------------------------------------------------------------------
@@ -1371,6 +1449,9 @@ draw_solitaire(ModeInfo * mi)
 	} else if (!bp->game->HandleGenerate()) {
 		bp->showend++;
 	}
+#ifdef STANDALONE
+	bp->game->Draw(mi);
+#endif
 }
 
 /*
@@ -1393,23 +1474,6 @@ release_solitaire(ModeInfo * mi)
 		}
 		free(solitaire);
 		solitaire = (solitairestruct *) NULL;
-	}
-}
-
-void
-refresh_solitaire(ModeInfo * mi)
-{
-	solitairestruct *bp;
-
-	if (solitaire == NULL)
-		return;
-	bp = &solitaire[MI_SCREEN(mi)];
-	if (!bp->game)
-		return;
-
-	if (bp->painted) {
-		bp->game->Redraw(mi);
-	  bp->painted = False;
 	}
 }
 

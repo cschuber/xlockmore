@@ -37,9 +37,13 @@
 #define START ((LRAND() & 1) ? 1 : 3)
 #define MINDOTPERC 10
 
+#define RED (0)
+#define ORANGE (3 * MI_NPIXELS(mi) / 32)
 #define YELLOW (MI_NPIXELS(mi) / 6)
 #define GREEN (23 * MI_NPIXELS(mi) / 64)
+#define CYAN (MI_NPIXELS(mi) / 2)
 #define BLUE (45 * MI_NPIXELS(mi) / 64)
+#define MAGENTA (53 * MI_NPIXELS(mi) / 64)
 #define WHITE (MI_NPIXELS(mi))
 
 #define LINEWIDTH	4
@@ -69,7 +73,7 @@ typedef struct {
 	int		oldcf, oldrf;
 	int		timeleft;
 	GhostState	aistate;
-	/*int         color; */
+	int		color;
 	int		speed;
 	XPoint	    	delta;
 	XPoint		err;
@@ -107,7 +111,7 @@ typedef struct {
 	unsigned int	nghosts;
 	Pixmap      	pacmanPixmap[4][MAXMOUTH];
 /*	Pixmap	    	ghostPixmap[4][MAXGPOS];*/
-	Pixmap	    	ghostPixmap;
+	Pixmap	    	ghostPixmap[2];
 	char        	level[LEVHEIGHT * LEVWIDTH];
 	unsigned int	wallwidth;
 	unsigned int	dotsleft;

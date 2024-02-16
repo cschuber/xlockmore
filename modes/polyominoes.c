@@ -42,6 +42,7 @@ static const char sccsid[] = "@(#)polyominoes.c 5.01 2000/12/18 xlockmore";
 
 # define reshape_polyominoes 0
 # define polyominoes_handle_event 0
+# define free_polyominoes 0
 #define SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
@@ -79,7 +80,7 @@ ENTRYPOINT ModeSpecOpt polyominoes_opts =
 #ifdef USE_MODULES
 ModStruct   polyominoes_description = {
   "polyominoes", "init_polyominoes", "draw_polyominoes", "release_polyominoes",
-  "refresh_polyominoes", "init_polyominoes", "free_polyominoes", &polyominoes_opts,
+  "refresh_polyominoes", "init_polyominoes", (char *) NULL, &polyominoes_opts,
   6000, 1, 8192, 1, 64, 1.0, "",
   "Shows attempts to place polyominoes into a rectangle", 0, NULL
 };
@@ -1067,7 +1068,6 @@ free_polyominoes_screen(polyominoesstruct *sp) {
   for (n=0;n<sp->nr_polyominoes;n++) {
     deallocate(sp->polyomino[n].point, point_type);
   }
-
   deallocate(sp->polyomino, polyomino_type);
   deallocate(sp->attach_list, int);
   deallocate(sp->rectangles, XRectangle);
@@ -1078,12 +1078,6 @@ free_polyominoes_screen(polyominoesstruct *sp) {
 
   free_bitmaps(sp);
   sp = NULL;
-}
-
-ENTRYPOINT void
-free_polyominoes(ModeInfo *mi)
-{
-  free_polyominoes_screen(&polyominoeses[MI_SCREEN(mi)]);
 }
 
 #define set_allocate(p,type,size) p = (type *) malloc(size);		\

@@ -45,6 +45,7 @@ static const char sccsid[] = "@(#)dragon.c	5.24 2007/01/18 xlockmore";
 	"*ncolors: 64 \n" \
 	"*neighbors: 6 \n" \
 
+# define free_dragon 0
 # define reshape_dragon 0
 # define dragon_handle_event 0
 # define UNIFORM_COLORS
@@ -81,7 +82,7 @@ ENTRYPOINT ModeSpecOpt dragon_opts =
 #ifdef USE_MODULES
 ModStruct   dragon_description =
 {"dragon", "init_dragon", "draw_dragon", "release_dragon",
- "refresh_dragon", "init_dragon", "free_dragon", &dragon_opts,
+ "refresh_dragon", "init_dragon", (char *) NULL, &dragon_opts,
  2000000, 1, 16, -24, 64, 1.0, "",
  "Shows Deventer's Hexagonal Dragons Maze", 0, NULL};
 
@@ -263,12 +264,6 @@ free_dragon_screen(Display *display, dragonstruct *dp)
 	}
 	free_struct(dp);
 	dp = NULL;
-}
-
-ENTRYPOINT void
-free_dragon(ModeInfo * mi)
-{
-	free_dragon_screen(MI_DISPLAY(mi), &dragons[MI_SCREEN(mi)]);
 }
 
 #if 0

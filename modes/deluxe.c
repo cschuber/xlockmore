@@ -21,14 +21,14 @@ static const char sccsid[] = "@(#)deluxe.c	5.22 2006/03/07 xlockmore";
 #ifdef STANDALONE
 # define MODE_deluxe
 
-# define DEFAULTS	"*delay: 10000 \n" \
-			"*size: 4 \n" \
-			"*ncolors: 8 \n" \
+# define DEFAULTS	"*delay: 5000 \n" \
+			"*count: 5 \n" \
+			"*ncolors: 64 \n" \
 			"*fullrandom: True \n" \
 			"*verbose: False \n" \
 
 #if 0
-# define DEFAULTS	"*delay: 5000 \n" \
+# define DEFAULTS	"*delay: 10000 \n" \
 			"*count: 5 \n", \
 			"*ncolors: 20 \n", \
 			"*nlayers: 0 \n", \
@@ -41,9 +41,16 @@ static const char sccsid[] = "@(#)deluxe.c	5.22 2006/03/07 xlockmore";
 
 #endif /* HAVE_DOUBLE_BUFFER_EXTENSION */
 #endif
+# define free_deluxe 0
 # define reshape_deluxe 0
 # define deluxe_handle_event 0
 # include "xlockmore.h"		/* in xscreensaver distribution */
+extern Bool allocate_alpha_colors (Screen *screen, Visual *visual,
+                                   Colormap cmap,
+                                   int *nplanesP, Bool additive_p,
+                                   unsigned long **plane_masks,
+                                   unsigned long *base_pixelP ,
+                                   ModeInfo* mi );
 #else /* STANDALONE */
 # include "xlock.h"		/* in xlockmore distribution */
 # include "color.h"
@@ -170,7 +177,7 @@ ENTRYPOINT ModeSpecOpt deluxe_opts =
 #ifdef USE_MODULES
 ModStruct   deluxe_description =
 {"deluxe", "init_deluxe", "draw_deluxe", "release_deluxe",
- "(char *) NULL", "init_deluxe", "free_deluxe", &deluxe_opts,
+ "(char *) NULL", "init_deluxe", (char *) NULL, &deluxe_opts,
  5000, 5, 1, 1, 64, 1.0, "",
  "Shows pulsing sequence of stars, circles, and lines.", 0, NULL};
 
@@ -213,12 +220,6 @@ free_deluxe_screen(Display *dpy, deluxestruct *dlp)
    	dlp->erase_gc = None;
      }
    dlp = NULL;
-}
-
-ENTRYPOINT void
-free_deluxe(ModeInfo * mi)
-{
-	free_deluxe_screen(MI_DISPLAY(mi), &deluxes[MI_SCREEN(mi)]);
 }
 
 /* http://mathworld.wolfram.com/Pentagram.html

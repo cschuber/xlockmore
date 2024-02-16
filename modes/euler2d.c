@@ -43,11 +43,14 @@ static const char sccsid[] = "@(#)euler2d.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_euler2d
-#define DEFAULTS "*delay: 1000 \n" \
+#define DEFAULTS "*delay: 10000 \n" \
 	"*count: 1024 \n" \
 	"*cycles: 3000 \n" \
-	"*ncolors: 200 \n" \
+	"*ncolors: 64 \n" \
+	"*fpsSolid: True \n" \
+	"*ignoreRotation: True \n" \
 
+# define free_euler2d 0
 # define reshape_euler2d 0
 # define euler2d_handle_event 0
 #define SMOOTH_COLORS
@@ -68,17 +71,13 @@ static float power = 1;
 
 static XrmOptionDescRec opts[] =
 {
-  {(char* ) "-eulertail", (char *) ".euler2d.eulertail",
-   XrmoptionSepArg, (caddr_t) NULL},
-  {(char* ) "-eulerpower", (char *) ".euler2d.eulerpower",
-   XrmoptionSepArg, (caddr_t) NULL},
+  {(char* ) "-eulertail", (char *) ".euler2d.eulertail", XrmoptionSepArg, (caddr_t) NULL},
+  {(char* ) "-eulerpower", (char *) ".euler2d.eulerpower", XrmoptionSepArg, (caddr_t) NULL},
 };
 static argtype vars[] =
 {
-  {(void *) &tail_len, (char *) "eulertail",
-   (char *) "EulerTail", (char *) DEF_EULERTAIL, t_Int},
-  {(void *) &power, (char *) "eulerpower",
-   (char *) "EulerPower", (char *) "1", t_Float},
+  {(void *) &tail_len, (char *) "eulertail",(char *) "EulerTail", (char *) DEF_EULERTAIL, t_Int},
+  {(void *) &power, (char *) "eulerpower", (char *) "EulerPower", (char *) "1", t_Float},
 };
 static OptionStruct desc[] =
 {
@@ -92,7 +91,7 @@ ENTRYPOINT ModeSpecOpt euler2d_opts =
 #ifdef USE_MODULES
 ModStruct   euler2d_description = {
 	"euler2d", "init_euler2d", "draw_euler2d", "release_euler2d",
-	"refresh_euler2d", "init_euler2d", "free_euler2d", &euler2d_opts,
+	"refresh_euler2d", "init_euler2d", (char *) NULL, &euler2d_opts,
 	1000, 1024, 3000, 1, 64, 1.0, "",
 	"Simulates 2D incompressible invisid fluid.", 0, NULL
 };
@@ -114,6 +113,7 @@ typedef struct {
 	int        height;
 	int        count;
 	double     xshift,yshift,scale;
+	double     xshift2,yshift2;
 	double     radius;
 
         int        N;
@@ -510,12 +510,6 @@ free_euler2d_screen(euler2dstruct *sp)
 }
 
 ENTRYPOINT void
-free_euler2d(ModeInfo * mi)
-{
-        free_euler2d_screen(&euler2ds[MI_SCREEN(mi)]);
-}
-
-ENTRYPOINT void
 init_euler2d(ModeInfo * mi)
 {
 #define nr_rotates 18 /* how many rotations to try to fill as much of screen as possible - must be even number */
@@ -535,13 +529,34 @@ init_euler2d(ModeInfo * mi)
 	MI_INIT(mi, euler2ds);
 	sp = &euler2ds[MI_SCREEN(mi)];
 
+#ifdef HAVE_JWXYZ
+  jwxyz_XSetAntiAliasing (MI_DISPLAY(mi), MI_GC(mi),  False);
+#endif
+
 	sp->boundary_color = NRAND(MI_NPIXELS(mi));
 	sp->hide_vortex = NRAND(4) != 0;
 
 	sp->count = 0;
 
+	sp->xshift2 = sp->yshift2 = 0;
+
 	sp->width = MI_WIDTH(mi);
 	sp->height = MI_HEIGHT(mi);
+
+	 if (sp->width > sp->height * 5 ||  /* window has weird aspect */
+		sp->height > sp->width * 5)
+	{
+	  if (sp->width > sp->height)
+	  {
+	    sp->height = sp->width * 0.8;
+	    sp->yshift2 = -sp->height/2;
+	  }
+	  else
+	  {
+            sp->width = sp->height * 0.8;
+            sp->xshift2 = -sp->width/2;
+	  }
+	}
 
 	sp->N = MI_COUNT(mi)+number_of_vortex_points;
 	sp->Nvortex = number_of_vortex_points;
@@ -684,6 +699,8 @@ init_euler2d(ModeInfo * mi)
 		else
 			sp->yshift = (low[besti-nr_rotates/2]+high[besti-nr_rotates/2])/2.0*sp->scale+sp->height/2;
 
+		sp->xshift += sp->xshift2;
+		sp->yshift += sp->yshift2;
 
 /* Initialize boundary */
 

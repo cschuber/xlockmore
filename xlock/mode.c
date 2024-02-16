@@ -378,16 +378,16 @@ LockStruct  LockProcs[] =
 	 10000, 1000, 20, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows the Julia set", 0, NULL},
 #endif
-#ifdef MODE_kaleid2
-	{"kaleid2", init_kaleid2, draw_kaleid2, release_kaleid2,
-	     refresh_kaleid2, init_kaleid2, NULL, &kaleid2_opts,
-	     20000, 1, 700, 1, 64, 1.0, "",
-	     "Shows a kaleidoscope", 0, NULL},
-#endif
 #ifdef MODE_kaleid
 	{(char *) "kaleid", init_kaleid, draw_kaleid, release_kaleid,
 	 refresh_kaleid, init_kaleid, (ModeHook *) NULL, &kaleid_opts,
 	 80000, 4, 40, -9, 64, 0.6, (char *) "",
+	 (char *) "Shows a kaleidoscope", 0, NULL},
+#endif
+#ifdef MODE_kaleid2
+ 	{"kaleid2", init_kaleid2, draw_kaleid2, release_kaleid2,
+	 refresh_kaleid2, init_kaleid2, NULL, &kaleid2_opts,
+	 20000, 1, 700, 1, 64, 1.0, "",
 	 (char *) "Shows a kaleidoscope", 0, NULL},
 #endif
 #ifdef MODE_kumppa
@@ -589,7 +589,7 @@ LockStruct  LockProcs[] =
 #endif
 #ifdef MODE_qix
 	{(char *) "qix", init_qix, draw_qix, release_qix,
-	 refresh_qix, init_qix, (ModeHook *) NULL, &qix_opts,
+	 refresh_qix, init_qix, free_qix, &qix_opts,
 	 30000, -5, 32, 1, 64, 1.0, (char *) "",
 	 (char *) "Shows spinning lines a la Qix(tm)", 0, NULL},
 #endif

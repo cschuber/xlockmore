@@ -1,4 +1,4 @@
-xlockmore-5.65: the maintained version of xlock
+xlockmore-5.66: the maintained version of xlock
 see docs/Revisions for more version stuff
 see docs/TODO for stuff to do :)
 Help is always appreciated too ;) .
@@ -15,6 +15,13 @@ send me mail if you want to be on a list for latest releases.
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
 
+Notice: a new bug is now seen when compiling with gcc -O2 on Linux (the
+current default) for pacman mode which gives the pacman an annoying
+hesitation behavior and lasts until a ghost comes close enough to trigger
+it to do something else.  So it is recommended to compile all first with -O2
+and then remove pacman.o and edit the Makefile to use -O1.  This is also 
+seen in older versions of this package with new compilations.  Seen with
+gcc 9.3.0.
 
 How to build?
 -------------
@@ -919,12 +926,20 @@ Other related stuff (all not maintained by me):
     Please note that my format is slightly different.  The number at the
       top of the file should match `grep -c "^%%$" fortune.dat`
   freetype and gltt for text3d
+    copy C:\Windows\Fonts\arial.ttf to /usr/lib/X11/xlock/fonts
     http://freetype.sourceforge.net/ is the official site for freetype
-      (need 1.3.1)
-    http://gltt.sourceforge.net/ is the official site for gltt (2.5)
-      To get this to compile with CC on Sun (mainly for xlock maintainer's
-        reference in case he ever has to do it again; if this is built using
-        g++ then xlock must be built using g++ if you want text3d to work).
+      (need 1.3.1) I used configure --prefix=/usr to keep it simple.
+      It fails in ftdump.c but this is in test dir, ignore and just do
+      make install
+    http://gltt.sourceforge.net/ is the official site for gltt (2.5.2)
+      configure was not working so copied mkinstalldirs, install-sh,
+        config.sub, and config.guess this distribution again used
+        configure --prefix=/usr
+      edit GLTTGlyphPolygonizerHandler.h to add GLTTGlyphPolyonizer header
+      To get this to compile with CC on Sun with 2.5 (mainly for xlock
+        maintainer's reference in case he ever has to do it again; if this is
+        built using g++ then xlock must be built using g++ if you want text3d
+        to work).
           configure --with-ttf-includes=/usr/openwin/include/freetype --with-ttf-libraries=/usr/openwin/lib
           change g++ reference in generated Makefile to CC
           change .la references to .a in Makefile to produce a libgltt.a
@@ -959,6 +974,7 @@ Other related stuff (all not maintained by me):
       {
 
   freetype2 and FTGL for text3d2
+    copy C:\Windows\Fonts\arial.ttf to /usr/lib/X11/xlock/fonts
     http://www.freetype.org/ need 2.x
     http://homepages.paradise.net.nz/henryj/code/#FTGL
 	=> there's a bug in FTGL that is "known" in text3d2

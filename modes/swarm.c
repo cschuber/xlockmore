@@ -33,8 +33,8 @@ static const char sccsid[] = "@(#)swarm.c	5.00 2000/11/01 xlockmore";
 #define DEFAULTS "*delay: 15000 \n" \
 	"*count: -100 \n" \
 	"*size: -100 \n" \
-	"*trackmouse: False \n" \
 
+# define free_swarm 0
 # define reshape_swarm 0
 # define swarm_handle_event 0
 #define BRIGHT_COLORS
@@ -74,7 +74,7 @@ ENTRYPOINT ModeSpecOpt swarm_opts =
 #ifdef USE_MODULES
 ModStruct   swarm_description =
 {"swarm", "init_swarm", "draw_swarm", "release_swarm",
- "refresh_swarm", "init_swarm", "free_swarm", &swarm_opts,
+ "refresh_swarm", "init_swarm", (char *) NULL, &swarm_opts,
  15000, -100, 1, -100, 64, 1.0, "",
  "Shows a swarm of bees following a wasp", 0, NULL};
 
@@ -161,12 +161,6 @@ free_swarm_screen(Display *display, swarmstruct *sp)
 		sp->cursor = None;
 	}
 	sp = NULL;
-}
-
-ENTRYPOINT void
-free_swarm(ModeInfo * mi)
-{
-	free_swarm_screen(MI_DISPLAY(mi), &swarms[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

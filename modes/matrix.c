@@ -69,8 +69,10 @@ static const char sccsid[] = "@(#)matrix.c	5.00 2000/11/01 xlockmore";
  */
 
 #ifdef STANDALONE
+#define MODE_matrix
 #define DEFAULTS "*delay: 1000\n" \
 
+# define free_matrix 0
 # define reshape_matrix 0
 # define matrix_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -78,18 +80,19 @@ static const char sccsid[] = "@(#)matrix.c	5.00 2000/11/01 xlockmore";
 #include "xlock.h"		/* in xlockmore distribution */
 #endif /* STANDALONE */
 
+#ifdef MODE_matrix
+
 ENTRYPOINT ModeSpecOpt matrix_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
 ModStruct   matrix_description =
 {"matrix", "init_matrix", "draw_matrix", "release_matrix",
- "refresh_matrix", "change_matrix", "free_matrix", &matrix_opts,
+ "refresh_matrix", "change_matrix", (char *) NULL, &matrix_opts,
  1000, 1, 1, 1, 64, 1.0, "",
  "Shows the Matrix", 0, NULL};
 #endif
 
-#ifdef MODE_matrix
 #ifndef WIN32
 #include <X11/Intrinsic.h>
 #endif /* WIN32 */
@@ -471,12 +474,6 @@ free_matrix_screen(Display *display, matrix_t *mp)
 	  mp->kana[1] = None;
 	}
 	mp = NULL;
-}
-
-ENTRYPOINT void
-free_matrix(ModeInfo * mi)
-{
-        free_matrix_screen(MI_DISPLAY(mi), &matrix[MI_SCREEN(mi)]);
 }
 
 /* NAME: setup_matrix()

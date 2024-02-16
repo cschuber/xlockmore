@@ -87,6 +87,7 @@ static const char sccsid[] = "@(#)skewb.c	5.00 2000/11/01 xlockmore";
 			"*count: -30 \n" \
 			"*cycles: 5 \n" \
 
+# define free_skewb 0
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 # include "gltrackball.h"
 
@@ -124,7 +125,7 @@ ENTRYPOINT ModeSpecOpt skewb_opts =
 #ifdef USE_MODULES
 ModStruct   skewb_description =
 {"skewb", "init_skewb", "draw_skewb", "release_skewb",
- "draw_skewb", "change_skewb", "free_skewb", &skewb_opts,
+ "draw_skewb", "change_skewb", "(char *) NULL", &skewb_opts,
  100000, -30, 5, 1, 64, 1.0, "",
  "Shows an auto-solving Skewb", 0, NULL};
 
@@ -1397,7 +1398,7 @@ shuffle(ModeInfo * mi)
 	return True;
 }
 
-ENTRYPOINT void
+static void
 reshape_skewb(ModeInfo * mi, int width, int height)
 {
 	skewbstruct *sp = &skewb[MI_SCREEN(mi)];
@@ -1474,12 +1475,6 @@ free_skewb_screen(skewbstruct *sp)
 		sp->moves = (SkewbMove *) NULL;
 	}
 	sp = NULL;
-}
-
-ENTRYPOINT void
-free_skewb(ModeInfo * mi)
-{
-	free_skewb_screen(&skewb[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

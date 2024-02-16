@@ -66,10 +66,12 @@ extern void getImage(ModeInfo * mi, XImage ** logo,
 		     int *graphics_format, Colormap * newcolormap,
 		     unsigned long *black);
 extern void destroyImage(XImage ** logo, int *graphics_format);
+#ifndef STANDALONE
 extern void getPixmap(ModeInfo * mi, Drawable drawable,
 	  int default_width, int default_height, unsigned char *default_bits,
 		      int *width, int *height, Pixmap * pixmap,
 		      int *graphics_format);
+#endif
 
 extern char * getModeFont(char *infont);
 #define getSound getModeFont /* reusing */

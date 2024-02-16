@@ -39,6 +39,7 @@ static const char sccsid[] = "@(#)lissie.c	5.00 2000/11/01 xlockmore";
 	"*size: -200 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_lissie 0
 # define reshape_lissie 0
 # define lissie_handle_event 0
 #define SMOOTH_COLORS
@@ -55,7 +56,7 @@ ENTRYPOINT ModeSpecOpt lissie_opts =
 #ifdef USE_MODULES
 ModStruct   lissie_description =
 {"lissie", "init_lissie", "draw_lissie", "release_lissie",
- "refresh_lissie", "init_lissie", "free_lissie", &lissie_opts,
+ "refresh_lissie", "init_lissie", (char *) NULL, &lissie_opts,
  10000, 1, 2000, -200, 64, 0.6, "",
  "Shows lissajous worms", 0, NULL};
 
@@ -119,13 +120,6 @@ free_lissie_screen(lissstruct *lp)
 	}
 	lp = NULL;
 }
-
-ENTRYPOINT void
-free_lissie(ModeInfo * mi)
-{
-	free_lissie_screen(&lisses[MI_SCREEN(mi)]);
-}
-
 
 static void
 drawlissie(ModeInfo * mi, lissiestruct * lissie)

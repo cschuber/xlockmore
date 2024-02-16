@@ -1,4 +1,7 @@
 extern int finite(double);
+extern void
+NAME(fzort_ctx *ctx, struct pvertex *v1,
+  struct pvertex *v2, struct pvertex *v3);
 
 /* undef'ing this makes things look a bit nicer, but slower  */
 #define DBL_PIXELS

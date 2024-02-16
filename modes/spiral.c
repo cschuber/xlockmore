@@ -41,6 +41,7 @@ static const char sccsid[] = "@(#)spiral.c	5.00 2000/11/01 xlockmore";
 	"*cycles: 350 \n" \
 	"*ncolors: 64 \n" \
 
+# define free_spiral 0
 # define reshape_spiral 0
 # define spiral_handle_event 0
 #define SMOOTH_COLORS
@@ -57,7 +58,7 @@ ENTRYPOINT ModeSpecOpt spiral_opts =
 #ifdef USE_MODULES
 ModStruct   spiral_description =
 {"spiral", "init_spiral", "draw_spiral", "release_spiral",
- "refresh_spiral", "init_spiral", "free_spiral", &spiral_opts,
+ "refresh_spiral", "init_spiral", (char *) NULL, &spiral_opts,
  5000, -40, 350, 1, 64, 1.0, "",
  "Shows a helical locus of points", 0, NULL};
 
@@ -130,12 +131,6 @@ free_spiral_screen(spiralstruct *sp) {
 	sp = NULL;
 }
  
-ENTRYPOINT void
-free_spiral(ModeInfo * mi)
-{
-	free_spiral_screen(&spirals[MI_SCREEN(mi)]);
-}
-
 ENTRYPOINT void
 init_spiral(ModeInfo * mi)
 {

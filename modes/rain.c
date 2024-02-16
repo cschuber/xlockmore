@@ -30,6 +30,7 @@ static const char sccsid[] = "@(#)rain.c  1.00 2007/05/22 xlockmore";
 #define DEFAULTS "*delay: 35000 \n" \
 	"*ncolors: 64 \n" \
 
+# define free_rain 0
 # define reshape_rain 0
 # define rain_handle_event 0
 #define SMOOTH_COLORS
@@ -50,7 +51,7 @@ ENTRYPOINT ModeSpecOpt rain_opts =
 ModStruct rain_description =
 {
   "rain", "init_rain", "draw_rain", "release_rain",
-  "refresh_rain", "init_rain", "free_rain", &rain_opts,
+  "refresh_rain", "init_rain", (char *) NULL, &rain_opts,
   35000, 1, 1, 1, 64, 0.3, "",
   "It's raining", 0, NULL
 };
@@ -133,12 +134,6 @@ free_rain_screen(rainstruct *rp)
     rp->drops = NULL;
   }
   rp = NULL;
-}
-
-ENTRYPOINT void
-free_rain(ModeInfo * mi)
-{
-  free_rain_screen(&rain[MI_SCREEN(mi)]);
 }
 
 /*

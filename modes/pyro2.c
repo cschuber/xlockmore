@@ -37,6 +37,7 @@ static const char sccsid[] = "@(#)pyro2.c	5.26 2008/02/07 xlockmore";
 	"*both3d: magenta \n" \
 	"*none3d: black \n" \
 
+# define free_pyro2 0
 # define reshape_pyro2 0
 # define pyro2_handle_event 0
 # define UNIFORM_COLORS
@@ -106,7 +107,7 @@ ModStruct   pyro2_description =
 	"release_pyro2",	/* release_name: name of shutdown of a mode */
 	"refresh_pyro2",	/* refresh_name: name of mode to repaint */
 	"init_pyro2",		/* change_name: name of mode to change */
-	"free_pyro2",		/* unused_name: name for future expansion */
+	(char *) NULL,		/* unused_name: name for future expansion */
 	&pyro2_opts,		/* msopt: this mode's def resources */
 	30000,			/* def_delay: default delay for mode */
 	400,			/* def_count: */
@@ -170,25 +171,25 @@ static char * ostext = NULL;
 #define READY		3
 
 #ifndef WIN32
+#ifndef STANDALONE
 /* aliases for vars defined in the bitmap file */
 #define LOGO_WIDTH   image_width
 #define LOGO_HEIGHT    image_height
 #define LOGO_BITS    image_bits
 
-#ifndef STANDALONE
 #include "pyro2.xbm"
-#endif
 
 #ifdef HAVE_XPM
 #define LOGO_NAME  image_name
 #include "pyro2.xpm"
 #define DEFAULT_XPM 0
 #endif
+#endif
 
 #if !defined( VMS ) || ( __VMS_VER >= 70000000 )
 #include <sys/utsname.h>
 #else
-#if USE_XVMSUTILS
+#ifdef USE_XVMSUTILS
 #if 0
 #include "../xvmsutils/utsname.h"
 #else
@@ -337,13 +338,6 @@ free_pyro2_screen(ModeInfo *mi, Display *display, pyrostruct *pp)
 	}
 	pp = NULL;
 }
-
-ENTRYPOINT void
-free_pyro2(ModeInfo * mi)
-{
-	free_pyro2_screen(mi, MI_DISPLAY(mi), &pyros[MI_SCREEN(mi)]);
-}
-
 
 /*#define delay(x)	usleep(x)*/
 #define delay(x)	(x)
@@ -1036,7 +1030,7 @@ init_pyro2(ModeInfo * mi)
 	int text_in_buffer = FALSE;
 	char *rov;
 	/*static char defaultString[] =
-#if __VMS
+#ifdef __VMS
 	"&0&1&2&3&4&5&6&7&8&9&a&b OpenVMS &a&b";
 #else
 	"&0&1&2&3&4&5&6&7&8&9&a&b Unix &a&b";

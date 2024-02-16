@@ -32,12 +32,13 @@ static const char sccsid[] = "@(#)marquee.c	5.00 2000/11/01 xlockmore";
 #define MODE_marquee
 #define DEFAULTS "*delay: 100000 \n" \
 	"*ncolors: 64 \n" \
-	"*font: fixed \n" \
+	"*font: fixed\n" \
 	"*text:\n" \
 	"*filename: \n" \
 	"*fortunefile: \n" \
 	"*program: \n" \
 
+# define free_marquee 0
 # define reshape_marquee 0
 # define marquee_handle_event 0
 #define SMOOTH_COLORS
@@ -55,13 +56,13 @@ ENTRYPOINT ModeSpecOpt marquee_opts =
 #ifdef USE_MODULES
 ModStruct   marquee_description =
 {"marquee", "init_marquee", "draw_marquee", "release_marquee",
- "init_marquee", "init_marquee", "free_marquee", &marquee_opts,
+ "init_marquee", "init_marquee", (char *) NULL, &marquee_opts,
  100000, 1, 1, 1, 64, 1.0, "",
  "Shows messages", 0, NULL};
 
 #endif
 
-#if USE_MB
+#ifdef USE_MB
 static int font_height(XFontStruct *f)
 {
 	XRectangle mbRect;
@@ -371,12 +372,6 @@ free_marquee_screen(Display * display, marqueestruct * mp)
 	if (mp->gc != None)
 		XFreeGC(display, mp->gc);
 	mp = NULL;
-}
-
-ENTRYPOINT void
-free_marquee(ModeInfo * mi)
-{
-	free_marquee_screen(MI_DISPLAY(mi), &marquees[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

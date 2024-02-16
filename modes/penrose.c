@@ -74,6 +74,7 @@ If one of these are hit penrose will reinitialize.
 	"*fullrandom: True \n" \
 	"*verbose: False \n" \
 
+# define free_penrose 0
 # define reshape_penrose 0
 # define penrose_handle_event 0
 #include "xlockmore.h"		/* from the xscreensaver distribution */
@@ -107,7 +108,7 @@ ENTRYPOINT ModeSpecOpt penrose_opts =
 #ifdef USE_MODULES
 ModStruct   penrose_description =
 {"penrose", "init_penrose", "draw_penrose", "release_penrose",
- "init_penrose", "init_penrose", "free_penrose", &penrose_opts,
+ "init_penrose", "init_penrose", (char *) NULL, &penrose_opts,
  10000, 1, 1, -40, 64, 1.0, "",
  "Shows Penrose's quasiperiodic tilings", 0, NULL};
 
@@ -415,12 +416,6 @@ free_penrose_screen(tiling_c * tp)
 }
 
 
-ENTRYPOINT void
-free_penrose(ModeInfo * mi)
-{
-	free_penrose_screen(&tilings[MI_SCREEN(mi)]);
-}
-	
 /* Called to init the mode. */
 ENTRYPOINT void
 init_penrose(ModeInfo * mi)
@@ -1292,7 +1287,11 @@ draw_penrose(ModeInfo * mi)
 	if (tp->fringe.nodes->prev == tp->fringe.nodes->next) {
 		vertex_type_c vtype = (unsigned char) (VT_TOTAL_MASK & LRAND());
 
+#ifdef STANDALONE
+		MI_CLEARWINDOWCOLORMAPFAST(mi, MI_GC(mi), MI_BLACK_PIXEL(mi));
+#else
 		MI_CLEARWINDOW(mi);
+#endif
 
 		if (!add_tile(mi, tp->fringe.nodes, S_LEFT, vtype))
 			free_penrose_screen(tp);

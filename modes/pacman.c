@@ -1,4 +1,3 @@
-/* -*- Mode: C; tab-width: 4 -*- */
 /* pacman --- Mr. Pacman and his ghost friends */
 
 #if 0
@@ -22,10 +21,13 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
  * other special, indirect and consequential damages.
  *
  * Revision History:
+ * 16-Oct-2020: Added colors and dress oscillation to ghosts.
+ *              It has some hesitation bug if compiled with gcc -O2 even in
+ *              older versions of this code. 
  * 13-May-2002: Added -trackmouse feature thanks to code from 'maze.c'.
  *		split up code into several files.  Retouched AI code, cleaned
  *		up code.
- *  3-May-2002: Added AI to pacman and ghosts, slowed down ghosts.
+ * 03-May-2002: Added AI to pacman and ghosts, slowed down ghosts.
  * 26-Nov-2001: Random level generator added
  * 01-Nov-2000: Allocation checks
  * 04-Jun-1997: Compatible with xscreensaver
@@ -33,8 +35,8 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
  */
 
 /* TODO:
-   1. add "bonus" dots
-   2. make better ghost sprites (eyes, waving dress)
+   1. add big "bonus" dots to corners and change ghosts to blue
+   2. ghost sprite erase beyond image
    3. make a bit better pacman sprite (mouth should be larger)
    4. think of a better level generation algorithm
 */
@@ -43,10 +45,11 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
 # define MODE_pacman
 # define DEFAULTS	"*delay: 10000 \n" \
 		 	"*size: 0 \n" \
-		 	"*ncolors: 6 \n" \
+		 	"*ncolors: 64 \n" \
 			"*fpsTop: true   \n" \
 			"*fpsSolid: true \n" \
 
+# define free_pacman 0
 # define reshape_pacman 0
 # define pacman_handle_event 0
 # define UNIFORM_COLORS
@@ -102,7 +105,7 @@ ModStruct   pacman_description = {
 	"release_pacman",	/* *release_name; */
  	"refresh_pacman", 	/* *refresh_name; */
 	"change_pacman", 	/* *change_name; */
-	"free_pacman", 		/* *unused_name; */
+	(char *) NULL, 		/* *unused_name; */
 	&pacman_opts,		/* *msopts */
  	10000, 4, 1, 0, 64, 1.0, "", "Shows Pacman(tm)", 0, NULL
 };
@@ -111,7 +114,7 @@ ModStruct   pacman_description = {
 static void
 free_pacman_screen(Display *display, pacmangamestruct *pp)
 {
-	int         dir, mouth;
+	int         dir, mouth, osc;
 
 	if (pp->ghosts != NULL) {
 		free(pp->ghosts);
@@ -121,10 +124,11 @@ free_pacman_screen(Display *display, pacmangamestruct *pp)
 		XFreeGC(display, pp->stippledGC);
 		pp->stippledGC = None;
 	}
-	if (pp->ghostPixmap != None) {
-		XFreePixmap(display, pp->ghostPixmap);
-		pp->ghostPixmap = None;
-	}
+	for (osc = 0; osc < 2; osc++)
+		if (pp->ghostPixmap[osc] != None) {
+			XFreePixmap(display, pp->ghostPixmap[osc]);
+			pp->ghostPixmap[osc] = None;
+		}
 	for (dir = 0; dir < 4; dir++)
 		for (mouth = 0; mouth < MAXMOUTH; mouth++)
 			if (pp->pacmanPixmap[dir][mouth] != None) {
@@ -132,12 +136,6 @@ free_pacman_screen(Display *display, pacmangamestruct *pp)
 					pp->pacmanPixmap[dir][mouth]);
 				pp->pacmanPixmap[dir][mouth] = None;
 			}
-}
-
-ENTRYPOINT void
-free_pacman(ModeInfo * mi)
-{
-	free_pacman_screen(MI_DISPLAY(mi), &pacmangames[MI_SCREEN(mi)]);
 }
 
 /* Checks for death of any ghosts/pacman and updates.  It also makes a new
@@ -184,6 +182,23 @@ check_death(ModeInfo * mi, pacmangamestruct *pp)
 
 	if (alldead == 1 || pp->dotsleft == 0)
 		repopulate(mi);
+}
+
+static int
+ghostColor(ModeInfo * mi, unsigned int i)
+{
+	switch(i) {
+	case 0:
+		return RED;
+	case 1:
+		return ORANGE;
+	case 2:
+		return CYAN;
+	case 3:
+		return MAGENTA;
+	default:
+		return GREEN;
+	}
 }
 
 /* Resets state of ghosts + pacman.  Creates a new level, draws that level. */
@@ -234,6 +249,7 @@ repopulate(ModeInfo * mi)
 		pp->ghosts[ghost].speed = 3;
 		pp->ghosts[ghost].delta.x = 0;
 		pp->ghosts[ghost].delta.y = 0;
+		pp->ghosts[ghost].color = ghostColor(mi, ghost);
 
 		ghost_update(pp, &(pp->ghosts[ghost]));
 	}
@@ -483,6 +499,7 @@ draw_ghost_sprite(ModeInfo * mi, const unsigned ghost) {
 	Display    *display = MI_DISPLAY(mi);
 	Window      window = MI_WINDOW(mi);
 	pacmangamestruct *pp = &pacmangames[MI_SCREEN(mi)];
+	int osc, dir;
 
 	pp->ghosts[ghost].cf =
 		pp->ghosts[ghost].col * pp->xs + pp->ghosts[ghost].delta.x *
@@ -523,14 +540,16 @@ draw_ghost_sprite(ModeInfo * mi, const unsigned ghost) {
 	if (MI_NPIXELS(mi) > 2)
 		XSetForeground(display,
 		     pp->stippledGC,
-		     MI_PIXEL(mi, GREEN));
+		     MI_PIXEL(mi, pp->ghosts[ghost].color));
 	else
 		XSetForeground(display,
 		     pp->stippledGC,
 		     MI_WHITE_PIXEL(mi));
 
+	/* scale down so not so annoying */
+	osc = ((pp->ghosts[ghost].cf + pp->ghosts[ghost].rf) >> 5) & 1;
 	XSetStipple(display, pp->stippledGC,
-			  pp->ghostPixmap);
+			  pp->ghostPixmap[osc]);
 
 #ifdef FLASH
 	XSetFillStyle(display,
@@ -552,7 +571,81 @@ draw_ghost_sprite(ModeInfo * mi, const unsigned ghost) {
 				     pp->ghosts[ghost].cf,
 				     pp->ghosts[ghost].rf,
 				     pp->spritexs, pp->spriteys);
+	{
+		/* EYES */
+		XSetForeground(display,
+		     pp->stippledGC,
+		     MI_WHITE_PIXEL(mi));
+		XSetFillStyle(display,
+			    pp->stippledGC,
+			    FillSolid);
+		XFillArc(display, window, pp->stippledGC,
+			pp->ghosts[ghost].cf + pp->spritexs / 5,
+			pp->ghosts[ghost].rf + pp->spriteys / 4,
+			pp->spritexs / 5, pp->spriteys / 3, 0, 23040);
+		XFillArc(display, window, pp->stippledGC,
+			pp->ghosts[ghost].cf + pp->spritexs * 3 / 5,
+			pp->ghosts[ghost].rf + pp->spriteys / 4,
+			pp->spritexs / 5, pp->spriteys / 3, 0, 23040);
+		dir = (ABS(pp->ghosts[ghost].cfactor) * (2 - pp->ghosts[ghost].cfactor) +
+	       		ABS(pp->ghosts[ghost].rfactor) * (1 + pp->ghosts[ghost].rfactor)) % 4;
+		XSetForeground(display,
+		     pp->stippledGC,
+		     MI_BLACK_PIXEL(mi));
+		XSetFillStyle(display,
+			    pp->stippledGC,
+			    FillSolid);
+		/* PUPILS */
+		switch(dir) {
+		case 0:
+			XFillArc(display, window, pp->stippledGC,
+				pp->ghosts[ghost].cf + pp->spritexs * 19 / 80,
+				pp->ghosts[ghost].rf + pp->spriteys / 4,
+				pp->spritexs / 8, pp->spriteys / 8, 0, 23040);
+			XFillArc(display, window, pp->stippledGC,
+				pp->ghosts[ghost].cf + pp->spritexs * 51 / 80,
+				pp->ghosts[ghost].rf + pp->spriteys / 4,
+				pp->spritexs / 8, pp->spriteys / 8, 0, 23040);
+			break;
+		case 1:
+			XFillArc(display, window, pp->stippledGC,
+				pp->ghosts[ghost].cf + pp->spritexs * 11 / 40
+#ifndef WIN32
+				+ 1
+#endif
+				, pp->ghosts[ghost].rf + pp->spriteys * 17 / 48,
+				pp->spritexs / 8, pp->spriteys / 8, 0, 23040);
+			XFillArc(display, window, pp->stippledGC,
+				pp->ghosts[ghost].cf + pp->spritexs * 27 / 40
+#ifndef WIN32
+				+ 1
+#endif
+				, pp->ghosts[ghost].rf + pp->spriteys * 17 / 48,
+				pp->spritexs / 8, pp->spriteys / 8, 0, 23040);
+			break;
+		case 2:
+			XFillArc(display, window, pp->stippledGC,
+				pp->ghosts[ghost].cf + pp->spritexs * 19 / 80,
+				pp->ghosts[ghost].rf + pp->spriteys * 11 / 24 + 1,
+				pp->spritexs / 8, pp->spriteys / 8, 0, 23040);
+			XFillArc(display, window, pp->stippledGC,
+				pp->ghosts[ghost].cf + pp->spritexs * 51 / 80,
+				pp->ghosts[ghost].rf + pp->spriteys * 11 / 24 + 1,
+				pp->spritexs / 8, pp->spriteys / 8, 0, 23040);
+			break;
+		case 3:
+			XFillArc(display, window, pp->stippledGC,
+				pp->ghosts[ghost].cf + pp->spritexs / 5,
+				pp->ghosts[ghost].rf + pp->spriteys * 17 / 48,
+				pp->spritexs / 8, pp->spriteys / 8, 0, 23040);
+			XFillArc(display, window, pp->stippledGC,
+				pp->ghosts[ghost].cf + pp->spritexs * 3 / 5,
+				pp->ghosts[ghost].rf + pp->spriteys * 17 / 48,
+				pp->spritexs / 8, pp->spriteys / 8, 0, 23040);
+			break;
+		}
 
+	}
 	pp->ghosts[ghost].oldcf = pp->ghosts[ghost].cf;
 	pp->ghosts[ghost].oldrf = pp->ghosts[ghost].rf;
 }
@@ -585,7 +678,7 @@ init_pacman(ModeInfo * mi)
 	int         size = MI_SIZE(mi);
 	pacmangamestruct *pp;
 	XGCValues   gcv;
-	int	    dir, mouth;
+	int	    dir, mouth, osc;
 	GC          fg_gc, bg_gc;
 	XPoint	    points[9];
 
@@ -594,11 +687,6 @@ init_pacman(ModeInfo * mi)
 
 	pp->width = (unsigned short)MI_WIDTH(mi);
 	pp->height = (unsigned short)MI_HEIGHT(mi);
-	if (pp->ghostPixmap != None) {
-		XFreePixmap(display, pp->ghostPixmap);
-		pp->ghostPixmap = None;
-		pp->graphics_format = 0 /*IS_NONE */ ;
-	}
 
 	if (size == 0 ||
 		MINGRIDSIZE * size > (int)pp->width ||
@@ -634,51 +722,67 @@ init_pacman(ModeInfo * mi)
 	pp->spritedx = (pp->xs - pp->spritexs) >> 1;
 	pp->spritedy = (pp->ys - pp->spriteys) >> 1;
 
-	if ((pp->ghostPixmap = XCreatePixmap(display, window,
-		pp->spritexs, pp->spriteys, 1)) == None) {
-		free_pacman_screen(display, pp);
-		return;
-	}
+	for (osc = 0; osc < 2; osc++) {
+		int hem0, hem1;
 
-	gcv.foreground = 0;
-	gcv.background = 1;
-	if ((bg_gc = XCreateGC(display, pp->ghostPixmap,
-			GCForeground | GCBackground, &gcv)) == None) {
-		free_pacman_screen(display, pp);
-		return;
-	}
+		if ((pp->ghostPixmap[osc] = XCreatePixmap(display, window,
+			pp->spritexs, pp->spriteys, 1)) == None) {
+			free_pacman_screen(display, pp);
+			return;
+		}
 
-	gcv.foreground = 1;
-	gcv.background = 0;
-	if ((fg_gc = XCreateGC(display, pp->ghostPixmap,
-			GCForeground | GCBackground, &gcv)) == None) {
-		XFreeGC(display, bg_gc);
-		free_pacman_screen(display, pp);
-		return;
-	}
+		gcv.foreground = 0;
+		gcv.background = 1;
+		if ((bg_gc = XCreateGC(display, pp->ghostPixmap[osc],
+				GCForeground | GCBackground, &gcv)) == None) {
+			free_pacman_screen(display, pp);
+			return;
+		}
+
+		gcv.foreground = 1;
+		gcv.background = 0;
+		if ((fg_gc = XCreateGC(display, pp->ghostPixmap[osc],
+				GCForeground | GCBackground, &gcv)) == None) {
+			XFreeGC(display, bg_gc);
+			free_pacman_screen(display, pp);
+			return;
+		}
 
 #define SETPOINT(p, xp, yp) p.x = xp; p.y = yp
 
-	/* draw the triangles on the bottom (scalable) */
-	SETPOINT(points[0], 1, 				pp->spriteys * 5 / 6);
-	SETPOINT(points[1], pp->spritexs / 6,		pp->spriteys);
-	SETPOINT(points[2], pp->spritexs / 3,		pp->spriteys * 5 / 6);
-	SETPOINT(points[3], pp->spritexs / 2,		pp->spriteys);
-	SETPOINT(points[4], pp->spritexs * 2 / 3,	pp->spriteys * 5 / 6);
-	SETPOINT(points[5], pp->spritexs * 5 / 6,	pp->spriteys);
-	SETPOINT(points[6], pp->spritexs,		pp->spriteys * 5 / 6);
-	SETPOINT(points[7], pp->spritexs,		pp->spriteys / 2);
-	SETPOINT(points[8], 1, 				pp->spriteys / 2);
+		/* draw the triangles on the bottom (scalable) */
+		if (osc == 0) {
+			hem0 = pp->spriteys * 5 / 6;
+			hem1 = pp->spriteys;
+		} else {
+			hem1 = pp->spriteys * 5 / 6;
+			hem0 = pp->spriteys;
+		}
+		SETPOINT(points[0], 1, hem0);
+		SETPOINT(points[1], pp->spritexs / 6, hem1);
+		SETPOINT(points[2], pp->spritexs / 3, hem0);
+		SETPOINT(points[3], pp->spritexs / 2, hem1);
+		SETPOINT(points[4], pp->spritexs * 2 / 3, hem0);
+		SETPOINT(points[5], pp->spritexs * 5 / 6, hem1);
+		SETPOINT(points[6], pp->spritexs, hem0);
+		SETPOINT(points[7], pp->spritexs, pp->spriteys / 2 - 1);
+		SETPOINT(points[8], 1, pp->spriteys / 2 - 1);
 
-	XFillRectangle(display, pp->ghostPixmap, bg_gc,
-		0, 0, pp->spritexs, pp->spriteys);
-	XFillArc(display, pp->ghostPixmap, fg_gc,
-		0, 0, pp->spritexs, pp->spriteys, 0, 11520);
-	XFillPolygon(display, pp->ghostPixmap, fg_gc,
-		points, 9, Nonconvex, CoordModeOrigin);
-	XFreeGC(display, bg_gc);
-	XFreeGC(display, fg_gc);
-
+		XFillRectangle(display, pp->ghostPixmap[osc], bg_gc,
+			0, 0, pp->spritexs, pp->spriteys);
+		XFillArc(display, pp->ghostPixmap[osc], fg_gc,
+			0, 0, pp->spritexs, pp->spriteys, 0, 11520);
+		XFillPolygon(display, pp->ghostPixmap[osc], fg_gc,
+			points, 9, Nonconvex, CoordModeOrigin);
+		XFillArc(display, pp->ghostPixmap[osc], bg_gc,
+			pp->spritexs / 5, pp->spriteys / 4,
+			pp->spritexs / 5, pp->spriteys / 3, 0, 23040);
+		XFillArc(display, pp->ghostPixmap[osc], bg_gc,
+			pp->spritexs * 3 / 5, pp->spriteys / 4,
+			pp->spritexs / 5, pp->spriteys / 3, 0, 23040);
+		XFreeGC(display, bg_gc);
+		XFreeGC(display, fg_gc);
+	}
 	if (!pp->stippledGC) {
 		gcv.foreground = MI_BLACK_PIXEL(mi);
 		gcv.background = MI_BLACK_PIXEL(mi);

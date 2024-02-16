@@ -74,6 +74,7 @@ static const char sccsid[] = "@(#)tetris.c	5.01 2000/12/19 xlockmore";
 	"*fullrandom: True \n" \
 	"*verbose: False \n" \
 
+# define free_tetris 0
 # define reshape_tetris 0
 # define tetris_handle_event 0
 #include "xlockmore.h"    /* in xscreensaver distribution */
@@ -141,7 +142,7 @@ ENTRYPOINT ModeSpecOpt tetris_opts =
 #ifdef USE_MODULES
 ModStruct   tetris_description =
 {"tetris", "init_tetris", "draw_tetris", "release_tetris",
- "refresh_tetris", "change_tetris", "free_tetris", &tetris_opts,
+ "refresh_tetris", "change_tetris", (char *) NULL, &tetris_opts,
  600000, -40, 200, -100, 64, 1.0, "",
  "Shows an autoplaying tetris game", 0, NULL};
 
@@ -1645,12 +1646,6 @@ free_tetris_screen(ModeInfo *mi, trisstruct *tp)
   }
   free_images(tp);
   tp = NULL;
-}
-
-ENTRYPOINT void
-free_tetris(ModeInfo * mi)
-{
-	free_tetris_screen(mi, &triss[MI_SCREEN(mi)]);
 }
 
 static int

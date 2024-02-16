@@ -29,7 +29,6 @@ static const char sccsid[] = "@(#)laser.c	5.00 2000/11/01 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_laser
-#define laser_opts xlockmore_opts
 #define DEFAULTS "*delay: 20000 \n" \
 	"*count: -10 \n" \
 	"*cycles: 200 \n" \
@@ -225,7 +224,7 @@ init_laser(ModeInfo * mi)
 	}
 }
 
-ENTRYPOINT void
+static void
 draw_laser_once(ModeInfo * mi)
 {
 	Display    *display = MI_DISPLAY(mi);

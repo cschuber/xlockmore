@@ -49,6 +49,7 @@ static const char sccsid[] = "@(#)tik_tak.c	5.00 2000/11/01 xlockmore";
 	"*fullrandom: True \n" \
 	"*verbose: False \n" \
 
+# define free_tik_tak 0
 # define reshape_tik_tak 0
 # define tik_tak_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -86,7 +87,7 @@ ENTRYPOINT ModeSpecOpt tik_tak_opts =
 #ifdef USE_MODULES
 ModStruct   tik_tak_description =
 {"tik_tak", "init_tik_tak", "draw_tik_tak", "release_tik_tak",
- "refresh_tik_tak", "init_tik_tak", "free_tik_tak", &tik_tak_opts,
+ "refresh_tik_tak", "init_tik_tak", (char *) NULL, &tik_tak_opts,
  60000, -20, 200, -1000, 64, 1.0, "",
  "Shows rotating polygons", 0, NULL};
 
@@ -265,12 +266,6 @@ free_tik_tak_screen(ModeInfo *mi, tik_takstruct *tiktak)
 		tiktak->object = (tik_takobject *) NULL;
 	}
 	tiktak = NULL;
-}
-
-ENTRYPOINT void
-free_tik_tak(ModeInfo * mi)
-{
-        free_tik_tak_screen(mi, &tik_taks[MI_SCREEN(mi)]);
 }
 
 #ifndef STANDALONE

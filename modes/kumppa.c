@@ -57,6 +57,7 @@ static const char sccsid[] = "@(#)kumppa.c	5.00 2000/11/01 xlockmore";
 	"*cycles: 1000 \n" \
 	".background: black\n" \
 
+# define free_kumppa 0
 # define reshape_kumppa 0
 # define kumppa_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -122,7 +123,7 @@ ENTRYPOINT ModeSpecOpt kumppa_opts =
 #ifdef USE_MODULES
 ModStruct   kumppa_description =
 {"kumppa", "init_kumppa", "draw_kumppa", "release_kumppa",
- "init_kumppa", "init_kumppa", "free_kumppa", &kumppa_opts,
+ "init_kumppa", "init_kumppa", (char *) NULL, &kumppa_opts,
  10000, 1, 1000, 1, 64, 1.0, "",
  "Shows Kumppa", 0, NULL};
 
@@ -347,12 +348,6 @@ free_kumppa_screen(ModeInfo *mi, kumppastruct *s)
 		s->rotateY = (int *) NULL;
 	}
 	s = NULL;
-}
-
-ENTRYPOINT void
-free_kumppa(ModeInfo * mi)
-{
-	free_kumppa_screen(mi, &kumppas[MI_SCREEN(mi)]);
 }
 
 static void

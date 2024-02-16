@@ -56,6 +56,7 @@ static const char sccsid[] = "@(#)spline.c	5.00 2000/11/01 xlockmore";
 	"*ncolors: 200 \n" \
 	"*fullrandom: True \n" \
 
+# define free_spline 0
 # define reshape_spline 0
 # define spline_handle_event 0
 #define UNIFORM_COLORS
@@ -94,7 +95,7 @@ ENTRYPOINT ModeSpecOpt spline_opts =
 #ifdef USE_MODULES
 ModStruct   spline_description =
 {"spline", "init_spline", "draw_spline", "release_spline",
- "refresh_spline", "init_spline", "free_spline_dup", &spline_opts,
+ "refresh_spline", "init_spline", (char *) NULL, &spline_opts,
  30000, -6, 2048, 1, 64, 0.3, "",
  "Shows colorful moving splines", 0, NULL};
 
@@ -154,21 +155,6 @@ free_spline_screen(splinestruct *sp)
 	}
 	sp = NULL;
 }
-
-/* FIXME */
-#ifdef STANDALONE
-ENTRYPOINT void
-free_spline(ModeInfo * mi)
-{
-	free_spline_screen(&splines[MI_SCREEN(mi)]);
-}
-#else
-ENTRYPOINT void
-free_spline_dup(ModeInfo * mi)
-{
-	free_spline_screen(&splines[MI_SCREEN(mi)]);
-}
-#endif
 
 ENTRYPOINT void
 init_spline(ModeInfo * mi)

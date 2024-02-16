@@ -1021,6 +1021,8 @@ static argtype modevars[] =
 
 #define NMODEARGS (sizeof modevars / sizeof modevars[0])
 
+extern void checkResources(void);
+
 static int  modevaroffs[NMODEARGS] =
 {
 	offsetof(LockStruct, def_delay),

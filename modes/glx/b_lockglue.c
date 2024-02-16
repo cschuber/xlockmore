@@ -95,7 +95,7 @@ init(struct context *c)
 	c->draw_context = glb_draw_init();
 }
 
-ENTRYPOINT void
+static void
 reshape_bubble3d(ModeInfo *mi, int w, int h)
 {
 	glViewport(0, 0, (GLsizei) w, (GLsizei) h);

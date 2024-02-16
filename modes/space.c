@@ -38,6 +38,7 @@ static const char sccsid[] = "@(#)space.c	5.00 2000/11/01 xlockmore";
 	"*both3d: magenta \n" \
 	"*none3d: black \n" \
 
+# define free_space 0
 # define reshape_space 0
 # define space_handle_event 0
 #define SMOOTH_COLORS
@@ -54,7 +55,7 @@ ENTRYPOINT ModeSpecOpt space_opts =
 #ifdef USE_MODULES
 ModStruct   space_description =
 {"space", "init_space", "draw_space", "release_space",
- (char *) NULL, "init_space", "free_space", &space_opts,
+ (char *) NULL, "init_space", (char *) NULL, &space_opts,
  10000, 100, 1, 1, 64, 1.0, "",
  "a journey into deep space", 0, NULL};
 
@@ -135,13 +136,6 @@ free_space_screen(SpaceStruct *sp)
 	}
 	sp = NULL;
 }
-
-ENTRYPOINT void
-free_space(ModeInfo * mi)
-{
-	free_space_screen(&spaces[MI_SCREEN(mi)]);
-}
-
 
 ENTRYPOINT void
 init_space(ModeInfo * mi)

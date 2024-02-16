@@ -49,6 +49,7 @@ static const char sccsid[] = "@(#)pyro.c	5.00 2000/11/01 xlockmore";
 	"*both3d: magenta \n" \
 	"*none3d: black \n" \
 
+# define free_pyro 0
 # define reshape_pyro 0
 # define pyro_handle_event 0
 # define UNIFORM_COLORS
@@ -65,13 +66,13 @@ ENTRYPOINT ModeSpecOpt pyro_opts =
 #ifdef USE_MODULES
 ModStruct   pyro_description =
 {"pyro", "init_pyro", "draw_pyro", "release_pyro",
- "refresh_pyro", "init_pyro", "free_pyro", &pyro_opts,
+ "refresh_pyro", "init_pyro", (char *) NULL, &pyro_opts,
  15000, 100, 1, -3, 64, 1.0, "",
  "Shows fireworks", 0, NULL};
 
 #endif
 
-#define ORANGE (MI_NPIXELS(mi) / 16)
+#define ORANGE (5 * MI_NPIXELS(mi) / 64)
 
 #define MINROCKETS 1
 #define MINSIZE 1
@@ -467,12 +468,6 @@ free_pyro_screen(pyrostruct * pp)
 		free(pp->rockq);
 	}
 	pp = NULL;
-}
-
-ENTRYPOINT void
-free_pyro(ModeInfo * mi)
-{
-	free_pyro_screen(&pyros[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

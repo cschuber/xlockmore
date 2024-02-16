@@ -102,13 +102,8 @@ static const char sccsid[] = "@(#)flow.c	5.00 2000/11/01 xlockmore";
 	"*size:  -10 \n" \
 	"*cycles: 10000 \n" \
 	"*ncolors: 200 \n" \
-	"*rotate: True \n" \
-	"*ride: True \n" \
-	"*box: True \n" \
-	"*periodic: True \n" \
-	"*search: True \n" \
-	"*dbuf: True \n" \
 
+# define free_flow 0
 # define reshape_flow 0
 # define flow_handle_event 0
 # include "xlockmore.h"		/* in xscreensaver distribution */
@@ -180,7 +175,7 @@ ENTRYPOINT ModeSpecOpt flow_opts =
 #ifdef USE_MODULES
 ModStruct   flow_description = {
 	"flow", "init_flow", "draw_flow", "release_flow",
-	"refresh_flow", "init_flow", "free_flow", &flow_opts,
+	"refresh_flow", "init_flow", (char *) NULL, &flow_opts,
 	1000, 1024, 10000, -10, 200, 1.0, "",
 	"Shows dynamic strange attractors", 0, NULL
 };
@@ -638,12 +633,6 @@ clip(double nx, double ny, double nz, double d, dvector *s, dvector *e)
 /*
  * Public functions
  */
-
-ENTRYPOINT void
-free_flow(ModeInfo * mi)
-{
-	free_flow_screen(&flows[MI_SCREEN(mi)]);
-}
 
 ENTRYPOINT void
 init_flow(ModeInfo * mi)

@@ -42,6 +42,7 @@ static const char sccsid[] = "@(#)swirl.c	5.09 2003/06/30 xlockmore";
 	"*count: 5 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_swirl 0
 # define reshape_swirl 0
 # define swirl_handle_event 0
 #define SMOOTH_COLORS
@@ -80,7 +81,7 @@ ENTRYPOINT ModeSpecOpt swirl_opts =
 #ifdef USE_MODULES
 ModStruct   swirl_description =
 {"swirl", "init_swirl", "draw_swirl", "release_swirl",
- "refresh_swirl", "init_swirl", "free_swirl", &swirl_opts,
+ "refresh_swirl", "init_swirl", (char* NULL), &swirl_opts,
  5000, 5, 1, 1, 64, 1.0, "",
  "Shows animated swirling patterns", 0, NULL};
 
@@ -234,13 +235,6 @@ free_swirl_screen(ModeInfo *mi, swirlstruct *sp)
 	}
 	sp = NULL;
 }
-
-ENTRYPOINT void
-free_swirl(ModeInfo * mi)
-{
-	free_swirl_screen(mi, &swirls[MI_SCREEN(mi)]);
-}
-
 
 #ifndef STANDALONE
 extern char *background;

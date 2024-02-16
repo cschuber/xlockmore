@@ -59,6 +59,7 @@ static const char sccsid[] = "@(#)nose.c	5.00 2000/11/01 xlockmore";
 	"*fortunefile: \n" \
 	"*program: \n" \
 
+# define free_nose 0
 # define reshape_nose 0
 # define nose_handle_event 0
 #define UNIFORM_COLORS
@@ -76,7 +77,7 @@ ENTRYPOINT ModeSpecOpt nose_opts =
 #ifdef USE_MODULES
 ModStruct   nose_description =
 {"nose", "init_nose", "draw_nose", "release_nose",
- "refresh_nose", "init_nose", "free_nose", &nose_opts,
+ "refresh_nose", "init_nose", (char *) NULL, &nose_opts,
  100000, 1, 1, 1, 64, 1.0, "",
  "Shows a man with a big nose runs around spewing out messages", 0, NULL};
 
@@ -209,12 +210,6 @@ free_nose_screen(Display *display, nosestruct *np)
 	   		np->noseGC[pix] = None;
 		}
 	}
-}
-
-ENTRYPOINT void
-free_nose(ModeInfo * mi)
-{
-        free_nose_screen(MI_DISPLAY(mi), &noses[MI_SCREEN(mi)]);
 }
 
 static Bool

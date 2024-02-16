@@ -50,11 +50,20 @@ static const char sccsid[] = "@(#)decay.c	5.00 2000/11/01 xlockmore";
 # define DEFAULTS "*delay: 200000 \n" \
  "*count: 6 \n" \
  "*cycles: 30 \n" \
- "*ncolors: 200 \n"
+ "*ncolors: 64 \n"
 
+# define free_decay 0
 # define reshape_decay 0
 # define decay_handle_event 0
+# define UNIFORM_COLORS
 # include "xlockmore.h"    /* in xscreensaver distribution */
+static XImage blogo =
+{
+	0, 0,			/* width, height */
+	0, XYBitmap, 0,		/* xoffset, format, data */
+	LSBFirst, 8,		/* byte-order, bitmap-unit */
+	LSBFirst, 8, 1		/* bitmap-bit-order, bitmap-pad, depth */
+};
 #else /* STANDALONE */
 # include "xlock.h"    /* in xlockmore distribution */
 # include "color.h"
@@ -73,23 +82,33 @@ ENTRYPOINT ModeSpecOpt decay_opts =
 #ifdef USE_MODULES
 ModStruct   decay_description =
 {"decay", "init_decay", "draw_decay", "release_decay",
- "refresh_decay", "init_decay", "free_decay", &decay_opts,
+ "refresh_decay", "init_decay", (char *) NULL, &decay_opts,
  200000, 6, 30, 1, 64, 0.3, "",
  "Shows a decaying screen", 0, NULL};
 
 #endif
 
-#define DECAY_WIDTH   image_width
-#define DECAY_HEIGHT    image_height
-#define DECAY_BITS    image_bits
-
-#ifndef STANDALONE
+#ifdef STANDALONE
+#define DECAY_WIDTH	xscreensaver_width
+#define DECAY_HEIGHT	xscreensaver_height
+#define DECAY_BITS	xscreensaver_bits
+#include "bitmaps/xscreensaver.xbm"
+#else
+#define DECAY_WIDTH	image_width
+#define DECAY_HEIGHT	image_height
+#define DECAY_BITS	image_bits
 #include "decay.xbm"
 #endif
 
 #ifdef HAVE_XPM
-#define DECAY_NAME    image_name
+#include <X11/xpm.h>
+#ifdef STANDALONE
+#define DECAY_NAME	xscreensaver
+#include "pixmaps/xscreensaver.xpm"
+#else
+#define DECAY_NAME	image_name
 #include "decay.xpm"
+#endif
 #define DEFAULT_XPM 1
 #endif
 
@@ -146,17 +165,38 @@ free_decay_screen(Display * display, decaystruct * dp)
 	dp = NULL;
 }
 
-ENTRYPOINT void
-free_decay(ModeInfo * mi)
-{
-	free_decay_screen(MI_DISPLAY(mi), &decay_info[MI_SCREEN(mi)]);
-}
-
 static void
 alloc_decay(ModeInfo * mi)
 {
 	decaystruct *dp = &decay_info[MI_SCREEN(mi)];
-#ifndef STANDALONE
+#ifdef STANDALONE
+#ifdef HAVE_XPM
+	XpmAttributes attrib;
+	attrib.visual = MI_VISUAL(mi);
+	attrib.colormap = MI_COLORMAP(mi);
+	attrib.depth = MI_DEPTH(mi);
+	attrib.valuemask = XpmVisual | XpmColormap | XpmDepth;
+	if (MI_NPIXELS(mi) > 2 &&
+			(XpmSuccess == XpmCreateImageFromData(MI_DISPLAY(mi),
+			DECAY_NAME, &(dp->logo), (XImage **) NULL, &attrib))) {
+		dp->graphics_format = IS_XPM;
+	} else
+#endif
+	{
+		int default_width = DECAY_WIDTH;
+		int default_height = DECAY_HEIGHT;
+		unsigned char * default_bits = DECAY_BITS;
+		if (!blogo.data) {
+			blogo.data = (char *) default_bits;
+			blogo.width = default_width;
+			blogo.height = default_height;
+			blogo.bytes_per_line = (blogo.width + 7) / 8;
+		}
+		dp->logo = &blogo;
+		dp->graphics_format = IS_XBM;
+	}
+	dp->hide = True;
+#else
 	Display    *display = MI_DISPLAY(mi);
 	Window      window = MI_WINDOW(mi);
 
@@ -234,7 +274,6 @@ init_decay(ModeInfo * mi)
 		dp->hide = hide;
 #endif
 
-
 	dp->windowsize.x = MI_WIDTH(mi);
 	dp->windowsize.y = MI_HEIGHT(mi);
 	alloc_decay(mi);
@@ -257,7 +296,6 @@ init_decay(ModeInfo * mi)
 			(int) (NRAND(MAX(1, (dp->logo->height - dp->windowsize.y)))),
                                  dp->randompos.x, dp->randompos.y,
                                  dp->windowsize.x, dp->windowsize.y);
-
 	}
 #ifndef STANDALONE
 	else {
@@ -268,7 +306,6 @@ init_decay(ModeInfo * mi)
 	}
 #endif
 }
-
 
 /*
  * perform one iteration of decay

@@ -30,6 +30,7 @@ static const char sccsid[] = "@(#)starfish.c	5.03 2003/05/01 xlockmore";
 	"*fullrandom: True \n" \
 	"*verbose: False \n" \
 
+# define free_starfish 0
 # define reshape_starfish 0
 # define starfish_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -88,7 +89,7 @@ ENTRYPOINT ModeSpecOpt starfish_opts =
 #ifdef USE_MODULES
 ModStruct   starfish_description =
 {"starfish", "init_starfish", "draw_starfish", "release_starfish",
- "init_starfish", "init_starfish", "free_starfish", &starfish_opts,
+ "init_starfish", "init_starfish", (char *), &starfish_opts,
  2000, 1, 1000, 1, 64, 1.0, "",
  "Shows starfish", 0, NULL};
 
@@ -188,13 +189,6 @@ free_starfish_screen(ModeInfo *mi, starfishstruct * sp)
 	}
 	sp = NULL;
 }
-
-ENTRYPOINT void
-free_starfish(ModeInfo * mi)
-{
-	free_starfish_screen(mi, &starfishes[MI_SCREEN(mi)]);
-}
-
 
 static void
 make_starfish(ModeInfo * mi)

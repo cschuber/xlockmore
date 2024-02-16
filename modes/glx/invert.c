@@ -42,6 +42,7 @@ static const char sccsid[] = "@(#)invert.c	5.01 2001/03/01 xlockmore";
 			"*wireframe:	False	\n"
 
 #define invert_handle_event 0
+#define free_invert 0
 #define reshape_invert 0
 #include "xlockmore.h"
 #else /* !STANDALONE */
@@ -62,7 +63,7 @@ ModStruct invert_description =
 {(char *) "invert", (char *) "init_invert",
  (char *) "draw_invert", (char *) "release_invert",
  (char *) "draw_invert", (char *) "init_invert",
- (char *) "free_invert", &invert_opts,
+ (char *) NULL, &invert_opts,
  80000, 1, 1, 1, 64, 1.0, (char *) "",
  (char *) "Shows a sphere inverted without wrinkles", 0, NULL};
 
@@ -154,13 +155,6 @@ free_invert_screen(Display *display, spherestruct *gp)
     gp->partlist = (char *) NULL;
   }
   gp = NULL;
-}
-
-ENTRYPOINT void
-free_invert(ModeInfo * mi)
-{
-	
-  free_invert_screen(MI_DISPLAY(mi), &spheres[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

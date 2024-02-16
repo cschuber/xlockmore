@@ -36,6 +36,7 @@ static const char sccsid[] = "@(#)thornbird.c	5.00 2000/11/01 xlockmore";
 	"*cycles: 16 \n" \
 	"*ncolors: 100 \n" \
 
+# define free_thornbird 0
 # define reshape_thornbird 0
 # define thornbird_handle_event 0
 #define SMOOTH_COLORS
@@ -52,7 +53,7 @@ ENTRYPOINT ModeSpecOpt thornbird_opts =
 #ifdef USE_MODULES
 ModStruct   thornbird_description =
 {"thornbird", "init_thornbird", "draw_thornbird", "release_thornbird",
- "refresh_thornbird", "init_thornbird", "free_thornbird", &thornbird_opts,
+ "refresh_thornbird", "init_thornbird", (char *) NULL, &thornbird_opts,
  1000, 800, 16, 1, 64, 1.0, "",
  "Shows an animated Bird in a Thorn Bush fractal map", 0, NULL};
 
@@ -105,12 +106,6 @@ free_thornbird_screen(thornbirdstruct *hp)
 		hp->pointBuffer = (XPoint **) NULL;
 	}
 	hp = NULL;
-}
-
-ENTRYPOINT void
-free_thornbird(ModeInfo * mi)
-{
-        free_thornbird_screen(&thornbirds[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

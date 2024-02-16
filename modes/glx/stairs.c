@@ -338,7 +338,7 @@ draw_stairs_internal(ModeInfo * mi)
 	return True;
 }
 
-ENTRYPOINT void
+static void
 reshape_stairs(ModeInfo * mi, int width, int height)
 {
 	stairsstruct *sp = &stairs[MI_SCREEN(mi)];

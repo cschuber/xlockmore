@@ -69,7 +69,6 @@ static const char sccsid[] = "@(#)glplanet.c	5.01 01/04/13 xlockmore";
 					"*imageBackground:	Blue	\n"
 
 #define free_glplanet 0
-#define reshape_glplanet 0
 #define glplanet_handle_event 0
 # include "xlockmore.h"			/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
@@ -310,10 +309,13 @@ setup_file_texture (ModeInfo *mi, char *filename)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 					 image->width, image->height, 0,
 					 GL_RGBA, GL_UNSIGNED_BYTE, image->data);
+#ifdef STANDALONE
+		check_gl_error("texture A");
+#else
 		if (check_gl_error("texture A")) {
 			return False;
 		}
-
+#endif
 		/* setup parameters for texturing */
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, image->width);
@@ -614,8 +616,8 @@ rotate_and_move (ModeInfo * mi)
 
 
 /* Standard reshape function */
-ENTRYPOINT void
-reshape_planet(ModeInfo *mi, int width, int height)
+static void
+reshape_glplanet(ModeInfo *mi, int width, int height)
 {
   GLfloat light[4];
   GLfloat h = (GLfloat) height / (GLfloat) width;
@@ -684,7 +686,7 @@ init_glplanet(ModeInfo * mi)
 
   gp->window = MI_WINDOW(mi);
   if ((gp->glx_context = init_GL(mi)) != NULL) {
-	reshape_planet(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
+	reshape_glplanet(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 	pinit(mi);
   } else {
 	MI_CLEARWINDOW(mi);

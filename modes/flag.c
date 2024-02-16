@@ -40,10 +40,11 @@ static const char sccsid[] = "@(#)flag.c	5.00 2000/11/01 xlockmore";
 	"*size: -7 \n" \
 	"*ncolors: 200 \n" \
 	"*bitmap: \n" \
-	"*font: fixed \n" \
+	"*font: fixed\n" \
 	"*text: \n" \
 	"*fullrandom: True \n" \
 
+# define free_flag 0
 # define reshape_flag 0
 # define flag_handle_event 0
 #define BRIGHT_COLORS
@@ -110,7 +111,7 @@ ENTRYPOINT ModeSpecOpt flag_opts =
 #ifdef USE_MODULES
 ModStruct   flag_description =
 {"flag", "init_flag", "draw_flag", "release_flag",
- "refresh_flag", "init_flag", "free_flag", &flag_opts,
+ "refresh_flag", "init_flag", (char *) NULL, &flag_opts,
  50000, 1, 1000, -7, 64, 1.0, "",
  "Shows a waving flag image", 0, NULL};
 
@@ -123,18 +124,18 @@ ModStruct   flag_description =
 
 #ifndef STANDALONE
 #include "flag.xbm"
-#endif
 
 #ifdef HAVE_XPM
 #define FLAG_NAME  image_name
 #include "flag.xpm"
 #define DEFAULT_XPM 0
 #endif
+#endif
 
 #if !defined( VMS ) || ( __VMS_VER >= 70000000 )
 #include <sys/utsname.h>
 #else
-#if USE_XVMSUTILS
+#ifdef USE_XVMSUTILS
 #if 0
 #include "../xvmsutils/utsname.h"
 #else
@@ -481,12 +482,6 @@ free_flag_screen(Display * display, flagstruct * fp)
 	}
 #endif
 	fp = NULL;
-}
-
-ENTRYPOINT void
-free_flag(ModeInfo * mi)
-{
-	free_flag_screen(MI_DISPLAY(mi), &flags[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

@@ -72,6 +72,7 @@ static const char sccsid[] = "@(#)kaleid.c	5.00 2000/11/01 xlockmore";
 	"*ncolors: 200 \n" \
 	"*fullrandom: False \n" \
 
+# define free_kaleid 0
 # define reshape_kaleid 0
 # define kaleid_handle_event 0
 #define UNIFORM_COLORS
@@ -154,7 +155,7 @@ ENTRYPOINT ModeSpecOpt kaleid_opts =
 ModStruct   kaleid_description =
 {
 	"kaleid", "init_kaleid", "draw_kaleid", "release_kaleid",
-	"refresh_kaleid", "init_kaleid", "free_kaleid", &kaleid_opts,
+	"refresh_kaleid", "init_kaleid", (char *) NULL, &kaleid_opts,
 	80000, 4, 40, -9, 64, 0.6, "",
 	"Shows Brewster's Kaleidoscope", 0, NULL
 };
@@ -1072,12 +1073,6 @@ free_kaleid_screen(kaleidstruct *kp)
 	if (kp->pen != NULL)
 		free(kp->pen);
 	kp = NULL;
-}
-
-ENTRYPOINT void
-free_kaleid(ModeInfo * mi)
-{
-	free_kaleid_screen(&kaleids[MI_SCREEN(mi)]);
 }
 
 /*-

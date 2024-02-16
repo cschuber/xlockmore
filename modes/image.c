@@ -35,12 +35,21 @@ static const char sccsid[] = "@(#)image.c	5.00 2000/11/01 xlockmore";
 #define MODE_image
 #define DEFAULTS "*delay: 2000000 \n" \
 	"*count: -10 \n" \
-	"*ncolors: 200 \n" \
+	"*ncolors: 64 \n" \
 	"*bitmap: \n" \
 
+# define free_image 0
 # define reshape_image 0
 # define image_handle_event 0
+# define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
+static XImage blogo =
+{
+	0, 0,			/* width, height */
+	0, XYBitmap, 0,		/* xoffset, format, data */
+	LSBFirst, 8,		/* byte-order, bitmap-unit */
+	LSBFirst, 8, 1		/* bitmap-bit-order, bitmap-pad, depth */
+};
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #include "color.h"
@@ -72,24 +81,34 @@ ENTRYPOINT ModeSpecOpt image_opts =
 #ifdef USE_MODULES
 ModStruct image_description =
 {"image", "init_image", "draw_image", "release_image",
- "refresh_image", "init_image", "free_image", &image_opts,
+ "refresh_image", "init_image", (char *) NULL, &image_opts,
  2000000, -10, 1, 1, 64, 1.0, "",
  "Shows randomly appearing logos", 0, NULL};
 
 #endif
 
 /* aliases for vars defined in the bitmap file */
+#ifdef STANDALONE
+#define IMAGE_WIDTH	xscreensaver_width
+#define IMAGE_HEIGHT	xscreensaver_height
+#define IMAGE_BITS	xscreensaver_bits
+#include "bitmaps/xscreensaver.xbm"
+#else
 #define IMAGE_WIDTH	image_width
 #define IMAGE_HEIGHT	image_height
 #define IMAGE_BITS	image_bits
-
-#ifndef STANDALONE
 #include "image.xbm"
 #endif
 
 #ifdef HAVE_XPM
+#ifdef STANDALONE
+#include <X11/xpm.h>
+#define IMAGE_NAME	xscreensaver
+#include "pixmaps/xscreensaver.xpm"
+#else
 #define IMAGE_NAME	image_name
 #include "image.xpm"
+#endif
 #define DEFAULT_XPM 1
 #endif
 
@@ -219,17 +238,41 @@ free_image_screen(Display * display, imagestruct * ip)
 	ip = NULL;
 }
 
-ENTRYPOINT void
-free_image(ModeInfo * mi)
-{
-	free_image_screen(MI_DISPLAY(mi), &ims[MI_SCREEN(mi)]);
-}
-
 static Bool
 initLogo(ModeInfo * mi)
 {
 	imagestruct *ip = &ims[MI_SCREEN(mi)];
-#ifndef STANDALONE
+#ifdef STANDALONE
+#ifdef HAVE_XPM
+	XpmAttributes attrib;
+	attrib.visual = MI_VISUAL(mi);
+	attrib.colormap = MI_COLORMAP(mi);
+	attrib.depth = MI_DEPTH(mi);
+	attrib.valuemask = XpmVisual | XpmColormap | XpmDepth;
+	if (MI_NPIXELS(mi) > 2 && 
+		(XpmSuccess == XpmCreateImageFromData(MI_DISPLAY(mi),
+			IMAGE_NAME, &(ip->logo), (XImage **) NULL, &attrib))) {
+		ip->graphics_format = IS_XPM;
+		ip->pixw = ip->logo->width;
+		ip->pixh = ip->logo->height;
+	} else
+#endif
+	{
+		int default_width = IMAGE_WIDTH;
+		int default_height = IMAGE_HEIGHT;
+		unsigned char * default_bits = IMAGE_BITS;
+		if (!blogo.data) {
+			blogo.data = (char *) default_bits;
+			blogo.width = default_width;
+			blogo.height = default_height;
+			blogo.bytes_per_line = (blogo.width + 7) / 8;
+		}
+		ip->logo = &blogo;
+		ip->graphics_format = IS_XBM;
+		ip->pixw = ip->logo->width;
+		ip->pixh = ip->logo->height;
+	}
+#else
 	Display *display = MI_DISPLAY(mi);
 
 	if (ip->logo == None) {

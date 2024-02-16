@@ -31,7 +31,7 @@
 #define SECOND			"秒"
 #define SECONDS			"秒"
 
-#if METRIC
+#ifdef METRIC
 #define AREA_STRING		"ヘクタール"
 #else
 #define AREA_STRING		"エーカー"

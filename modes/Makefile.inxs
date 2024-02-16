@@ -3,7 +3,7 @@
 
 @SET_MAKE@
 .SUFFIXES:
-.SUFFIXES: .c .o
+.SUFFIXES: .cc .c .o
 
 srcdir		= @srcdir@
 VPATH		= @srcdir@
@@ -25,9 +25,11 @@ HACKDIR		= @HACKDIR@
 HACK_CONF_DIR	= @HACK_CONF_DIR@
 
 CC		= @CC@
+CXX		= g++
 CFLAGS		= @CFLAGS@
+CXXFLAGS	= -Wall
 LDFLAGS		= @LDFLAGS@
-DEFS		= -DSTANDALONE @DEFS@
+DEFS		= -DSTANDALONE -DHAVE_XPM @DEFS@
 LIBS		= @LIBS@
 PERL		= @PERL@
 
@@ -57,7 +59,7 @@ XFT_LIBS	= @XFT_LIBS@
 # Note: see comment in ../driver/Makefile.in for explanation of X_LIBS, etc.
 #
 HACK_PRE	= $(LIBS) $(X_LIBS)
-HACK_POST     = $(X_PRE_LIBS) $(XFT_LIBS) -lXt -lX11 $(XMU_LIBS) -lXext $(X_EXTRA_LIBS) -lm
+HACK_POST	= $(X_PRE_LIBS) $(XFT_LIBS) -lXt -lX11 $(XMU_LIBS) -lXext $(X_EXTRA_LIBS) -lm
 HACK_LIBS	= $(HACK_PRE) @ANIM_LIBS@ @HACK_LIBS@ $(HACK_POST)
 PNG_LIBS	= $(HACK_PRE) @PNG_LIBS@ @HACK_LIBS@ $(HACK_POST)
 JPEG_LIBS	= @JPEG_LIBS@
@@ -122,7 +124,7 @@ helix.c hop.c hyper.c \
 ico.c ifs.c image.c juggle.c julia.c kaleid.c kumppa.c \
 laser.c life.c life1d.c life3d.c \
 lightning.c lisa.c lissie.c loop.c lyapunov.c \
-mandelbrot.c marquee.c maze.c mountain.c munch.c \
+mandelbrot.c marquee.c matrix.c maze.c mountain.c munch.c \
 nose.c pacman.c penrose.c petal.c petri.c \
 polyominoes.c puzzle.c pyro.c pyro2.c \
 qix.c rain.c roll.c rotor.c \
@@ -135,6 +137,9 @@ vines.c voters.c \
 wator.c wire.c world.c worm.c xcl.c xjack.c \
 blank.c bomb.c run.c \
 random.c
+
+XLOCKCXXSRCS = solitaire.cc
+
 XLOCKMODEOBJS = anemone.o ant.o ant3d.o apollonian.o \
 ball.o bat.o blot.o \
 bouboule.o bounce.o braid.o bubble.o bug.o \
@@ -148,7 +153,7 @@ helix.o hop.o hyper.o \
 ico.o ifs.o image.o juggle.o julia.o kaleid.o kumppa.o \
 laser.o life.o life1d.o life3d.o \
 lightning.o lisa.o lissie.o loop.o lyapunov.o \
-mandelbrot.o marquee.o maze.o mountain.o munch.o \
+mandelbrot.o marquee.o matrix.o maze.o mountain.o munch.o \
 nose.o pacman.o penrose.o petal.o petri.o \
 polyominoes.o puzzle.o pyro.o pyro2.o \
 qix.o rain.o roll.o rotor.o \
@@ -161,6 +166,9 @@ vines.o voters.o \
 wator.o wire.o world.o worm.o xcl.o xjack.o \
 blank.o bomb.o run.o \
 random.o
+
+XLOCKCXXOBJS = solitaire.o
+
 XLOCKMODEEXES = anemone ant ant3d apollonian \
 ball bat blot \
 bouboule bounce braid bubble bug \
@@ -170,11 +178,11 @@ dilemma discrete dragon drift \
 eyes euler2d fadeplot fiberlamp \
 flag flame flow forest fzort \
 galaxy goop grav \
-helix hop \
+helix hop hyper \
 ico ifs image juggle julia kaleid kumppa \
 laser life life1d life3d \
 lightning lisa lissie loop lyapunov \
-mandelbrot marquee maze mountain munch \
+mandelbrot marquee matrix maze mountain munch \
 nose pacman penrose petal petri \
 polyominoes puzzle pyro pyro2 \
 qix rain roll rotor \
@@ -187,6 +195,8 @@ vines voters \
 wator wire world worm xcl xjack \
 blank bomb run
 #random
+
+XLOCKCXXEXES = solitaire
 
 # List of source files
 BITMAPS = bat.xbm bounce.xbm decay.xbm eyes.xbm eyes2.xbm flag.xbm \
@@ -372,7 +382,7 @@ TARFILES	= $(SRCS) $(HDRS) $(SCRIPTS) $(MEN) $(RETIRED_MEN) \
 
 
 default: all
-all: $(XLOCKMODEEXES)
+all: $(XLOCKMODEEXES) $(XLOCKCXXEXES)
 
 install:   install-program   install-scripts install-xml install-man
 uninstall: uninstall-program uninstall-xml uninstall-man
@@ -628,6 +638,8 @@ HACK_CFLAGS_BASE=$(INCLUDES) $(DEFS) $(CPPFLAGS) $(CFLAGS) $(X_CFLAGS)
 .c.o:
 	$(CC) -c $(HACK_CFLAGS_BASE) $<
 
+.cc.o:
+	$(CXX) -c $(HACK_CFLAGS_BASE) $<
 
 # Make sure these are regenerated when the version number ticks.
 screenhack.o: $(UTILS_SRC)/version.h
@@ -650,6 +662,7 @@ APPLE2          = apple2.o $(ATV)
 TEXT            = $(UTILS_BIN)/textclient.o
 
 CC_HACK		= $(CC) $(LDFLAGS)
+CXX_HACK	= $(CXX) $(LDFLAGS)
 
 BITMAPTYPE = x11
 PIXMAPTYPE = x11
@@ -1103,7 +1116,7 @@ ball:		ball.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 bat:		bat.o		$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS) -lXpm
 
 blank:		blank.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
@@ -1147,7 +1160,7 @@ dclock:		dclock.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 decay:		decay.o		$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS) -lXpm
 
 #deco:		deco.o		$(HACK_OBJS) $(COL)
 #	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(COL) $(HACK_LIBS)
@@ -1237,7 +1250,7 @@ ifs:		ifs.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 image:		image.o		$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS) -lXpm
 
 julia:		julia.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
@@ -1289,7 +1302,7 @@ marquee:	marquee.o	$(XLOCK_OBJS)
 mountain:	mountain.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
-matrix:		matrix.		$(XLOCK_OBJS)
+matrix:		matrix.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 maze:		maze.o		$(XLOCK_OBJS)
@@ -1326,7 +1339,7 @@ polyominoes:	polyominoes.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 puzzle:		puzzle.o	$(XLOCK_OBJS)
-	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
+	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS) -lXpm
 
 pyro2:		pyro2.o	$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
@@ -1367,6 +1380,9 @@ sierpinski:	sierpinski.o	$(XLOCK_OBJS)
 
 slip:		slip.o		$(XLOCK_OBJS) $(GRAB)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(GRAB) $(HACK_LIBS)
+
+solitaire:	solitaire.o	$(XLOCK_OBJS)
+	$(CXX_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
 
 space:		space.o		$(XLOCK_OBJS)
 	$(CC_HACK) -o $@ $@.o	$(XLOCK_OBJS) $(HACK_LIBS)
@@ -2664,6 +2680,21 @@ slip.o: $(UTILS_SRC)/visual.h
 slip.o: $(UTILS_SRC)/yarandom.h
 slip.o: $(HACKS_SRC)/xlockmoreI.h
 slip.o: $(HACKS_SRC)/xlockmore.h
+solitaire.o: $(srcdir)/../../config.h
+solitaire.o: $(HACKS_SRC)/fps.h
+solitaire.o: $(HACKS_SRC)/recanim.h
+solitaire.o: $(HACKS_SRC)/screenhackI.h
+solitaire.o: $(UTILS_SRC)/colors.h
+solitaire.o: $(UTILS_SRC)/erase.h
+solitaire.o: $(UTILS_SRC)/font-retry.h
+solitaire.o: $(UTILS_SRC)/grabscreen.h
+solitaire.o: $(UTILS_SRC)/hsv.h
+solitaire.o: $(UTILS_SRC)/resources.h
+solitaire.o: $(UTILS_SRC)/usleep.h
+solitaire.o: $(UTILS_SRC)/visual.h
+solitaire.o: $(UTILS_SRC)/yarandom.h
+solitaire.o: $(HACKS_SRC)/xlockmoreI.h
+solitaire.o: $(HACKS_SRC)/xlockmore.h
 space.o: $(srcdir)/../../config.h
 space.o: $(HACKS_SRC)/fps.h
 space.o: $(HACKS_SRC)/recanim.h

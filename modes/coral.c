@@ -47,6 +47,7 @@ static const char sccsid[] = "@(#)coral.c	5.00 2000/11/01 xlockmore";
 	"*size: 35 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_coral 0
 # define reshape_coral 0
 # define coral_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -138,12 +139,6 @@ free_coral_screen(coralstruct *cp)
 		cp->pointbuf = (XPoint *) NULL;
 	}
 	cp = NULL;
-}
-
-ENTRYPOINT void
-free_coral(ModeInfo * mi)
-{
-        free_coral_screen(&reefs[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

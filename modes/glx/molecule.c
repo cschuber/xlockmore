@@ -904,9 +904,10 @@ parse_pdb_data (molecule *m, const char *data, const char *filename, int line)
           char *n2 = name;
           int L = strlen(s);
 
-          if (L > 99) L = 99;
-
-          (void) strncpy(n2, s, L);
+          if (L > 99)
+          	(void) strncpy(n2, s, 99);
+          else
+          	(void) strcpy(n2, s);
           n2 += 7;
           while (isspace((int) *n2)) n2++;
 
@@ -1214,7 +1215,7 @@ load_molecules (ModeInfo *mi)
 
 /* Window management, etc
  */
-ENTRYPOINT void
+static void
 reshape_molecule (ModeInfo *mi, int width, int height)
 {
   GLfloat h = (GLfloat) height / (GLfloat) width;

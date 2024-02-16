@@ -44,6 +44,7 @@ static const char sccsid[] = "@(#)bug.c	5.24 2007/01/18 xlockmore";
 			"*size: -4 \n" \
 		 	"*ncolors: 64 \n" \
 
+# define free_bug 0
 # define reshape_bug 0
 # define bug_handle_event 0
 # include "xlockmore.h"		/* in xscreensaver distribution */
@@ -91,7 +92,7 @@ ENTRYPOINT ModeSpecOpt bug_opts =
 #ifdef USE_MODULES
 ModStruct   bug_description =
 {"bug", "init_bug", "draw_bug", "release_bug",
- "refresh_bug", "init_bug", "free_bug", &bug_opts,
+ "refresh_bug", "init_bug", (char *) NULL, &bug_opts,
  75000, 10, 32767, -4, 64, 1.0, "",
  "Shows Palmiter's bug evolution and garden of Eden", 0, NULL};
 
@@ -134,7 +135,7 @@ typedef struct {
 	int         col, row;
 	int         gene[MAXNEIGHBORS];
 	double      gene_prob[MAXNEIGHBORS];
-#if EXTRA_GENES
+#ifdef EXTRA_GENES
 	int         lgene[MAXNEIGHBORS];
 	double      lgene_prob[MAXNEIGHBORS];
 #endif
@@ -1025,7 +1026,7 @@ mutatebug(bugstruct * info, int local_neighbors)
 		sum += genexp[info->gene[gene] + MAXGENE];
 	for (gene = 0; gene < local_neighbors; gene++)
 		info->gene_prob[gene] = genexp[info->gene[gene] + MAXGENE] / sum;
-#if EXTRA_GENES
+#ifdef EXTRA_GENES
 	if (local_neighbors % 2) {
 		sum = 0.0;
 		gene = NRAND(local_neighbors);
@@ -1133,12 +1134,6 @@ free_bug_screen(Display *display, bugfarmstruct *bp)
 		bp->bacteria = (char *) NULL;
 	}
 	bp = NULL;
-}
-
-ENTRYPOINT void
-free_bug(ModeInfo * mi)
-{
-	free_bug_screen(MI_DISPLAY(mi), &bugfarms[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void
@@ -1339,7 +1334,7 @@ init_bug(ModeInfo * mi)
 				sum += genexp[info.gene[gene] + MAXGENE];
 			for (gene = 0; gene < bp->neighbors; gene++)
 				info.gene_prob[gene] = genexp[info.gene[gene] + MAXGENE] / sum;
-#if EXTRA_GENES
+#ifdef EXTRA_GENES
 			if (bp->neighbors % 2) {
 				for (gene = 0; gene < bp->neighbors; gene++) {
 #if 1

@@ -142,10 +142,11 @@
 			"*wireframe:	False	\n"
 #include "xlockmore.h"
 #define refresh_juggler3d 0
+#define free_juggler3d 0
 
-#define MI_COLOR_red    ((MI)->colors->red)
-#define MI_COLOR_green    ((MI)->colors->green)
-#define MI_COLOR_blue    ((MI)->colors->blue)
+#define MI_COLOR_red    ((mi)->colors[color].red)
+#define MI_COLOR_green    ((mi)->colors[color].green)
+#define MI_COLOR_blue    ((mi)->colors[color].blue)
 
 /* TODO for JWZ: move this to better place */
 #define MI_POLYGONCOUNT(MI)    ((MI)->polygon_count)
@@ -168,7 +169,11 @@
 #include "tube.h"
 #include "rotator.h"
 #include "gltrackball.h"
+#ifdef STANDALONE
+#include "texfont.h"
+#else
 #include "glxfonts.h"
+#endif
 #include <ctype.h>
 
 #include <GL/glu.h>
@@ -616,9 +621,12 @@ typedef struct {
   ObjType       objtypes;
   Object_j       *objects;
   struct patternindex patternindex;
-
+#ifdef STANDALONE
+  texture_font_data *font_data;
+#else
   XFontStruct *mode_font;
   GLuint font_dlist;
+#endif
 } jugglestruct;
 
 static jugglestruct *juggles = (jugglestruct *) NULL;
@@ -676,7 +684,10 @@ trajectory_destroy(Trajectory *t) {
 }
 
 static void
-free_juggler3d(jugglestruct *sp) {
+free_juggler3d_screen(jugglestruct *sp) {
+  if (sp == NULL) {
+	return;
+  }
   if (sp->head != NULL) {
 	while (sp->head->next != sp->head) {
 	  trajectory_destroy(sp->head->next);
@@ -695,17 +706,26 @@ free_juggler3d(jugglestruct *sp) {
 	free(sp->pattern);
 	sp->pattern = NULL;
   }
-  if (sp->mode_font!=None) {
-	XFreeFontInfo(NULL,sp->mode_font,1);
+#ifdef STANDALONE
+  if (sp->font_data != NULL) {
+        free_texture_font(sp->font_data);
+	sp->font_data = NULL;
+  }
+#else
+  if (sp->mode_font != None) {
+	XFreeFontInfo(NULL, sp->mode_font, 1);
 	sp->mode_font = None;
   }
+#endif
   if (sp->rot != NULL) {
 	free_rotator(sp->rot);
+	sp->rot = NULL;
   }
   if (sp->trackball != NULL) {
 	free (sp->trackball);
 	sp->trackball = NULL;
   }
+  sp = NULL;
 }
 
 static Bool
@@ -715,7 +735,7 @@ add_throw(jugglestruct *sp, char type, int h, Notation n, const char* name)
 
   ADD_ELEMENT(Trajectory, t, sp->head->prev);
   if(t == NULL){ /* Out of Memory */
-	free_juggler3d(sp);
+	free_juggler3d_screen(sp);
 	return False;
   }
   t->object = NULL;
@@ -956,7 +976,7 @@ part(jugglestruct *sp)
 	  t->action = CATCH;
 	  ADD_ELEMENT(Trajectory, nt, p);
 	  if(nt == NULL){
-		free_juggler3d(sp);
+		free_juggler3d_screen(sp);
 		return False;
 	  }
 	  nt->object = NULL;
@@ -2484,7 +2504,7 @@ release_juggler3d (ModeInfo * mi)
 	int screen;
 
 	for (screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-	  free_juggler3d(&juggles[screen]);
+		free_juggler3d_screen(&juggles[screen]);
 	free(juggles);
 	juggles = (jugglestruct *) NULL;
   }
@@ -2616,7 +2636,7 @@ refill_juggle(ModeInfo * mi)
   positions(sp);
 
   if (!projectile(sp)) {
-	free_juggler3d(sp);
+	free_juggler3d_screen(sp);
 	return;
   }
 
@@ -2657,7 +2677,7 @@ change_juggler3d(ModeInfo * mi)
 }
 
 
-ENTRYPOINT void
+static void
 reshape_juggler3d (ModeInfo *mi, int width, int height)
 {
   GLfloat h = (GLfloat) height / (GLfloat) width;
@@ -2697,8 +2717,13 @@ init_juggler3d (ModeInfo * mi)
   sp = &juggles[MI_SCREEN(mi)];
   sp->glx_context = init_GL(mi);
 
+#ifdef STANDALONE
+  if (!sp->glx_context)   /* re-initting breaks print_texture_label */
+    sp->glx_context = init_GL(mi);
+  sp->font_data = load_texture_font (mi->dpy, "titleFont");
+#else 
   load_font (MI_DISPLAY(mi), (char *) "titleFont",  &sp->mode_font, &sp->font_dlist);
-
+#endif
   reshape_juggler3d (mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 
   if (!wire)
@@ -2783,14 +2808,14 @@ init_juggler3d (ModeInfo * mi)
 	/* create circular trajectory list */
 	ADD_ELEMENT(Trajectory, sp->head, sp->head);
 	if(sp->head == NULL){
-	  free_juggler3d(sp);
+	  free_juggler3d_screen(sp);
 	  return;
 	}
 
 	/* create circular object list */
 	ADD_ELEMENT(Object_j, sp->objects, sp->objects);
 	if(sp->objects == NULL){
-	  free_juggler3d(sp);
+	  free_juggler3d_screen(sp);
 	  return;
 	}
 
@@ -2848,8 +2873,8 @@ init_juggler3d (ModeInfo * mi)
 
 }
 
-ENTRYPOINT Bool
-juggle_handle_event (ModeInfo *mi, XEvent *event)
+static Bool
+juggler3d_handle_event (ModeInfo *mi, XEvent *event)
 {
   jugglestruct *sp = &juggles[MI_SCREEN(mi)];
 
@@ -3090,14 +3115,19 @@ draw_juggler3d (ModeInfo *mi)
 					 MI_SCREEN(mi), sp->pattern);
 	}
   }
-
+#ifdef STANDALONE
+  glColor3f (1, 1, 0);
+  print_texture_label (mi->dpy, sp->font_data,
+                     mi->xgwa.width, mi->xgwa.height,
+                     1, sp->pattern);
+#else
   if(sp->mode_font != None) {
     print_gl_string (MI_DISPLAY(mi), sp->mode_font, sp->font_dlist,
                      MI_WIDTH(mi), MI_HEIGHT(mi),
                      10, MI_HEIGHT(mi) - 10,
                      sp->pattern, False);
   }
-
+#endif
 #ifdef MEMTEST
   if((int)(sp->time/10) % 1000 == 0)
 	(void) fprintf(stderr, "sbrk: %d\n", (int)sbrk(0));
@@ -3118,8 +3148,9 @@ draw_juggler3d (ModeInfo *mi)
   glXSwapBuffers(dpy, window);
 }
 
-#ifdef STANDALONE
+/*#ifdef STANDALONE
 XSCREENSAVER_MODULE_2 ("Juggler3D", juggler3d, juggle)
-#endif
+#endif*/
+XSCREENSAVER_MODULE ("Juggler3d", juggler3d)
 
 #endif /* MODE_juggler3d */

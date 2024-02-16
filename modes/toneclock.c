@@ -54,6 +54,7 @@ static const char sccsid[] = "@(#)toneclock.c	5.00 2004/09/16 xlockmore";
 	"*fullrandom: True \n" \
 	"*verbose: False \n" \
 
+# define free_toneclock 0
 # define reshape_toneclock 0
 # define toneclock_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -111,7 +112,7 @@ ENTRYPOINT ModeSpecOpt toneclock_opts =
 #ifdef USE_MODULES
 ModStruct   toneclock_description =
 {"toneclock", "init_toneclock", "draw_toneclock", "release_toneclock",
- "refresh_toneclock", "init_toneclock", "free_toneclock", &toneclock_opts,
+ "refresh_toneclock", "init_toneclock", (char *) NULL, &toneclock_opts,
  60000, -20, 200, -1000, 64, 1.0, "",
  "Shows Peter Schat's toneclock", 0, NULL};
 
@@ -292,12 +293,6 @@ free_toneclock_screen(ModeInfo *mi, toneclockstruct *tclock)
 	}
 #endif
 	tclock = NULL;
-}
-
-ENTRYPOINT void
-free_toneclock(ModeInfo * mi)
-{
-        free_toneclock_screen(mi, &toneclocks[MI_SCREEN(mi)]);
 }
 
 #ifndef STANDALONE
@@ -560,7 +555,7 @@ init_toneclock(ModeInfo * mi)
           }
     	if ( size_hour < 0 )
           {
-	     tclock->radius = MIN(NRAND( size_hour - 10) + 10,
+	     tclock->radius = MIN(NRAND( -size_hour - 10) + 10,
 		tclock->radius );
           }
         else

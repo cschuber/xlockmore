@@ -50,6 +50,7 @@ static const char sccsid[] = "@(#)eyes.c	5.00 2000/11/01 xlockmore";
 	"*ncolors: 200 \n" \
 	"*bitmap: \n" \
 
+# define free_eyes 0
 # define reshape_eyes 0
 # define eyes_handle_event 0
 # include "xlockmore.h"		/* in xscreensaver distribution */
@@ -86,7 +87,7 @@ ENTRYPOINT ModeSpecOpt eyes_opts =
 #ifdef USE_MODULES
 ModStruct   eyes_description =
 {"eyes", "init_eyes", "draw_eyes", "release_eyes",
- "refresh_eyes", "init_eyes", "free_eyes", &eyes_opts,
+ "refresh_eyes", "init_eyes", ((char *) NULL, &eyes_opts,
  20000, -8, 5, 1, 64, 1.0, "",
  "Shows eyes following a bouncing grelb", 0, NULL};
 
@@ -906,12 +907,6 @@ free_eyes_screen(Display * display, EyeScrInfo * ep)
 		ep->cursor = None;
 	}
 	ep = NULL;
-}
-
-ENTRYPOINT void
-free_eyes(ModeInfo * mi)
-{
-	free_eyes_screen(MI_DISPLAY(mi), &eye_info[MI_SCREEN(mi)]);
 }
 
 /*-

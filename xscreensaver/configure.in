@@ -4322,7 +4322,7 @@ AC_OUTPUT(Makefile
           utils/Makefile
           jwxyz/Makefile
           hacks/Makefile
-	  xlockmore/xlock/Makefile
+          xlockmore/xlock/Makefile
           xlockmore/modes/Makefile
           xlockmore/modes/glx/Makefile
           hacks/images/Makefile

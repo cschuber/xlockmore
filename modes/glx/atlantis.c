@@ -123,9 +123,6 @@ static const char sccsid[] = "@(#)atlantis.c	5.12 2004/03/03 xlockmore";
 			 "*cycles:       100 \n" \
 			 "*size:        6000 \n" \
 			 "*wireframe:  False \n" \
-			 "*texture:    " DEF_TEXTURE    " \n" \
-			 "*gradient:   " DEF_GRADIENT   " \n" \
-			 "*whalespeed: " DEF_WHALESPEED " \n" \
 
 #define free_atlantis 0
 #define atlantis_handle_event 0
@@ -141,13 +138,12 @@ static const char sccsid[] = "@(#)atlantis.c	5.12 2004/03/03 xlockmore";
 #include <GL/glu.h>
 
 #ifdef HAVE_XPM
-# include "xpm-ximage.h"
+#include "xpm-ximage.h"
 
-# ifdef STANDALONE
-#  include "../images/sea-texture.xpm"
-# else /* !STANDALONE */
-#  include "pixmaps/sea-texture.xpm"
-# endif /* !STANDALONE */
+#if 0
+#include "../images/sea-texture.xpm"
+#endif
+#include "pixmaps/sea-texture.xpm"
 #endif
 
 static int  whalespeed;
@@ -325,8 +321,13 @@ Init(ModeInfo * mi)
                          ap->texture->width, ap->texture->height, 0,
                          GL_RGBA, GL_UNSIGNED_BYTE,
                          ap->texture->data);
-            if (check_gl_error("texture")) {
+#ifdef STANDALONE
+            check_gl_error("texture");
+#else
+            if (check_gl_error("texture"))
 	       do_texture = False;
+#endif
+            if (!do_texture) {
                glDisable(GL_TEXTURE_2D);
 	    } else {
 
@@ -362,7 +363,7 @@ Init(ModeInfo * mi)
 	glClearColor(0.0, fgreen, fblue, 0.0);
 }
 
-ENTRYPOINT void
+static void
 reshape_atlantis(ModeInfo * mi, int width, int height)
 {
 	atlantisstruct *ap = &atlantis[MI_SCREEN(mi)];

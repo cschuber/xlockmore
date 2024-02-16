@@ -48,6 +48,7 @@ static const char sccsid[] = "@(#)bomb.c	5.00 2000/11/01 xlockmore";
 			"*ncolors: 200 \n" \
 			"*verbose: False \n" \
 
+# define free_bomb 0
 # define reshape_bomb 0
 # define bomb_handle_event 0
 # define UNIFORM_COLORS
@@ -66,7 +67,7 @@ ENTRYPOINT ModeSpecOpt bomb_opts =
 #ifdef USE_MODULES
 const ModStruct bomb_description =
 {"bomb", "init_bomb", "draw_bomb", "release_bomb",
- "refresh_bomb", "change_bomb", "free_bomb", &bomb_opts,
+ "refresh_bomb", "change_bomb", (char *) NULL, &bomb_opts,
  100000, 10, 20, 1, 64, 1.0, "",
  "Shows a bomb and will autologout after a time", 0, NULL};
 
@@ -88,7 +89,7 @@ const ModStruct bomb_description =
 #define FULL_COUNT_FONT         "-adobe-courier-bold-r-*-*-34-*-*-*-*-*-iso8859-1"
 #define ICON_COUNT_FONT         "-misc-fixed-medium-r-normal-*-8-*-*-*-*-*-iso8859-1"
 #else
-#define FULL_COUNT_FONT         "-*-*-*-*-*-*-34-*-*-*-*-*-*-*"
+#define FULL_COUNT_FONT         "-*-*-*-*-*-*-18-*-*-*-*-*-*-*"
 #define ICON_COUNT_FONT         "-*-*-*-*-*-*-8-*-*-*-*-*-*-*"
 #endif
 #define COUNTDOWN       600	/* No. seconds to lock for */
@@ -118,7 +119,7 @@ static bombstruct *bombs = NULL;
 
 #ifdef USE_MB
 static XFontSet mode_font = None;
-static int getFontHeight(XFontSet f)
+/*static int getFontHeight(XFontSet f)
 {
 	XRectangle ink, log;
 
@@ -128,7 +129,7 @@ static int getFontHeight(XFontSet f)
 		XmbTextExtents(mode_font, "My", strlen("My"), &ink, &log);
 		return log.height;
 	}
-}
+}*/
 static int getTextWidth(char *string)
 {
 	XRectangle ink, logical;
@@ -144,10 +145,13 @@ extern XFontSet getFontSet(Display * display);
 	d, p, mode_font, gc, start, ascent, string, len)
 #else
 static XFontStruct *mode_font = None;
-#define getFontHeight(f) ((f == None) ? 8 : f->ascent + f->descent)
+/*#define getFontHeight(f) ((f == None) ? 8 : f->ascent + f->descent)*/
 static int getTextWidth(char *string)
 {
-	return XTextWidth(mode_font, string, strlen(string));
+	int width = XTextWidth(mode_font, string, strlen(string));
+	if (width == 0)
+		return 8;
+	return width;
 }
 
 extern XFontStruct *getFont(Display * display);
@@ -167,12 +171,6 @@ free_bomb_screen(Display *display, bombstruct *bp)
 		bp->gc = None;
 	}
 	bp = NULL;
-}
-
-ENTRYPOINT void
-free_bomb(ModeInfo * mi)
-{
-	free_bomb_screen(MI_DISPLAY(mi), &bombs[MI_SCREEN(mi)]);
 }
 
 static void
@@ -374,7 +372,11 @@ init_bomb(ModeInfo * mi)
 		bp->countdown = time((time_t *) NULL) + bp->startcountdown;
 	/* Detonator Primed */
 
+#ifdef STANDALONE
+	MI_CLEARWINDOWCOLORMAPFAST(mi, MI_GC(mi), MI_BLACK_PIXEL(mi));
+#else
 	MI_CLEARWINDOW(mi);
+#endif
 	bp->painted = False;
 
 	/*
@@ -469,7 +471,6 @@ draw_bomb(ModeInfo * mi)
 		(void) sprintf(number, "%0*d:%02d", NDIGITS - 2,
 			(countleft / 60) % 100, countleft % 60);
 #endif
-
 		/* Blank out the previous number .... */
 		XSetForeground(display, gc, MI_BLACK_PIXEL(mi));
 		XFillRectangle(display, MI_WINDOW(mi), gc,

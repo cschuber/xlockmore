@@ -36,8 +36,8 @@ static const char sccsid[] = "@(#)voters.c	5.24 2007/01/18 xlockmore";
 	"*cycles: 327670 \n" \
 	"*size: 0 \n" \
 	"*ncolors: 64 \n" \
-	"*neighbors: 0 \n" \
 
+# define free_voters 0
 # define reshape_voters 0
 # define voters_handle_event 0
 #define UNIFORM_COLORS
@@ -84,7 +84,7 @@ ENTRYPOINT ModeSpecOpt voters_opts =
 #ifdef USE_MODULES
 ModStruct   voters_description =
 {"voters", "init_voters", "draw_voters", "release_voters",
- "refresh_voters", "init_voters", "free_voters", &voters_opts,
+ "refresh_voters", "init_voters", (char *) NULL, &voters_opts,
  1000, 0, 327670, 0, 64, 1.0, "",
  "Shows Dewdney's Voters", 0, NULL};
 
@@ -793,13 +793,6 @@ free_voters_screen(voterstruct *vp)
 	}
 	vp = NULL;
 }
-
-ENTRYPOINT void
-free_voters(ModeInfo * mi)
-{
-	free_voters_screen(&voters[MI_SCREEN(mi)]);
-}
-
 
 ENTRYPOINT void
 init_voters(ModeInfo * mi)

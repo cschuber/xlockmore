@@ -40,6 +40,7 @@ static const char sccsid[] = "@(#)rotor.c	5.00 2000/11/01 xlockmore";
 	"*size: -6 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_rotor 0
 # define reshape_rotor 0
 # define rotor_handle_event 0
 #define SMOOTH_COLORS
@@ -121,12 +122,6 @@ free_rotor_screen(rotorstruct *rp)
 		rp->save = (XPoint *) NULL;
 	}
 	rp = NULL;
-}
-
-ENTRYPOINT void
-free_rotor(ModeInfo * mi)
-{
-	free_rotor_screen(&rotors[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

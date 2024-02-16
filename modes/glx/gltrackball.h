@@ -19,6 +19,9 @@ typedef struct trackball_state trackball_state;
    to make dragging the mouse on the window of a GL program do the right thing.
  */
 extern trackball_state *gltrackball_init (int dummy);
+#ifdef STANDALONE
+extern void gltrackball_free (trackball_state *);
+#endif
 
 /* Begin tracking the mouse: Call this when the mouse button goes down.
    x and y are the mouse position relative to the window.
@@ -54,6 +57,17 @@ extern void gltrackball_get_quaternion (trackball_state *ts, float q[4]);
 /* Reset the trackball to the default unrotated state.
  */
 extern void gltrackball_reset (trackball_state *ts);
+
+#if STANDALONE
+/* A utility function for event-handler functions:
+   Handles the various motion and click events related to trackballs.
+   Returns True if the event was handled.
+ */
+extern Bool gltrackball_event_handler (XEvent *,
+                                       trackball_state *,
+                                       int window_width, int window_height,
+                                       Bool *button_down_p);
+#endif
 
 #endif /* __GLTRACKBALL_H__ */
 

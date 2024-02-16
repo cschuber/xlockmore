@@ -31,7 +31,7 @@ static const char sccsid[] = "@(#)erase.c	5.03 2001/10/18 xlockmore";
 
 extern int erasedelay, erasetime;
 extern void erasemodefromname(char *name, Bool verbose);
-static int advanceErase();
+static int advanceErase(void);
 
 typedef void (*Eraser) (Display * dpy, Window window, GC gc,
 			int width, int height, int delay, int granularity);
@@ -1148,7 +1148,7 @@ erasemodefromname(char *name, Bool verbose)
 
 
 static int
-advanceErase()
+advanceErase(void)
 {
 	if (currentEraseMode < 0)
 		return 0;

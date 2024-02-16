@@ -34,6 +34,7 @@ static const char sccsid[] = "@(#)grav.c	5.00 2000/11/01 xlockmore";
 	"*count: -12 \n" \
 	"*ncolors: 64 \n" \
 
+# define free_grav 0
 # define reshape_grav 0
 # define grav_handle_event 0
 #define BRIGHT_COLORS
@@ -75,7 +76,7 @@ ENTRYPOINT ModeSpecOpt grav_opts =
 #ifdef USE_MODULES
 ModStruct   grav_description =
 {"grav", "init_grav", "draw_grav", "release_grav",
- "refresh_grav", "init_grav", "free_grav", &grav_opts,
+ "refresh_grav", "init_grav", (char *) NULL, &grav_opts,
  10000, -12, 1, 1, 64, 1.0, "",
  "Shows orbiting planets", 0, NULL};
 
@@ -241,12 +242,6 @@ free_grav_screen(gravstruct *gp)
 	if (gp->planets)
 		free(gp->planets);
 	gp = NULL;
-}
-
-ENTRYPOINT void
-free_grav(ModeInfo * mi)
-{
-	free_grav_screen(&gravs[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

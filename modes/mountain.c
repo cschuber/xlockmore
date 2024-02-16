@@ -36,6 +36,7 @@ static const char sccsid[] = "@(#)mountain.c	5.00 2000/11/01 xlockmore";
 	"*wireframe: False \n" \
 	"*fullrandom: False \n" \
 
+# define free_mountain 0
 # define reshape_mountain 0
 # define mountain_handle_event 0
 # define SMOOTH_COLORS
@@ -52,7 +53,7 @@ ENTRYPOINT ModeSpecOpt mountain_opts =
 #ifdef USE_MODULES
 ModStruct   mountain_description =
 {"mountain", "init_mountain", "draw_mountain", "release_mountain",
- "refresh_mountain", "init_mountain", "free_mountain", &mountain_opts,
+ "refresh_mountain", "init_mountain", (char *) NULL, &mountain_opts,
  1000, 30, 4000, 1, 64, 1.0, "",
  "Shows Papo's mountain range", 0, NULL};
 
@@ -174,12 +175,6 @@ free_mountain_screen(Display * display, mountainstruct * mp)
 	if (mp->stippledGC != None)
 		XFreeGC(display, mp->stippledGC);
 	mp = NULL;
-}
-
-ENTRYPOINT void
-free_mountain(ModeInfo * mi)
-{
-	free_mountain_screen(MI_DISPLAY(mi), &mountains[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

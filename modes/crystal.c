@@ -91,6 +91,7 @@ static const char sccsid[] = "@(#)crystal.c	5.24 2007/01/18 xlockmore";
 	"*fpsSolid: True \n" \
 	"*ignoreRotation: True \n" \
 
+# define free_crystal 0
 # define reshape_crystal 0
 # define crystal_handle_event 0
 # include "xlockmore.h"		/* in xscreensaver distribution */
@@ -632,13 +633,6 @@ free_crystal_screen(ModeInfo *mi, crystalstruct *cryst)
 	}
 	cryst = NULL;
 }
-
-ENTRYPOINT void
-free_crystal(ModeInfo * mi)
-{
-	free_crystal_screen(mi, &crystals[MI_SCREEN(mi)]);
-}
-
 
 static void
 DrawLine(Display *display, Window window, crystalstruct *cryst,

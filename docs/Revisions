@@ -1,4 +1,4 @@
-xlockmore-5.65 as of 20 July 2020, the maintained version of xlock
+xlockmore-5.66 as of 25 October 2020, the maintained version of xlock
 
 Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
@@ -11,6 +11,39 @@ send me mail if you want to be on a list for latest releases.
 
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
+
+5.66
+  GL mode atunnels, juggler3d, atlantis, lament, invert, solitaire, text3d,
+    and text3d2 fixed up by EoflaOE ViceCity and myself to build in
+    xscreensaver.
+  bomb, helix, lightning, penrose, petal, scooter fixes for xscreensaver
+    port (clear screen issue).  Clock fixed to run by changing a spot from
+    "Clock" to "CLOCK".
+  A few updates from xscreensaver-5.44/hacks/xlockmore.c for xscreensaver
+    port.
+  Duplicate resources and unloadable resources for xscreensaver port fixed
+    by EoflaOE.
+  Double free removed for xscreensaver port fixed by EoflaOE and myself.
+  Removed some warnings in xscreensaver port in fzort, rubik, skewb, and
+    sproingies.
+  Xpm textures added to xscreensaver ports that need them.
+  image, puzzle, decay, bat now work but use xscreensaver bitmap/pixmap
+    in xscreensaver port.
+  Bug fix in qix and toneclock for xscreensaver port, xlock was not
+    affected by negative NRAND input.
+  euler2d synced up with xscreensaver version.
+  Change to fzort to use __asm__ instead of asm as its probably more
+    likely to work.
+  Fixed solitaire so deckPile changes just a little bit as it doles
+    out cards.
+  Updated bomb to use size 18 font when USE_MB is not set as it seems
+    34 is not widely available anymore.
+  pacman now has different colored ghosts (no green ghost) and also
+    oscillating dress and eyes.  See README for a notice for this mode.
+  Fixed some bad drawings in solitaire and pacman noticed on
+    Windows side.
+  Warnings removed for -Wstrict-prototypes -Wmissing-prototypes
+    -Wdeclaration-after-statement
 
 5.65
   Fix from Jan Kratochvil and Adrian Reber, adrian AT lisas.de for Fedora.

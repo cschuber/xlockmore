@@ -37,6 +37,7 @@ static const char sccsid[] = "@(#)world.c	5.00 2000/11/01 xlockmore";
 	"*count: -16 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_world 0
 # define reshape_world 0
 # define world_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -52,7 +53,7 @@ ENTRYPOINT ModeSpecOpt world_opts =
 #ifdef USE_MODULES
 ModStruct   world_description =
 {"world", "init_world", "draw_world", "release_world",
- "refresh_world", "init_world", "free_world", &world_opts,
+ "refresh_world", "init_world", (char *) NULL, &world_opts,
  100000, -16, 1, 1, 64, 0.3, "",
  "Shows spinning Earths", 0, NULL};
 
@@ -159,12 +160,6 @@ free_world_screen(worldstruct * wp)
 	if (wp->planets != NULL)
 		free(wp->planets);
 	wp = NULL;
-}
-
-ENTRYPOINT void
-free_world(ModeInfo * mi)
-{
-	free_world_screen(&worlds[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

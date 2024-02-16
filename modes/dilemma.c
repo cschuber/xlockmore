@@ -71,6 +71,7 @@ static const char sccsid[] = "@(#)dilemma.c	5.24 2007/01/18 xlockmore";
 	"*size: 0 \n" \
 	"*ncolors: 6 \n" \
 
+# define free_dilemma 0
 # define reshape_dilemma 0
 # define dilemma_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -127,7 +128,7 @@ ENTRYPOINT ModeSpecOpt dilemma_opts =
 #ifdef USE_MODULES
 ModStruct   dilemma_description =
 {"dilemma", "init_dilemma", "draw_dilemma", "release_dilemma",
- "refresh_dilemma", "init_dilemma", "free_dilemma", &dilemma_opts,
+ "refresh_dilemma", "init_dilemma", (char *) NULL, &dilemma_opts,
  200000, -2, 1000, 0, 64, 1.0, "",
  "Shows Lloyd's Prisoner's Dilemma simulation", 0, NULL};
 
@@ -447,12 +448,6 @@ free_dilemma_screen(dilemmastruct *dp)
 		dp->payoff = (float *) NULL;
 	}
 	dp = NULL;
-}
-
-ENTRYPOINT void
-free_dilemma(ModeInfo * mi)
-{
-	free_dilemma_screen(&dilemmas[MI_SCREEN(mi)]);
 }
 
 static void

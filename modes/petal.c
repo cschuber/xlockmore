@@ -50,6 +50,7 @@ static const char sccsid[] = "@(#)petal.c	5.00 2000/11/01 xlockmore";
 	"*wireframe: False \n" \
 	"*fullrandom: False \n" \
 
+# define free_petal 0
 # define reshape_petal 0
 # define petal_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -65,7 +66,7 @@ ENTRYPOINT ModeSpecOpt petal_opts =
 #ifdef USE_MODULES
 ModStruct   petal_description =
 {"petal", "init_petal", "draw_petal", "release_petal",
- "refresh_petal", "init_petal", "free_petal", &petal_opts,
+ "refresh_petal", "init_petal", (char *) NULL, &petal_opts,
  10000, -500, 400, 1, 64, 1.0, "",
  "Shows various GCD Flowers", 0, NULL};
 
@@ -287,12 +288,6 @@ free_petal_screen(petalstruct *pp)
 }
 
 ENTRYPOINT void
-free_petal(ModeInfo * mi)
-{
-	free_petal_screen(&petals[MI_SCREEN(mi)]);
-}
-
-ENTRYPOINT void
 init_petal(ModeInfo * mi)
 {
 	petalstruct *pp;
@@ -325,7 +320,11 @@ init_petal(ModeInfo * mi)
 	else
 		pp->wireframe = MI_IS_WIREFRAME(mi);
 
+#ifdef STANDALONE
+	MI_CLEARWINDOWCOLORMAPFAST(mi, MI_GC(mi), MI_BLACK_PIXEL(mi));
+#else
 	MI_CLEARWINDOW(mi);
+#endif
 	pp->painted = False;
 
 	random_petal(mi);

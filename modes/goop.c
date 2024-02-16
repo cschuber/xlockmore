@@ -87,6 +87,7 @@ static const char sccsid[] = "@(#)goop.c	5.00 2000/11/01 xlockmore";
 "*elasticity:		1.8",
 "*maxVelocity:	1.2",
  */
+# define free_goop 0
 # define reshape_goop 0
 # define goop_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -104,7 +105,7 @@ ENTRYPOINT ModeSpecOpt goop_opts =
 #ifdef USE_MODULES
 ModStruct   goop_description =
 {"goop", "init_goop", "draw_goop", "release_goop",
- "init_goop", "init_goop", "free_goop", &goop_opts,
+ "init_goop", "init_goop", (char *) NULL, &goop_opts,
  10000, -12, 1, 1, 64, 1.0, "",
  "Shows goop from a lava lamp", 0, NULL};
 
@@ -401,12 +402,6 @@ free_goop_screen(Display * display, goopstruct * gp)
 		gp->pixmap = None;
 	}
 	gp = NULL;
-}
-
-ENTRYPOINT void
-free_goop(ModeInfo * mi)
-{
-        free_goop_screen(MI_DISPLAY(mi), &goops[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

@@ -231,14 +231,14 @@ ERROR!  Sorry, xlockmore.h requires ANSI C (gcc, for example.)
 # define COLOR_SCHEME XLOCKMORE_COLOR_SCHEME
 #endif
 
-#define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX)			\
+#define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX) 			\
 									\
   static struct xlockmore_function_table				\
-	 NAME ## _xlockmore_function_table = {			\
+	 NAME ## _xlockmore_function_table = {				\
 	   CLASS,							\
 	   DEFAULTS,							\
 	   WRITABLE_COLORS,						\
-	   COLOR_SCHEME,					\
+	   COLOR_SCHEME,						\
 	   init_    ## PREFIX,						\
 	   draw_    ## PREFIX,						\
 	   reshape_ ## PREFIX,						\

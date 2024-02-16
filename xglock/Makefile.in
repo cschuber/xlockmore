@@ -66,6 +66,7 @@ INSTPGMFLAGS = @INSTPGMFLAGS@
 #CC = gcc -g -Wall -ansi -pedantic
 #CC = gcc -g -Wall
 #CC = g++ -g -Wall
+#CC = gcc -g -Wall -Wstrict-prototypes -Wnested-externs -Wmissing-prototypes -Wno-overlength-strings -Wdeclaration-after-statement
 CC = @CC@
 
 #LINT = lint

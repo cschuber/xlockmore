@@ -36,6 +36,7 @@ static const char sccsid[] = "@(#)fadeplot.c	5.00 2000/11/01 xlockmore";
 	"*cycles: 1500 \n" \
 	"*ncolors: 64 \n" \
 
+# define free_fadeplot 0
 # define reshape_fadeplot 0
 # define fadeplot_handle_event 0
 #define BRIGHT_COLORS
@@ -54,7 +55,7 @@ ENTRYPOINT ModeSpecOpt fadeplot_opts =
 #ifdef USE_MODULES
 ModStruct   fadeplot_description =
 {"fadeplot", "init_fadeplot", "draw_fadeplot", "release_fadeplot",
- "refresh_fadeplot", "init_fadeplot", "free_fadeplot", &fadeplot_opts,
+ "refresh_fadeplot", "init_fadeplot", (char *) NULL, &fadeplot_opts,
  30000, 10, 1500, 1, 64, 0.6, "",
  "Shows a fading plot of sine squared", 0, NULL};
 
@@ -90,12 +91,6 @@ free_fadeplot_screen(fadeplotstruct *fp)
 		fp->stab = (int *) NULL;
 	}
 	fp = NULL;
-}
-
-ENTRYPOINT void
-free_fadeplot(ModeInfo * mi)
-{
-	free_fadeplot_screen(&fadeplots[MI_SCREEN(mi)]);
 }
 
 static Bool

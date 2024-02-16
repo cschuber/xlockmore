@@ -57,6 +57,7 @@ static const char sccsid[] = "@(#)pipes.c	5.00 2000/11/01 xlockmore";
 			"*fpsSolid: True \n" \
 			"*wireframe: True \n" \
 
+#define free_pipes 0
 #define reshape_pipes 0
 #define pipes_handle_event 0
 # include "xlockmore.h"		/* from the xscreensaver distribution */
@@ -495,7 +496,7 @@ MakeShape(ModeInfo * mi, int newdir)
 	}
 }
 
-ENTRYPOINT void
+static void
 reshape(ModeInfo * mi, int width, int height)
 {
 	pipesstruct *pp = &pipes[MI_SCREEN(mi)];
@@ -675,12 +676,6 @@ free_factory(Display *display, pipesstruct *pp)
 		}
 	}
 	pp = NULL;
-}
-
-ENTRYPOINT void
-free_pipes(ModeInfo * mi)
-{
-	free_factory(MI_DISPLAY(mi), &pipes[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

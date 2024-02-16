@@ -549,7 +549,7 @@ draw_moebius_strip(ModeInfo * mi)
 #undef MoebiusDivisions
 #undef MoebiusTransversals
 
-ENTRYPOINT void
+static void
 reshape_moebius(ModeInfo * mi, int width, int height)
 {
 	moebiusstruct *mp = &moebius[MI_SCREEN(mi)];

@@ -41,12 +41,12 @@ static const char sccsid[] = "@(#)clock.c	5.00 2000/11/01 xlockmore";
 	"*size: -200 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_clock 0
 # define reshape_clock 0
 # define clock_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
 #else /* STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
-
 #endif /* STANDALONE */
 
 #ifdef MODE_clock
@@ -57,7 +57,7 @@ ENTRYPOINT ModeSpecOpt clock_opts =
 #ifdef USE_MODULES
 ModStruct   clock_description =
 {"clock", "init_clock", "draw_clock", "release_clock",
- "refresh_clock", "init_clock", "free_clock", &clock_opts,
+ "refresh_clock", "init_clock", (char *) NULL, &clock_opts,
  100000, -16, 200, -200, 64, 1.0, "",
  "Shows Packard's clock", 0, NULL};
 
@@ -268,7 +268,7 @@ new_clock_state(ModeInfo * mi, int clck)
 		/* We change the clock size */
 		if (size < -MINSIZE)
 			cp->oclocks[clck].size = NRAND(MIN(-size, MAX(MINSIZE,
-			MIN(cp->width, cp->height))) - MINSIZE + 1) + MINSIZE;
+				MIN(cp->width, cp->height))) - MINSIZE + 1) + MINSIZE;
 		else if (size < MINSIZE) {
 			if (!size)
 				cp->oclocks[clck].size = MAX(MINSIZE, MIN(cp->width, cp->height));
@@ -277,7 +277,6 @@ new_clock_state(ModeInfo * mi, int clck)
 		} else
 			cp->oclocks[clck].size = MIN(size, MAX(MINSIZE,
 						MIN(cp->width, cp->height)));
-
 		/* We must compute new attributes for the clock because its size changes */
 		cp->oclocks[clck].hours.size = (cp->oclocks[clck].size * HOURS_SIZE) / 200;
 		cp->oclocks[clck].minutes.size =
@@ -344,7 +343,7 @@ update_clock(ModeInfo * mi, int clck)
 		 SecondsToAngle(&cp->oclocks[clck]), 1);
 }
 
-ENTRYPOINT void
+static void
 free_clock_screen(clockstruct *cp) {
 	if (cp == NULL) {
 		return;
@@ -357,12 +356,6 @@ free_clock_screen(clockstruct *cp) {
 }
 
 ENTRYPOINT void
-free_clock(ModeInfo * mi)
-{
-	free_clock_screen(&clocks[MI_SCREEN(mi)]);
-}
-
-ENTRYPOINT void
 init_clock(ModeInfo * mi)
 {
 	clockstruct *cp;
@@ -370,7 +363,6 @@ init_clock(ModeInfo * mi)
 
 	MI_INIT(mi, clocks);
 	cp = &clocks[MI_SCREEN(mi)];
-
 
 	cp->redrawing = 0;
 	cp->width = MI_WIDTH(mi);
@@ -484,6 +476,6 @@ refresh_clock(ModeInfo * mi)
 }
 #endif
 
-XSCREENSAVER_MODULE ("Clock", clock)
+XSCREENSAVER_MODULE ("CLOCK", clock)
 
 #endif /* MODE_clock */

@@ -87,6 +87,7 @@ static const char sccsid[] = "@(#)bounce.c	5.00 2000/11/01 xlockmore";
 			"*size: 0 \n" \
 			"*ncolors: 200 \n" \
 
+# define free_bounce 0
 # define reshape_bounce 0
 # define bounce_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -104,7 +105,7 @@ ENTRYPOINT ModeSpecOpt bounce_opts =
 #ifdef USE_MODULES
 const ModStruct bounce_description =
 {"bounce", "init_bounce", "draw_bounce", "release_bounce",
- "refresh_bounce", "init_bounce", "free_bounce", &bounce_opts,
+ "refresh_bounce", "init_bounce", (char *) NULL, &bounce_opts,
  5000, -10, 1, 0, 64, 1.0, "",
  "Shows bouncing footballs", 0, NULL};
 
@@ -121,19 +122,19 @@ const ModStruct bounce_description =
   XCreateBitmapFromData(display,window,(char *)n,w,h))==None){\
   free_bounce_screen(display,bp); return False;} else {bp->init_orients++;}
 
+#ifndef STANDALONE
 /* aliases for vars defined in the bitmap file */
 #define BOUNCE_WIDTH     image_width
 #define BOUNCE_HEIGHT    image_height
 #define BOUNCE_BITS      image_bits
 
-#ifndef STANDALONE
 #include "bounce.xbm"
-#endif
 
 #ifdef HAVE_XPM
 #define BOUNCE_NAME      image_name
 #include "bounce.xpm"
 #define DEFAULT_XPM 1
+#endif
 #endif
 
 #define MAX_STRENGTH 24
@@ -589,12 +590,6 @@ init_stuff(ModeInfo * mi)
 		bp->backGC = MI_GC(mi);
 	}
 	return True;
-}
-
-ENTRYPOINT void
-free_bounce(ModeInfo * mi)
-{
-	free_bounce_screen(MI_DISPLAY(mi), &bounces[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

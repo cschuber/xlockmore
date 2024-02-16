@@ -46,6 +46,7 @@ static const char sccsid[] = "@(#)boxed.c	0.9 01/09/26 xlockmore";
 			"*showFPS:   False   \n" \
 			"*wireframe: False   \n"
 
+# define free_boxed 0
 # define boxed_handle_event xlockmore_no_events
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 #else  /* !STANDALONE */
@@ -102,7 +103,7 @@ ENTRYPOINT ModeSpecOpt boxed_opts =
 
 ModStruct   boxed_description = { 
      "boxed", "init_boxed", "draw_boxed", "release_boxed",
-     "draw_boxed", "init_boxed", "free_boxed", &boxed_opts,
+     "draw_boxed", "init_boxed", (char *) NULL, &boxed_opts,
      1000, 1, 2, 1, 64, 1.0, "",
      "Shows GL's boxed balls", 0, NULL};
 
@@ -1199,7 +1200,8 @@ static void draw(ModeInfo * mi)
 /* 
  * new window size or exposure 
  */
-ENTRYPOINT void reshape_boxed(ModeInfo *mi, int width, int height)
+static void
+reshape_boxed(ModeInfo *mi, int width, int height)
 {
    GLfloat     h = (GLfloat) height / (GLfloat) width;
    int y = 0;
@@ -1409,12 +1411,6 @@ free_boxed_screen(boxedstruct *gp) {
         gp->tex1 = NULL;
     }
     gp = NULL;
-}
-
-ENTRYPOINT void
-free_boxed(ModeInfo * mi)
-{
-     free_boxed_screen(&boxed[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

@@ -14,6 +14,7 @@
 # define MODE_fzort
 # define DEFAULTS "*delay: 0 \n" \
 
+# define free_fzort 0
 # define reshape_fzort 0
 # define fzort_handle_event 0
 # define UNIFORM_COLORS
@@ -34,7 +35,7 @@ ENTRYPOINT ModeSpecOpt fzort_opts =
 #ifdef USE_MODULES
 ModStruct fzort_description =
 { "fzort", "init_fzort", "draw_fzort", "release_fzort",
-  "refresh_fzort", "init_fzort", "free_fzort", &fzort_opts,
+  "refresh_fzort", "init_fzort", (char *) NULL, &fzort_opts,
   10000, 1, 1, 1, 64, 1.0, "",
   "Shows a metallic-looking fzort.", 0, NULL };
 #endif
@@ -181,7 +182,7 @@ static inline long
 fp_div(long a, long b)
 {
 	long c;
-	asm volatile("movl %%eax,%%edx; shll %3,%%eax; sarl %4,%%edx; idivl %2"
+	__asm__ volatile("movl %%eax,%%edx; shll %3,%%eax; sarl %4,%%edx; idivl %2"
 		: "=a"(c)
 		: "0"(a), "m"(b), "i"(FP_SHIFT), "i"(32 - FP_SHIFT)
 		: "edx");
@@ -201,7 +202,7 @@ static inline long
 fp_mul(long a, long b)
 {
 	long c;
-    asm volatile("imull %2; shrdl %3,%%edx,%%eax"
+	__asm__ volatile("imull %2; shrdl %3,%%edx,%%eax"
 		: "=a"(c)
 		: "0"(a), "m"(b), "i"(FP_SHIFT)
 		: "edx"); 
@@ -221,7 +222,7 @@ static inline long
 fp_mul_add(long s, long a, long b)
 {
 	long c;
-    asm volatile("imull %2; shrdl %3,%%edx,%%eax; addl %4,%%eax"
+	__asm__ volatile("imull %2; shrdl %3,%%edx,%%eax; addl %4,%%eax"
 		: "=a"(c)
 		: "0"(a), "m"(b), "i"(FP_SHIFT), "m"(s)
 		: "edx"); 
@@ -1210,7 +1211,7 @@ make_image(ModeInfo *mi, struct fzort_ctx *fz)
 }
 
 static void
-free_image(ModeInfo *mi, struct fzort_ctx *fz)
+free_an_image(ModeInfo *mi, struct fzort_ctx *fz)
 {
 	destroy_xshm_image (MI_DISPLAY(mi), fz->image, &fz->shm_info);
 	fz->image = NULL;
@@ -1233,16 +1234,10 @@ free_fzort_screen(ModeInfo *mi, fzort_ctx *fz)
 		free(fz->order_out);
 		free(fz->texture);
 		mesh_free(fz->mesh);
-		free_image(mi, fz);
+		free_an_image(mi, fz);
 		fz->initialized = False;
 	}
 	fz = NULL;
-}
-
-ENTRYPOINT void
-free_fzort(ModeInfo * mi)
-{
-	free_fzort_screen(mi, &fzorts[MI_SCREEN(mi)]);
 }
 
 static void
@@ -1386,7 +1381,7 @@ failed_3:
 failed_2:
 	mesh_free(fz->mesh);
 failed_1:
-	free_image(mi, fz);
+	free_an_image(mi, fz);
 failed_0:
 	return;
 }

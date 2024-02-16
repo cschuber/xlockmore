@@ -71,11 +71,9 @@ static const char sccsid[] = "@(#)hyper.c	5.00 2000/11/01 xlockmore";
 	"*left3d: blue \n" \
 	"*both3d: magenta \n" \
 	"*none3d: black \n" \
-	"*spinDelay: 2 \n" \
-	"*showAxes: false \n" \
-	"*randomStart:false \n" \
 	"*debug: false \n" \
 
+# define free_hyper 0
 # define reshape_hyper 0
 # define hyper_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -123,7 +121,7 @@ ENTRYPOINT ModeSpecOpt hyper_opts =
 #ifdef USE_MODULES
 ModStruct   hyper_description =
 {"hyper", "init_hyper", "draw_hyper", "release_hyper",
- "refresh_hyper", "change_hyper", "free_hyper", &hyper_opts,
+ "refresh_hyper", "change_hyper", (char *) NULL, &hyper_opts,
  100000, -6, 300, 1, 64, 1.0, "",
  "Shows spinning n-dimensional hypercubes", 0, NULL};
 
@@ -435,12 +433,6 @@ free_hyper_screen(Display *display, hyperstruct *hp)
 	}
 	free_hyper_stuff(hp);
 	hp = NULL;
-}
-
-ENTRYPOINT void
-free_hyper(ModeInfo * mi)
-{
-	free_hyper_screen(MI_DISPLAY(mi), &hypers[MI_SCREEN(mi)]);
 }
 
 static Bool

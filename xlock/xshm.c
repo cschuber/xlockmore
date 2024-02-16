@@ -266,10 +266,10 @@ put_xshm_image (Display *dpy, Drawable d, GC gc, XImage *image,
     /* xlockmore: Things look fine without it, but fzort wants to wait. */
     if (result && wait) {
       static int shm_completion_event = 0; /* X protocol reserves 0. */
+      XEvent event;
       if (!shm_completion_event)
         shm_completion_event = XShmGetEventBase(dpy) + ShmCompletion;
 
-      XEvent event;
       while (XCheckTypedEvent(dpy, shm_completion_event, &event) == False);
     }
     return wait;
@@ -299,6 +299,7 @@ void
 destroy_xshm_image (Display *dpy, XImage *image, XShmSegmentInfo *shm_info)
 {
 #ifdef HAVE_XSHM_EXTENSION
+  Status status;
   if (shm_info->shmid == -1) {
 #endif /* HAVE_XSHM_EXTENSION */
 
@@ -310,8 +311,6 @@ destroy_xshm_image (Display *dpy, XImage *image, XShmSegmentInfo *shm_info)
 
 #ifdef HAVE_XSHM_EXTENSION
   }
-
-  Status status;
 
   CATCH_X_ERROR(dpy);
   status = XShmDetach (dpy, shm_info);

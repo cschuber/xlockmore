@@ -40,6 +40,7 @@ static const char sccsid[] = "@(#)sierpinski.c	5.00 2000/11/01 xlockmore";
 	"*cycles: 100 \n" \
 	"*ncolors: 64 \n" \
 
+# define free_sierpinski 0
 # define reshape_sierpinski 0
 # define sierpinski_handle_event 0
 #define BRIGHT_COLORS
@@ -56,7 +57,7 @@ ENTRYPOINT ModeSpecOpt sierpinski_opts =
 #ifdef USE_MODULES
 ModStruct   sierpinski_description =
 {"sierpinski", "init_sierpinski", "draw_sierpinski", "release_sierpinski",
- "refresh_sierpinski", "init_sierpinski", "free_sierpinski", &sierpinski_opts,
+ "refresh_sierpinski", "init_sierpinski", (char *) NULL, &sierpinski_opts,
  400000, 2000, 100, 1, 64, 1.0, "",
  "Shows Sierpinski's triangle", 0, NULL};
 
@@ -128,12 +129,6 @@ free_sierpinski_screen(sierpinskistruct *sp)
 			sp->pointBuffer[corner] = (XPoint *) NULL;
 		}
 	sp = NULL;
-}
-
-ENTRYPOINT void
-free_sierpinski(ModeInfo * mi)
-{
-	free_sierpinski_screen(&tris[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

@@ -17,14 +17,16 @@
 
 #ifdef USE_GL
 #include <GL/gl.h>
+
 #ifdef WIN32
 extern HGLRC init_GL(ModeInfo * mi);
 /*extern void glXMakeCurrent(Display *display, Window window, HGLRC hglrc);*/
 extern void FreeAllGL(ModeInfo * mi);
 extern void do_fps (ModeInfo *mi);
-#else
-#include <GL/glx.h>
 
+#else
+
+#include <GL/glx.h>
 #ifdef __cplusplus
   extern "C" {
 #endif
@@ -33,12 +35,8 @@ extern void FreeAllGL(ModeInfo * mi);
 extern void do_fps (ModeInfo *mi);
 extern void clear_gl_error (void);
 extern Bool check_gl_error (const char *type);
-
-#ifndef WIN32
 extern XVisualInfo *
 getGLVisual(Display * display, int screen, XVisualInfo * wantVis, int monochrome);
-#endif
-
 #ifdef __cplusplus
   }
 #endif

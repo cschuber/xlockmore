@@ -733,7 +733,7 @@ placeObject(maze_configuration* maze, unsigned char type)
 	return position;
 }
 
-ENTRYPOINT void
+static void
 reshape_maze3d (ModeInfo *mi, int width, int height)
 {
 	glViewport(0, 0, (GLint) width, (GLint) height);
@@ -741,7 +741,7 @@ reshape_maze3d (ModeInfo *mi, int width, int height)
 }
 
 
-ENTRYPOINT Bool
+static Bool
 maze3d_handle_event (ModeInfo *mi, XEvent *event)
 {
   maze_configuration *maze = &mazes[MI_SCREEN(mi)];

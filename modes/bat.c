@@ -78,7 +78,7 @@ static const char sccsid[] = "@(#)bat.c	5.00 2000/11/01 xlockmore";
 
 #ifdef MODE_bat
 
-ModeSpecOpt bat_opts =
+ENTRYPOINT ModeSpecOpt bat_opts =
 {0, (XrmOptionDescRec *) NULL, 0, (argtype *) NULL, (OptionStruct *) NULL};
 
 #ifdef USE_MODULES
@@ -105,19 +105,19 @@ ENTRYPOINT ModStruct bat_description =
 #include "bitmaps/bat-3.xbm"
 #include "bitmaps/bat-4.xbm"
 
+#ifndef STANDALONE
 /* aliases for vars defined in the bitmap file */
 #define BAT_WIDTH     image_width
 #define BAT_HEIGHT    image_height
 #define BAT_BITS      image_bits
 
-#ifndef STANDALONE
 #include "bat.xbm"
-#endif
 
 #ifdef HAVE_XPM
 #define BAT_NAME      image_name
 #include "bat.xpm"
 #define DEFAULT_XPM 1
+#endif
 #endif
 
 #define MAX_STRENGTH 24
@@ -419,7 +419,6 @@ init_stuff(ModeInfo * mi)
 #endif
 	{
 		if (bp->cmap == None) {
-#ifndef STANDALONE
 /* problems here with XpmCreateImageFromData */
 #ifdef HAVE_XPM
 		int         total = 0;
@@ -472,7 +471,6 @@ init_stuff(ModeInfo * mi)
 			}
 		}
 		if (total <= ORIENTS / 2)
-#endif
 #endif
 			{
 				if (!bimages[0].data)	/* Only need to do this once */

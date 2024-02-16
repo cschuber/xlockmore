@@ -82,6 +82,14 @@ static void _XReportParseError(XrmOptionDescRec *arg, char *msg)
 #include "Xapi.h"
 #endif /* WIN32 */
 
+extern void XlockrmParseCommand(
+    XrmDatabase		*pdb,		/* data base */
+    register XrmOptionDescList options, /* pointer to table of valid options */
+    int                 num_options,	/* number of options		     */
+    char               *prefix,		/* name to prefix resources with     */
+    int                *arg_c,		/* address of argument count 	     */
+    char              **arg_v);		/* argument list (command line)	     */
+
 void
 XlockrmParseCommand(
     XrmDatabase		*pdb,		/* data base */

@@ -297,7 +297,7 @@ draw_impossiblecage(ModeInfo *mi, cagestruct * cp, int wire)
 	return True;
 }
 
-ENTRYPOINT void
+static void
 reshape_cage(ModeInfo * mi, int width, int height)
 {
 	cagestruct *cp = &cage[MI_SCREEN(mi)];

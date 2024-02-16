@@ -93,8 +93,8 @@ static const char sccsid[] = "@(#)wire.c	5.24 2007/01/18 xlockmore";
 	"*cycles: 150 \n" \
 	"*size: -8 \n" \
 	"*ncolors: 64 \n" \
-	"*neighbors: 0 \n" \
 
+# define free_wire 0
 # define reshape_wire 0
 # define wire_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -139,7 +139,7 @@ ENTRYPOINT ModeSpecOpt wire_opts =
 #ifdef USE_MODULES
 ModStruct   wire_description =
 {"wire", "init_wire", "draw_wire", "release_wire",
- "refresh_wire", "init_wire", "free_wire", &wire_opts,
+ "refresh_wire", "init_wire", (char *) NULL, &wire_opts,
  500000, 1000, 150, -8, 64, 1.0, "",
  "Shows a random circuit with 2 electrons", 0, NULL};
 
@@ -956,13 +956,6 @@ free_wire_screen(Display *display, circuitstruct *wp)
 	free_list(wp);
 	wp = NULL;
 }
-
-ENTRYPOINT void
-free_wire(ModeInfo * mi)
-{
-	free_wire_screen(MI_DISPLAY(mi), &circuits[MI_SCREEN(mi)]);
-}
-
 
 ENTRYPOINT void
 init_wire(ModeInfo * mi)

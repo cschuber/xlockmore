@@ -79,6 +79,7 @@ static const char sccsid[] = "@(#)petri.c	5.04 2002/07/19 xlockmore";
 	"*fullrandom: True \n" \
 	"*verbose: False \n" \
 
+# define free_petri 0
 # define reshape_petri 0
 # define petri_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -185,7 +186,7 @@ ENTRYPOINT ModeSpecOpt petri_opts =
 #ifdef USE_MODULES
 ModStruct   petri_description =
 {"petri", "init_petri", "draw_petri", "release_petri",
- "refresh_petri", "init_petri", "free_petri", &petri_opts,
+ "refresh_petri", "init_petri", (char *) NULL, &petri_opts,
  10000, 1, 1, 4, 8, 1.0, "",
  "Shows a mold simulation in a petri dish", 0, NULL};
 
@@ -292,12 +293,6 @@ free_petri_screen(Display *display, petristruct *sp)
 		sp->tail = (cell *) NULL;
     }
     sp = NULL;
-}
-
-ENTRYPOINT void
-free_petri(ModeInfo * mi)
-{
-  free_petri_screen(MI_DISPLAY(mi), &petries[MI_SCREEN(mi)]);
 }
 
 static int setup_random_colormap (ModeInfo * mi)

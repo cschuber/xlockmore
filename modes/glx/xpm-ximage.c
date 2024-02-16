@@ -23,6 +23,7 @@ static const char sccsid[] = "@(#)xpm-ximage.c       5.0 00/11/14 xlockmore";
 
 #ifdef STANDALONE
 #include "xlockmore.h"              /* from the xlockmore distribution */
+#include "xpm-ximage.h"
 #else                           /* !STANDALONE */
 #include "xlock.h"              /* from the xlockmore distribution */
 #endif                          /* !STANDALONE */
@@ -31,6 +32,9 @@ static const char sccsid[] = "@(#)xpm-ximage.c       5.0 00/11/14 xlockmore";
 #include <X11/xpm.h>
 
 #include <X11/Xutil.h>
+
+extern XImage *
+xpm_to_ximage(Display *dpy, Visual *visual, Colormap cmap, char **xpm_data);
 
 static Bool
 bigendian (void)

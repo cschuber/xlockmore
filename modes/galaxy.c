@@ -50,6 +50,7 @@ static const char sccsid[] = "@(#)galaxy.c	5.01 2001/01/02 xlockmore";
 	"*size: -3 \n" \
 	"*ncolors: 64 \n" \
 
+# define free_galaxy 0
 # define reshape_galaxy 0
 # define galaxy_handle_event 0
 #define UNIFORM_COLORS
@@ -93,7 +94,7 @@ ENTRYPOINT ModeSpecOpt galaxy_opts =
 #ifdef USE_MODULES
 ModStruct   galaxy_description =
 {"galaxy", "init_galaxy", "draw_galaxy", "release_galaxy",
- "refresh_galaxy", "init_galaxy", "free_galaxy", &galaxy_opts,
+ "refresh_galaxy", "init_galaxy", (char *) NULL, &galaxy_opts,
  100, -5, 250, -3, 64, 1.0, "",
  "Shows crashing spiral galaxies", 0, NULL};
 
@@ -210,12 +211,6 @@ free_galaxy_screen(Display *display, unistruct * gp)
 		gp->pixmap = None;
 	}
 	gp = NULL;
-}
-
-ENTRYPOINT void
-free_galaxy(ModeInfo * mi)
-{
-	free_galaxy_screen(MI_DISPLAY(mi), &universes[MI_SCREEN(mi)]);
 }
 
 static Bool

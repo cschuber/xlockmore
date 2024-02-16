@@ -96,6 +96,7 @@ SOFTWARE.
 	"*cycles: 300 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_ico 0
 # define reshape_ico 0
 # define ico_handle_event 0
 #define UNIFORM_COLORS
@@ -145,7 +146,7 @@ ENTRYPOINT ModeSpecOpt ico_opts =
 #ifdef USE_MODULES
 ModStruct   ico_description =
 {"ico", "init_ico", "draw_ico", "release_ico",
- "refresh_ico", "change_ico", "free_ico", &ico_opts,
+ "refresh_ico", "change_ico", (char *) NULL, &ico_opts,
  200000, 0, 400, 0, 64, 1.0, "",
  "Shows a bouncing polyhedron", 0, NULL};
 
@@ -1224,12 +1225,6 @@ free_ico_screen(Display *display, icostruct *ip)
 		ip->dbuf_gc = None;
 	}
 	ip = NULL;
-}
-
-ENTRYPOINT void
-free_ico(ModeInfo * mi)
-{
-	free_ico_screen(MI_DISPLAY(mi), &icos[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

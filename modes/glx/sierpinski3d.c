@@ -38,8 +38,6 @@ static const char sccsid[] = "@(#)sierpinski3D.c	00.01 99/11/04 xlockmore";
 # define DEFAULTS					"*count:		1       \n"			\
 									"*cycles:		9999    \n"			\
 									"*delay:		15000   \n"			\
-									"*maxDepth:		5       \n"			\
-									"*speed:		150     \n"			\
 									"*showFPS:      False   \n"			\
 									"*wireframe:	False	\n"
 
@@ -443,28 +441,6 @@ draw(ModeInfo *mi)
     }
 }
 
-
-/* new window size or exposure */
-ENTRYPOINT void
-reshape_gasket(ModeInfo *mi, int width, int height)
-{
-  GLfloat h = (GLfloat) height / (GLfloat) width;
-
-  glViewport(0, 0, (GLint) width, (GLint) height);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-
-  gluPerspective( 30.0, 1/h, 1.0, 100.0 );
-  gluLookAt( 0.0, 0.0, 15.0,
-             0.0, 0.0, 0.0,
-             0.0, 1.0, 0.0);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glTranslatef(0.0, 0.0, -15.0);
-
-  glClear(GL_COLOR_BUFFER_BIT);
-}
-
 static void
 pinit(ModeInfo *mi)
 {
@@ -555,6 +531,26 @@ rotate(GLfloat *pos, GLfloat *v, GLfloat *dv, GLfloat max_v, Bool verbose)
     }
 }
 
+/* new window size or exposure */
+static void
+reshape_gasket(ModeInfo *mi, int width, int height)
+{
+  GLfloat h = (GLfloat) height / (GLfloat) width;
+
+  glViewport(0, 0, (GLint) width, (GLint) height);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+
+  gluPerspective( 30.0, 1/h, 1.0, 100.0 );
+  gluLookAt( 0.0, 0.0, 15.0,
+             0.0, 0.0, 0.0,
+             0.0, 1.0, 0.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glTranslatef(0.0, 0.0, -15.0);
+
+  glClear(GL_COLOR_BUFFER_BIT);
+}
 
 ENTRYPOINT void
 init_gasket(ModeInfo *mi)

@@ -38,6 +38,7 @@ static const char sccsid[] = "@(#)drift.c	5.00 2000/11/01 xlockmore";
 			"*ncolors: 200 \n" \
 			"*fullrandom: True \n" \
 
+# define free_drift 0
 # define reshape_drift 0
 # define drift_handle_event 0
 # define SMOOTH_COLORS
@@ -82,7 +83,7 @@ ENTRYPOINT ModeSpecOpt drift_opts =
 #ifdef USE_MODULES
 ModStruct   drift_description =
 {"drift", "init_drift", "draw_drift", "release_drift",
- "refresh_drift", "init_drift", "free_drift", &drift_opts,
+ "refresh_drift", "init_drift", (char *) NULL, &drift_opts,
  10000, 30, 1, 1, 64, 1.0, "",
  "Shows cosmic drifting flame fractals", 0, NULL};
 
@@ -276,12 +277,6 @@ free_drift_screen(driftstruct *dp)
 		dp->cpts = (XPoint *) NULL;
 	}
 	dp = NULL;
-}
-
-ENTRYPOINT void
-free_drift(ModeInfo * mi)
-{
-	free_drift_screen(&drifts[MI_SCREEN(mi)]);
 }
 
 static void
@@ -626,6 +621,9 @@ draw_drift(ModeInfo * mi)
 			draw_flush(mi, dp, window);
 			if (0 == --dp->nfractals) {
 				initmode(mi, frandom(dp, 2));
+				/*dp->erase_countdown = 4 * 1000000 /
+				((MI_PAUSE(mi) == 0) ? 1 : MI_PAUSE(mi));
+				return;*/
 			}
 			initfractal(mi);
 		}

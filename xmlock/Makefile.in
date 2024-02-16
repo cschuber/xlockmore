@@ -68,6 +68,7 @@ INSTPGMFLAGS = @INSTPGMFLAGS@
 #CC = gcc -g -Wall -Wstrict-prototypes -Wnested-externs -Wno-format
 #CC = gcc -g -Wall -W -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wwrite-strings -Waggregate-return -Wmissing-prototypes -Wstrict-prototypes
 #CC = g++ -g -Wall
+#CC = gcc -g -Wall -Wstrict-prototypes -Wnested-externs -Wmissing-prototypes -Wno-overlength-strings -Wdeclaration-after-statement
 CC = @CC@
 
 #LINT = lint

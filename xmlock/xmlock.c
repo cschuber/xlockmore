@@ -1,4 +1,4 @@
-#if !defined( lint ) && !defined( SABER )
+#if 0
 
 static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
 
@@ -112,7 +112,7 @@ static pid_t numberprocess = -1;	/* PID of xlock */
  * To know the number of element
  * in the Opt Array
 **************************/
-extern int getNumberofElementofOpt();
+extern int getNumberofElementofOpt(void);
 
 /* Widget */
 Widget      toplevel;
@@ -144,7 +144,7 @@ static char *r_PushButtons[PUSHBUTTONS] =
 
 static int  numberinlist = 0;
 
-static void checkTime();
+static void checkTime(void);
 /* CallBack */
 
 void exitcallback(Widget w, XtPointer client_data, XtPointer call_data)
@@ -233,7 +233,7 @@ callLocker(int choice)
 /*    and compares it to the timeout value.                 */
 /*----------------------------------------------------------*/
 
-static void checkTime()
+static void checkTime(void)
 {
   struct stat statmouse;
 #if 0

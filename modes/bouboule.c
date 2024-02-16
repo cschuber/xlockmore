@@ -81,6 +81,7 @@ static const char sccsid[] = "@(#)bouboule.c	5.00 2000/11/01 xlockmore";
 			"*both3d: magenta \n" \
 			"*none3d: black \n" \
 
+# define free_bouboule 0
 # define reshape_bouboule 0
 # define bouboule_handle_event 0
 # define SMOOTH_COLORS
@@ -97,7 +98,7 @@ ENTRYPOINT ModeSpecOpt bouboule_opts =
 #ifdef USE_MODULES
 const ModStruct bouboule_description =
 {"bouboule", "init_bouboule", "draw_bouboule", "release_bouboule",
- "refresh_bouboule", "init_bouboule", "free_bouboule", &bouboule_opts,
+ "refresh_bouboule", "init_bouboule", (char *) NULL, &bouboule_opts,
  10000, 100, 1, 15, 64, 1.0, "",
  "Shows Mimi's bouboule of moving stars", 0, NULL};
 
@@ -358,13 +359,6 @@ free_bouboule_screen(StarField *sp)
 	sinfree(&(sp->thetay));
 	sinfree(&(sp->thetaz));
 	sp = NULL;
-}
-
-
-ENTRYPOINT void
-free_bouboule(ModeInfo * mi)
-{
-	free_bouboule_screen(&starfield[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

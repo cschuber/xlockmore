@@ -55,6 +55,7 @@ static const char sccsid[] = "@(#)shape.c	5.00 2000/11/01 xlockmore";
 	"*fullrandom: True \n" \
 	"*verbose: False \n" \
 
+# define free_shape 0
 # define reshape_shape 0
 # define shape_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -131,7 +132,7 @@ ENTRYPOINT ModeSpecOpt shape_opts =
 #ifdef USE_MODULES
 ModStruct   shape_description =
 {"shape", "init_shape", "draw_shape", "release_shape",
- "refresh_shape", "init_shape", "free_shape", &shape_opts,
+ "refresh_shape", "init_shape", (char *) NULL, &shape_opts,
  10000, 100, 256, 1, 64, 1.0, "",
  "Shows overlaying rectangles, ellipses, and triangles", 0, NULL};
 
@@ -188,12 +189,6 @@ free_shape_screen(Display *display, shapestruct *sp)
 		XFreePixmap(display, sp->pixmaps[bits]);
 	/*sp->init_bits = 0;*/
 	sp = NULL;
-}
-
-ENTRYPOINT void
-free_shape(ModeInfo * mi)
-{
-	free_shape_screen(MI_DISPLAY(mi), &shapes[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

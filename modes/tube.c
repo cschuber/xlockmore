@@ -38,6 +38,7 @@ static const char sccsid[] = "@(#)tube.c	5.09 2003/06/30 xlockmore";
 	"*size: -200 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_tube 0
 # define reshape_tube 0
 # define tube_handle_event 0
 #define SMOOTH_COLORS
@@ -75,7 +76,7 @@ ENTRYPOINT ModeSpecOpt tube_opts =
 #ifdef USE_MODULES
 ModStruct   tube_description =
 {"tube", "init_tube", "draw_tube", "release_tube",
- (char *) NULL, "init_tube", "free_tube", &tube_opts,
+ (char *) NULL, "init_tube", (char *) NULL, &tube_opts,
  25000, -9, 20000, -200, 64, 1.0, "",
  "Shows an animated tube", 0, NULL};
 
@@ -158,12 +159,6 @@ free_tube_screen(ModeInfo *mi, tubestruct *tp)
      tp->gc = None;
   }
   tp = NULL;
-}
-
-ENTRYPOINT void
-free_tube(ModeInfo * mi)
-{
-        free_tube_screen(mi, &tubes[MI_SCREEN(mi)]);
 }
 
 #ifndef STANDALONE

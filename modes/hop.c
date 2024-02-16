@@ -60,6 +60,7 @@ static const char sccsid[] = "@(#)hop.c	5.00 2000/11/01 xlockmore";
 			"*fullrandom: True \n" \
 			"*verbose: False \n" \
 
+# define free_hop 0
 # define reshape_hop 0
 # define hop_handle_event 0
 # define SMOOTH_COLORS
@@ -154,7 +155,7 @@ ENTRYPOINT ModeSpecOpt hop_opts =
 #ifdef USE_MODULES
 ModStruct   hop_description =
 {"hop", "init_hop", "draw_hop", "release_hop",
- "refresh_hop", "init_hop", "free_hop", &hop_opts,
+ "refresh_hop", "init_hop", (char *) NULL, &hop_opts,
  10000, 1000, 2500, 1, 64, 1.0, "",
  "Shows real plane iterated fractals", 0, NULL};
 
@@ -200,12 +201,6 @@ free_hop_screen(hopstruct *hp)
 	if (hp->pointBuffer != NULL)
 		free(hp->pointBuffer);
 	hp = NULL;
-}
-
-ENTRYPOINT void
-free_hop(ModeInfo * mi)
-{
-	free_hop_screen(&hops[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

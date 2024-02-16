@@ -66,7 +66,6 @@ static const char sccsid[] = "@(#)life3d.c	5.27 2008/07/28 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_life3d
-#define life3d_opts xlockmore_opts
 #define DEFAULTS "*delay: 1000000 \n" \
 	"*count: 35 \n" \
 	"*cycles: 85 \n" \

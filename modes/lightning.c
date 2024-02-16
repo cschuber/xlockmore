@@ -546,6 +546,11 @@ draw_lightning(ModeInfo * mi)
 		case 0:
 			MI_IS_DRAWN(mi) = False;
 			MI_CLEARWINDOW(mi);
+#ifdef STANDALONE
+			MI_CLEARWINDOWCOLORMAPFAST(mi, MI_GC(mi), MI_BLACK_PIXEL(mi));
+#else
+			MI_CLEARWINDOW(mi);
+#endif
 			MI_IS_DRAWN(mi) = True;
 
 			st->color = NRAND(MI_NPIXELS(mi));
@@ -573,7 +578,11 @@ draw_lightning(ModeInfo * mi)
 			break;
 		case 3:
 			MI_IS_DRAWN(mi) = False;
+#ifdef STANDALONE
+			MI_CLEARWINDOWCOLORMAPFAST(mi, MI_GC(mi), MI_BLACK_PIXEL(mi));
+#else
 			MI_CLEARWINDOW(mi);
+#endif
 			MI_IS_DRAWN(mi) = True;
 
 			if (storm_active(st))

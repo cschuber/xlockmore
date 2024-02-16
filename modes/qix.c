@@ -191,7 +191,7 @@ init_qix(ModeInfo * mi)
 
 	qp->npoints = MI_COUNT(mi);
 	if (qp->npoints < -MINPOINTS)
-		qp->npoints = NRAND(qp->npoints - MINPOINTS + 1) + MINPOINTS;
+		qp->npoints = NRAND(-qp->npoints - MINPOINTS + 1) + MINPOINTS;
 	/* Absolute minimum */
 	if (qp->npoints < MINPOINTS)
 		qp->npoints = MINPOINTS;

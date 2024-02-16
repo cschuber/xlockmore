@@ -55,12 +55,12 @@ static const char sccsid[] = "@(#)mandelbrot.c	5.09 2003/06/30 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_mandelbrot
-#define mandelbrot_opts xlockmore_opts
 #define DEFAULTS "*delay: 25000 \n" \
 	"*count: -8 \n" \
 	"*cycles: 20000 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_mandelbrot 0
 # define reshape_mandelbrot 0
 # define mandelbrot_handle_event 0
 #define SMOOTH_COLORS
@@ -164,7 +164,7 @@ ENTRYPOINT ModeSpecOpt mandelbrot_opts =
 #ifdef USE_MODULES
 ModStruct   mandelbrot_description =
 {"mandelbrot", "init_mandelbrot", "draw_mandelbrot", "release_mandelbrot",
- (char *) NULL, "init_mandelbrot", "free_mandelbrot", &mandelbrot_opts,
+ (char *) NULL, "init_mandelbrot", (char *) NULL, &mandelbrot_opts,
  25000, -8, 20000, 1, 64, 1.0, "",
  "Shows mandelbrot sets", 0, NULL};
 
@@ -534,12 +534,6 @@ free_mandelbrot_screen(ModeInfo *mi, mandelstruct *mp)
 		mp->gc = None;
 	}
 	mp = NULL;
-}
-
-ENTRYPOINT void
-free_mandelbrot(ModeInfo * mi)
-{
-	free_mandelbrot_screen(mi, &mandels[MI_SCREEN(mi)]);
 }
 
 #ifndef STANDALONE

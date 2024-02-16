@@ -45,15 +45,14 @@ static const char sccsid[] = "@(#)atunnels.c	5.13 2004/07/19 xlockmore";
 #ifdef STANDALONE		/* xscreensaver mode */
 # define MODE_atunnels
 #define	DEFAULTS                "*delay:	10000	\n" \
-				"*showFPS:     	False	\n" \
-                                "*light:	True	\n" \
-                                "*wire:		False	\n" \
-                                "*texture:	True	\n"
+				"*showFPS:     	False	\n"
 
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#define free_atunnels 0
+#define atunnels_handle_event 0
 #else /* !STANDALONE */
 # include "xlock.h"		/* from the xlockmore distribution */
 # include "visgl.h"
@@ -65,21 +64,20 @@ static const char sccsid[] = "@(#)atunnels.c	5.13 2004/07/19 xlockmore";
 #ifdef HAVE_XPM
 #include "xpm-ximage.h"
 
-#ifdef STANDALONE
+#if 0
 #include "../images/tunnel0.xpm"
 #include "../images/tunnel1.xpm"
 #include "../images/tunnel2.xpm"
 #include "../images/tunnel3.xpm"
 #include "../images/tunnel4.xpm"
 #include "../images/tunnel5.xpm"
-#else /* !STANDALONE */
+#endif
 #include "pixmaps/tunnel0.xpm"
 #include "pixmaps/tunnel1.xpm"
 #include "pixmaps/tunnel2.xpm"
 #include "pixmaps/tunnel3.xpm"
 #include "pixmaps/tunnel4.xpm"
 #include "pixmaps/tunnel5.xpm"
-#endif /* !STANDALONE */
 #endif /* HAVE_XPM */
 
 #undef countof
@@ -162,8 +160,12 @@ static Bool LoadTexture(ModeInfo * mi, char **fn, int t_num)
 	clear_gl_error();
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, teximage->width, teximage->height,
 			0, GL_RGBA, GL_UNSIGNED_BYTE, teximage->data);
+#ifdef STANDALONE
+	check_gl_error("texture");
+#else
 	if (check_gl_error("texture"))
 		return False;
+#endif
 
 	/* Texture parameters, LINEAR scaling for better texture quality */
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -249,7 +251,7 @@ static Bool Init(ModeInfo * mi)
 
 
 /* Standard reshape function */
-ENTRYPOINT void
+static void
 reshape_atunnels(ModeInfo *mi, int width, int height)
 {
 	float a;

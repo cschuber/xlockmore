@@ -1,4 +1,4 @@
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)sound.c	4.00 97/01/01 xlockmore";
 
 #endif
@@ -21,6 +21,10 @@ static const char sccsid[] = "@(#)sound.c	4.00 97/01/01 xlockmore";
 #else
 #define SOUNDPATH "/usr/local/share/xlock/sounds"
 #endif
+#endif
+
+#ifdef USE_SOUND
+extern void playSound(char *filename, Bool verbose);
 #endif
 
 #ifdef DEF_PLAY

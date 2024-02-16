@@ -39,6 +39,7 @@ static const char sccsid[] = "@(#)wator.c	5.24 2007/01/18 xlockmore";
 	"*size: 0 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_wator 0
 # define reshape_wator 0
 # define wator_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -83,7 +84,7 @@ ENTRYPOINT ModeSpecOpt wator_opts =
 #ifdef USE_MODULES
 ModStruct   wator_description =
 {"wator", "init_wator", "draw_wator", "release_wator",
- "refresh_wator", "init_wator", "free_wator", &wator_opts,
+ "refresh_wator", "init_wator", (char *) NULL, &wator_opts,
  750000, 1, 32767, 0, 64, 1.0, "",
  "Shows Dewdney's Water-Torus planet of fish and sharks", 0, NULL};
 
@@ -857,12 +858,6 @@ free_wator_screen(watorstruct *wp)
 		wp->arr = (CellList **) NULL;
 	}
 	wp = NULL;
-}
-
-ENTRYPOINT void
-free_wator(ModeInfo * mi)
-{
-	free_wator_screen(&wators[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

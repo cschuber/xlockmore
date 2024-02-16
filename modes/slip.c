@@ -196,7 +196,7 @@ quantize(double d)
 	return i;
 }
 
-ENTRYPOINT void
+static void
 reshape_slip(ModeInfo * mi, int w, int h)
 {
 	slipstruct *sp = &slips[MI_SCREEN(mi)];

@@ -42,6 +42,7 @@ static const char sccsid[] = "@(#)lyapunov.c	5.09 2003/06/30 xlockmore";
 	"*cycles: 20000 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_lyapunov 0
 # define reshape_lyapunov 0
 # define lyapunov_handle_event 0
 #define SMOOTH_COLORS
@@ -88,7 +89,7 @@ ENTRYPOINT ModeSpecOpt lyapunov_opts =
 #ifdef USE_MODULES
 ModStruct   lyapunov_description =
 {"lyapunov", "init_lyapunov", "draw_lyapunov", "release_lyapunov",
- (char *) NULL, "init_lyapunov", "free_lyapunov", &lyapunov_opts,
+ (char *) NULL, "init_lyapunov", (char *) NULL, &lyapunov_opts,
  25000, 600, 20000, 1, 64, 1.0, "",
  "Shows lyapunov space", 0, NULL};
 
@@ -222,12 +223,6 @@ free_lyapunov_screen(ModeInfo *mi, lyapstruct *lp)
 		lp->gc = None;
 	}
 	lp = NULL;
-}
-
-ENTRYPOINT void
-free_lyapunov(ModeInfo * mi)
-{
-	free_lyapunov_screen(mi, &lyaps[MI_SCREEN(mi)]);
 }
 
 #ifndef STANDALONE

@@ -137,6 +137,7 @@ static const char sccsid[] = "@(#)juggle.c	5.10 2003/09/02 xlockmore";
 	"*ncolors: 32 \n" \
 	"*font: -*-times-bold-r-normal-*-180-*\n" \
 
+# define free_juggle 0
 # define juggle_handle_event 0
 #undef SMOOTH_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -261,7 +262,7 @@ ENTRYPOINT ModeSpecOpt juggle_opts =
 #ifdef USE_MODULES
 ModStruct   juggle_description = {
 	"juggle", "init_juggle", "draw_juggle", "release_juggle",
-	"draw_juggle", "change_juggle", "free_juggle", &juggle_opts,
+	"draw_juggle", "change_juggle", (char *) NULL, &juggle_opts,
 	10000, 200, 1000, 1, 64, 1.0, "",
 	"Shows a Juggler, juggling", 0, NULL
 };
@@ -704,12 +705,6 @@ free_juggle_screen(jugglestruct *sp) {
 	sp->pattern = NULL;
   }
   sp = NULL;;
-}
-
-ENTRYPOINT void
-free_juggle(ModeInfo * mi)
-{
-	free_juggle_screen(&juggles[MI_SCREEN(mi)]);
 }
 
 static Bool

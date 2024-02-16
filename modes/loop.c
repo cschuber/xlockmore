@@ -99,6 +99,7 @@ ping.
 	"*size: -12 \n" \
 	"*ncolors: 15 \n" \
 
+# define free_loop 0
 # define reshape_loop 0
 # define loop_handle_event 0
 #define UNIFORM_COLORS
@@ -194,7 +195,7 @@ ENTRYPOINT ModeSpecOpt loop_opts =
 #ifdef USE_MODULES
 ModStruct   loop_description =
 {"loop", "init_loop", "draw_loop", "release_loop",
- "refresh_loop", "init_loop", "free_loop", &loop_opts,
+ "refresh_loop", "init_loop", (char *) NULL, &loop_opts,
  100000, 5, 1600, -12, 64, 1.0, "",
  "Shows Langton's self-producing loops", 0, NULL};
 
@@ -1323,12 +1324,6 @@ free_loop_screen(Display *display, loopstruct * lp)
 	}
 	free_cells(lp);
 	lp = NULL;
-}
-
-ENTRYPOINT void
-free_loop(ModeInfo * mi)
-{
-	free_loop_screen(MI_DISPLAY(mi), &loops[MI_SCREEN(mi)]);
 }
 
 static Bool

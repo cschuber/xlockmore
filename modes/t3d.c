@@ -54,6 +54,7 @@ static const char sccsid[] = "@(#)t3d.c	5.0 2000/11/01 xlockmore";
 	"*ncolors: 200 \n" \
 	"*mouse: False \n" \
 
+# define free_t3d 0
 # define reshape_t3d 0
 # define t3d_handle_event 0
 #define UNIFORM_COLORS
@@ -151,7 +152,7 @@ ENTRYPOINT ModeSpecOpt t3d_opts =
 #ifdef USE_MODULES
 ModStruct   t3d_description =
 {"t3d", "init_t3d", "draw_t3d", "release_t3d",
- "refresh_t3d", "init_t3d", "free_t3d", &t3d_opts,
+ "refresh_t3d", "init_t3d", (char *) NULL, &t3d_opts,
  250000, 1000, 60000 , 1, 64, 1.0, "",
  "Flying Balls Clock Demo", 0, NULL};
 
@@ -655,12 +656,6 @@ free_t3d_screen(ModeInfo *mi, t3dstruct *t3dp)
 		t3dp->zeit = (struct tm *) NULL;
 	}
 	t3dp = NULL;
-}
-
-ENTRYPOINT void
-free_t3d(ModeInfo * mi)
-{
-	free_t3d_screen(mi, &t3ds[MI_SCREEN(mi)]);
 }
 
 static Bool

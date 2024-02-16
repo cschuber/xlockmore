@@ -48,15 +48,15 @@ static const char sccsid[] = "@(#)text3d.2cc	5.12 2004/03/09 xlockmore";
 #define DEFAULTS	"*delay:	10000       \n" \
 			"*showFPS:      False       \n" \
 			"*wireframe:    False       \n" \
-			"*spin:       " DEF_SPIN   "\n" \
-			"*wander:     " DEF_WANDER "\n" \
 			"*nosplit:    " DEF_NOSPLIT "\n" \
 			"*message:    " DEF_TEXT   "\n"
 
 #define free_text3d2 0
+#define text3d2_handle_event 0
 extern "C"
 {
   #include "xlockmore.h"	/* from the xscreensaver distribution */
+  /*#include "iostuff.h"*/
 }
 #else				/* !STANDALONE */
   #include "xlock.h"		/* from the xlockmore distribution */
@@ -64,8 +64,8 @@ extern "C"
   #ifdef HAS_MMOV
     #undef error
   #endif
+  #include "iostuff.h"
 #endif				/* !STANDALONE */
-#include "iostuff.h"
 
 #ifdef MODE_text3d2
 
@@ -91,11 +91,13 @@ extern "C"
 #include <X11/Xcms.h>
 
 /* Yes, it's an ugly mix of 'C' and 'C++' functions */
+#ifndef STANDALONE
 extern "C" { void init_text3d2(ModeInfo * mi); }
 extern "C" { void draw_text3d2(ModeInfo * mi); }
 extern "C" { void change_text3d2(ModeInfo * mi); }
 extern "C" { void release_text3d2(ModeInfo * mi); }
 extern "C" { void refresh_text3d2(ModeInfo * mi); }
+#endif
 
 /* arial.ttf is not supplied for legal reasons. */
 /* NT and Windows 3.1 in c:\WINDOWS\SYSTEM\ARIAL.TTF */
@@ -105,12 +107,11 @@ extern "C" { void refresh_text3d2(ModeInfo * mi); }
 /* symbol.ttf and wingding.ttf should be excluded or it may core dump */
 /* can be excluded if gltt is modified see README */
 #ifdef __CYGWIN__
-#define DEF_TTFONT "c:\\windows\\fonts\\"
+#define DEF_TTFONT "C:\\Windows\\Fonts\\"
 #else
 #define DEF_TTFONT "/usr/lib/X11/xlock/fonts/"
 #endif
 #endif
-
 
 static char *mode_font;
 static int nosplit;
@@ -147,7 +148,7 @@ static OptionStruct desc[] =
     {(char *) "-spin name/+spin", (char *) "Text3d2 spin mode"},
 };
 
-ModeSpecOpt text3d2_opts =
+ENTRYPOINT ModeSpecOpt text3d2_opts =
 {sizeof opts / sizeof opts[0], opts, sizeof vars / sizeof vars[0], vars, desc};
 
 #ifdef USE_MODULES
@@ -293,6 +294,7 @@ static void
     int text_length;
     char *c_text;
 
+#ifndef STANDALONE
     if (!nosplit)
     {
 	text_length = index_dir(tp->words, (char *) " ");
@@ -305,6 +307,7 @@ static void
 	c_text[text_length+1] = 0;
     }
     else
+#endif
     {
 	text_length = strlen(tp->words_start);
 	if ((c_text = (char *) malloc(text_length+2)) != NULL)
@@ -330,6 +333,34 @@ static void
 
 /*
  *-----------------------------------------------------------------------------
+ *    The display is being taken away from us.  Free up malloc'ed
+ *      memory and X resources that we've alloc'ed.  Only called
+ *      once, we must zap everything for every screen.
+ *-----------------------------------------------------------------------------
+ */
+
+ENTRYPOINT void
+ release_text3d2(ModeInfo * mi)
+{
+    if (text3d2 != NULL)
+    {
+	for (int screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
+	{
+	    text3d2struct *tp = &text3d2[screen];
+
+	    if (tp->font)
+		delete tp->font;
+	    if (tp->rot)
+		free_rotator(tp->rot);
+	}
+	free(text3d2);
+	text3d2 = (text3d2struct *) NULL;
+    }
+    FreeAllGL(mi);
+}
+
+/*
+ *-----------------------------------------------------------------------------
  *    Initialize text3d2.  Called each time the window changes.
  *-----------------------------------------------------------------------------
  */
@@ -337,7 +368,6 @@ static void
 ENTRYPOINT void
  init_text3d2(ModeInfo * mi)
 {
-    int i;
     text3d2struct *tp;
 
     if (text3d2 == NULL)
@@ -351,7 +381,12 @@ ENTRYPOINT void
     tp->wire = MI_IS_WIREFRAME(mi);
     tp->counter = 0;
 
+#ifdef STANDALONE
+    if ((fontfile = (char *) malloc(strlen(mode_font) + 10)) != NULL)
+    	sprintf(fontfile, "%s%s", mode_font, "arial.ttf");
+#else
     fontfile = getModeFont(mode_font);
+#endif
     if (!fontfile) {
 		MI_CLEARWINDOW(mi);
 		release_text3d2(mi);
@@ -459,6 +494,7 @@ ENTRYPOINT void
     MI_IS_DRAWN(mi) = True;
     tp->counter = tp->counter + 1;
 
+#ifndef STANDALONE
     if (tp->counter > (MI_CYCLES(mi) & !nosplit))
     {
 	int text_length = index_dir(tp->words, (char *) " ");
@@ -475,6 +511,7 @@ ENTRYPOINT void
 		getWords(MI_SCREEN(mi), MI_NUM_SCREENS(mi));
 	}
     }
+#endif
   glShadeModel(GL_SMOOTH);
 
   glEnable(GL_DEPTH_TEST);
@@ -520,34 +557,6 @@ ENTRYPOINT void
 
 }
 
-/*
- *-----------------------------------------------------------------------------
- *    The display is being taken away from us.  Free up malloc'ed
- *      memory and X resources that we've alloc'ed.  Only called
- *      once, we must zap everything for every screen.
- *-----------------------------------------------------------------------------
- */
-
-ENTRYPOINT void
- release_text3d2(ModeInfo * mi)
-{
-    if (text3d2 != NULL)
-    {
-	for (int screen = 0; screen < MI_NUM_SCREENS(mi); screen++)
-	{
-	    text3d2struct *tp = &text3d2[screen];
-
-	    if (tp->font)
-		delete tp->font;
-	    if (tp->rot)
-		free_rotator(tp->rot);
-	}
-	free(text3d2);
-	text3d2 = (text3d2struct *) NULL;
-    }
-    FreeAllGL(mi);
-}
-
 #ifndef STANDALONE
 ENTRYPOINT void
  refresh_text3d2(ModeInfo * mi)
@@ -575,5 +584,7 @@ ENTRYPOINT void
 #endif
 }
 #endif
+
+XSCREENSAVER_MODULE ("Text3d2", text3d2)
 
 #endif				/* MODE_text3d2 */

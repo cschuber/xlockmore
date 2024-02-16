@@ -57,6 +57,7 @@ static const char sccsid[] = "@(#)strange.c	5.00 2000/11/01 xlockmore";
 	"*useThreads: True \n" \
 
 # define SMOOTH_COLORS
+# define free_strange 0
 # define refresh_strange 0
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 # include "pow2.h"
@@ -158,7 +159,7 @@ ENTRYPOINT ModeSpecOpt strange_opts =
 #ifdef USE_MODULES
 ModStruct   strange_description =
 {"strange", "init_strange", "draw_strange", "release_strange",
-"init_strange", "init_strange", "free_strange", &strange_opts,
+"init_strange", "init_strange", (char *) NULL, &strange_opts,
 10000, 1, 1, 1, 64, 1.0, "",
 "Shows strange attractors", 0, NULL};
 #endif
@@ -505,13 +506,6 @@ free_strange_screen(ModeInfo *mi, ATTRACTOR *A)
 #endif
 	A = NULL;
 }
-
-ENTRYPOINT void
-free_strange(ModeInfo * mi)
-{
-	free_strange_screen(mi, &Root[MI_SCREEN(mi)]);
-}
-
 
 /* NRAND() is also in use; making three PRNGs in total here. */
 

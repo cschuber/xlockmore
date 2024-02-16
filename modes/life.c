@@ -137,7 +137,6 @@ static const char sccsid[] = "@(#)life.c	5.24 2007/01/18 xlockmore";
 
 #ifdef STANDALONE
 #define MODE_life
-#define life_opts xlockmore_opts
 #define DEFAULTS "*delay: 750000 \n" \
  "*count: 40 \n" \
  "*cycles: 140 \n" \
@@ -362,7 +361,6 @@ static XImage bimage =
   0, 0, 0, XYBitmap, 0, LSBFirst, 8, LSBFirst, 8, 1
 };
 #endif
-#endif
 
 #ifdef HAVE_XPM
 #define CELL_NAME image_name
@@ -374,6 +372,7 @@ static char *image_name[] =
 #include "life.xpm"
 #endif
 #define DEFAULT_XPM 0
+#endif
 #endif
 
 #define REDRAWSTEP 2000		/* How many cells to draw per cycle */

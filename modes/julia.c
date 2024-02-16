@@ -50,6 +50,7 @@ static const char sccsid[] = "@(#)julia.c	5.00 2000/11/01 xlockmore";
 	 "*ncolors: 200 \n" \
 	 "*mouse: False \n" \
 
+# define free_julia 0
 # define reshape_julia 0
 # define julia_handle_event 0
 #define UNIFORM_COLORS
@@ -89,7 +90,7 @@ ENTRYPOINT ModeSpecOpt julia_opts =
 #ifdef USE_MODULES
 ModStruct   julia_description =
 {"julia", "init_julia", "draw_julia", "release_julia",
- "refresh_julia", "init_julia", "free_julia", &julia_opts,
+ "refresh_julia", "init_julia", (char *) NULL, &julia_opts,
  10000, 1000, 20, 1, 64, 1.0, "",
  "Shows the Julia set", 0, NULL};
 
@@ -212,12 +213,6 @@ free_julia_screen(Display *display, juliastruct *jp)
 		jp->cursor = None;
 	}
 	jp = NULL;
-}
-
-ENTRYPOINT void
-free_julia(ModeInfo * mi)
-{
-	free_julia_screen(MI_DISPLAY(mi), &julias[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

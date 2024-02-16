@@ -82,6 +82,7 @@ static const char sccsid[] = "@(#)fire.c	5.02 2001/09/26 xlockmore";
 		"*showFPS:    False \n" \
 		"*wireframe:  False \n"	\
 
+# define free_fire 0
 # define fire_handle_event 0
 # include "xlockmore.h"		/* from the xscreensaver distribution */
 #else				/* !STANDALONE */
@@ -99,13 +100,12 @@ static const char sccsid[] = "@(#)fire.c	5.02 2001/09/26 xlockmore";
 #ifdef HAVE_XPM
 #include "xpm-ximage.h"
 
-#ifdef STANDALONE
+#if 0
 #include "../images/ground.xpm"
 #include "../images/tree.xpm"
-#else /* !STANDALONE */
+#endif
 #include "pixmaps/ground.xpm"
 #include "pixmaps/tree.xpm"
-#endif /* !STANDALONE */
 #endif /* HAVE_XPM */
 
 /* vector utility macros */
@@ -205,7 +205,7 @@ ENTRYPOINT ModeSpecOpt fire_opts =
 #ifdef USE_MODULES
 ModStruct fire_description =
     { "fire", "init_fire", "draw_fire", "release_fire",
-    "draw_fire", "change_fire", "free_fire", &fire_opts,
+    "draw_fire", "change_fire", (char *) NULL, &fire_opts,
     10000, 800, 1, 0, 64, 1.0, "",
     "Shows a 3D fire-like image", 0, NULL
 };
@@ -660,7 +660,7 @@ static Bool inittree(ModeInfo * mi)
  *-----------------------------------------------------------------------------
  */
 
-ENTRYPOINT void
+static void
 reshape_fire(ModeInfo * mi, int width, int height)
 {
 
@@ -958,12 +958,6 @@ free_fire_screen(firestruct *fs)
  *    Initialize fire.  Called each time the window changes.
  *-----------------------------------------------------------------------------
  */
-
-ENTRYPOINT void
-free_fire(ModeInfo * mi)
-{
-	free_fire_screen(&fire[MI_SCREEN(mi)]);
-}
 
 ENTRYPOINT void
 init_fire(ModeInfo * mi)

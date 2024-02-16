@@ -65,6 +65,7 @@ static const char sccsid[] = "@(#)star.c	5.62 2020/01/25 xlockmore";
  "*both3d: magenta \n" \
  "*none3d: black \n" \
 
+# define free_star 0
 # define reshape_star 0
 # define star_handle_event 0
 #define BRIGHT_COLORS
@@ -118,7 +119,7 @@ ENTRYPOINT ModeSpecOpt star_opts =
 #ifdef USE_MODULES
 ModStruct   star_description =
 {"star", "init_star", "draw_star", "release_star",
- "refresh_star", "init_star", "free_star", &star_opts,
+ "refresh_star", "init_star", (char *) NULL, &star_opts,
  40000, 100, 1, 100, 64, 0.3, "",
  "Shows a star field with a twist", 0, NULL};
 
@@ -404,12 +405,6 @@ free_star_screen(Display *display, starstruct *sp)
 	}
 	/*sp->init_ships = 0;*/
 	sp = NULL;
-}
-
-ENTRYPOINT void
-free_star(ModeInfo * mi)
-{
-	free_star_screen(MI_DISPLAY(mi), &stars[MI_SCREEN(mi)]);
 }
 
 static void

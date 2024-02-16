@@ -38,6 +38,7 @@ static const char sccsid[] = "@(#)fiberlamp.c	5.00 2000/11/01 xlockmore";
 	"*cycles: 10000 \n" \
 	"*ncolors: 64 \n" \
 
+# define free_fiberlamp 0
 # define fiberlamp_handle_event 0
 #define UNIFORM_COLORS
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -56,7 +57,7 @@ ENTRYPOINT ModeSpecOpt fiberlamp_opts =
 #ifdef USE_MODULES
 ModStruct   fiberlamp_description =
 {"fiberlamp", "init_fiberlamp", "draw_fiberlamp", "release_fiberlamp",
- "draw_fiberlamp", "change_fiberlamp", "free_fiberlamp", &fiberlamp_opts,
+ "draw_fiberlamp", "change_fiberlamp", (char *) NULL, &fiberlamp_opts,
  1000, 500, 10000, 0, 64, 1.0, "", "Shows a Fiber Optic Lamp", 0, NULL};
 
 #endif
@@ -142,13 +143,6 @@ free_fiberlamp_screen(Display *display, fiberlampstruct *fl)
 	free_fiber(fl);
 	fl = NULL;
 }
-
-ENTRYPOINT void
-free_fiberlamp(ModeInfo * mi)
-{
-	free_fiberlamp_screen(MI_DISPLAY(mi), &fiberlamps[MI_SCREEN(mi)]);
-}
-
 
 ENTRYPOINT void
 change_fiberlamp(ModeInfo * mi)

@@ -35,6 +35,7 @@ static const char sccsid[] = "@(#)roll.c	5.00 2000/11/01 xlockmore";
 	"*size: -64 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_roll 0
 # define reshape_roll 0
 # define roll_handle_event 0
 #define BRIGHT_COLORS
@@ -52,7 +53,7 @@ ENTRYPOINT ModeSpecOpt roll_opts =
 #ifdef USE_MODULES
 ModStruct   roll_description =
 {"roll", "init_roll", "draw_roll", "release_roll",
- "refresh_roll", "init_roll", "free_roll", &roll_opts,
+ "refresh_roll", "init_roll", (char *) NULL, &roll_opts,
  100000, 25, 1, -64, 64, 0.6, "",
  "Shows a rolling ball", 0, NULL};
 
@@ -157,12 +158,6 @@ free_roll_screen(rollstruct *rp)
 		rp->p = (XPoint *) NULL;
 	}
 	rp = NULL;
-}
-
-ENTRYPOINT void
-free_roll(ModeInfo * mi)
-{
-	free_roll_screen(&rolls[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

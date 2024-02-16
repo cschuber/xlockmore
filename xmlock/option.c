@@ -1,4 +1,4 @@
-#if !defined( lint ) && !defined( SABER )
+#if 0
 static const char sccsid[] = "@(#)option.c	4.00 97/01/01 xlockmore";
 
 #endif
@@ -61,6 +61,8 @@ static Widget Options[OPTIONS];
 
 /* extern variables */
 extern Widget toplevel;
+extern void setup_Option(Widget MenuBar);
+extern int getNumberofElementofOpt(void);
 
 void exitcallback(Widget w, XtPointer client_data, XtPointer call_data);
 
@@ -303,6 +305,6 @@ setup_Option(Widget MenuBar)
  * this function return the number of
  * element of the array Opt
 **************************/
-int getNumberofElementofOpt() {
+int getNumberofElementofOpt(void) {
 	return( sizeof(Opt)/sizeof(OptionStruct));
 	}

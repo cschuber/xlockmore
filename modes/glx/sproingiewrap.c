@@ -89,16 +89,7 @@ ModStruct   sproingies_description =
 #include <GL/glu.h>
 #include <time.h>
 
-void        NextSproingie(int screen);
-void        NextSproingieDisplay(int screen);
-void        DisplaySproingies(int screen);
-
-#if 0
-void        ReshapeSproingies(int w, int h);
-
-#endif
-void        CleanupSproingies(int screen);
-Bool        InitSproingies(int wfmode, int grnd, int mspr, int screen, int numscreens, int mono);
+#include "sproingies.h"
 
 typedef struct {
 #ifdef WIN32

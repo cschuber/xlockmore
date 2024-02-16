@@ -52,6 +52,7 @@ static const char sccsid[] = "@(#)worm.c	5.00 2000/11/01 xlockmore";
 	"*both3d: magenta \n" \
 	"*none3d: black \n" \
 
+# define free_worm 0
 # define reshape_worm 0
 # define worm_handle_event 0
 #define SMOOTH_COLORS
@@ -68,7 +69,7 @@ ENTRYPOINT ModeSpecOpt worm_opts =
 #ifdef USE_MODULES
 ModStruct   worm_description =
 {"worm", "init_worm", "draw_worm", "release_worm",
- "refresh_worm", "init_worm", "free_worm", &worm_opts,
+ "refresh_worm", "init_worm", (char *) NULL, &worm_opts,
  17000, -20, 10, -3, 64, 1.0, "",
  "Shows wiggly worms", 0, NULL};
 
@@ -280,12 +281,6 @@ free_worm_screen(wormstruct * wp)
 		wp->size = (int *) NULL;
 	}
 	wp = NULL;
-}
-
-ENTRYPOINT void
-free_worm(ModeInfo * mi)
-{
-        free_worm_screen(&worms[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

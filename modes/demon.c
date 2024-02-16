@@ -57,6 +57,7 @@ static const char sccsid[] = "@(#)demon.c	5.24 2007/01/18 xlockmore";
 	"*size: -7 \n" \
 	"*ncolors: 64 \n" \
 
+# define free_demon 0
 # define reshape_demon 0
 # define demon_handle_event 0
 #define UNIFORM_COLORS
@@ -108,7 +109,7 @@ ENTRYPOINT ModeSpecOpt demon_opts =
 #ifdef USE_MODULES
 ModStruct   demon_description =
 {"demon", "init_demon", "draw_demon", "release_demon",
- "refresh_demon", "init_demon", "free_demon", &demon_opts,
+ "refresh_demon", "init_demon", (char *) NULL, &demon_opts,
  50000, 0, 1000, -7, 64, 1.0, "",
  "Shows Griffeath's cellular automata", 0, NULL};
 
@@ -393,12 +394,6 @@ free_demon_screen(Display *display, demonstruct *dp)
 	dp->init_bits = 0;
 	free_struct(dp);
 	dp = NULL;
-}
-
-ENTRYPOINT void
-free_demon(ModeInfo * mi)
-{
-	free_demon_screen(MI_DISPLAY(mi), &demons[MI_SCREEN(mi)]);
 }
 
 static Bool

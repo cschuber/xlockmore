@@ -78,6 +78,7 @@ static const char sccsid[] = "@(#)maze.c	5.00 2000/11/01 xlockmore";
 	"*bitmap: \n" \
 	"*trackmouse: False \n" \
 
+# define free_maze 0
 # define reshape_maze 0
 # define maze_handle_event 0
 #include "xlockmore.h"		/* in xscreensaver distribution */
@@ -132,7 +133,7 @@ ENTRYPOINT ModeSpecOpt maze_opts =
 #ifdef USE_MODULES
 ModStruct   maze_description =
 {"maze", "init_maze", "draw_maze", "release_maze",
- "refresh_maze", "init_maze", "free_maze", &maze_opts,
+ "refresh_maze", "init_maze", (char *) NULL, &maze_opts,
  1000, 1, 3000, -40, 64, 1.0, "",
  "Shows a random maze and a depth first search solution", 0, NULL};
 
@@ -385,12 +386,6 @@ free_maze_screen(Display * display, mazestruct * mp)
 	}
 #endif
 	mp = NULL;
-}
-
-ENTRYPOINT void
-free_maze(ModeInfo * mi)
-{
-	free_maze_screen(MI_DISPLAY(mi), &mazes[MI_SCREEN(mi)]);
 }
 
 static Bool

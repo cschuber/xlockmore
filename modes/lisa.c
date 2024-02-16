@@ -44,6 +44,7 @@ static const char sccsid[] = "@(#)lisa.c	5.00 2000/11/01 xlockmore";
 	"*size: -1 \n" \
 	"*ncolors: 200 \n" \
 
+# define free_lisa 0
 # define reshape_lisa 0
 # define lisa_handle_event 0
 #define UNIFORM_COLORS
@@ -81,7 +82,7 @@ ENTRYPOINT ModeSpecOpt lisa_opts =
 #ifdef USE_MODULES
 ModStruct   lisa_description =
 {"lisa", "init_lisa", "draw_lisa", "release_lisa",
- "refresh_lisa", "change_lisa", "free_lisa", &lisa_opts,
+ "refresh_lisa", "change_lisa", (char *) NULL, &lisa_opts,
  25000, 1, 256, -1, 64, 1.0, "",
  "Shows animated lisajous loops", 0, NULL};
 
@@ -184,12 +185,6 @@ free_lisa_screen(lisacons *lc)
 		lc->lisajous = (lisas *) NULL;
 	}
 	lc = NULL;
-}
-
-ENTRYPOINT void
-free_lisa(ModeInfo * mi)
-{
-        free_lisa_screen(&Lisa[MI_SCREEN(mi)]);
 }
 
 static Bool

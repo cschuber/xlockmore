@@ -56,6 +56,7 @@ static const char sccsid[] = "@(#)munch.c	5.00 2000/11/01 xlockmore";
 #define DEFAULTS "*delay: 5000 \n" \
 	"*cycles: 7 \n" \
 
+# define free_munch 0
 # define reshape_munch 0
 # define munch_handle_event 0
 #include "xlockmore.h"		/* from the xscreensaver distribution */
@@ -71,7 +72,7 @@ ENTRYPOINT ModeSpecOpt munch_opts =
 #ifdef USE_MODULES
 ModStruct   munch_description =
 {"munch", "init_munch", "draw_munch", "release_munch",
- "init_munch", "init_munch", "free_munch", &munch_opts,
+ "init_munch", "init_munch", (char *) NULL, &munch_opts,
  5000, 1, 7, 1, 64, 1.0, "",
  "Shows munching squares", 0, NULL};
 
@@ -165,12 +166,6 @@ free_munch_screen(Display * display, munchstruct * mp)
 	if (mp->gc)
 		XFreeGC(display, mp->gc);
 	mp = NULL;
-}
-
-ENTRYPOINT void
-free_munch(ModeInfo * mi)
-{
-	free_munch_screen(MI_DISPLAY(mi), &munches[MI_SCREEN(mi)]);
 }
 
 ENTRYPOINT void

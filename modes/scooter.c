@@ -36,12 +36,15 @@ static const char sccsid[] = "@(#)scooter.c	5.01 2001/03/02 xlockmore";
 #define MODE_scooter
 #define DEFAULTS "*delay: 20000 \n" \
 	"*count: 24 \n" \
-	"*cycles: 3 \n" \
+	"*cycles: 5 \n" \
 	"*size: 100 \n" \
 	"*ncolors: 200 \n" \
 	"*fullrandom: True \n" \
 	"*verbose: False \n" \
+	"*fpsSolid: True \n" \
+	"*lowrez: True \n"
 
+# define free_scooter 0
 # define reshape_scooter 0
 # define scooter_handle_event 0
 #include "xlockmore.h"          /* in xscreensaver distribution */
@@ -57,7 +60,7 @@ ENTRYPOINT ModeSpecOpt scooter_opts =
 #ifdef USE_MODULES
 ModStruct scooter_description =
 {"scooter", "init_scooter", "draw_scooter", "release_scooter",
- "refresh_scooter", "change_scooter", "free_scooter", &scooter_opts,
+ "refresh_scooter", "change_scooter", (char *) NULL, &scooter_opts,
  20000, 24, 3, 100, 64, 1.0, "",
  "Shows a journey through space tunnel and stars", 0, NULL};
 /*
@@ -286,12 +289,6 @@ free_scooter_screen(scooterstruct *sp)
 }
 
 ENTRYPOINT void
-free_scooter(ModeInfo * mi)
-{
-	free_scooter_screen(&scooters[MI_SCREEN(mi)]);
-}
-
-ENTRYPOINT void
 release_scooter(ModeInfo *mi)
 {
         if (scooters != NULL) {
@@ -398,7 +395,11 @@ init_scooter(ModeInfo *mi)
 
 static void cleardoors(ModeInfo *mi)
 {
+#ifdef STANDALONE
+	XClearWindow(MI_DISPLAY(mi), MI_WINDOW(mi));
+#else
 	MI_CLEARWINDOW(mi);
+#endif
 }
 
 /* Should be taken care of already... but just in case */

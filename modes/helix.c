@@ -309,7 +309,11 @@ init_helix(ModeInfo * mi)
 	hp->ymid = hp->height / 2;
 	hp->redraw = 0;
 
+#ifdef STANDALONE
+	MI_CLEARWINDOWCOLORMAPFAST(mi, MI_GC(mi), MI_BLACK_PIXEL(mi));
+#else
 	MI_CLEARWINDOW(mi);
+#endif
 	hp->painted = False;
 
 	if (MI_NPIXELS(mi) > 2)
