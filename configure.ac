@@ -3,7 +3,8 @@ dnl configure.in for xlockmore.  Various things were taken from xscreensaver's
 dnl configure.in --- xscreensaver, Copyright (c) 1997 Jamie Zawinski.
 dnl
 
-AC_INIT(config.h.in)
+AC_INIT
+AC_CONFIG_SRCDIR([config.h.in])
 AC_CANONICAL_HOST
 canonical=$host
 
@@ -200,7 +201,6 @@ fi
 #AC_NO_CPLUSPLUS_COMMENTS_IN_C_CODE
 AC_PROG_LN_S
 AC_PROG_CPP
-AC_AIX
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 ac_link_test="-L"
@@ -217,8 +217,7 @@ dnl Optional features.
 dnl add copious amounts of debugging with gcc
 
 dnl Checks for header files.
-dnl AC_HEADER_STDC /* If its not ansi, its not going to go */
-AC_ISC_POSIX
+AC_SEARCH_LIBS([strerror],[cposix])
 dnl AC_HEADER_SYS_WAIT
 dnl AC_CHECK_HEADERS(poll.h sys/poll.h)
 AC_CHECK_HEADERS(fcntl.h limits.h sys/resource.h sys/select.h sys/time.h syslog.h unistd.h memory.h sys/param.h)
@@ -230,7 +229,6 @@ AC_TYPE_MODE_T
 AC_TYPE_UID_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
-AC_HEADER_TIME
 AC_STRUCT_TM
 
 AC_MSG_CHECKING([for getenv declaration])
@@ -240,7 +238,6 @@ AC_EGREP_HEADER(getenv, stdlib.h,
 
 dnl Checks for library functions.
 dnl AC_TYPE_GETGROUPS
-dnl AC_TYPE_SIGNAL
 dnl AC_CHECK_FUNCS(poll)
 dnl AC_CHECK_FUNCS(signal)
 AC_CHECK_FUNCS(gethostname select strdup)
@@ -4444,7 +4441,7 @@ else
 fi
 
 dnl Problems here if -I/usr/include/stddef.h used with g++ on Solaris
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 ac_save_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS -I/usr/include"
 AC_MSG_CHECKING([whether wchar_t is defined internal to C++])
@@ -4459,7 +4456,7 @@ else
   AC_MSG_RESULT(no)
 fi
 CPPFLAGS="$ac_save_CPPFLAGS"
-AC_LANG_C
+AC_LANG([C])
 
 AC_ARG_ENABLE(bitmapdir, [  --enable-bitmapdir=DIR  set directory for bitmaps, default is ./bitmaps],bitmap_dir=$enableval,bitmap_dir=no)
 case "x$bitmap_dir" in
@@ -5207,7 +5204,7 @@ AC_SUBST(FORTUNE)
 AC_SUBST(FORTUNE_PATH)
 AC_SUBST(NOPLAY)
 
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile xlock/Makefile modes/Makefile modes/glx/Makefile
   xmlock/Makefile xglock/Makefile])
 AC_OUTPUT

@@ -86,7 +86,7 @@ $!
 $ if p1 .eqs. "CLEAN" then goto Clean
 $ if p1 .eqs. "CLOBBER" then goto Clobber
 $!
-$ defs=="VMS,USE_MB,HAVE_PTHREAD,HAVE_UNISTD_H"
+$ defs=="VMS,USE_MB,HAVE_PTHREAD,HAVE_UNISTD_H,HAVE_MOTIF"
 $ dtsaver=f$search("SYS$LIBRARY:CDE$LIBDTSVC.EXE") .nes. ""
 $ xpm=f$search("''xpmf'") .nes. ""
 $ gl=f$search("''glf'") .nes. ""

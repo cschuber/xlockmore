@@ -41,7 +41,6 @@ static const char sccsid[] = "@(#)option.c	4.00 97/01/01 xlockmore";
 #include <stdint.h>
 #endif
 
-#ifdef HAVE_MOTIF
 /* #include <Xm/XmAll.h> Does not work on my version of Lesstif */
 #include <Xm/RowColumn.h>
 #include <Xm/SelectioB.h>
@@ -49,21 +48,29 @@ static const char sccsid[] = "@(#)option.c	4.00 97/01/01 xlockmore";
 #include <Xm/PushBG.h>
 #include <Xm/List.h>
 #include <Xm/ToggleBG.h>
-#elif defined(HAVE_XAW3D)
-#include <X11/StringDefs.h>
-#include <X11/Xaw3d/Form.h>
-#define HAVE_ATHENA 1
-#elif defined(HAVE_ATHENA)
-#include <X11/StringDefs.h>
-#include <X11/Xaw/Form.h>
-#endif
 
 #include "option.h"
 
 /*#define OPTIONS 8*/
 /*#define REGULAR_OPTIONS (OPTIONS-2)*/
+
 #define NBPROGNAME 3
 #define MAXNAMES 10000
+Widget      Menuoption;
+static Widget Options[OPTIONS];
+
+/* extern variables */
+extern Widget toplevel;
+extern void setup_Option(Widget MenuBar);
+extern int getNumberofElementofOpt(void);
+
+void exitcallback(Widget w, XtPointer client_data, XtPointer call_data);
+
+
+/* Widget */
+static Widget PromptDialog, FontSelectionDialog, ProgramSelectionDialog;
+
+Widget Toggles[TOGGLES];
 
 /****************************************
  * This describe the options of user menu
@@ -88,7 +95,7 @@ static char *prognames[NBPROGNAME] =
 	(char *) "echo hello world"
 };
 
-char *toggleNames[TOGGLES] =
+char *r_Toggles[TOGGLES] =
 {
         (char *) "allowaccess",
         (char *) "allowroot",
@@ -115,23 +122,6 @@ char *toggleNames[TOGGLES] =
 	(char *) "mono"
 
 };
-
-Widget      menuOption;
-static Widget Options[OPTIONS];
-
-/* extern variables */
-extern int getNumberofElementofOpt(void);
-#ifdef HAVE_MOTIF
-extern Widget topLevel;
-extern void setupOption(Widget menuBar);
-void exitcallback(Widget w, XtPointer client_data, XtPointer call_data);
-
-
-/* Widget */
-static Widget PromptDialog, FontSelectionDialog, ProgramSelectionDialog;
-
-Widget toggles[TOGGLES];
-
 
 /* string temp */
 static char **whichone;
@@ -190,17 +180,17 @@ f_fontdia(Widget w, XtPointer client_data, XtPointer call_data)
 
 	whichone = &Opt[OPTIONS].userdata;
 	if (!loadfont) {
-		tmp = XCreateFontCursor(XtDisplay(topLevel), XC_watch);
-		XDefineCursor(XtDisplay(topLevel), XtWindow(topLevel), tmp);
-		dirnames = XListFonts(XtDisplay(topLevel), "*", MAXNAMES, &numdirnames);
+		tmp = XCreateFontCursor(XtDisplay(toplevel), XC_watch);
+		XDefineCursor(XtDisplay(toplevel), XtWindow(toplevel), tmp);
+		dirnames = XListFonts(XtDisplay(toplevel), "*", MAXNAMES, &numdirnames);
 		listtmp = XmSelectionBoxGetChild(FontSelectionDialog, XmDIALOG_LIST);
 		for (i = 0; i < numdirnames; i++) {
 			label_str = XmStringCreateSimple(dirnames[i]);
 			XmListAddItemUnselected(listtmp, label_str, 0);
 			XmStringFree(label_str);
 		}
-		tmp = XCreateFontCursor(XtDisplay(topLevel), XC_left_ptr);
-		XDefineCursor(XtDisplay(topLevel), XtWindow(topLevel), tmp);
+		tmp = XCreateFontCursor(XtDisplay(toplevel), XC_left_ptr);
+		XDefineCursor(XtDisplay(toplevel), XtWindow(toplevel), tmp);
 		loadfont = 1;
 		XFreeFontNames(dirnames);
 	}
@@ -240,7 +230,7 @@ f_Dialog(Widget w, XtPointer client_data, XtPointer call_data)
 
 /* Setup Widget */
 void
-setupOption(Widget menuBar)
+setup_Option(Widget MenuBar)
 {
 	Arg         args[15];
 	int         i, ac = 0;
@@ -251,20 +241,20 @@ setupOption(Widget menuBar)
 /**
  ** Popup Menu File
  **/
-	pulldownmenu = XmCreatePulldownMenu(menuBar, (char *) "PopupFile",
+	pulldownmenu = XmCreatePulldownMenu(MenuBar, (char *) "PopupFile",
 		(Arg *) NULL, 0);
 	label_str = XmStringCreateSimple((char *) "File");
-	XtVaCreateManagedWidget("File", xmCascadeButtonWidgetClass, menuBar,
+	XtVaCreateManagedWidget("File", xmCascadeButtonWidgetClass, MenuBar,
 		XmNlabelString, label_str, XmNsubMenuId, pulldownmenu, NULL);
 	XmStringFree(label_str);
 	exitwidget = XtVaCreateManagedWidget("Exit", xmPushButtonGadgetClass,
 		pulldownmenu, NULL);
 	XtAddCallback(exitwidget, XmNactivateCallback, exitcallback,NULL);
 
-	pulldownmenu = XmCreatePulldownMenu(menuBar, (char *) "PopupOptions",
+	pulldownmenu = XmCreatePulldownMenu(MenuBar, (char *) "PopupOptions",
 		(Arg *) NULL, 0);
 	label_str = XmStringCreateSimple((char *) "Options");
-	XtVaCreateManagedWidget("Options", xmCascadeButtonWidgetClass, menuBar,
+	XtVaCreateManagedWidget("Options", xmCascadeButtonWidgetClass, MenuBar,
 		XmNlabelString, label_str, XmNsubMenuId, pulldownmenu, NULL);
 	XmStringFree(label_str);
 
@@ -275,18 +265,18 @@ setupOption(Widget menuBar)
 		XtAddCallback(Options[i], XmNactivateCallback, f_option, iptr++);
 	}
 /* PURIFY 4.0.1 on Solaris 2 reports a 12 byte memory leak on the next line. */
-	PromptDialog = XmCreatePromptDialog(topLevel, (char *) "PromptDialog",
+	PromptDialog = XmCreatePromptDialog(toplevel, (char *) "PromptDialog",
 		args, ac);
 	XtAddCallback(PromptDialog, XmNokCallback, f_Dialog, NULL);
 
 /* PURIFY 4.0.1 on Solaris 2 reports a 28 byte and a 12 byte memory leak on
    the next line. */
-	FontSelectionDialog = XmCreateSelectionDialog(topLevel,
+	FontSelectionDialog = XmCreateSelectionDialog(toplevel,
 		(char *) "FontSelectionDialog", (Arg *) NULL, 0);
 	XtAddCallback(FontSelectionDialog, XmNokCallback, f_Dialog, NULL);
 
 /* PURIFY 4.0.1 on Solaris 2 reports a 38 byte memory leak on the next line. */
-	ProgramSelectionDialog = XmCreateSelectionDialog(topLevel,
+	ProgramSelectionDialog = XmCreateSelectionDialog(toplevel,
 		(char *) "ProgramSelectionDialog", (Arg *) NULL, 0);
 	XtAddCallback(ProgramSelectionDialog, XmNokCallback, f_Dialog, NULL);
 	listtmp = XmSelectionBoxGetChild(ProgramSelectionDialog, XmDIALOG_LIST);
@@ -299,19 +289,18 @@ setupOption(Widget menuBar)
 /**
  ** Make the menu with all options boolean
 ***/
-	pulldownmenu = XmCreatePulldownMenu(menuBar, (char *) "PopupSwitches",
+	pulldownmenu = XmCreatePulldownMenu(MenuBar, (char *) "PopupSwitches",
 		(Arg *) NULL, 0);
 	label_str = XmStringCreateSimple((char *) "Switches");
-	XtVaCreateManagedWidget("Switches", xmCascadeButtonWidgetClass, menuBar,
+	XtVaCreateManagedWidget("Switches", xmCascadeButtonWidgetClass, MenuBar,
 		XmNlabelString, label_str, XmNsubMenuId, pulldownmenu, NULL);
 	XmStringFree(label_str);
 
         for (i = 0; i < TOGGLES; i++) {
-		toggles[i] = XtVaCreateManagedWidget(toggleNames[i],
+		Toggles[i] = XtVaCreateManagedWidget(r_Toggles[i],
 			xmToggleButtonGadgetClass, pulldownmenu, NULL);
 	}
 }
-#endif 
 /*************************
  * this function return the number of
  * element of the array Opt

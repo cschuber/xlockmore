@@ -66,7 +66,7 @@ static const char sccsid[] = "@(#)t3d.c	5.0 2000/11/01 xlockmore";
 #endif /* STANDALONE */
 
 #include <time.h>
-#ifdef TIME_WITH_SYS_TIME /* for sco */
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
 

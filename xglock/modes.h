@@ -381,11 +381,9 @@ LockStruct  LockProcs[] =
 	 2000000, 1, 1, 1, 1.00,
 	 "Shows Klondike's game of solitaire", (void *) NULL},
 #endif
-#ifdef USE_UNSTABLE
 	{"space",
 	 10000, 100, 1, 15, 1.00,
 	 "Shows a journey into deep space", (void *) NULL},
-#endif
 	{"sphere",
 	 5000, 1, 20, 0, 1.00,
 	 "Shows a bunch of shaded spheres", (void *) NULL},

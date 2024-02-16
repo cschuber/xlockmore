@@ -152,7 +152,9 @@ static LockStruct LockProcs[] =
 #ifdef HAVE_CXX
 {(char *) "solitaire", (char *) "Shows Klondike's game of solitaire"},
 #endif
+#ifdef USE_UNSTABLE
 {(char *) "space", (char *) "Shows a journey into deep space"},
+#endif
 {(char *) "sphere", (char *) "Shows a bunch of shaded spheres"},
 {(char *) "spiral", (char *) "Shows a helical locus of points"},
 {(char *) "spline", (char *) "Shows colorful moving splines"},

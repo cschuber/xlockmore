@@ -3,23 +3,23 @@
 # xlockmore Makefile.in for autoconf (UNIX/VMS X11 support)
 ############################################################
 
-# @SET_MAKE@
+# 
 
-datarootdir = @datarootdir@
-srcdir = @srcdir@
-top_srcdir = @top_srcdir@
-VPATH = @srcdir@
-BITMAPDIR = @BITMAPDIR@/
+datarootdir = ${prefix}/share
+srcdir = ../../xlockmore/xmlock
+top_srcdir = ../../xlockmore
+VPATH = ../../xlockmore/xmlock
+BITMAPDIR = $(top_srcdir)/bitmaps/
 XMLOCKDIR = $(top_srcdir)/xmlock/
 
 N=
-O=.@OBJEXT@
+O=.o
 #O=.obj
 C=.c
 #C=.cc
 S=$(N) $(N)
 #S=,
-E=@EXEEXT@
+E=
 #E=.exe
 
 # please define
@@ -29,13 +29,15 @@ E=@EXEEXT@
 
 ####################################################################
 # List of object files
-XMLOCKOBJS = option$(O)$(S)xmlock$(O)
+#XMLOCKOBJS = option$(O)$(S)xmlock$(O)
+XMLOCKOBJS = xmlock$(O)
 
 # List of source files
-XMLOCKSRCS = $(VPATH)/option$(C) $(VPATH)/xmlock$(C)
+#XMLOCKSRCS = $(VPATH)/option$(C) $(VPATH)/xmlock$(C)
+XMLOCKSRCS = $(VPATH)/xmlock$(C)
 
 # default target
-all : @XMLOCK@
+all : xmlock
 
 # this tells GNU make not to export variables into the environment
 # But other makes do not understand its significance, so it must
@@ -45,19 +47,19 @@ all : @XMLOCK@
 
 SHELL = /bin/sh
 
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+prefix = /usr/local
+exec_prefix = ${prefix}
 
-bindir = @bindir@
-mandir = @mandir@/man1
-xapploaddir = @APPDEFAULTS@
+bindir = ${exec_prefix}/bin
+mandir = ${datarootdir}/man/man1
+xapploaddir = /usr/lib/X11/app-defaults
 
 CONFIGDIR = $(srcdir)/config/
 
-INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_DATA = @INSTALL_DATA@
-INSTPGMFLAGS = @INSTPGMFLAGS@
+INSTALL = /usr/bin/install -c
+INSTALL_PROGRAM = ${INSTALL}
+INSTALL_DATA = ${INSTALL} -m 644
+INSTPGMFLAGS = -s -g shadow -m 2111
 
 #CC = cc -g
 #CC = cc -Ac -g
@@ -69,18 +71,18 @@ INSTPGMFLAGS = @INSTPGMFLAGS@
 #CC = gcc -g -Wall -W -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wwrite-strings -Waggregate-return -Wmissing-prototypes -Wstrict-prototypes
 #CC = g++ -g -Wall
 #CC = gcc -g -Wall -Wstrict-prototypes -Wnested-externs -Wmissing-prototypes -Wno-overlength-strings -Wdeclaration-after-statement
-CC = @CC@
+CC = gcc -Wnested-externs -Wno-format
 
 #LINT = lint
 LINT = lint -Ncheck=%all
 #LINT = alint
 
 #DEPEND = makedepend
-DEPEND = @DEPEND@
-DEPEND_FLAGS = @DEPEND_FLAGS@
-DEPEND_DEFINES = @DEPEND_DEFINES@
+DEPEND = makedepend
+DEPEND_FLAGS = 
+DEPEND_DEFINES = 
 
-LN_S = @LN_S@
+LN_S = ln -s
 RM = rm -f
 RM_S = $(RM)
 ECHO = echo
@@ -90,20 +92,18 @@ ECHO = echo
 #RM_S = set file/remove/nolog
 #ECHO = write sys$output
 
-DEFS = @DEFS@ $(DEFINES) -DHAVE_MOTIF
-#DEFS = @DEFS@ $(DEFINES) -DHAVE_ATHENA # change -lXm to -Xaw
-#DEFS = @DEFS@ $(DEFINES) -DHAVE_XAW3D # change -lXm to -Xaw3d
-XMLOCKINC = @XMLOCKINC@ -I.. -I$(top_srcdir)
-CFLAGS = @CFLAGS@
+DEFS = -DHAVE_CONFIG_H $(DEFINES) -DHAVE_ATHENA
+XMLOCKINC =  -I/usr/include -I/usr/include -I.. -I$(top_srcdir)
+CFLAGS = -g -O2 -pthread
 #CFLAGS = -O
 #CFLAGS = -g
-XMLOCKLDFLAGS = @XMLOCKLDFLAGS@ @LDFLAGS@
-XLIBS = @XLIBS@
-XMLOCKLIBS = @XMLOCKLIBS@
+XMLOCKLDFLAGS =  
+XLIBS = 
+XMLOCKLIBS =  -L/usr/lib -L/usr/dt/lib -lXpm -lXmu -lXaw -lXt  -lX11
 #If you have purify, and want to use it, uncomment this definition or
 # run the make as `make PURIFY=purify'
 # or run configure with the --with-purify argument.
-PURIFY = @PURIFY@
+PURIFY = 
 
 xmlock : $(XMLOCKOBJS)
 	$(PURIFY) $(CC) -o $@ $(XMLOCKOBJS) $(XMLOCKLDFLAGS) $(XMLOCKLIBS)
@@ -115,7 +115,7 @@ xmlock : $(XMLOCKOBJS)
 $(C)$(O) :
 	$(CC) -c $(CPPFLAGS) $(DEFS) $(XMLOCKINC) $(CFLAGS) $<
 
-install : @INSTALL_XMLOCK@
+install : install_xmlock
 
 install_xmlock : install-program install-man install-ad
 	@ $(ECHO) "$@ COMPLETE"
@@ -131,7 +131,7 @@ install-ad :
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(xapploaddir)
 	$(INSTALL_DATA) $(top_srcdir)/xmlock/XmLock.ad $(DESTDIR)$(xapploaddir)/XmLock
 
-uninstall : @UNINSTALL_XMLOCK@
+uninstall : uninstall_xmlock
 
 uninstall_xmlock : uninstall-program uninstall-man uninstall-ad
 
@@ -215,7 +215,7 @@ distdepend :
 
 option.o: option.h
 xmlock.o: ../config.h
-xmlock.o: option.h
+#xmlock.o: option.h
 xmlock.o: $(BITMAPDIR)/m-xlock.xbm
 xmlock.o: modes.h
 

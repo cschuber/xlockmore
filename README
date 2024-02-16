@@ -1,4 +1,4 @@
-xlockmore-5.69: the maintained version of xlock
+xlockmore-5.70: the maintained version of xlock
 see docs/Revisions for more version stuff
 see docs/TODO for stuff to do :)
 Help is always appreciated too ;) .
@@ -153,6 +153,10 @@ XCOMM #define DtSaverLibrary
       It also creates a small window where if you select a particular mode
       it will run the screen saver and display it on that small window.
 
+      https://www.reddit.com/r/linux/comments/jv7zra/guide_the_easiest_way_to_install_cde_common/
+      If using Linux and using configure, edit modes/Makefile for this line:
+      before -lm for the XLOCKLIBS, may need to add "-lXm -ltt -lDtXinerama ".
+
     Here's how to set it up on your home directory.
       cp etc/dtprofile $HOME/.dtprofile
         This uses a ksh syntax.  If your shell is csh or other change it
@@ -166,6 +170,7 @@ XCOMM #define DtSaverLibrary
     Here's how to set it up on your system.
       edit /usr/dt/bin/Xsession DTSCREENSAVERLIST to contain the
         DTSCREENSAVERLIST stuff in etc/dtprofile
+      cp -p /usr/dt/appconfig/types/C/dtscreen.dt /usr/dt/appconfig/types/C/dtscreen.dt.save
       cp etc/dtscreen.dt /usr/dt/appconfig/types/C/dtscreen.dt
 
     The disadvantage to the above is some features of xlock are absent,

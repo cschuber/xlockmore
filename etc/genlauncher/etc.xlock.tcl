@@ -1,4 +1,4 @@
-#!/usr/X11/bin/wish -f
+#!/usr/bin/wish -f
 
 #charles vidal 1998 <vidalc@club-intenet.fr>
 # update Sun Oct 18 1998

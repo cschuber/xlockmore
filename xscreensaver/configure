@@ -1546,7 +1546,7 @@ Server Extension Options:
   --with-xf86vmode-ext    Include support for virtual screens.
   --with-xinerama-ext     Include support for multiple monitors.
   --with-randr-ext        Include support for multiple monitors.
-  --with-xinput-ext       Include support for the XInput2 extension.
+  --with-xinput-ext       The XInput2 extension is required.
   --with-xf86gamma-ext    Include support for XFree86 gamma fading.
   --with-xidle-ext        Include support for the X11R5 XIDLE extension.
   --with-sgi-ext          Include support for the SGI SCREEN_SAVER extension.
@@ -1565,12 +1565,12 @@ Server Extension Options:
 Screen Locking Options:
 
   --disable-locking       Do not allow locking of the display at all.
-  --with-pam              Include support for PAM (Pluggable Auth Modules).
+  --with-pam              Use Pluggable Authentication Modules.
   --with-pam-service-name Set the name of the xscreensaver PAM service.
   --enable-pam-account    Whether PAM should check the result of account
 	    		  modules when authenticating.  Only do this if you
 	    		  have "account" modules configured on your system.
-  --enable-root-passwd	  Allow the root passwd to unlock, if not using PAM.
+  --enable-root-passwd	  Allow the root password to unlock, if not using PAM.
   --with-kerberos         Include support for Kerberos authentication.
   --with-shadow           Include support for shadow password authentication.
 
@@ -1587,7 +1587,6 @@ User Interface Options:
 
 Graphics Options:
 
-  --with-gl               Build those demos which depend on OpenGL.
   --with-gles             Emulate OpenGL 1.3 in terms of OpenGL ES 1.x.
   --with-glx              Use GLX to interface OpenGL and X11 instead of EGL.
   --with-gle              Include support for the GL Extrusion library.
@@ -2510,6 +2509,11 @@ ac_config_headers="$ac_config_headers config.h"
 echo "current directory: `pwd`"
 echo "command line was: $0 $@"
 
+if ! test -z "$ac_unrecognized_opts" ; then
+  echo "" >&2
+  exit 2
+fi
+
 ###############################################################################
 #
 #       Autoheader stuff
@@ -2611,12 +2615,6 @@ echo "command line was: $0 $@"
 
 
 
-
-
-
-
-
-
 #
 # Image loading.
 #
@@ -2692,7 +2690,7 @@ echo "command line was: $0 $@"
 # check for some random other files that come later in the tar file,
 # to make sure everything is here.
 #
-for d in utils jwxyz hacks hacks/glx driver ; do
+for d in utils jwxyz hacks xlockmore/xlock xlockmore/modes xlockmore/modes/glx hacks/glx driver ; do
   f=$srcdir/$d/Makefile.in
   if test \! -r $f ; then
     echo ""
@@ -10709,7 +10707,8 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Xinerama_XineramaQueryScreens" >&5
 $as_echo "$ac_cv_lib_Xinerama_XineramaQueryScreens" >&6; }
 if test "x$ac_cv_lib_Xinerama_XineramaQueryScreens" = xyes; then :
-  have_xinerama=yes; XINERAMA_LIBS="-lXinerama"
+  have_xinerama=yes;
+                      XINERAMA_LIBS="$XINERAMA_LIBS -lXinerama"
 else
   true
 fi
@@ -11015,7 +11014,8 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_Xrandr_XRRGetScreenInfo" >&5
 $as_echo "$ac_cv_lib_Xrandr_XRRGetScreenInfo" >&6; }
 if test "x$ac_cv_lib_Xrandr_XRRGetScreenInfo" = xyes; then :
-  have_randr=yes; SAVER_LIBS="$SAVER_LIBS -lXrandr $xrender_libs"
+  have_randr=yes;
+              XINERAMA_LIBS="$XINERAMA_LIBS -lXrandr $xrender_libs"
 else
   true
 fi
@@ -11245,6 +11245,10 @@ fi
     $as_echo "#define HAVE_XINPUT 1" >>confdefs.h
 
   fi
+
+elif test "$with_xinput" = no; then
+  echo "error: --without-xinput-ext is not supported."
+  exit 1
 
 elif test "$with_xinput" != no; then
   echo "error: must be yes or no: --with-xinput-ext=$with_xinput"
@@ -17810,6 +17814,13 @@ fi
 
   fi
 
+elif test "$with_gl" = no; then
+  echo "error: --without-opengl is not supported."
+  # You may be saying "but but but microcontrollers" -- bullshit.
+  # It is the Twenty-First Century, and in This Modern World, every
+  # extant microcontroller is more performant than the desktop
+  # computers on which I developed most of the OpenGL hacks.
+  exit 1
 
 elif test "$with_gl" != no; then
   echo "error: must be yes or no: --with-gl=$with_gl"
@@ -21964,7 +21975,7 @@ fi
 
 if test "$have_gl" = no ; then
   if test "$with_gl_req" = yes ; then
-    warnL 'Use of GL was requested, but it was not found.'
+    warnL 'The OpenGL 3D library is required, but it was not found.'
     CONF_STATUS=1
   elif test "$with_gl_req" = no ; then
     noteL 'The OpenGL 3D library is not being used.'
@@ -22052,6 +22063,17 @@ fi
 if test "$ac_macosx" = yes -a "$enable_locking" = yes ; then
   warn  "You have specified --enable-locking on macOS."
   warn2 "THIS DOES NOT WORK!  Don't do this!"
+fi
+
+if test "$have_jwzgles" = yes ; then
+  warn  "Do not use --with-gles unless you are sure that you know"
+  warn2 "what you are doing!  It is not recommended on normal X11"
+  warn2 "systems."
+
+  if test "$have_egl" = no; then
+    warn2 ""
+    warn2 "Using --with-gles and --with-glx probably won't work."
+  fi
 fi
 
 

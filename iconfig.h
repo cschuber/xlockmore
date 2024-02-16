@@ -111,6 +111,7 @@ XCOMM If its not with your X11 stuff you should set the following
 XCOMM  MOTIFHOME = /usr/local
 XCOMM  MOTIFHOME = /usr/dt
 
+XMDEF = -DHAVE_MOTIF
 XCOMM If you get an error "Cannot find Xm/PanedW.h" while compiling, set
 XCOMM XMINC to the directory Xm/PanedW.h is in.  Below is a guess.
 XCOMM  XMINC = -I$(MOTIFHOME)/include
@@ -547,7 +548,7 @@ XCOMM  OPTDEF += -DSTAFF_FILE=\"/etc/xlock.staff\"
 XCOMM  OPTDEF += -DSTAFF_NETGROUP=\"/etc/xlock.netgroup\"
 
 DEFINES = -DDEF_FILESEARCHPATH=\"$(LIBDIR)/%T/%N%S\" \
-$(SYSTEMDEF) $(EDITRESDEF) $(SLEEPDEF) $(OPTDEF) $(RANDDEF) \
+$(SYSTEMDEF) $(XMDEF) $(EDITRESDEF) $(SLEEPDEF) $(OPTDEF) $(RANDDEF) \
 $(MODULEDEF) $(CHECKDEF) $(INTERACTIVEDEF) $(UNSTABLEDEF) $(PASSWDDEF) \
 $(XMINC) $(XAWINC) $(CPPDEF) $(XPMDEF) $(GLDEF) $(DTSAVERDEF) $(DPMSDEF) \
 $(SOUNDDEF) $(THREADDEF) $(THREADS_DEFINES) $(THREADS_CFLAGS) $(PASSWDINC) \

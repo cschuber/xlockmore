@@ -406,7 +406,7 @@ LockStruct  LockProcs[] =
 #endif
 	{"space",
 	 10000, 100, 1, 15, 64, 1.0, "",
-	 "Shows a journey into deep space", 0, NULL, "#ifdef USE_UNSTABLE"},
+	 "Shows a journey into deep space", 0, NULL, NULL},
 	{"sphere",
 	 5000, 1, 20, 0, 64, 1.0, "",
 	 "Shows a bunch of shaded spheres", 0, NULL, NULL},

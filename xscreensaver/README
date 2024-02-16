@@ -1,20 +1,23 @@
 # Previously written for xscreensaver-2.17 and xscreensaver-5.10.
-Currently this is for getting xlockmore modes running in xscreensaver-6.03.
+Currently this is for getting xlockmore modes running in xscreensaver-6.04.
 
 First figure out how to compile xscreensaver without my changes.
 For me I had to do this:
   sudo apt-get -y install intltool # install intltool 0.51.0
-  ./configure # Says needs XInput2 and systemd, not sure where to get these
+  tar xvzf ~/Downloads/xscreensaver-6.04.tar.gz
+  cd xscreensaver-6.04
+  ./configure # Says needs systemd, not sure where to get this
   make
   used to die trying to build ximage-loader.o n 5.44... not my issue
-  now dies in xscreenaver.o for XInput2.h in 6.01
+  used to die in xscreenaver.o for XInput2.h in 6.01
   (previously had trouble with: libglade-2.0 not found... no demo it warns and no jpeg)
 
-Then... with a "make -f Makefile.in disclean" copy of latest code, say its xlockmore-5.69
-  cp -rp xlockmore-5.69 xscreensaver-6.03/xlockmore 
-  cd xscreensaver-6.03
+Then... with a "make -f Makefile.in disclean" copy of latest code, say its xlockmore-5.70
+  cd ..
+  cp -rp xlockmore-5.70 xscreensaver-6.04/xlockmore 
+  cd xscreensaver-6.04
   # edit configure.ac (previously configure.in) replace 
-  sed -i 's#utils jwxyz hacks hacks/glx driver#utils jwxyz hacks xlockmore/xlock xlockmore/modes xlockmore/modes/glx hacks/glx driver#'
+  sed -i 's#utils jwxyz hacks hacks/glx driver#utils jwxyz hacks xlockmore/xlock xlockmore/modes xlockmore/modes/glx hacks/glx driver#' configure.ac
   sed -i 's#hacks/Makefile#hacks/Makefile\n          xlockmore/xlock/Makefile\n          xlockmore/modes/Makefile\n          xlockmore/modes/glx/Makefile#' configure.ac
   autoconf
 (I made copies configure.ac and configure in this directory, but may go out of date)
@@ -33,7 +36,7 @@ sed -i 's/#define HAVE_EGL 1/\/*#undef HAVE_EGL *\//' config.h
 # I had to add -lpng16 to the end of HACK_POST in many Makefiles (hacks/Makefile))
 
  make
-  # for me this ends with a fatal error for X11/extensions/XInput2.h
+  # used die with a fatal error for X11/extensions/XInput2.h
  cd hacks
  cp -p xlockmore.h xlockmore.h.orig
  cp -p xlockmoreI.h xlockmoreI.h.orig
