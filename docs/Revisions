@@ -1,4 +1,4 @@
-xlockmore-5.68 as of 19 December 2021, the maintained version of xlock
+xlockmore-5.69 as of 9 March 2022, the maintained version of xlock
 
 Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
@@ -11,6 +11,10 @@ send me mail if you want to be on a list for latest releases.
 
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
+
+5.69
+  Patch for xkb groups thanks to Audrey Af, public.irkutsk AT gmail.com.
+  Minor touches for xscreensaver-6.03 port, life and life3d.
 
 5.68
   Updated xscreensaver port for xscreensaver-6.02.

@@ -1,5 +1,5 @@
 # Previously written for xscreensaver-2.17 and xscreensaver-5.10.
-Currently this is for getting xlockmore modes running in xscreensaver-6.02.
+Currently this is for getting xlockmore modes running in xscreensaver-6.03.
 
 First figure out how to compile xscreensaver without my changes.
 For me I had to do this:
@@ -10,9 +10,9 @@ For me I had to do this:
   now dies in xscreenaver.o for XInput2.h in 6.01
   (previously had trouble with: libglade-2.0 not found... no demo it warns and no jpeg)
 
-Then... with a "make -f Makefile.in disclean" copy of latest code, say its xlockmore-5.67
-  cp -rp xlockmore-5.67 xsreensaver-6.02/xlockmore 
-  cd xsreensaver-6.02
+Then... with a "make -f Makefile.in disclean" copy of latest code, say its xlockmore-5.69
+  cp -rp xlockmore-5.69 xscreensaver-6.03/xlockmore 
+  cd xscreensaver-6.03
   # edit configure.ac (previously configure.in) replace 
   sed -i 's#utils jwxyz hacks hacks/glx driver#utils jwxyz hacks xlockmore/xlock xlockmore/modes xlockmore/modes/glx hacks/glx driver#'
   sed -i 's#hacks/Makefile#hacks/Makefile\n          xlockmore/xlock/Makefile\n          xlockmore/modes/Makefile\n          xlockmore/modes/glx/Makefile#' configure.ac

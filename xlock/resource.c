@@ -157,6 +157,7 @@ static int  descr();
 #define DEF_ERASETIME	"2"	/* Maximum number of seconds for erase */
 #define DEF_LOCKDELAY	"0"	/* secs until lock */
 #define DEF_UNLOCKDELAY	"0"	/* secs until unlock */
+#define DEF_XKBLOCKGROUP "-1"	/* xkb lock group */
 #define DEF_TIMEOUT	"30"	/* secs until password entry times out */
 #ifndef DEF_FONT
 # ifdef AIXV3
@@ -373,6 +374,7 @@ static XrmOptionDescRec genTable[] =
 	{(char *) "-nice", (char *) ".nice", XrmoptionSepArg, (caddr_t) NULL},
 	{(char *) "-lockdelay", (char *) ".lockdelay", XrmoptionSepArg, (caddr_t) NULL},
 	{(char *) "-unlockdelay", (char *) ".unlockdelay", XrmoptionSepArg, (caddr_t) NULL},
+	{(char *) "-xkblockgroup", (char *) ".xkblockgroup", XrmoptionSepArg, (caddr_t) NULL},
 	{(char *) "-timeout", (char *) ".timeout", XrmoptionSepArg, (caddr_t) NULL},
 	{(char *) "-font", (char *) ".font", XrmoptionSepArg, (caddr_t) NULL},
 	{(char *) "-planfont", (char *) ".planfont", XrmoptionSepArg, (caddr_t) NULL},
@@ -605,6 +607,7 @@ static OptionStruct opDesc[] =
 	{(char *) "-nice level", (char *) "nice level for xlock process"},
 	{(char *) "-lockdelay seconds", (char *) "number of seconds until lock"},
 	{(char *) "-unlockdelay seconds", (char *) "number of seconds until unlock"},
+	{(char *) "-xkblockgroup layout", (char *) "xkb lock group layout"},
 	{(char *) "-timeout seconds", (char *) "number of seconds before password times out"},
 	{(char *) "-font fontname", (char *) "font to use for password prompt"},
 	{(char *) "-planfont fontname", (char *) "font to use for plan message"},
@@ -757,6 +760,7 @@ int         VisualClassWanted;
 int         nicelevel;
 int         lockdelay;
 int         unlockdelay;
+int         xkblockgroup;
 int         timeout;
 
 char       *fontname;
@@ -901,6 +905,7 @@ static argtype genvars[] =
 	{(void *) & nicelevel, (char *) "nice", (char *) "Nice", (char *) DEF_NICE, t_Int},
 	{(void *) & lockdelay, (char *) "lockdelay", (char *) "LockDelay", (char *) DEF_LOCKDELAY, t_Int},
 	{(void *) & unlockdelay, (char *) "unlockdelay", (char *) "UnLockDelay", (char *) DEF_UNLOCKDELAY, t_Int},
+	{(void *) & xkblockgroup, (char *) "xkblockgroup", (char *) "XkbLockGroup", (char *) DEF_XKBLOCKGROUP, t_Int},
 	{(void *) & timeout, (char *) "timeout", (char *) "Timeout", (char *) DEF_TIMEOUT, t_Int},
 	{(void *) & fontname, (char *) "font", (char *) "Font", (char *) DEF_FONT, t_String},
 	{(void *) & planfontname, (char *) "planfont", (char *) "PlanFont", (char *) DEF_PLANFONT, t_String},
@@ -2146,6 +2151,7 @@ getResources(Display ** displayp, int argc, char **argv)
 		unlockdelay = 0;
 		install = False;
 		lockdelay = 0;
+		xkblockgroup = -1;
 		geometry = (char *) DEF_GEOMETRY;
 	}
 #endif

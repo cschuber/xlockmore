@@ -135,6 +135,9 @@ xlock \- Locks the local X display until a password is entered.
 .BI \-timeout " seconds"
 ]
 [
+.BI \-xkblockgroup " layout"
+]
+[
 .BI \-font " fontname"
 ]
 [

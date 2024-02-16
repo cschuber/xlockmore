@@ -763,6 +763,7 @@ extern Bool verbose;
 extern Bool remote;
 extern int  nicelevel;
 extern int  lockdelay;
+extern int  xkblockgroup;
 extern int  timeout;
 extern Bool wireframe;
 #ifdef USE_GL
@@ -2246,6 +2247,9 @@ update_plan(void) /* updates current time in plantext */
 	}
 }
 
+#include <X11/extensions/XKB.h>
+#include <X11/XKBlib.h>
+
 static int
 getPassword(void)
 {
@@ -2299,6 +2303,10 @@ getPassword(void)
 	XSetForeground(dsp, Scr[screen].textgc, MI_WHITE_PIXEL(mi));
 	XSetForeground(dsp, Scr[screen].plantextgc, MI_WHITE_PIXEL(mi));
 #endif
+
+        if(0 <= xkblockgroup)
+	    XkbLockGroup(dsp, XkbUseCoreKbd, xkblockgroup);
+
 	if (description)
 		modeDescription(mi);
 
