@@ -19,7 +19,7 @@ CATEGORY="X11"
 SUMMARY="xlock screen locker"
 DESCRIPTION="xlock locks the X server till the user enters
 their password at the keyboard."
-DIR_URI="http://www.sillycycle.com/${GROUP}"
+DIR_URI="https://www.sillycycle.com/${GROUP}"
 PKG=tar.xz
 SRC_DIR=${NAME}-${VERSION}
 SRC_URI=${DIR_URI}/${SRC_DIR}.${PKG}

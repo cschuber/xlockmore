@@ -91,7 +91,7 @@ static char nontotalistic8[256] =
  * the Glider Gun is an exception)
  */
 
-/* http://www.sillycycle.com/life.html */
+/* https://www.sillycycle.com/life.html */
 /* Below generated from java Life2DForms | dos2unix */
 static char patterns_5B2S24[][2 * NUMPTS + 1] =
 {
@@ -6673,7 +6673,7 @@ static char patterns_8B36S23[][2 * NUMPTS + 1] =
 	},
 };
 
-/* http://www.sillycycle.com/life.html */
+/* https://www.sillycycle.com/life.html */
 /* Below generated from java Life2DForms | dos2unix */
 
 static char patterns_8B3S245[][2 * NUMPTS + 1] =
@@ -10737,7 +10737,7 @@ static char patterns_12B46S356[][2 * NUMPTS + 1] =
 	},
 };
 /* Above generated from java Life2DForms | dos2unix */
-/* http://www.sillycycle.com/life.html */
+/* https://www.sillycycle.com/life.html */
 
 #ifdef LIFE_NAMES
 #define PAT_SPACE 2

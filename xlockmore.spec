@@ -16,10 +16,10 @@
 # other special, indirect and consequential damages.
 #
 # mailto:bagleyd AT verizon.net
-# http://www.sillycycle.com/xlockmore.html
+# https://www.sillycycle.com/xlockmore.html
 
 %define	name		xlockmore
-%define	stableversion	5.59
+%define	stableversion	5.61
 %define	release		1
 %define	serial		1
 # Comment quality for stable release
@@ -48,8 +48,8 @@ Release: %{release}
 Serial: %{serial}
 Copyright: BSD
 Group: Amusements/Graphics
-Url: http://www.sillycycle.com/xlockmore.html
-Source: http://www.sillycycle.com/xlockmore/%{name}-%{version}.tar.bz2
+Url: https://www.sillycycle.com/xlockmore.html
+Source: https://www.sillycycle.com/xlockmore/%{name}-%{version}.tar.xz
 # ftp site is currently down. :(
 #Patch0: %{name}-%{version}-patch
 BuildPrereq: esound-devel, audiofile-devel gltt-devel Mesa-devel freetype-devel

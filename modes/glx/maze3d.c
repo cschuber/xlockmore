@@ -734,7 +734,7 @@ placeObject(maze_configuration* maze, unsigned char type)
 }
 
 ENTRYPOINT void
-reshape_maze (ModeInfo *mi, int width, int height)
+reshape_maze3d (ModeInfo *mi, int width, int height)
 {
 	glViewport(0, 0, (GLint) width, (GLint) height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -742,7 +742,7 @@ reshape_maze (ModeInfo *mi, int width, int height)
 
 
 ENTRYPOINT Bool
-maze_handle_event (ModeInfo *mi, XEvent *event)
+maze3d_handle_event (ModeInfo *mi, XEvent *event)
 {
   maze_configuration *maze = &mazes[MI_SCREEN(mi)];
   if (event->xany.type == ButtonPress)
@@ -773,7 +773,7 @@ init_maze3d (ModeInfo * mi)
 
 	maze->glx_context = init_GL(mi);
 
-	reshape_maze(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
+	reshape_maze3d(mi, MI_WIDTH(mi), MI_HEIGHT(mi));
 
     for (i = 0; i < countof(maze->dlists); i++)
       maze->dlists[i] = glGenLists (1);
@@ -1979,8 +1979,7 @@ release_maze3d (ModeInfo * mi)
     }
 }
 
-#ifdef STANDALONE
-XSCREENSAVER_MODULE_2 ("Maze3D", maze3d, maze)
-#endif
+/*XSCREENSAVER_MODULE_2 ("Maze3D", maze3d, maze)*/
+XSCREENSAVER_MODULE ("Maze3D", maze3d)
 
 #endif /* MODE_maze3d */

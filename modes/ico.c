@@ -194,9 +194,17 @@ typedef struct {
  * octahedron                   8/12/6           {3,3,3,3}       4|2 3
  * dodecahedron                 12/30/20         {5,5,5}         3|2 5
  * icosahedron                  20/30/12         {3,3,3,3,3}     5|2 3
+ *
  * Edge Transitive Catalan Solids:
  * rhombic dodecahedron         12/24/14
  * rhombic triacontahedron      30/60/32
+ *
+ * Space Filling Archimedean Solid:
+ * truncated octahedron
+ *
+ * Polyhedron Compound:
+ * stella octangula
+ * 
  * Kepler-Poinsot Solids (not added yet):
  * small stellated dodecahedron 12/30/12      {5/2,5/2,5/2,5/2,5/2}   5|2 5/2
  * great stellated dodecahedron 12/30/20         {5/2,5/2,5/2}   3|2 5/2
@@ -542,12 +550,70 @@ static Polyinfo polygons[] =
 		}
 	},
 
+/* objtruncoct - structure values for truncated octahedron */
+
+	{
+#ifdef DEFUNCT
+		"truncated_octahedron", "mecon",	/* long and short names */
+		"tetrakis_hexahedron",	/* long name of dual */
+#endif
+		24, 36, 14,	/* number of vertices, edges, and faces */
+		{		/* vertices (x,y,z) */
+			/* all points must be within radius 1 of the origin */
+#define T 0.8506508083520399322 /* cossec 36 / 2 */
+#define H 0.42532537
+			{T, H, 0},
+			{T, -H, 0},
+			{T, 0, H},
+			{T, 0, -H},
+			{-T, H, 0},
+			{-T, -H, 0},
+			{-T, 0, H},
+			{-T, 0, -H},
+			{H, T, 0},
+			{-H, T, 0},
+			{0, T, H},
+			{0, T, -H},
+			{H, -T, 0},
+			{-H, -T, 0},
+			{0, -T, H},
+			{0, -T, -H},
+			{H, 0, T},
+			{-H, 0, T},
+			{0, H, T},
+			{0, -H, T},
+			{H, 0, -T},
+			{-H, 0, -T},
+			{0, H, -T},
+			{0, -H, -T},
+#undef H
+#undef T
+		},
+		{		/* faces (numfaces + indexes into vertices) */
+		/* faces must be specified clockwise from the outside */
+			4, 0, 2, 1, 3,
+			4, 4, 7, 5, 6,
+			4, 8, 11, 9, 10,
+			4, 12, 14, 13, 15,
+			4, 16, 18, 17, 19,
+			4, 20, 23, 21, 22,
+			6, 2, 0, 8, 10, 18, 16,
+			6, 0, 3, 20, 22, 11, 8,
+			6, 1, 2, 16, 19, 14, 12,
+			6, 3, 1, 12, 15, 23, 20,
+			6, 4, 6, 17, 18, 10, 9,
+			6, 7, 4, 9, 11, 22, 21,
+			6, 6, 5, 13, 14, 19, 17,
+			6, 5, 7, 21, 23, 15, 13,
+		}
+	},
+
 /* ico does not draw non-convex polyhedra well. */
 /* objstar - structure values for octahedron star (stellated octahedron?) */
 	{
 #ifdef DEFUNCT
-		"star", "star",	/* long and short names */
-		"star",		/* long name of dual */
+		"stella_octangula", "star",	/* long and short names */
+		"stella_octangula",		/* long name of dual */
 #endif
 		32, 96, 24,	/* number of vertices, edges, and faces */
 		/*8, 12, 8,*/	/* number of real vertices, edges, and faces */
@@ -587,6 +653,17 @@ static Polyinfo polygons[] =
 			{0, -T, 0},
 			{0, 0, -T},
 #undef T
+/*#define T 0.577
+			{T, T, T},
+			{T, -T, -T},
+			{-T, T, -T},
+			{-T, -T, T},
+			{-T, -T, -T},
+			{-T, T, T},
+			{T, -T, T},
+			{T, T, -T},
+#undef T*/
+
 		},
 		{		/* faces (numfaces + indexes into vertices) */
 		/* faces must be specified clockwise from the outside */
@@ -622,6 +699,16 @@ static Polyinfo polygons[] =
 			3, 22, 23, 21,
 			3, 26, 27, 25,
 			3, 29, 31, 30,
+/*
+			3, 2, 1, 0,
+			3, 1, 3, 0,
+			3, 3, 2, 0,
+			3, 2, 3, 1,
+			3, 6, 5, 4,
+			3, 5, 7, 4,
+			3, 7, 6, 4,
+			3, 6, 7, 5,
+*/
 		}
 	},
 /* objplane - structure values for plane */
@@ -669,57 +756,18 @@ static Polyinfo polygons[] =
 		{	/* faces (numfaces + indexes into vertices) */
 		/* faces must be specified clockwise from the outside */
 			3, 0, 4, 2,
-			/* 3, 0, 2, 5, */
-			/* 3, 0, 5, 3, */
 			3, 0, 3, 4,
 			3, 1, 2, 4,
-			/* 3, 1, 5, 2, */
-			/* 3, 1, 3, 5, */
 			3, 1, 4, 3,
 			4, 0, 2, 1, 3,
 		}
 	},
 
-/* ico does not draw non-convex polyhedra well. */
-/* objstar - structure values for octahedron star (stellated octahedron?) */
-	{
-#ifdef DEFUNCT
-		"star", "star",	/* long and short names */
-		"star",		/* long name of dual */
-#endif
-		8, 12, 8,	/* number of vertices, edges, and faces */
-		{		/* vertices (x,y,z) */
-			/* all points must be within radius 1 of the origin */
-#define T 0.577
-			{T, T, T},
-			{T, -T, -T},
-			{-T, T, -T},
-			{-T, -T, T},
-			{-T, -T, -T},
-			{-T, T, T},
-			{T, -T, T},
-			{T, T, -T},
-#undef T
-		},
-		{		/* faces (numfaces + indexes into vertices) */
-		/* faces must be specified clockwise from the outside */
-			3, 2, 1, 0,
-			3, 1, 3, 0,
-			3, 3, 2, 0,
-			3, 2, 3, 1,
-			3, 6, 5, 4,
-			3, 5, 7, 4,
-			3, 7, 6, 4,
-			3, 6, 7, 5,
-		}
-	},
-  /* Needed 4 other 3-D stars */
-
 };
 
 static int  polysize = sizeof (polygons) / sizeof (polygons[0]);
-#define POLYSIZE 7	/* Only the 5 Platonic solids and the 2 edge */
-			/* transitive Catalan solids work, why is that? */
+#define POLYSIZE 8	/* Only the 5 Platonic solids, the 2 edge transitive*/
+	/* Catalan solids and the space filling Archimedean solid work */
 
 #define POLYBITS(n,w,h)\
   if ((ip->pixmaps[ip->init_bits]=\
@@ -1054,7 +1102,7 @@ drawPoly(ModeInfo * mi, Polyinfo * poly, GC gc,
 				gcv.foreground = MI_WHITE_PIXEL(mi);
 				gcv.background = MI_BLACK_PIXEL(mi);
 				XChangeGC(MI_DISPLAY(mi), ip->stippledGC,
-                          GCStipple | GCForeground | GCBackground, &gcv);
+				GCStipple | GCForeground | GCBackground, &gcv);
 				lgc = ip->stippledGC;
 				/* XSetForeground(display, lgc, MI_WHITE_PIXEL(mi)); */
 			}
@@ -1115,10 +1163,10 @@ drawPoly(ModeInfo * mi, Polyinfo * poly, GC gc,
 			XSetForeground(display, lgc, MI_PIXEL(mi, ip->color));
 		}
 		XSetLineAttributes(display, lgc, ip->linewidth,
-                           LineSolid, CapRound, JoinRound);
+			LineSolid, CapRound, JoinRound);
 		XDrawSegments(display, lwindow, lgc, edge_segs, pe - edge_segs);
 		XSetLineAttributes(display, lgc, 1,
-                           LineSolid, CapNotLast, JoinRound);
+			LineSolid, CapNotLast, JoinRound);
 	} else if (!ip->faces) {
 		if (MI_NPIXELS(mi) <= 2)
 			XSetForeground(display, lgc, MI_WHITE_PIXEL(mi));
@@ -1135,7 +1183,7 @@ drawPoly(ModeInfo * mi, Polyinfo * poly, GC gc,
 		{
 			for (j = 0; j < pp-pts; j++)
 			  XFillArc(display, lwindow, lgc,
-                             pts[j].x - ip->linewidth / 2, pts[j].y - ip->linewidth / 2, ip->linewidth, ip->linewidth, 0, 23040);
+			    pts[j].x - ip->linewidth / 2, pts[j].y - ip->linewidth / 2, ip->linewidth, ip->linewidth, 0, 23040);
 
 		}
 	}

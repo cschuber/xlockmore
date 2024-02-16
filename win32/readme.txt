@@ -310,7 +310,7 @@ Please don't email David with questions about Xlockmore95.
 They can be directed to me: petey_leinonen AT yahoo.com.au
 
 You can find the latest information about xlockmore from 
-David A. Bagley's site at http://www.sillycycle.com/xlockmore.html
+David A. Bagley's site at https://www.sillycycle.com/xlockmore.html
 
 
 Copyright.

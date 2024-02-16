@@ -1150,7 +1150,7 @@ about_dialog(GtkWidget *w,
          "Updates by Eric Lassauge <lassauge@users.sourceforge.net>.\n\n"
 #endif
          "GTK+ launcher for xlockmore: the maintained version of xlock.\n"
- 	 "http://www.sillycycle.com/xlockmore.html\n"
+ 	 "https://www.sillycycle.com/xlockmore.html\n"
 	 "Version 3.0\n";
 
   xlabel = gtk_label_new(text);

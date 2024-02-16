@@ -18,7 +18,7 @@ typedef struct trackball_state trackball_state;
 /* Returns a trackball_state object, which encapsulates the stuff necessary
    to make dragging the mouse on the window of a GL program do the right thing.
  */
-extern trackball_state *gltrackball_init (void);
+extern trackball_state *gltrackball_init (int dummy);
 
 /* Begin tracking the mouse: Call this when the mouse button goes down.
    x and y are the mouse position relative to the window.

@@ -36,7 +36,7 @@ struct trackball_state {
    to make dragging the mouse on the window of a GL program do the right thing.
  */
 trackball_state *
-gltrackball_init (void)
+gltrackball_init (int dummy)
 {
   trackball_state *ts = (trackball_state *) calloc (1, sizeof (*ts));
   if (!ts) return 0;

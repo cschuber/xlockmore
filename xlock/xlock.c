@@ -1063,6 +1063,7 @@ syslogStop(char *displayName)
 #endif
 
 char error_buf[ERROR_BUF];
+static int error_exitcode = 1;
 
 void
 error(const char *buf)
@@ -1079,7 +1080,14 @@ error(const char *buf)
 #else
 	(void) fprintf(stderr, "%s", buf);
 #endif
-	exit(1);
+	if (error_exitcode < 0) {
+		int sig = -error_exitcode;
+		signal(sig, SIG_DFL);
+		raise(sig);
+		/* We are still alive?? */
+		error_exitcode = sig + 128;
+	}
+	exit(error_exitcode); 
 }
 
 /* Server access control support. */
@@ -2891,6 +2899,7 @@ sigcatch(int signum)
 		ProgramName: DEFAULT_NAME, signum,
 		(strlen(ProgramName) + strlen(name) <
 		ERROR_BUF - 2 * ERROR_LINE) ?  name: "?", (long) getuid());
+	error_exitcode = -signum;
 	error(error_buf);
 #endif /* !WIN32 */
 }

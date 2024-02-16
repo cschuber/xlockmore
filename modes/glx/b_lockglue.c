@@ -53,6 +53,8 @@ struct glb_config glb_config =
 #define MODE_bubble3d
 #define DEFAULTS	"*delay:	20000 \n"
 
+#define free_bubble3d 0
+#define bubble3d_handle_event 0
 #include "xlockmore.h"
 #else
 #include "xlock.h"

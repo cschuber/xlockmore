@@ -16,7 +16,11 @@
  * 17-06-99: Started log. :)
  */
 
+#ifdef STANDALONE
+#include "xlockmore.h"
+#else
 #include "xlock.h"
+#endif
 #include <GL/gl.h>
 #include <GL/glu.h>
 

@@ -57,3 +57,4 @@ The build should stop with random.c... (no reason to convert that one I guess).
  make
 Just a few modes like skewb and biof, for now.  Will stop at cage for wood images.
 fire needs its trees and ground images.
+I had to add -lpng16 to HACK_POST in Makefile

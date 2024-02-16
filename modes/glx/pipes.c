@@ -834,7 +834,9 @@ draw_pipes(ModeInfo * mi)
 		/* If the maximum number of system was drawn, restart (clearing the screen), */
 		/* else start a new system. */
 		if (++pp->system_number > pp->number_of_systems) {
+#ifndef STANDALONE
 			(void) sleep(1);
+#endif
 			pinit(mi, 1);
 		} else {
 			pinit(mi, 0);

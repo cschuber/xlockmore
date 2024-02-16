@@ -189,7 +189,7 @@ OBJS		= biof.o fire.o invert.o skewb.o \
 		  maze3d.o handsy.o handsy_model.o gravitywell.o deepstars.o
 
 GL_EXES		= biof boxed fire gears morph3d noof rubik skewb superquadrics \
-		  cage maze3d moebius pipes sballs sproingies stairs \
+		  sproingies pipes maze3d cage moebius sballs stairs \
 		  atlantis lament bubble3d glplanet \
 		  sierpinski3d molecule invert \
 		  pulsar  gflux stonerview starwars gltext \
@@ -644,7 +644,7 @@ stairs:		stairs.o	sphere.o $(PNG) $(HACK_TRACK_OBJS)
 				$(HACK_LIBS) $(PNG_LIBS)
 
 SPROINGIES = sproingiewrap.o $(HACK_SRC)/glx/gllist.o \
-	     s1_1.o s1_2.o s1_3.o s1_4.o s1_5.o s1_6.o s1_b.o
+	     s1_1.o s1_2.o s1_3.o s1_4.o s1_5.o s1_6.o s1_b.o buildlwo.o
 sproingies: sproingies.o	$(HACK_OBJS) $(SPROINGIES)
 	$(CC_HACK) -o $@ $@.o	$(HACK_OBJS) $(SPROINGIES) $(HACK_LIBS)
 

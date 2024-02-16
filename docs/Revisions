@@ -1,19 +1,31 @@
-xlockmore-5.59 as of 2 October 2019, the maintained version of xlock
-Adapted from Patrick J. Naughton's original xlock
+xlockmore-5.61 as of 10 December 2019, the maintained version of xlock
 
-Primary site: http://www.sillycycle.com/xlock
+Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
-Web page: http://www.sillycycle.com/xlockmore.html
+Web page: https://www.sillycycle.com/xlockmore.html
 Maintainer: David A. Bagley <bagleyd AT verizon.net>
 Primary key fingerprint: 1B79 C847 8F23 6DCD ADC0  D6AC CF15 9707 3779 19AE
 
-Please just send me mail if you want to be on a list for latest releases.
-I lost old mailing lists from mailman xlock-announce and xlock-develop.
+Send all bug reports to bagleyd AT verizon.net .  Also just
+send me mail if you want to be on a list for latest releases.
 
-Please send all bug reports to bagleyd AT verizon.net .
 Adapted from Patrick J. Naughton's original xlock, with lots of help
- from others.
-BUGS to fix and other stuff to do see docs/TODO.
+from others.
+
+5.61
+  Same fix from Jouk Jansen and Adrian Reber, adrian AT lisas.de
+    for juggler3d.cc in previous release.
+  Change from Denys Vlasenko (thanks to Adrian Reber for pointing out)
+    https://bugzilla.redhat.com/show_bug.cgi?id=874484
+    This helps xlock's parent process to know xlock crashed.
+  ico mode added truncated octahedron.
+  Another  gl mode, sierpinski3d, fixed up by EoflaOE ViceCity to run
+    in xscreensaver.
+
+5.60
+  Updated references to website to https.  https://www.sillycycle.com
+  A few more gl modes (incl. maze3d, pipe, sproingies) fixed up by
+    EoflaOE ViceCity to run in xscreensaver.
 
 5.59
   Thanks to tobik, ohartmann AT walstatt.org, and Jason Helfman,
@@ -3244,4 +3256,4 @@ Changes of xlock (sccs version 23.19) patchlevel = 2.2
     Patrick J. Naughton				   email: naughton AT sun.com
     Sun Microsystems Laboratories, Inc.		   voice: (415) 336 - 1080
 
-Maintainer: David A. Bagley <bagleyd AT sillycycle.com>
+Maintainer: David A. Bagley <bagleyd AT verizon.net>

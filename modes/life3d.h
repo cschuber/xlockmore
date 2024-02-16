@@ -46,7 +46,7 @@ static char plots[NEIGHBORKINDS] =
 	6, 8, 12, 14, -14, 16, 18, -18, 20, 22, 26	/* Neighborhoods */
 };
 
-/* http://www.sillycycle.com/life.html */
+/* https://www.sillycycle.com/life.html */
 /* Below generated from java Life3DForms | dos2unix */
 static char glider_12B3S3[][3 * NUMPTS + 1] =
 {
@@ -20434,7 +20434,7 @@ static char patterns_26B67S67[][3 * NUMPTS + 1] =
 	},
 };
 /* Above generated from java Life3DForms | dos2unix */
-/* http://www.sillycycle.com/life.html */
+/* https://www.sillycycle.com/life.html */
 
 #ifdef LIFE_NAMES
 #define PAT_SPACE 2

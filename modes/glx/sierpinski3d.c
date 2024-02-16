@@ -589,9 +589,17 @@ init_gasket(ModeInfo *mi)
   intens_factor = intensity / 65536000.0;
   gp->ncolors = 255;
   gp->colors = (XColor *) calloc(gp->ncolors, sizeof(XColor));
-  make_smooth_colormap (mi, None,
-                        gp->colors, &gp->ncolors,
-                        False, (Bool *) NULL);
+  make_smooth_colormap (
+ #ifdef STANDALONE
+    MI_SCREENPTR(mi), MI_VISUAL(mi), MI_WIN_COLORMAP(mi),
+    gp->colors, &gp->ncolors,
+    False, (Bool *) NULL, False
+#else
+    mi, None,
+    gp->colors, &gp->ncolors,
+    False, (Bool *) NULL
+#endif
+  );
 
   if ((gp->glx_context = init_GL(mi)) != NULL)
   {
@@ -674,6 +682,6 @@ release_gasket(ModeInfo * mi)
   FreeAllGL(mi);
 }
 
-XSCREENSAVER_MODULE ("Sierpinski3d", sierpinski3d)
+XSCREENSAVER_MODULE ("Sierpinski3d", gasket)
 
 #endif /* MODE_sierpinski3d */

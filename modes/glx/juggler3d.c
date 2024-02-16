@@ -2729,7 +2729,7 @@ init_juggler3d (ModeInfo * mi)
     double spin_accel   = 0.05;
     sp->rot = make_rotator (0, spin_speed, 0, 
                             spin_accel, wander_speed, False);
-    sp->trackball = gltrackball_init ();
+    sp->trackball = gltrackball_init (True);
   }
 
   if (only && *only && strcmp(only, " ")) {

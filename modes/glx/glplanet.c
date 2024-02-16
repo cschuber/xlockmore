@@ -64,14 +64,7 @@ static const char sccsid[] = "@(#)glplanet.c	5.01 01/04/13 xlockmore";
 # define MODE_glplanet
 #define DEFAULTS	"*delay:			15000   \n"	\
 					"*showFPS:			False   \n" \
-                    "*rotate:           True    \n" \
-                    "*roll:             True    \n" \
-                    "*bounce:           True    \n" \
 					"*wireframe:		False	\n"	\
-					"*light:			True	\n"	\
-					"*texture:			True	\n" \
-					"*stars:			True	\n" \
-					"*pimage:			BUILTIN	\n" \
 					"*imageForeground:	Green	\n" \
 					"*imageBackground:	Blue	\n"
 
@@ -276,12 +269,14 @@ setup_xbm_texture (unsigned char *bits, int width, int height,
   clear_gl_error();
   glTexImage2D(GL_TEXTURE_2D, 0, 3, width, height, 0,
 			   GL_RGB, GL_UNSIGNED_BYTE, data);
+#ifndef STANDALONE
   if (check_gl_error("texture")) {
 	if (data != NULL) {
 		free(data);
 	}
 	return False;
   }
+#endif
 
   /* setup parameters for texturing */
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

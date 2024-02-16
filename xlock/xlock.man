@@ -1,7 +1,7 @@
-.\" @(#)xlock.man	5.57 2019/05/29
+.\" @(#)xlock.man	5.60 2019/12/04
 .\" Copyright (c) 1991 - Patrick J. Naughton
 .\" xlockmore updates from David A. Bagley
-.TH XLOCK 1 "29 May 2019" "X11R6 Contrib"
+.TH XLOCK 1 "04 Dec 2019" "X11R6 Contrib"
 .SH NAME
 xlock \- Locks the local X display until a password is entered.
 .sp
@@ -2537,7 +2537,7 @@ David A. Bagley, <\fIbagleyd AT verizon.net\fP>
 .sp
 The latest version is currently at:
 .RS
-\fIhttp://www.sillycycle.com/xlock\fP
+\fIhttps://www.sillycycle.com/xlock\fP
 .br
 \fIhttp://ibiblio.org/pub/Linux/X11/screensavers\fP
 .RE
