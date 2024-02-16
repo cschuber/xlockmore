@@ -83,7 +83,7 @@ gltrackball_track (trackball_state *ts, int x, int y, int w, int h)
 }
 
 /* Execute the rotations current encapsulated in the trackball_state:
-   this does something analagous to glRotatef().
+   this does something analogous to glRotatef().
  */
 void
 gltrackball_rotate (trackball_state *ts)

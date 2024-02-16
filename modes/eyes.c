@@ -212,7 +212,7 @@ static EyeScrInfo *eye_info = (EyeScrInfo *) NULL;
 /* ---------------------------------------------------------------------- */
 
 /*-
- *    Fill an arc, using a tranformation matrix.  Lifted from xeyes.
+ *    Fill an arc, using a transformation matrix.  Lifted from xeyes.
  *      The code to return the bounding box is a local addition.
  */
 
@@ -245,7 +245,7 @@ TFillArc(register Display * dpy, Drawable d, GC gc, Transform * t, double x, dou
 
 
 /*-
- *    Set a tranform matrix from the given arguments.  Lifted from xeyes.
+ *    Set a transform matrix from the given arguments.  Lifted from xeyes.
  */
 
 static void

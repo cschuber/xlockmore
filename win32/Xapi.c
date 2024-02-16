@@ -366,7 +366,7 @@ HDC GCGetDC(Drawable d, GC gc)
 	if (d > 0 && d < NUMBER_BITMAP)
 	{
 		if (dbhdc == NULL)
-			/* create a compatible DC from the saved intial DC. To draw
+			/* create a compatible DC from the saved initial DC. To draw
 			   to this DC we still need to put a HBITMAP into it (not 
 			   done in this function)
 			 */
@@ -1446,7 +1446,7 @@ void XDrawArc(Display *display, Drawable d, GC gc, int x, int y,
 
 	if (angle2 == 0) {
 		/* Special case - In X this is a point but Arc in Windows would
-		   do a complete elipse!  Draw a (thick) line instead.  */
+		   do a complete ellipse!  Draw a (thick) line instead.  */
 	  
 		XDrawLine(display, d, gc, xa1, ya1, xa1, ya1);
 
@@ -1787,7 +1787,7 @@ void XFillArc(Display *display, Drawable d, GC gc, int x, int y,
 
 	if (angle2 == 0) {
 	  /* Special case - In X this is a point but Arc in Windows would
-		 do a complete elipse!  Draw a (thick) line instead.  */
+		 do a complete ellipse!  Draw a (thick) line instead.  */
 	  
 	  XDrawLine(display, d, gc, cx, cy, xa1, ya1);
 
@@ -1858,7 +1858,7 @@ void XFillArcs(Display *display, Drawable d, GC gc,
 
 		if (arcs[i].angle2 == 0) {
 		  /* Special case - In X this is a point but Arc in Windows would
-			 do a complete elipse!  Draw a (thick) line instead.  */
+			 do a complete ellipse!  Draw a (thick) line instead.  */
 		  
 		  XDrawLine(display, d, gc, cx, cy, xa1, ya1);
 
@@ -2650,7 +2650,7 @@ void XSetFont(Display *display, GC gc, Font font)
 
 /*-
  *  XSetForeground
- *    sets the color of the current color, forground pen and
+ *    sets the color of the current color, foreground pen and
  *    brush
  */
 void XSetForeground(Display *display, GC gc, unsigned long foreground)

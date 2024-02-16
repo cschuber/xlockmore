@@ -21,7 +21,7 @@ static const char sccsid[] = "@(#)sproingiewrap.c	5.00 2000/11/01 xlockmore";
  * other special, indirect and consequential damages.
  *
  *    Programming:  Ed Mackey, http://www.netaxs.com/~emackey/
- *    Sproingie 3D objects modeled by:  Al Mackey, al@iam.com
+ *    Sproingie 3D objects modeled by:  Al Mackey, al AT iam.com
  *       (using MetaNURBS in NewTek's Lightwave 3D v5).
  *
  * Revision History:

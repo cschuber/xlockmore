@@ -33,7 +33,7 @@ static const char sccsid[] = "@(#)juggle.c	5.10 2003/09/02 xlockmore";
  *              implementation, so that different objects can have
  *              different length trails.
  * 11-Nov-2004: [TDA] Clap when all the balls are in the air.
- * 10-Nov-2004: [TDA] Display pattern name converted to hight
+ * 10-Nov-2004: [TDA] Display pattern name converted to height
  *              notation.
  * 31-Oct-2004: [TDA] Add -clubs and new trail implementation.
  * 02-Sep-2003: Non-real time to see what is happening without a
@@ -990,7 +990,7 @@ choose_object(void) {
   return o;
 }
 
-/* Connnect up throws and catches to figure out which ball goes where.
+/* Connect up throws and catches to figure out which ball goes where.
    Do the same with the juggler's hands. */
 
 static void
@@ -1566,7 +1566,7 @@ hands(jugglestruct *sp)
 	  continue;
 	}
 
-	/* double spline takes hand from throw, thru catch, to
+	/* double spline takes hand from throw, through catch, to
 	   next throw */
 
 	t->finish = u->start;
@@ -2672,7 +2672,7 @@ draw_juggle(ModeInfo * mi)
   for (traj = sp->head->next; traj != sp->head; traj = traj->next) {
 	if (traj->status != PREDICTOR) {
 	  /* Skip any elements that need further processing */
-	  /* We could remove them, but there shoudn't be many and they
+	  /* We could remove them, but there shouldn't be many and they
 		 would be needed if we ever got the pattern refiller
 		 working */
 	  continue;

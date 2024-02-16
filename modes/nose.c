@@ -498,7 +498,7 @@ walk(ModeInfo * mi, register int dir)
 	nosestruct *np = &noses[MI_SCREEN(mi)];
 	register int incr = 0;
 
-	if (dir & (LEFT | RIGHT)) {	/* left/right movement (mabye up/down too) */
+	if (dir & (LEFT | RIGHT)) {	/* left/right movement (maybe up/down too) */
 		np->up = -np->up;	/* bouncing effect (even if hit a wall) */
 		if (dir & LEFT) {
 			incr = X_INCR;
@@ -603,7 +603,7 @@ talk(ModeInfo * mi, Bool force_erase)
 	}
 	np->talking = True;
 	walk(mi, FRONT);
-	p = strncpy(buf, np->words, BUFSIZ);
+	p = strncpy(buf, np->words, BUFSIZ - 1);
 	while (strlen(p) > 0) {
 		p2 = p + strlen(p) - 1;
 		if (*p2 == '\n')

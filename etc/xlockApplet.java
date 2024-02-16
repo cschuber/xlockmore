@@ -225,7 +225,7 @@ public class xlockApplet extends Applet implements ItemListener {
 		Panel2.add(launchButton);
 		Panel2.add(launchInWinButton);
 		Panel2.add(quitButton);
-		errorFrame = new ErrorFrame("An error occured, can not launch xlock");
+		errorFrame = new ErrorFrame("An error occurred, can not launch xlock");
  		errorFrame.setSize(350, 150);
 		choice.addItemListener(this);
 

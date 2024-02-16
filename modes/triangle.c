@@ -155,7 +155,7 @@ draw_atriangle(ModeInfo * mi, XPoint * p, int y_0, int y_1, int y_2, double dinv
 		} else if (tp->wireframe) {
 			XDrawLines(display, window, gc, p, 4, CoordModeOrigin);
 		} else {
-			/* dieing on my Sun here with gcc -g -O2, flakey */
+			/* dying on my Sun here with gcc -g -O2, flakey */
 			XFillPolygon(display, window, gc, p, 3, Convex, CoordModeOrigin);
 		}
 	} else {

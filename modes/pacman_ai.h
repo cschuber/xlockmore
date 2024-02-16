@@ -20,7 +20,7 @@
 
 /* fills array of DIRVECS size with possible directions, returns number of
    directions. 'posdirs' points to a possibly undefined array of four
-   integers.  The vector will contain booleans wether the direction is
+   integers.  The vector will contain booleans whether the direction is
    a possible direction or not.  Reverse directions are deleted. */
 static int
 ghost_get_posdirs(pacmangamestruct *pp, int *posdirs, ghoststruct *g)
@@ -52,7 +52,7 @@ ghost_get_posdirs(pacmangamestruct *pp, int *posdirs, ghoststruct *g)
 	return nrdirs;
 }
 
-/* Directs ghost to a random direction, exluding opposite (except in the
+/* Directs ghost to a random direction, excluding opposite (except in the
    impossible situation that there is only one valid direction). */
 static void
 ghost_random(pacmangamestruct *pp, ghoststruct *g)

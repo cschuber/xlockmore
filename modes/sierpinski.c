@@ -27,7 +27,7 @@ static const char sccsid[] = "@(#)sierpinski.c	5.00 2000/11/01 xlockmore";
  * Revision History:
  * 01-Nov-2000: Allocation checks
  * 18-Sep-1997: 3D version Antti Kuntsi <kuntsi@iki.fi>.
- * 20-May-1997: Changed the name tri to sierpinski for more compatiblity
+ * 20-May-1997: Changed the name tri to sierpinski for more compatibility
  * 10-May-1997: Jamie Zawinski <jwz AT jwz.org> compatible with xscreensaver
  * 05-Sep-1996: Desmond Daignault Datatimes Incorporated
  *            <tekdd@dtol.datatimes.com> .

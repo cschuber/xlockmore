@@ -24,7 +24,7 @@ static const char sccsid[] = "@(#)cage.c	5.01 2001/03/01 xlockmore";
  *     Second Edition" Pag. 227, exercise 5.15.
  *
  * This mode shows some interesting scenes that are impossible OR very
- * wierd to build in the real universe. Much of the scenes are inspirated
+ * weird to build in the real universe. Much of the scenes are inspirated
  * on Mauritz Cornelis Escher's works which derivated the mode's name.
  * M.C. Escher (1898-1972) was a dutch artist and many people prefer to
  * say he was a mathematician.
@@ -56,7 +56,7 @@ static const char sccsid[] = "@(#)cage.c	5.01 2001/03/01 xlockmore";
  *              Marcelo F. Vianna.
  * 03-Jun-1997: Initial Release (Only one scene: "Moebius Strip")
  *              The Moebius Strip scene was inspirated in a M.C. Escher's
- *              painting named Moebius Strip II in wich ants walk across a
+ *              painting named Moebius Strip II in which ants walk across a
  *              Moebius Strip path, sometimes meeting each other and sometimes
  *              being in "opposite faces" (note that the moebius strip has
  *              only one face and one edge).
@@ -68,7 +68,7 @@ static const char sccsid[] = "@(#)cage.c	5.01 2001/03/01 xlockmore";
  * visuals DO NOT support texture mapping in OpenGL.
  *
  * BUT Mesa do implements RGBA contexts in pseudo color visuals, so texture
- * mapping shuld work on PseudoColor, DirectColor, TrueColor using Mesa. Mono
+ * mapping should work on PseudoColor, DirectColor, TrueColor using Mesa. Mono
  * is not officially supported for both OpenGL and Mesa, but seems to not crash
  * Mesa.
  *

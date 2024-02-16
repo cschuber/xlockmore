@@ -16,7 +16,7 @@ static unsigned char image_bits[] = {
    0x7f, 0xf2, 0x3f, 0xf9};
 
 /* Linux Penguin from logo.gif and logo.txt /usr/src/linux/Documentation
-This is the full-colour version of the currenly unofficial Linux logo
+This is the full-colour version of the currently unofficial Linux logo
 ("currently unofficial" just means that there has been no paperwork and
 that I haven't really announced it yet).  It was created by Larry Ewing,
 and is freely usable as long as you acknowledge Larry as the original

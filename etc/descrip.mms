@@ -6,7 +6,7 @@
 #
 # Usage : type MMS in the directory containing the source
 #
-# It automatically detects the existance of the XPM-library and the XVMSUTILS
+# It automatically detects the existence of the XPM-library and the XVMSUTILS
 # library to use the new (better) features of the program. It is assumed that
 # both libraries if exist are in the directory with logical symbol X11.
 #

@@ -205,7 +205,7 @@ positionOfNeighbor(circuitstruct * wp, int dir, int *pcol, int *prow)
 {
 	int         col = *pcol, row = *prow;
 
-	/* NO WRAPING */
+	/* NO WRAPPING */
 
 	if (wp->polygon == 4 || wp->polygon == 6) {
 		switch (dir) {

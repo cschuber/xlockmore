@@ -86,7 +86,7 @@ static struct {
 	unsigned simular_to;
 } tiles[TILES_COUNT] = {
 /*
- *   ' ' == dont care == BLOCK_EMPTY
+ *   ' ' == don't care == BLOCK_EMPTY
  *   '#' == set wall, and not clear == BLOCK_WALL
  *   '`' == clear == BLOCK_DOT_1
  *   middle position is always set as cleardef

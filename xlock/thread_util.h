@@ -37,7 +37,7 @@ implied warranty.
 */
 
 /*
-   The basic stragegy for applying threads to a CPU-hungry mode:
+   The basic strategy for applying threads to a CPU-hungry mode:
 
    1. Find the CPU-hungry part of the mode.
 
@@ -66,7 +66,7 @@ implied warranty.
       full-screen XImages @ 30 FPS.
 
       On systems with simultaneous multithreading (a.k.a. Hyper-threading),
-      performance gains may be slim to non-existant.
+      performance gains may be slim to non-existent.
  */
 
 #include "aligned_malloc.h"

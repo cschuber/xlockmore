@@ -33,7 +33,7 @@ static const char sccsid[] = "@(#)pyro.c	5.00 2000/11/01 xlockmore";
  * overcomes the rocket's impulse) and explode as the rocket's main fuse
  * gives out (we could add a ballistic stage, maybe).  The individual
  * stars fan out from the rocket, and they decelerate less quickly.
- * That's called bouyancy, but really it's again a visual preference.
+ * That's called buoyancy, but really it's again a visual preference.
  */
 
 #ifdef STANDALONE
@@ -113,7 +113,7 @@ ModStruct   pyro_description =
 #define FUSILLEN 100		/* Length of fusillade, in ignitions */
 
 #define SVELFACTOR 0.1		/* Max star velocity / yvel */
-#define BOUYANCY 0.2		/* Reduction in grav deceleration for stars */
+#define BUOYANCY 0.2		/* Reduction in grav deceleration for stars */
 #define MAXSTARS 150		/* Number of stars issued from a shell */
 #define MINSTARS 50
 #define MINSFUSE 50		/* Range of fuse lengths for stars */
@@ -553,7 +553,7 @@ init_pyro(ModeInfo * mi)
 	}
 	pp->maxsvel = pp->minvely * SVELFACTOR;
 	pp->rockdecel = (float) (pp->height) * GRAVFACTOR;
-	pp->stardecel = pp->rockdecel * BOUYANCY;
+	pp->stardecel = pp->rockdecel * BUOYANCY;
 	if (MI_IS_INSTALL(mi) && MI_IS_USE3D(mi)) {
 		MI_CLEARWINDOWCOLOR(mi, MI_NONE_COLOR(mi));
 	} else {

@@ -5,7 +5,7 @@
 # Add the menu file with load resources
 # and the exit button
 # Add the load_process procedure loading
-# the ressource file ~/XLock
+# the resource file ~/XLock
 #
 
 #function find in demo: mkStyles.tcl
@@ -205,7 +205,7 @@ than  0x0).   This  should also be used with esaver to protect screen from phosp
     {"-icongeometry" {this option sets  the  size  of  the iconic screen (normally 64x64) seen when entering the password.  This should be  used  with  caution  since many  of  the  modes will fail if the windows are far from square
 or are too small (size  must  be  greater than  0x0).   The  greatest  size  is
 256x256.  There should be some limit  so  users  could  see  who  has locked  the  screen.  Position information of icon is ignored.} 1 }
-    {"-font" { Ths option  sets  the  font  to be used on the prompt screen.} 1 }
+    {"-font" { This option  sets  the  font  to be used on the prompt screen.} 1 }
     { "-fg "  { This option sets the color of the text on the password screen.} 1 }
     {"-bg" { This option sets the color of the background on the password screen.} 1 }
     {"-forceLogout" { This option sets the  auto-logout.  This  might not be enforced depending how your system is configured.} 1 }} {
@@ -510,7 +510,7 @@ proc Affopts { device } {
   eval exec $linecommand
 }
 
-proc load_ressource { } {
+proc load_resource { } {
   global XLock_invalid
   global XLock_validate
   global XLock_info
@@ -574,12 +574,12 @@ global XLock_info
 # Creation of GUI
 
 #Creation of  menu
-set fileressource ""
+set fileresource ""
 
 menubutton .menu.buttonf -text "file" -menu .menu.buttonf.file
 menu .menu.buttonf.file
 set FILE .menu.buttonf.file
-$FILE add command -label "Load ressource" -command "load_ressource"
+$FILE add command -label "Load resource" -command "load_resource"
 $FILE add command -label "exit" -command "exit"
 
 menu .menu.button.check

@@ -352,7 +352,7 @@ ominos[] =
 {
   /* Side of smallest square that contains shape */
   /* Number of orientations */
-  /* Position, Next Postion, (not used yet),
+  /* Position, Next Position, (not used yet),
      number_down, used_for_start?
      Polyomino (side^2 values) */
 

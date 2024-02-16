@@ -24,9 +24,6 @@ SRCS=Xapi.c xlock95.c scrnsave.c
 # objects
 OBJS=$(SRCS:.c=.o)
 
-# resources
-#OBJS=$(SRCS:.c=.o)
-
 # general rules
 .rc.res:
 	$(RC) --include-dir $(WIN32API) $< -O coff -o $@
@@ -37,7 +34,7 @@ OBJS=$(SRCS:.c=.o)
 # specific rules
 all:	$(OBJS) xlock95.res
 
-xlock95.o:	xlock95.h
+xlock95.o:	xlock95.h ../xlock/version.h
 
 xlock.ico:	../pixmaps/t-xlock.xpm ../pixmaps/s-xlock.xpm
 	xpmtoppm -alphaout t-xlock_mask.ppm ../pixmaps/t-xlock.xpm >\

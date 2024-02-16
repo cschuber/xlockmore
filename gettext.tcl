@@ -39,7 +39,7 @@
 #
 
 #####################################################################
-# Internal valueable. Don't use it.
+# Internal valuable. Don't use it.
 set g_language "C"
 set g_resource("__dummy__") ""
 

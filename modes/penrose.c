@@ -146,7 +146,7 @@ ModStruct   penrose_description =
  * we do not really need them and they would only consume memory and
  * cause additional bookkeeping.  Instead we only have vertices, and
  * each vertex lists the type of each adjacent tile as well as the
- * position of the vertex on the tile (hereafter refered to as
+ * position of the vertex on the tile (hereafter referred to as
  * "corner").  These positions are numbered in counterclockwise order
  * so that 0 is where two double arrows meet (see one of the
  * articles).  The tile type and vertex number are stored in a single
@@ -181,7 +181,7 @@ typedef unsigned char vertex_type_c;
  *
  * Here we use a doubly chained ring-like structure as vertices often need
  * to be removed or inserted (they are kept in geometrical order
- * circling the tiled area counterclockwise).  The ring is refered to by
+ * circling the tiled area counterclockwise).  The ring is referred to by
  * a pointer to one more or less random node.  When deleting nodes one
  * must make sure that this pointer continues to refer to a valid
  * node.  A vertex count is maintained to make it easier to pick

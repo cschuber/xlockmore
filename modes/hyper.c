@@ -111,10 +111,10 @@ static argtype vars[] =
 };
 static OptionStruct desc[] =
 {
-	{(char *) "-/+randomstart", (char *) "turn on/off begining with random rotations"},
+	{(char *) "-/+randomstart", (char *) "turn on/off beginning with random rotations"},
 	{(char *) "-/+showaxes", (char *) "turn on/off showing the axes"},
 	{(char *) "-/+showplanes", (char *) "turn on/off showing the planes"},
-	{(char *) "-spindelay num", (char *) "delay in seconds before chaning spin speed"},
+	{(char *) "-spindelay num", (char *) "delay in seconds before changing spin speed"},
 };
 
 ENTRYPOINT ModeSpecOpt hyper_opts =

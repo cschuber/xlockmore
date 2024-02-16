@@ -37,7 +37,7 @@ xlock.java and xlockFrame.java is yet another xlock launcher similar to
 Contributed by Igor Markov <imarkov@math.ucla.edu>
 xlocksat.pl  use like "xlock -saturation `xlocksat.pl`"  The idea is that
   high saturation looks weird at night and low saturation looks weird
-  during the day.  Unfortuantely, as the day progresses the saturation does
+  during the day.  Unfortunately, as the day progresses the saturation does
   not change.
 xlockranddur.pl  use like "xlock random -duration `xlockranddur.pl`"
   This gives a random duration of a mode (providing you have fortune!).

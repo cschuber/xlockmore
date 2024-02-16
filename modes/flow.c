@@ -320,7 +320,7 @@ static flowstruct *flows = (flowstruct *) NULL;
 /* Generic 3D Cubic Polynomial.  Includes all the Quadratics (Lorentz,
    Rossler) and much more! */
 
-/* I considered offering a seperate 'Quadratic' option, since Cubic is
+/* I considered offering a separate 'Quadratic' option, since Cubic is
    clearly overkill for the standard examples, but the performance
    difference is too small to measure.  The compute time is entirely
    dominated by the XDrawSegments calls anyway. [TDA] */
@@ -1192,7 +1192,7 @@ draw_flow(ModeInfo * mi)
 					(Drawable) sp->buffer, MI_GC(mi),
 					sp->csegs + col * segindex, sp->cnsegs[col]);
 			}
-	} else { /* mono handled seperately since xlockmore uses '1' for
+	} else { /* mono handled separately since xlockmore uses '1' for
 				mono white! */
 		XSetForeground(MI_DISPLAY(mi), MI_GC(mi), MI_WHITE_PIXEL(mi));
 		XDrawSegments(MI_DISPLAY(mi), (Drawable) sp->buffer, MI_GC(mi),

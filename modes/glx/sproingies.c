@@ -172,7 +172,7 @@ LayGround(int sx, int sy, int sz, int width, int height, sp_instance * si)
 			glVertex3i(x + 2, y - 2, z);
 			glVertex3i(x + 1, y - 2, z);
 /*-
- * PURIFY 4.0.1 reports an unitialized memory read on the next line when using
+ * PURIFY 4.0.1 reports an uninitialized memory read on the next line when using
  * MesaGL 2.2 and -mono.  This has been fixed in MesaGL 2.3 and later. */
 			glEnd();
 			++x;
@@ -528,7 +528,7 @@ RenderSproingie(int t, sp_instance * si)
 			(si->dist / 64.0);
 		glPointSize((pointsize < 1.0) ? 1.0 : pointsize);
 /*-
- * PURIFY 4.0.1 reports an unitialized memory read on the next line when using
+ * PURIFY 4.0.1 reports an uninitialized memory read on the next line when using
  * MesaGL 2.2.  This has been tracked to MesaGL 2.2 src/points.c line 313. */
 		glCallList(si->SproingieBoom);
 		glPointSize(1.0);

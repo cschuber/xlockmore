@@ -176,10 +176,10 @@ static const char sccsid[] = "@(#)xlock.c	5.34 2011/05/23 xlockmore";
  * 24-Mar-88: Added color support. [-color]
  *	      wrote the man page.
  * 23-Mar-88: Added HOPALONG routines from Scientific American Sept. 86 p. 14.
- *	      added password requirement for invokation
+ *	      added password requirement for invocation
  *	      removed option for command line password
  *	      added requirement for display to be "unix:0".
- * 22-Mar-88: Recieved Walter Milliken's comp.windows.x posting.
+ * 22-Mar-88: Received Walter Milliken's comp.windows.x posting.
  *
  */
 
@@ -1153,7 +1153,7 @@ monitor_powered_on_p(Display *dpy)
   CARD16 state;
 
   if (!DPMSQueryExtension(dpy, &event_number, &error_number))
-    /* DPMS extention is not supported */
+    /* DPMS extension is not supported */
     result = True;
 
   else if (!DPMSCapable(dpy))
@@ -1598,7 +1598,7 @@ putText(Display * display, Window window, GC gc,
 	*py = y;
 }
 
-/* language dependant strings */
+/* language dependent strings */
 #if defined DE 
 #include "xlock-msg-de.h"
 #elif defined FR

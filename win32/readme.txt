@@ -51,7 +51,7 @@ while for control to come back to you if xlock95 is set.
 If it does not show up the scr file is probably in the wrong directory.
 
 Alternatively you can just double click the .scr from
-explorer and it should run fine (but thats not the
+explorer and it should run fine (but that's not the
 same as setting it up as a screen saver).
 
 Windows Screen Saver commandline arguments:
@@ -185,7 +185,7 @@ version 0.4 (debug build)
   this due to differences between X11 and Win32), and of course all
   the X11 functions and structures. But the rest is xlockmore 4.07 
   code. At some point I will see if David will integrate the Win32
-  source code into the official distrubution.
+  source code into the official distribution.
 
 . As a result a lot more modes are now added. These are:
   Braid, Clock, Daisy, Drift, Flame, Galaxy, Geometry, Grav, Helix, 
@@ -277,7 +277,7 @@ version 0.10 (26-Jul-2005)
 
 . fixed ball. The problem had to do with XCreateGC(). The way I had
   implemented this function meant only about 5 GCs could be created
-  before problems were occuring. This was fine for all other modes,
+  before problems were occurring. This was fine for all other modes,
   apart from ball which needs about 20 GCs. I now have totally
   reorganised how GCs are created and are related back to a device
   context (DC), which is what Windows uses. I now only have 1 DC, and
@@ -286,7 +286,7 @@ version 0.10 (26-Jul-2005)
 
 version 0.11 (29-Sep-2005)
 . updated to use xlockmore-5.19. This is the first step of getting my
-  source code integrated into the offical source. A number of changes
+  source code integrated into the official source. A number of changes
   had to be made to my code, but it was mostly OK. The following modes
   are removed in this new version (removed in the official code): 
   geometry (14-Sep-2005)

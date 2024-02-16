@@ -66,7 +66,7 @@ ModStruct   spiral_description =
 #define MAXTRAIL 512		/* The length of the trail */
 #define MAXDOTS 40
 #define MINDOTS 1
-#define TWOPI (2.0*M_PI)	/* for convienence */
+#define TWOPI (2.0*M_PI)	/* for convenience */
 #define JAGGINESS 4		/* This sets the "Craziness" of the spiral (I like 4) */
 #define SPEED 2.0
 

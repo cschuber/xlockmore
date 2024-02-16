@@ -77,7 +77,7 @@ extern char *logoutCmd;
 
 #ifdef CLOSEDOWN_LOGOUT
 
-/* Logout the user by contacting the display and closeing all windows */
+/* Logout the user by contacting the display and closing all windows */
 
 
 /*-

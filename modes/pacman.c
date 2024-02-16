@@ -23,7 +23,7 @@ static const char sccsid[] = "@(#)pacman.c	5.00 2000/11/01 xlockmore";
  *
  * Revision History:
  * 13-May-2002: Added -trackmouse feature thanks to code from 'maze.c'.
- *		splitted up code into several files.  Retouched AI code, cleaned
+ *		split up code into several files.  Retouched AI code, cleaned
  *		up code.
  *  3-May-2002: Added AI to pacman and ghosts, slowed down ghosts.
  * 26-Nov-2001: Random level generator added

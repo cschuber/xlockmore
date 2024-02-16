@@ -85,7 +85,7 @@ ping.
    machine is not contained in the loop.  This is a simplification of
    von Neumann and Codd's self-producing Turing machine.
    The data spinning around could be viewed as both its DNA and its internal
-   clock.  The program can be initalized to have the loop spin both ways...
+   clock.  The program can be initialized to have the loop spin both ways...
    but only one way around will work for a given rule.  An open question (at
    least to me): Is handedness a requirement for (artificial) life?  Here
    there is handedness at both the initial condition and the transition rule.
@@ -933,7 +933,7 @@ static unsigned int hexTransitionTable[] =
     000270270, 000007020, 000040270,
 
     /* Collision starts (gen 540), not sure to have rules to save it
-       or depend on calloc to intialize remaining rules to 0 so that
+       or depend on calloc to initialize remaining rules to 0 so that
        the mutant will be born
      */
     000050220,

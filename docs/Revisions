@@ -1,4 +1,4 @@
-xlockmore-5.62 as of 1 February 2020, the maintained version of xlock
+xlockmore-5.63 as of 10 May 2020, the maintained version of xlock
 
 Primary site: https://www.sillycycle.com/xlock
 Alternate site: http://ibiblio.org/pub/Linux/X11/screensavers
@@ -11,6 +11,16 @@ send me mail if you want to be on a list for latest releases.
 
 Adapted from Patrick J. Naughton's original xlock, with lots of help
 from others.
+
+5.63
+  Lots of spelling errors fixed due to codespell
+    https://manpages.debian.org/testing/codespell/codespell.1.en.html
+  A few more gl modes (molecule, invert) fixed up by
+    EoflaOE ViceCity to run in xscreensaver.
+  Added additional changes to solitaire and invert.  invert will
+    build in xscreensaver with some coaxing, see README in
+    xscreensaver directory.
+  Removed buffer gcc warning about nose.c.
 
 5.62
   Fix from brett.diamond AT gmail.com to get "xlock -help" from
@@ -255,7 +265,8 @@ from others.
 
 5.37
   life3d mode: rhombic dodecahedral life internal format now uses even cells
-    instead of odd (thought to be more straighforward as (0, 0, 0) is a cell).
+    instead of odd (thought to be more straightforward as (0, 0, 0) is a
+    cell).
   biof mode: removed as I now see it has a GNU copyright, created a patch
     xlockmore-$VERSION+gnu.tar.bz2
 
@@ -552,7 +563,7 @@ from others.
     -index is similar, but displays at which iteration the closest return
     occurs.  These show a fibonacci branching structure from the base of
     each bud, ie each adjacent pair of domains surrounds a domain whose
-    index is the sum of the indices of its neigbors.
+    index is the sum of the indices of its neighbors.
     -lyap option for colors in the interior of the set according to an
     estimate of the Lyapunov exponent.  (Not to be confused with real plane
     Lyapunov fractals).  Also now allow -binary and -dem.
@@ -874,7 +885,7 @@ from others.
     and not using USE_XLOCKRC and cygwin.
   Clean up of some text errors with BUTTON_LOGOUT and failure count.
   Added a Caps Lock check.  Don't you hate it when certain software says
-    "Make sure that the Caps Lock is not accidently on." and the Caps Lock
+    "Make sure that the Caps Lock is not accidentally on." and the Caps Lock
     is not on... I thought computers can know their own state.
     added ", Caps Lock on" to invalid string.... needs French/Japanese
     translations (also needs German translation but others parts need that
@@ -949,7 +960,7 @@ from others.
 
 5.04
   pacman AI update with trackmouse thanks to Edwin de Jong <mauddib AT gmx.net>
-    C++ fixes, memcpy prefered over bcopy, random start.
+    C++ fixes, memcpy preferred over bcopy, random start.
   Changed delay on several GL modes.  They were too fast on my GeForce4.
   bounce drawing errors fixed on my nVidia fixed
   ant: fudged the truchet lines a bit more for squares and hexagons.
@@ -1120,7 +1131,7 @@ from others.
     not burn up cpu when screen is blank.
   tetris and dragon leak fixed thanks to Tom Schmidt.
     Memory read fix in tetris thanks to Tom Schmidt.
-  dragon mode added.  Just one of Oskar van Deventer's ingenius mazes.
+  dragon mode added.  Just one of Oskar van Deventer's ingenious mazes.
   juggle mode: probablility of adding another ball when juggling 2 balls
     was increased.
   loop mode: Added some flaws, random blue wall spots, to "liven" it up.
@@ -1197,7 +1208,7 @@ from others.
   SIA passwording for Tru64 help thanks to Octave Orgeron <octave AT sun.com>.
   ImageMagick stuff added by Jouk Jansen <joukj AT hrem.stm.tudelft.nl>
     Setup to go only for VMS.
-  SunC++ (Forte 6 U1) compatiblity changes.
+  SunC++ (Forte 6 U1) compatibility changes.
   sball mode... new GL mode, converted by Eric Lassauge.
   euler2d new mode option, eulerpower Added optimizations, rotation
     of region to maximize screen fill, and new algorithm for solving
@@ -1431,7 +1442,7 @@ from others.
     refresh for life mode would come up with a new bitmap where size of the
     bitmap was all wrong.
   Allow for -1 for configuring a button so a button logout can be chosen
-    (or not) by a user.  Still can be forced at compiletime.  Thanks to the
+    (or not) by a user.  Still can be forced at compile time.  Thanks to the
     Michael Stone (Debian maintainer for xlock) <mstone AT justice.loyola.edu>.
   crystal fix for Solaris.  Lines needed to be drawn without xor or would
     have drawing errors.
@@ -1770,9 +1781,9 @@ from others.
   starfish taken out of unstable since it is fixed for multiscreens.
     Similar changes for kumppa and crystal.
   Fix for the following:
-    xlock -mode random -modelist image -bitmap /nonexistant/
+    xlock -mode random -modelist image -bitmap /nonexistent/
       xlock: caught signal 11 while running image mode (uid 561).
-    xlock -mode random -modelist image -bitmap /nonexistant
+    xlock -mode random -modelist image -bitmap /nonexistent
       could not read file "gublety-gook"
   Converted Jamie Zawinski <jwz AT jwz.org> lament to xlockmore.
     This mode I just got working, so you need to configure with
@@ -1876,7 +1887,7 @@ from others.
     petal, voters, and wator.
       deco, marquee, nose could be better too.
   debounced puzzle.
-  bug more interruptable.
+  bug more interruptible.
   xmlock and xalock patched to display black screens.
   "xlock -sound -lockdelay 1" fixed so there is no overlapping sounds.
   Thanks to Michael Duane <mduane AT metapath.com> for his check mail patch.
@@ -1978,7 +1989,7 @@ from others.
   Patched up imagefile
   Took out MAXSCREENS.  No multiscreen limit now.
   Took out NUMCOLORS.  Put in ncolors as a mode option, range 2-200
-  Took out inital point in qix in the top left corner.
+  Took out initial point in qix in the top left corner.
   Fixed closedown logout.  Display was shutdown before logout was running.
   New crystal.c thanks to Jouk Jansen <joukj AT hrem.stm.tudelft.nl> and fixes
     for AIX and VMS.
@@ -2073,7 +2084,7 @@ from others.
     the -cpasswd option, failing that $HOME/.xlockrc, failing that it queries
     the user.  This way, you do not need to choose between to have it
     as a compile-time option.  This is only used as a fallback.  -DUSE_XLOCKRC
-    still remains in case that default is prefered.
+    still remains in case that default is preferred.
   Thanks to Charles Vidal <cvidal AT ivsweb.com> for his new mode, bubble.
   Solved a bug in flag involving raster files.
   -garden mode for daisy.
@@ -2294,7 +2305,7 @@ file: glider.3dlife (-rule S45/B5)
     are read in the .xlockmessage, .plan, .signature.  (Tom Schmidt did this
     for all fopen calls except one :) ).
     Tabs here are now interpreted.
-  Jason Larke <jlarke AT psc.lsa.umich.edu> for his AFS patch so nonsence lines
+  Jason Larke <jlarke AT psc.lsa.umich.edu> for his AFS patch so nonsense lines
     in passwd or shadow do not cause the xlock to barf.
   release code now called in finish originally written by Ron Hitchens
     <ron AT idiom.com>.

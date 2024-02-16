@@ -105,7 +105,7 @@ static petalstruct *petals = (petalstruct *) NULL;
  *   cosine
  * Description:
  *   Assume that degrees is .. oh 360... meaning that
- *   there are 360 degress in a circle.  Then this function
+ *   there are 360 degrees in a circle.  Then this function
  *   would return the sin of the angle in degrees.  But lets
  *   say that they are really big degrees, with 4 big degrees
  *   the same as one regular degree.  Then this routine

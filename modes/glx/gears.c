@@ -32,7 +32,7 @@ static const char sccsid[] = "@(#)gears.c	5.03 2001/11/28 xlockmore";
  */
 
 /*-
- * PURIFY 3.0a on SunOS4 reports an unitialized memory read on each of
+ * PURIFY 3.0a on SunOS4 reports an uninitialized memory read on each of
  * the glCallList() functions below when using MesaGL 2.1.  This has
  * been fixed in MesaGL 2.2 and later releases.
  */
@@ -571,7 +571,7 @@ draw(ModeInfo * mi)
       glPushMatrix();
       glTranslatef(-3.0, -2.0, 0.0);
       glRotatef(gp->angle, 0.0, 0.0, 1.0);
-/* PURIFY 4.0.1 reports an unitialized memory read on the next line when using
+/* PURIFY 4.0.1 reports an uninitialized memory read on the next line when using
    * MesaGL 2.2 and -mono.  This has been fixed in MesaGL 2.3 and later. */
       glCallList(gp->gear1);
       glPopMatrix();

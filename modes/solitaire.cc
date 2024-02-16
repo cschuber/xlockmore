@@ -49,10 +49,7 @@ static const char sccsid[] = "@(#)solitaire.cc	5.00 2000/11/01 xlockmore";
 # define free_solitaire 0
 # define solitaire_handle_event 0
 
-extern "C"
-{
 #include "xlockmore.h"		/* from the xscreensaver distribution */
-}
 #else				/* !STANDALONE */
 #include "xlock.h"		/* in xlockmore distribution */
 #endif				/* !STANDALONE */

@@ -44,7 +44,7 @@ AH_TEMPLATE([HAVE_XHPDISABLERESET],
 #	    extension if the file /usr/include/X11/extensions/xidle.h
 #	    exists.) Turning on this flag lets XScreenSaver work better with
 #	    servers which support this extension; but it will still work
-#	    with servers which do not suport it, so it's a good idea to
+#	    with servers which do not support it, so it's a good idea to
 #	    compile in support for it if you can.])
 
 # Using this extension will crash your X server and make fading not work.
@@ -511,7 +511,7 @@ AC_DEFUN([AC_NO_OBJECTIVE_C],
 #       so much for compatibility!)
 #
 #       UPDATE: apparently there is NO WAY to tell gcc 3.2.2 to require that
-#       declarations preceed statements, without resorting to "-pedantic".
+#       declarations precede statements, without resorting to "-pedantic".
 #       This means that there is no way to get gcc3 to issue warnings that
 #       ensure that your code complies with the ANSI/ISO C89 standard, without
 #       also drowning in totally useless warnings.  Thank you master may I
@@ -544,7 +544,7 @@ AC_DEFUN([AC_NO_CPLUSPLUS_COMMENTS_IN_C_CODE],
    # ANSI C compilers.  This means that it's a portability problem: every time
    # these comments have snuck into the xscreensaver source code, I've gotten
    # complaints about it the next day.  So we turn off support for them in gcc
-   # as well to prevent them from accidentially slipping in.
+   # as well to prevent them from accidentally slipping in.
    #
    if test "$ac_gcc_accepts_std" = yes ; then
      #
@@ -3271,7 +3271,7 @@ if test "$with_gles" = yes; then
   have_gles=yes
   AC_DEFINE(HAVE_JWZGLES)
   JWZGLES_OBJS='$(JWXYZ_BIN)/jwzgles.o'
-  AC_MSG_RESULT(using OpenGL ES compatiblity shim)
+  AC_MSG_RESULT(using OpenGL ES compatibility shim)
 elif test "$with_gles" != no; then
   echo "error: must be yes or no: --with-gles=$with_gles"
   exit 1

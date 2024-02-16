@@ -140,7 +140,7 @@ typedef struct {
 #endif
 } bugstruct;
 
-/* Doublely linked list */
+/* Doubly linked list */
 typedef struct _BugList {
 	bugstruct   info;
 	struct _BugList *previous, *next;
@@ -190,7 +190,7 @@ positionOfNeighbor(bugfarmstruct * bp, int dir, int *pcol, int *prow)
 {
 	int         col = *pcol, row = *prow;
 
-	/* NO WRAPING */
+	/* NO WRAPPING */
 
 	if (bp->neighbors == 4 || bp->neighbors == 6 || bp->neighbors == 8) {
 		switch (dir) {

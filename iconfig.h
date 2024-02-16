@@ -518,7 +518,7 @@ XCOMM -DDEF_BUTTON_LOGOUT=\"5\" Set default logout button (minutes)
 XCOMM -DUSE_BOMB                Enable automatic logout mode (does not come up
 XCOMM                           in random mode)
 XCOMM -DDISABLE_INTERACTIVE     Disable interactive modes (useful for production
-XCOMM                           enviroments)
+XCOMM                           environments)
 XCOMM -DUSE_UNSTABLE            Enable unstable (alpha) modes
 XCOMM -DCLOSEDOWN_LOGOUT        Use with USE_AUTO_LOGOUT, USE_BUTTON_LOGOUT,
 XCOMM                           USE_BOMB if using xdm

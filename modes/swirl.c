@@ -124,7 +124,7 @@ typedef enum {
 
 /* data associated with a swirl window */
 typedef struct swirl_data {
-	/* window paramaters */
+	/* window parameters */
 	int         width, height;	/* window size */
 	int         depth;	/* depth */
 	int         rdepth;	/* real depth (for XImage) */
@@ -955,7 +955,7 @@ init_swirl(ModeInfo * mi)
 	/* resolution starts off chunky */
 	sp->resolution = MIN_RES + 1;
 
-	/* calculate the pixel step for this resulution */
+	/* calculate the pixel step for this resolution */
 	sp->r = (1 << (sp->resolution - 1));
 
 	/* how many knots? */
@@ -1050,7 +1050,7 @@ draw_swirl(ModeInfo * mi)
 				/* move to higher resolution */
 				sp->resolution--;
 
-				/* calculate the pixel step for this resulution */
+				/* calculate the pixel step for this resolution */
 				sp->r = (1 << (sp->resolution - 1));
 
 				/* start drawing again */

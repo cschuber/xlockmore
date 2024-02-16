@@ -540,7 +540,7 @@ getUserName(void)
 /*-
  * The PasswdEtc libraries have replacement passwd functions that make
  * queries to DomainOS registries.  Unfortunately, these functions do
- * wierd things to the process (at minimum, signal handlers get changed,
+ * weird things to the process (at minimum, signal handlers get changed,
  * there are probably other things as well) that cause xlock to become
  * unstable.
  *
@@ -756,7 +756,7 @@ gpass(void)
 				&& buf[0] == '*') ||
 #endif
 			       (strlen(buf) == CPASSLENGTH && buf[CPASSLENGTH - 1] == '\n')))) {
-				(void) fprintf(stderr, "%s: %s crypted password %s\n", xlockrc,
+				(void) fprintf(stderr, "%s: %s encrypted password %s\n", xlockrc,
 				       buf[0] == '\0' ? "null" : "bad", buf);
 #if defined(HAVE_KRB4) || defined(HAVE_KRB5)
 				if (!gpasskey(buf)) {
@@ -775,7 +775,7 @@ gpass(void)
 	} else {
 
 		if (strlen(cpasswd) != CPASSLENGTH - 1) {
-			(void) fprintf(stderr, "%s: bad crypted password %s\n",
+			(void) fprintf(stderr, "%s: bad encrypted password %s\n",
 				       ProgramName, cpasswd);
 			exit(1);
 		} else

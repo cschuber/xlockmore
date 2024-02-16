@@ -19,7 +19,7 @@ static const char sccsid[] = "@(#)vtlock.c	1.3 2000/01/28 xlockmore";
  * other special, indirect and consequential damages.
  *
  * The original code for was written by R. Cohen-Scali
- * (remi.cohenscali AT pobox.com) for a command line vtswich control tool
+ * (remi.cohenscali AT pobox.com) for a command line vtswitch control tool
  * can be found in the etc directory!
  *
  * My e-mail address is <lassauge AT users.sourceforge.net>
@@ -79,7 +79,7 @@ static int display_nr = -1;
 extern int is_x_vt_active(int);
 extern int restore_vt_active(int);
 extern int set_x_vt_active(int);
-	/* from ressource.c */
+	/* from resource.c */
 extern Bool vtlock_set_active;
 extern Bool vtlock_restore;
 extern Bool debug;

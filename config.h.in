@@ -86,7 +86,7 @@
 /* Define if you have the setreuid function.  */
 #undef HAVE_SETREUID
 
-/* Define one of these if they exist, usleep prefered.  */
+/* Define one of these if they exist, usleep preferred.  */
 #undef HAVE_USLEEP
 #undef HAVE_NANOSLEEP
 
@@ -98,7 +98,7 @@
 #undef HAVE_RANDOM
 #undef HAVE_RAND
 
-/* Avoid delaring these if the system has already done it for us. */
+/* Avoid declaring these if the system has already done it for us. */
 #undef DECLARED_GETENV
 #undef DECLARED_SRAND48
 
@@ -260,7 +260,7 @@
 #undef USE_VMSUTILS
 
 /* For personal use you may want to consider: */
-/* Unfriendly paranoid admininistrator or unknown shadow passwd algorithm */
+/* Unfriendly paranoid administrator or unknown shadow passwd algorithm */
 #undef USE_XLOCKRC
 
 /* For labs you may want to consider: */

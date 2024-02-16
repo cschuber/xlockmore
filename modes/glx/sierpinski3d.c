@@ -333,7 +333,7 @@ compile_gasket(ModeInfo *mi)
 
   GL_VECTOR   vertex[5];
 
-  /* define verticies */
+  /* define vertices */
   vertex[0].x =  0.5;
   vertex[0].y = -(1.0/3.0)*sqrt((2.0/3.0));
   vertex[0].z = -sqrt(3.0)/6.0;

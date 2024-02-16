@@ -125,7 +125,7 @@ typedef struct {
 	int         col, row;
 } cellstruct;
 
-/* Doublely linked list */
+/* Doubly linked list */
 typedef struct _CellList {
 	cellstruct  info;
 	struct _CellList *previous, *next;

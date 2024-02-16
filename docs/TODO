@@ -146,7 +146,7 @@ kick-off-able or really locked.
   the user if they ask for a mode that is not available.
 
   o some sort of command line or xlockrc option that allowed
-   specifiying users who had unlocking privileges.
+   specifying users who had unlocking privileges.
 
   o some sort of completion is used which may be confusing on UNIX
    Say if a ../bitmaps directory exists and ../bitmap does not

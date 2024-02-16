@@ -1,7 +1,9 @@
+#ifdef STANDALONE
+#include "xlockmore.h"          /* from the xscreensaver distribution */
+#else                           /* !STANDALONE */
+#include "xlock.h"              /* in xlockmore distribution */
+#endif                          /* !STANDALONE */
 #define XLOCK 1
-#ifdef XLOCK
-#include "xlock.h"
-#endif
 
 #include "i_spline.h"
 #include "i_evert.h"

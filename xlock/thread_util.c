@@ -192,7 +192,7 @@ static unsigned _get_cache_line_size(void)
         glibc and OS X.
 	    - A few other methods that could be added:
 	      - Query x86 CPUs directly with the CPUID instruction.
-	      - Query various ELF systems through the auxillary vector.
+	      - Query various ELF systems through the auxiliary vector.
             (Power, Alpha, SuperH)
 	      - Query Linux through
             /sys/devices/system/cpu/cpu?/cache/index?/coherency_line_size

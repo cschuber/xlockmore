@@ -39,7 +39,7 @@ extern      "C" {
 	float       rfreq;
 	int 	    direction;
 	char       *words, *words_start;
-	/* per Screen varialbles */
+	/* per Screen variables */
 	FTFace     *face;
 	float       center_x, center_y, center_z;
 	float       phi, theta, radius;

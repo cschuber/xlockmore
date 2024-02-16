@@ -233,7 +233,7 @@ init_tube(ModeInfo * mi)
 		}
 		start = (float) NRAND(360);
 		do {
-			star = NRAND(tp->shape / 2) + 1;	/* Not always a star but thats ok. */
+			star = NRAND(tp->shape / 2) + 1;	/* Not always a star but that's ok. */
 		} while ((star != 1) && (!(tp->shape % star)));
 		for (i = 0; i < tp->shape; i++) {
 			tp->proto_pts[i].x = tp->average / 2 +
@@ -467,7 +467,7 @@ draw_tube(ModeInfo * mi)
 		tp->x1 = MI_WIDTH(mi) - tp->width - 1 - lw;
 		tp->dx1 = -tp->dx1;
 	}
-	/* move rectange forward, vert */
+	/* move rectangle forward, vert */
 	tp->y1 += tp->dy1;
 	if (tp->y1 < lw) {
 		tp->y1 = lw;

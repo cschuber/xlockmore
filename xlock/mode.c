@@ -989,7 +989,7 @@ ExpandPath(char *path)
 
 /*-
  * Loads screensaver modules in the directories in path.  path is a
- * colon separated list of direcories to search in.  LoadModules
+ * colon separated list of directories to search in.  LoadModules
  * searches for files ending in .xlk to load as modules.
  */
 

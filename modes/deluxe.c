@@ -156,7 +156,7 @@ static OptionStruct desc[] =
 	{(char *) "-thickness num", (char *) "Figure thickness"},
 	{(char *) "-speed num", (char *) "Animation speed"},
 	{(char *) "-planes num", (char *) "Number of planes"},
-	{(char *) "-/+transparent", (char *) "turn on/off transparancy"},
+	{(char *) "-/+transparent", (char *) "turn on/off transparency"},
 #ifdef HAVE_DOUBLE_BUFFER_EXTENSION
 	{(char *) "-/+useDBEClear", (char *) "turn on/off useDBEClear"},
 #endif

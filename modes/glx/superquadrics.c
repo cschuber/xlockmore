@@ -396,7 +396,7 @@ DoneScale(superquadricsstruct * sp)
 						glVertex3f(xx, yy, zz);
 						glVertex3f(sp->Prevxx[iv - 1], sp->Prevyy[iv - 1], sp->Prevzz[iv - 1]);
 					}
-/* PURIFY 4.0.1 reports an unitialized memory read on the next line when using
+/* PURIFY 4.0.1 reports an uninitialized memory read on the next line when using
    * MesaGL 2.2 and -mono.  This has been fixed in MesaGL 2.3 and later. */
 					glEnd();
 				}

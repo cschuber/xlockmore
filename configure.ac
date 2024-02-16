@@ -166,7 +166,7 @@ AC_DEFUN([AC_NO_CPLUSPLUS_COMMENTS_IN_C_CODE],
    # ANSI C compilers.  This means that it's a portability problem: every time
    # these comments have snuck into the source code, I've gotten
    # complaints about it the next day.  So we turn off support for them in gcc
-   # as well to prevent them from accidentially slipping in.
+   # as well to prevent them from accidentally slipping in.
    #
    if test "$ac_gcc_accepts_std" = yes ; then
      #
@@ -335,7 +335,7 @@ main ()
              gtk_major_version, gtk_minor_version, gtk_micro_version);
       printf ("*** was found! If gtk-config was correct, then it is best\n");
       printf ("*** to remove the old version of GTK+. You may also be able to fix the error\n");
-      printf("*** by modifying your LD_LIBRARY_PATH enviroment variable, or by editing\n");
+      printf("*** by modifying your LD_LIBRARY_PATH environment variable, or by editing\n");
       printf("*** /etc/ld.so.conf. Make sure you have run ldconfig if that is\n");
       printf("*** required on your system.\n");
       printf("*** If gtk-config was wrong, set the environment variable GTK_CONFIG\n");
@@ -363,7 +363,7 @@ main ()
         printf("*** being found. The easiest way to fix this is to remove the old version\n");
         printf("*** of GTK+, but you can also set the GTK_CONFIG environment to point to the\n");
         printf("*** correct copy of gtk-config. (In this case, you will have to\n");
-        printf("*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n");
+        printf("*** modify your LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf\n");
         printf("*** so that the correct libraries are found at run-time))\n");
       }
     }
@@ -410,7 +410,7 @@ main ()
           echo "***"
           echo "***    rpm --erase --nodeps gtk gtk-devel" ],
         [ echo "*** The test program failed to compile or link. See the file config.log for the"
-          echo "*** exact error that occured. This usually means GTK was incorrectly installed"
+          echo "*** exact error that occurred. This usually means GTK was incorrectly installed"
           echo "*** or that you have moved GTK since it was installed. In the latter case, you"
           echo "*** may want to edit the gtk-config script: $GTK_CONFIG" ])
           CFLAGS="$ac_save_CFLAGS"
@@ -3586,7 +3586,7 @@ if test "$no_xinerama" = yes; then
   XINERAMA="#"
 else
   xinerama=yes
-  AC_DEFINE([USE_XINERAMA], [1], [Xinemara to combine seperate displays])
+  AC_DEFINE([USE_XINERAMA], [1], [Xinemara to combine separate displays])
   XLOCKLIBS="${XLOCKLIBS} -lXinerama"
   test "x$xinerama_includes" = xNONE && xinerama_includes=$ac_xinerama_includes
   test "x$xinerama_libraries" = xNONE && xinerama_libraries=$ac_xinerama_libraries
@@ -4141,7 +4141,7 @@ fi
 
 dnl Should have a tester for XHPUX Xhp
 
-dnl Now we handle the various system dependant problems
+dnl Now we handle the various system dependent problems
 dnl that are not addressed in the X header files, or things dealing
 dnl with utility quirks on some systems.
 
@@ -4263,7 +4263,7 @@ dnl XLOCKLIBS="${XLOCKLIBS} -lgdbm"
     BITMAPTYPE="dec"
     PIXMAPTYPE="dec"
     AC_MSG_CHECKING([for Digital/Tru64 Unix Enhanced Security])
-    # This section should check for the presense of the newer Enhanced
+    # This section should check for the presence of the newer Enhanced
     # security routines, and use them if they're available.
     if test -f /usr/sbin/rcmgr && test -f /etc/rc.config ; then
       if test X`/usr/sbin/rcmgr get SECURITY` = XENHANCED ; then

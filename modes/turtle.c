@@ -57,7 +57,7 @@ ModStruct   turtle_description =
 
 #endif
 
-#define HILBERT 0		/* Not exactly a turtle algorthm... p199 */
+#define HILBERT 0		/* Not exactly a turtle algorithm... p199 */
 #define CESARO_VAR 1		/* Telephone curve p168 */
 #define HARTER_HEIGHTWAY 2	/* Dragon curve p292 */
 #define TURTLE_CURVES 3

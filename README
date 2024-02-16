@@ -1,4 +1,4 @@
-xlockmore-5.62: the maintained version of xlock
+xlockmore-5.63: the maintained version of xlock
 see docs/Revisions for more version stuff
 see docs/TODO for stuff to do :)
 Help is always appreciated too ;) .
@@ -163,7 +163,7 @@ XCOMM #define DtSaverLibrary
 
     The disadvantage to the above is some features of xlock are absent,
       in particular, the logout lab feature.  This version of xlock does not
-      hava a drop in replacement for the Screen Style Manager.  Here is a
+      have a a drop in replacement for the Screen Style Manager.  Here is a
       work around on Solaris in 3 patches:
       1. Take out Screen option.
       2. Put in /usr/local/bin/xlock as the default locker.
@@ -347,7 +347,7 @@ CONTROL Lock
           might remove the HELP_TOPIC and HELP_VOLUME fields, but this
           modification is not necessary.
 
-        - Now tell the window manger to reread the configuration
+        - Now tell the window manager to reread the configuration
           files.  You do this by selecting "Restart Workspace Manager..."
           from your workspace menu.
 
@@ -422,8 +422,8 @@ CONTROL Lock
       -DglGenTextures=glGenTexturesEXT\
       -DglDeleteTextures=glDeleteTexturesEXT\
       -DglBindTexture=glBindTextureEXT
-    xmlock wont work because there is a /usr/bin/X11/xlock too,
-    so either rename that one or dont use xmlock.
+    xmlock will not work because there is a /usr/bin/X11/xlock too,
+    so either rename that one or do not use xmlock.
 
   KERBEROS
     See iconfig.h (xmkmf) or configure --help .
@@ -614,7 +614,7 @@ xlock.c:1584: `sigset_t' undeclared (first use this function)
       services for OpenVMS) is used. Probably you'll need the Developer
       license to get it compiled.
       limitations :
-         -currently the SYSNAM privilige is needed to play sounds
+         -currently the SYSNAM privilege is needed to play sounds
           (limitation of MMOV)
          -some compilation warnings/informationals in the routines which
           are taken from the users system disk. (problem in MMOV)
@@ -719,7 +719,7 @@ XCOMM #define XpmLibrary
     Linux:
       Not all distributions of Linux have "dlfcn.h" which is needed.
       Using configure --enable-modules (MODULE_PATH set in modes/Makefile(.in)
-        and xlock/Makefile(.in)) then build as normal. This is not recomended
+        and xlock/Makefile(.in)) then build as normal. This is not recommended
         since random mode seems to act very strangely.
       Uncomment at least "#define Modules" in iconfig.h, run "xmkmf -a"
         and run make install as normal.

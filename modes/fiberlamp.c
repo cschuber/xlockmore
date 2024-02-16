@@ -248,7 +248,7 @@ init_fiberlamp(ModeInfo * mi)
   fl->bright = fl->medium = fl->dim = MI_BLACK_PIXEL(mi);
 #else
   if(MI_NPIXELS(mi) > 2) {
-  	/* Set up colours for the fiber bodies.  Tips handled seperately */
+  	/* Set up colours for the fiber bodies.  Tips handled separately */
 	XColor c, t;
 	if(XAllocNamedColor(MI_DISPLAY(mi), MI_COLORMAP(mi), "#E0E0C0", &c, &t)){
 	  fl->bright = c.pixel;

@@ -81,7 +81,7 @@ ModStruct   munch_description =
 #include <assert.h>
 #endif
 
-/* flags for random things.  Must be < log2(random's maximum), incidentially. */
+/* flags for random things.  Must be < log2(random's maximum), incidentally. */
 #define SHIFT_KX (0x01)
 #define SHIFT_KT (0x02)
 #define SHIFT_KY (0x04)

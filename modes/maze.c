@@ -821,7 +821,7 @@ try_to_move(ModeInfo *mi, int dir)
 			(int) (dir));
 #endif
 		/* The following call is supposed to make things look more
-		   intutive, i.e., that the square we think we are on is
+		   intuitive, i.e., that the square we think we are on is
 		   filled in.
                    The direction has to be reversed to prevent it from
 		   drawing squares on top of lines.

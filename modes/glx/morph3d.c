@@ -64,7 +64,7 @@ Marcelo Fernandes Vianna
 POLYHEDRA GENERATION
 
 For the purpose of this program it's not sufficient to know the polyhedra
-vertexes coordinates. Since the morphing algorithm applies a nonlinear 
+vertices coordinates. Since the morphing algorithm applies a nonlinear 
 transformation over the surfaces (faces) of the polyhedron, each face has
 to be divided into smaller ones. The morphing algorithm needs to transform 
 each vertex of these smaller faces individually. It's a very time consuming
@@ -93,11 +93,11 @@ I've not found any reference about the mentioned angles, so I needed to
 calculate them, not a trivial task until I figured out how :)
 Curiously these angles are the same for the tetrahedron and octahedron.
 A way to obtain this value is inscribing the tetrahedron inside the cube
-by matching their vertexes. So you'll notice that the remaining unmatched
-vertexes are in the same straight line starting in the cube/tetrahedron
+by matching their vertices. So you'll notice that the remaining unmatched
+vertices are in the same straight line starting in the cube/tetrahedron
 center and crossing the center of each tetrahedron's face. At this point
 it's easy to obtain the bigger angle of the isosceles triangle formed by
-the center of the cube and two opposite vertexes on the same cube face.
+the center of the cube and two opposite vertices on the same cube face.
 The edges of this triangle have the following lengths: sqrt(2) for the base
 and sqrt(3)/2 for the other two other edges. So the angle we want is:
      +-----------------------------------------------------------+
@@ -111,7 +111,7 @@ want is:
      | 2*ARCSIN((sqrt(2)/2)/1)   = 90.000000000000000000 degrees |
      +-----------------------------------------------------------+
 For the octahedron we use the same idea used for the tetrahedron, but now
-we inscribe the cube inside the octahedron so that all cubes's vertexes
+we inscribe the cube inside the octahedron so that all cubes's vertices
 matches exactly the center of each octahedron's face. It's now clear that
 this angle is the same of the tetrahedron one:
      +-----------------------------------------------------------+
@@ -154,7 +154,7 @@ Update May-23-2005  [Maintainer wants to add a rhombic dodecahedron and the
    completeness.
    One important thing you need to elaborate before adding any solid to
    morph3d is how to divide each of its faces in smaller ones (triangles
-   or squares).  This is the only way you will have inner vertexes  (as P
+   or squares).  This is the only way you will have inner vertices  (as P
    in the example of the below figure) for each face that will be subject
    for the transformations in the mode.
 

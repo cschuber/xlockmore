@@ -871,7 +871,7 @@ make_smooth_colormap(ModeInfo * mi, Colormap cmap,
 		s[i] = LRAND() / MAXRAND;
 		v[i] = 0.8 * LRAND() / MAXRAND + 0.2;
 
-		/* Make sure that no two adjascent colors are *too* close together.
+		/* Make sure that no two adjacent colors are *too* close together.
 		   If they are, try again.
 		 */
 		if (i > 0) {

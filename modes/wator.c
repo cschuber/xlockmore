@@ -144,7 +144,7 @@ typedef struct {
 	int         col, row;
 } cellstruct;
 
-/* Doublely linked list */
+/* Doubly linked list */
 typedef struct _CellList {
 	cellstruct  info;
 	struct _CellList *previous, *next;
@@ -154,7 +154,7 @@ typedef struct {
 	Bool        painted, vertical;
 	int         nkind[KINDS];	/* Number of fish and sharks */
 	int         breed[KINDS];	/* Breeding time of fish and sharks */
-	int         sstarve;	/* Time the sharks starve if they dont find a fish */
+	int         sstarve;	/* Time the sharks starve if they don't find a fish */
 	int         kind;	/* Currently working on fish or sharks? */
 	int         xs, ys;	/* Size of fish and sharks */
 	int         xb, yb;	/* Bitmap offset for fish and sharks */

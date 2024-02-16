@@ -109,7 +109,7 @@ extern char 	*fpsfontname;
 
 /*-
  * NOTE WELL:  We _MUST_ destroy the glXContext between each mode
- * in random mode, otherwise OpenGL settings and paramaters from one
+ * in random mode, otherwise OpenGL settings and parameters from one
  * mode will affect the default initial state for the next mode.
  * BUT, we are going to keep the visual returned by glXChooseVisual,
  * because it will still be good (and because Mesa must keep track

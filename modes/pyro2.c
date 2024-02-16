@@ -220,7 +220,7 @@ its ID. When the applied ID is not (yet) used the last used ID is assumed.
 
 Each explosion consists of several generations.
 a collection of sparks created at same time is denoted as a generation of sparks
-how many generations are produced is controled by the defined EXP_MAX_GENERATION
+how many generations are produced is controlled by the defined EXP_MAX_GENERATION
 */
 
 typedef struct	{
@@ -782,7 +782,7 @@ static void explosion(ModeInfo * mi, PYRO *p)
 
 			}
 			case 23:
-			case 42:	/* glpyhs */
+			case 42:	/* glyphs */
 				if (p->bitmap != NULL) {
 				/*e->angle[e->sparkcnt] = (double)p->glyph->phi[i]/1000000.0;*/
 				/*e->v0[e->sparkcnt] = (double)p->glyph->dist[i]/1000000.0 * 600;*/

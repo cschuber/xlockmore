@@ -37,7 +37,7 @@ static const char sccsid[] = "@(#)lament.c	5.03 2001/11/28 xlockmore";
      *  Perhaps use a slightly-bumpy or oily texture for the interior surfaces?
 
      *  Some of the edges don't line up perfectly (since the images are not
-        perfectly symetrical.)  Something should be done about this; either
+        perfectly symmetrical.)  Something should be done about this; either
         making the edges overlap slightly (instead of leaving gaps) or fixing
         the images so that the edges may be symmetrical.
 
@@ -2188,7 +2188,7 @@ reshape_lament(ModeInfo *mi, int width, int height)
 
 	/* But if the window is more than a little larger than our target size,
 	   scale the object back down, so that the bits drawn on the screen end
-	   up rougly target_size across (actually it ends up a little larger.)
+	   up roughly target_size across (actually it ends up a little larger.)
 	   Note that the image-map bits we have are 128x128.  Therefore, if the
 	   image is magnified a lot, it looks pretty blocky.  So it's better to
 	   have a 128x128 animation on a 1280x1024 screen that looks good, than
@@ -2285,7 +2285,7 @@ gl_init(ModeInfo * mi)
 		 * It looks like there's a bug in MESA (up to 3.1beta1) for the
 		 * "Default" texture (named '0'). For this texture
 		 * I added a glBindTexture and the same glTexParameteri
-		 * as for the specific textures. Now it does'nt core
+		 * as for the specific textures. Now it doesn't core
 		 * anymore.
 		 *
 		 * 22-mar-99 for latest version of Mesa this codes wipes

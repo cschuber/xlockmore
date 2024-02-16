@@ -63,16 +63,8 @@ static const char sccsid[] = "@(#)molecule.c	5.01 2001/04/12 xlockmore";
 #ifdef STANDALONE
 # define MODE_molecule
 # define DEFAULTS	"*delay:	10000         \n" \
-			"*timeout:    " DEF_TIMEOUT  "\n" \
 			"*showFPS:      False         \n" \
 			"*wireframe:    False         \n" \
-			"*molecule:   " DEF_MOLECULE "\n" \
-			"*spin:       " DEF_SPIN     "\n" \
-			"*wander:     " DEF_WANDER   "\n" \
-			"*labels:     " DEF_LABELS   "\n" \
-			"*atoms:      " DEF_ATOMS    "\n" \
-			"*bonds:      " DEF_BONDS    "\n" \
-			"*bbox:       " DEF_BBOX     "\n" \
 			"*atomFont:   -*-times-bold-r-normal-*-240-*\n" \
 			"*titleFont:  -*-times-bold-r-normal-*-180-*\n" \
 			"*noLabelThreshold:    30     \n" \
@@ -297,7 +289,7 @@ static Bool
 load_font (ModeInfo *mi, char *res, XFontStruct **fontP, GLuint *dlistP)
 {
 #ifdef STANDALONE
-  const char *font = get_string_resource (res, "Font");
+  const char *font = get_string_resource (MI_DISPLAY(mi), res, "Font");
 #else
   const char *font = res;
 #endif
@@ -316,16 +308,14 @@ load_font (ModeInfo *mi, char *res, XFontStruct **fontP, GLuint *dlistP)
 
   clear_gl_error ();
   *dlistP = glGenLists ((GLuint) last+1);
-  if (check_gl_error ("glGenLists"))
-	return False;
+  check_gl_error ("glGenLists");
   /*-
    * PURIFY reports a cumulative memory leak on the next line with Mesa 3.4.1
    * on Solaris 2.X and SunOS 4.1.X. This can be fixed with a patch to Mesa
    * 3.4.1. OpenGL on Solaris does not have the memory leak.
    */
   glXUseXFont(id, first, last-first+1, *dlistP + first);
-  if (check_gl_error ("glXUseXFont"))
-	return False;
+  check_gl_error ("glXUseXFont");
 
   *fontP = f;
   return True;
@@ -1247,7 +1237,7 @@ reshape_molecule (ModeInfo *mi, int width, int height)
 
 
 static void
-gl_init()
+gl_init(void)
 {
   static GLfloat pos[4] = {5.0, 5.0, 10.0, 1.0};
   glLightfv(GL_LIGHT0, GL_POSITION, pos);
@@ -1474,9 +1464,11 @@ init_molecule (ModeInfo *mi)
   mc->which =  NRAND(mc->nmolecules);
 
 #ifdef STANDALONE
-  mc->no_label_threshold = get_float_resource ("noLabelThreshold",
+  mc->no_label_threshold = get_float_resource (MI_DISPLAY(mi),
+                                               "noLabelThreshold",
                                                "NoLabelThreshold");
-  mc->wireframe_threshold = get_float_resource ("wireframeThreshold",
+  mc->wireframe_threshold = get_float_resource (MI_DISPLAY(mi),
+                                                "wireframeThreshold",
                                                 "WireframeThreshold");
 #else
   mc->no_label_threshold = 30;

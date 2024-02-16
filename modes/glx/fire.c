@@ -49,7 +49,7 @@ static const char sccsid[] = "@(#)fire.c	5.02 2001/09/26 xlockmore";
  * E.Lassauge - 25-Oct-2000:
  *	- add the trees (with a new resource '-trees')
  *      - corrected handling of color (textured vs untextured)
- *      - corrected handling of endiannes for the xpm files
+ *      - corrected handling of endianness for the xpm files
  *      - inverted ground pixmap file
  *      - use malloc-ed tree array
  *

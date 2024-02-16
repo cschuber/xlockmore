@@ -271,7 +271,7 @@ typedef struct ModeInfo_s {
  * It was acting weird with the first rectangle drawn
  * on a Ultra2 with TrueColor Solaris2.x in deco mode.
  * Not sure if other modes are affected... now handled in deco mode.
- * If it does happen it is probably not as noticable to worry about.
+ * If it does happen it is probably not as noticeable to worry about.
  */
 #endif
 

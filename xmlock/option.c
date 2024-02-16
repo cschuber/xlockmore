@@ -300,7 +300,7 @@ setup_Option(Widget MenuBar)
 	}
 }
 /*************************
- * this fonction return the number of
+ * this function return the number of
  * element of the array Opt
 **************************/
 int getNumberofElementofOpt() {

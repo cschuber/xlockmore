@@ -24,7 +24,7 @@
   XgLock Problems are almost the same as XmLock's ones.
     1. Allowing only one in -inroot.  Need a way to kill it. (a menu ?)
     2. Still missing many options (TO DO).
-    3. Need a clean rewritting.
+    3. Need a clean rewriting.
  */
 
 #include <sys/types.h>
@@ -211,7 +211,7 @@ secured_realloc(gpointer ptr,
  * compose_xlock_command
  * ---------------------
  * This function scan the string passed as argument to see if
- * it is necessary to suround it with quotes for using it as a command
+ * it is necessary to surround it with quotes for using it as a command
  * line argument.
  */
 static gchar *
@@ -429,7 +429,7 @@ compose_xlock_command(gchar ***cmd_argv_p,
 /*
  * kill_xlock_cb
  * -------------
- * Callback associated wih the Kill xlock file menu entry
+ * Callback associated with the Kill xlock file menu entry
  */
 static void
 kill_xlock_cb(GtkWidget *w,

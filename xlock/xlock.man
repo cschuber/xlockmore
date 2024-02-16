@@ -774,7 +774,7 @@ In anenome mode it is means nothing.
 
 In ant and ant3d modes this refers the number of ants.
 
-In apollonian mode it is the number of possible ways to imbed circles within
+In apollonian mode it is the number of possible ways to embed circles within
 a circle, all of integer curvature.
 
 In atlantis mode it is the number of sharks.
@@ -1194,7 +1194,7 @@ means VT switch locking + switching to xlock VT when activated.
 .TP 10
 .I restore
 means VT switch locking + switching to xlock VT when activated +
-switching back to previous VT when desactivated.
+switching back to previous VT when deactivated.
 .TP 10
 .I noswitch
 means VT switch locking only when xlock VT is active.

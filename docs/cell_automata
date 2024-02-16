@@ -86,7 +86,7 @@ life:
   -label: pattern name and rule
   -serial: picking of sequential patterns with a rule (use with
     middle button)
-  -rule <string>: survival and birth parameters formated
+  -rule <string>: survival and birth parameters formatted
     B<neighborhood>/S<neighborhood>, so John Conway's rule is B3/S23,
       David Bell's HighLife rule is B36/S23 (also -highlife),
       Nathan Thompson's Day and Night rule is B3678/S34678,
@@ -179,7 +179,7 @@ life3d: 3 dimensional life
   -label: pattern name and rule
   -serial: picking of sequential patterns with a rule (use with
     middle button)
-  -rule <string>: survival and birth parameters formated
+  -rule <string>: survival and birth parameters formatted
     B<neighborhood>/S<neighborhood>, so Carter Bays' rules are
     B5/S45, B6/S567, B5/S56, B5/S678, and B67/S67.  There is
     currently no way of accessing the a total of 10 to 26 neighbors

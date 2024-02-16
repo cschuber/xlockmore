@@ -164,7 +164,7 @@ typedef struct _polyominoesstruct{
    again and again to fit something into B, when it should have figured out
    the first time that it was impossible.
 
-   To overcome this, everytime we try to attach a piece, we collect the reasons
+   To overcome this, every time we try to attach a piece, we collect the reasons
    why it cannot be attached (a boolean for each piece that got in the way).
    If we see that a piece cannot be attached, we detach the other pieces until
    we have detached at least one piece for which the boolean reason_to_not_attach

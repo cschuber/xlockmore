@@ -4,7 +4,7 @@
 #endif
 
 /*-
- * Utilites stuff
+ * Utilities stuff
  *
  * See xlock.c for copying information.
  *

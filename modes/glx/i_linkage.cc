@@ -1,4 +1,8 @@
-#include "xlock.h"
+#ifdef STANDALONE
+#include "xlockmore.h"          /* from the xscreensaver distribution */
+#else                           /* !STANDALONE */
+#include "xlock.h"              /* in xlockmore distribution */
+#endif                          /* !STANDALONE */
 
 #include "i_linkage.h"
 #include "i_threejetvec.h"

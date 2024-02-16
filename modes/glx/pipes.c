@@ -23,7 +23,7 @@ static const char sccsid[] = "@(#)pipes.c	5.00 2000/11/01 xlockmore";
  *
  * ==========================================================================
  * The routine myElbow is derivated from the doughnut routine from the MesaGL
- * library (more especifically the Mesaaux library) written by Brian Paul.
+ * library (more especially the Mesaaux library) written by Brian Paul.
  * ==========================================================================
  *
  * Thanks goes to Brian Paul for making it possible and inexpensive to use
@@ -438,11 +438,11 @@ MakeGuage(ModeInfo * mi, int newdir)
 {
 	pipesstruct *pp = &pipes[MI_SCREEN(mi)];
 
-	/* Can't have a guage on a vertical pipe. */
+	/* Can't have a gauge on a vertical pipe. */
 	if ((newdir == dirUP) || (newdir == dirDOWN))
 		return (0);
 
-	/* Is there space above this pipe for a guage? */
+	/* Is there space above this pipe for a gauge? */
 	if (!pp->directions[dirUP])
 		return (0);
 
@@ -807,7 +807,7 @@ draw_pipes(ModeInfo * mi)
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, pp->system_color);
 
-	/* If it's the begining of a system, draw a sphere */
+	/* If it's the beginning of a system, draw a sphere */
 	if (pp->olddir == dirNone) {
 		glPushMatrix();
 		glTranslatef((pp->PX - 16) / 3.0 * 4.0, (pp->PY - 12) / 3.0 * 4.0, (pp->PZ - 16) / 3.0 * 4.0);

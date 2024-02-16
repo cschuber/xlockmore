@@ -206,7 +206,7 @@ randomball(ModeInfo * mi, int i)
 	balltype   *bti = &bp->bt[i];
 	Display    *display = MI_DISPLAY(mi);
 	int         x, y, bn;
-	int         dum;
+	int         dummy;
 	int         attempts;
 	unsigned long randbg;
 
@@ -243,7 +243,7 @@ randomball(ModeInfo * mi, int i)
 	bti->rad = bp->rad;	/* Pretty lame... should be different sizes */
 
 	do {
-		dum = i;
+		dummy = i;
 		x = NRAND((long) bp->dispx);
 		y = 0;
 		attempts++;
@@ -251,8 +251,8 @@ randomball(ModeInfo * mi, int i)
 			bti->def = 0;
 			return;
 		}
-	} while ((inwin(bp, x, y, &dum, bti->rad) != NONE) ||
-	       (inwin(bp, bti->dx + x, bti->dy + y, &dum, bti->rad) != NONE));
+	} while ((inwin(bp, x, y, &dummy, bti->rad) != NONE) ||
+	       (inwin(bp, bti->dx + x, bti->dy + y, &dummy, bti->rad) != NONE));
 
 	bti->def = 1;
 	bti->x = x;

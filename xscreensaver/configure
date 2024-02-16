@@ -2719,7 +2719,7 @@ done
 #       so much for compatibility!)
 #
 #       UPDATE: apparently there is NO WAY to tell gcc 3.2.2 to require that
-#       declarations preceed statements, without resorting to "-pedantic".
+#       declarations precede statements, without resorting to "-pedantic".
 #       This means that there is no way to get gcc3 to issue warnings that
 #       ensure that your code complies with the ANSI/ISO C89 standard, without
 #       also drowning in totally useless warnings.  Thank you master may I
@@ -14008,8 +14008,8 @@ if test "$with_gles" = yes; then
   $as_echo "#define HAVE_JWZGLES 1" >>confdefs.h
 
   JWZGLES_OBJS='$(JWXYZ_BIN)/jwzgles.o'
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: using OpenGL ES compatiblity shim" >&5
-$as_echo "using OpenGL ES compatiblity shim" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: using OpenGL ES compatibility shim" >&5
+$as_echo "using OpenGL ES compatibility shim" >&6; }
 elif test "$with_gles" != no; then
   echo "error: must be yes or no: --with-gles=$with_gles"
   exit 1

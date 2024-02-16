@@ -151,7 +151,7 @@ $     copy SYS$COMMON:[SYSHLP.EXAMPLES.MMOV.COMMON]*.* []
 $! spawn included to avoid unwanted redefinition of logicals
 $     spawn @build_common
 $     copy SYS$COMMON:[SYSHLP.EXAMPLES.MMOV.VIDEO]readavi.c []
-$     spaw @[-]mmov
+$     spawn @[-]mmov
 $     set def [-]
 $     endif
 $   endif

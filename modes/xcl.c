@@ -469,7 +469,7 @@ draw_xcl(ModeInfo * mi)
 
   if(viewmodel == True)
     {
-      dp->Vx = 1;                     /* movement in X (width,negativ)*/
+      dp->Vx = 1;                     /* movement in X (width,negative)*/
       if(dp->width < 900)
         dp->Vy = 800*800/dp->width;   /*  Y (deep)*/
       else

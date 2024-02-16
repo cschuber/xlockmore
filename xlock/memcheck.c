@@ -233,7 +233,7 @@ allocate_memory(ULONG length, void *caller_addr)
 		if (old_action.sa_handler == SIG_DFL) {
 			hup_action.sa_handler = hup_handler;
 #ifdef _INCLUDE_HPUX_SOURCE
-			hup_action.sa_flags = SA_RESETHAND;	/* Just gettting it to compile */
+			hup_action.sa_flags = SA_RESETHAND;	/* Just getting it to compile */
 #else
 			hup_action.sa_flags = SA_RESTART;
 #endif

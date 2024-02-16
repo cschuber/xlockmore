@@ -16,7 +16,7 @@ static const char sccsid[] = "@(#)xmlock.c	4.08 98/02/18 xlockmore";
  *     tdphette@dexter.glaci.com
  *   Sun -- works (both timeouts seem connected to the same device)
  *   Linux -- mouse timeout works, keyboard timeout does not work
- *   Cygwin -- mouse timout does not work, keyboard timeout does not work
+ *   Cygwin -- mouse timeout does not work, keyboard timeout does not work
  *   Alpha -- "does something"  ;)
  *   Since keyboard timeout does not seem to help, it was removed.
  * Nov-96: Continual minor improvements by Charles Vidal and David Bagley.
@@ -227,7 +227,7 @@ callLocker(int choice)
 /*----------------------------------------------------------*/
 /* Code taken from Xlockup by Thad Phetteplace              */
 /*    tdphette@dexter.glaci.com used by permission          */
-/* CHECKTIME: This routine is called periodicaly by the     */
+/* CHECKTIME: This routine is called periodically by the     */
 /*    openwin event handler.  It checks the last access     */
 /*    time/date stamp on the mouse and keyboard devices     */
 /*    and compares it to the timeout value.                 */
@@ -486,7 +486,7 @@ main(int argc, char **argv)
 	XtSetLanguageProc(NULL, NULL, NULL);
 #endif
 
-/* PURIFY 4.0.1 on Solaris 2 reports an unitialized memory read on the next
+/* PURIFY 4.0.1 on Solaris 2 reports an uninitialized memory read on the next
    line. */
 	toplevel = XtInitialize(argv[0], "XmLock", (XrmOptionDescRec*) NULL, 0,
 		&argc, argv);
@@ -496,7 +496,7 @@ main(int argc, char **argv)
 			(char *) image_bits, image_width, image_height));
 	XtSetValues(toplevel, args, 1);
 	/* creation Widget */
-/* PURIFY 4.0.1 on Solaris 2 reports an unitialized memory read on the next
+/* PURIFY 4.0.1 on Solaris 2 reports an uninitialized memory read on the next
    line. */
 	form = XmCreateForm(toplevel, (char *) "Form", (Arg *) NULL, 0);
 	Setup_Widget(form);

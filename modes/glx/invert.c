@@ -34,8 +34,20 @@ static const char sccsid[] = "@(#)invert.c	5.01 2001/03/01 xlockmore";
 #ifdef VMS
 #include <types.h>
 #endif
+
+#ifdef STANDALONE
+#define MODE_invert
+#define DEFAULTS	"*delay:	10000   \n"	\
+			"*showFps:      False   \n"     \
+			"*wireframe:	False	\n"
+
+#define invert_handle_event 0
+#define reshape_invert 0
+#include "xlockmore.h"
+#else /* !STANDALONE */
 #include "xlock.h"
 #include "visgl.h"
+#endif /* !STANDALONE */
 
 #ifdef MODE_invert
 

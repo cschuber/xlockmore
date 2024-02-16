@@ -67,7 +67,7 @@ depend :
 distdepend :
 	@+$(MAKE_SUBDIR)
 
-AUTOMAKE=/usr/share/automake-1.12
+AUTOMAKE=/usr/share/automake-1.16
 
 automake :
 	cp -p ${AUTOMAKE}/config.guess .;\

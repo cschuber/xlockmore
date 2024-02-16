@@ -516,7 +516,7 @@ iter(driftstruct * dp)
 #endif
 
 	/* how to check nan too?  some machines don't have finite().
-	   don't need to check ny, it'll propogate */
+	   don't need to check ny, it'll propagate */
 	if (nx > 1e4 || nx < -1e4) {
 		nx = halfrandom(dp, 1000) / 500.0 - 1.0;
 		ny = halfrandom(dp, 1000) / 500.0 - 1.0;

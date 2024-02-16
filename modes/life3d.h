@@ -17645,7 +17645,7 @@ static char patterns_26B58S58[][3 * NUMPTS + 1] =
         127
 	},
 #ifdef LIFE_NAMES
-	{"dependant (p4)"},
+	{"dependent (p4)"},
 #endif
 	{
         1, -1, -3, 2, -1, -3,

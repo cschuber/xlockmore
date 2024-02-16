@@ -2,7 +2,7 @@
 #define __TWOJET
 
 #ifdef STANDALONE
-#include <math.h>
+#include "xlockmore.h"
 #else
 #include "xlock.h"
 #endif

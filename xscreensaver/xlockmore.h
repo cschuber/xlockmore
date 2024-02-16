@@ -225,6 +225,12 @@ ERROR!  Sorry, xlockmore.h requires ANSI C (gcc, for example.)
    NAME and PREFIX are usually the same.  If they are not, use
    XSCREENSAVER_MODULE_2() instead of XSCREENSAVER_MODULE().
  */
+#if __cplusplus > 199711L
+# define COLOR_SCHEME xlockmore_function_table::XLOCKMORE_COLOR_SCHEME
+#else
+# define COLOR_SCHEME XLOCKMORE_COLOR_SCHEME
+#endif
+
 #define XSCREENSAVER_MODULE_2(CLASS,NAME,PREFIX)			\
 									\
   static struct xlockmore_function_table				\
@@ -232,7 +238,7 @@ ERROR!  Sorry, xlockmore.h requires ANSI C (gcc, for example.)
 	   CLASS,							\
 	   DEFAULTS,							\
 	   WRITABLE_COLORS,						\
-	   XLOCKMORE_COLOR_SCHEME,					\
+	   COLOR_SCHEME,					\
 	   init_    ## PREFIX,						\
 	   draw_    ## PREFIX,						\
 	   reshape_ ## PREFIX,						\

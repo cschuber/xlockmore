@@ -173,7 +173,7 @@ static int  descr();
 #define DEF_BG		"White"
 #define DEF_FG		"Black"
 
-/* language dependant resources */
+/* language dependent resources */
 #if defined FR
 #include "resource-msg-fr.h"
 #elif defined NL
@@ -226,7 +226,7 @@ static int  descr();
 #define DEF_CLASSNAME	"XLock"
 #if 0
 /*-
-  Grid     Number of Neigbors
+  Grid     Number of Neighbors
   ----     ------------------
   Square   4 or 8
   Hexagon  6
@@ -1961,7 +1961,7 @@ getResources(Display ** displayp, int argc, char **argv)
 
 		if (!ms->numopts)
 			continue;
-                 /*     Runnning real XrmParseCommand on a nullDB to set argv
+                 /*     Running real XrmParseCommand on a nullDB to set argv
                         and argc.
                  */
 		XrmParseCommand(&nullDB, ms->opts, ms->numopts,

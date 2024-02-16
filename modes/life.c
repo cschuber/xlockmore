@@ -103,7 +103,7 @@ static const char sccsid[] = "@(#)life.c	5.24 2007/01/18 xlockmore";
  *
  *
  * References:
- * Bays, Carter, "Cellular Automata in the Trianglular Tessellation",
+ * Bays, Carter, "Cellular Automata in the Triangular Tessellation",
  *   1994, Complex Systems 8 127-150
  * Bays, Carter, "A Note on the Game of Life in Hexagonal and Pentagonal
  *   Tesselations", 2005, Complex Systems 15 245-252

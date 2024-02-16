@@ -41,7 +41,7 @@ static const char sccsid[] = "@(#)stairs.c	5.01 2001/03/01 xlockmore";
  * 01-Mar-2001: Added FPS stuff - Eric Lassauge <lassauge AT users.sourceforge.net>
  * 01-Nov-2000: Allocation checks
  * 07-Jan-1998: This would be a scene for the escher mode, but now escher mode
- *              was splitted in different modes for each scene. This is the
+ *              was split in different modes for each scene. This is the
  *              initial release and is not working yet.
  *              Marcelo F. Vianna.
  */
@@ -51,7 +51,7 @@ static const char sccsid[] = "@(#)stairs.c	5.01 2001/03/01 xlockmore";
  * visuals DO NOT support texture mapping in OpenGL.
  *
  * BUT Mesa do implements RGBA contexts in pseudo color visuals, so texture
- * mapping shuld work on PseudoColor, DirectColor, TrueColor using Mesa. Mono
+ * mapping should work on PseudoColor, DirectColor, TrueColor using Mesa. Mono
  * is not officially supported for both OpenGL and Mesa, but seems to not crash
  * Mesa.
  *
